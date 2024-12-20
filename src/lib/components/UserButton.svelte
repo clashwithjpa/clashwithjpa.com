@@ -36,7 +36,7 @@
                         <MaterialSymbolsLogoutRounded class="size-5 rotate-180 transition-transform" />
                         <span class="text-xs">Logout</span>
                     </Button>
-                    <Button href="/cwl/apply" class="p-2">
+                    <Button href="/apply" class="p-2">
                         <MaterialSymbolsLabProfileRounded class="size-5 transition-transform" />
                         <span class="text-xs">Apply</span>
                     </Button>

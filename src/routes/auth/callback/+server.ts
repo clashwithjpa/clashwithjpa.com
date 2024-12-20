@@ -3,7 +3,7 @@ import { error } from "@sveltejs/kit";
 import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
     const code = url.searchParams.get("code");
     if (!code) {
         error(400, "No code provided");
@@ -41,12 +41,25 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
                 httpOnly: true
             });
 
-            return new Response("Returning to homepage", {
-                status: 302,
-                headers: {
-                    Location: "/"
-                }
-            });
+            const userResp = await fetch(`/auth/user`);
+            if (userResp.ok) {
+                const userData = await userResp.json();
+                cookies.set("user", JSON.stringify(userData), {
+                    path: "/",
+                    maxAge: expires_in,
+                    sameSite: "lax",
+                    httpOnly: true
+                });
+
+                return new Response("Returning to homepage", {
+                    status: 302,
+                    headers: {
+                        Location: "/"
+                    }
+                });
+            } else {
+                error(500, "Failed to get user data");
+            }
         } else {
             error(resp.status, await resp.text());
         }

@@ -19,7 +19,6 @@ export const POST: RequestHandler = async ({ url, request, cookies }) => {
             client_secret: DISCORD_SECRET,
             grant_type: "refresh_token",
             refresh_token: refreshToken,
-            redirect_uri: `${url.origin}/auth/callback`
         }).toString()
     });
 
@@ -29,23 +28,36 @@ export const POST: RequestHandler = async ({ url, request, cookies }) => {
         cookies.set("access_token", access_token, {
             path: "/",
             maxAge: expires_in,
-            sameSite: "strict",
+            sameSite: "lax",
             httpOnly: true
         });
 
         cookies.set("refresh_token", refresh_token, {
             path: "/",
             maxAge: 60 * 60 * 24 * 365, // 1 year
-            sameSite: "strict",
+            sameSite: "lax",
             httpOnly: true
         });
 
-        return new Response("", {
-            status: 307,
-            headers: {
-                Location: "/"
-            }
-        });
+        const userResp = await fetch(`/auth/user`);
+        if (userResp.ok) {
+            const userData = await userResp.json();
+            cookies.set("user", JSON.stringify(userData), {
+                path: "/",
+                maxAge: expires_in,
+                sameSite: "lax",
+                httpOnly: true
+            });
+
+            return new Response("", {
+                status: 307,
+                headers: {
+                    Location: "/"
+                }
+            });
+        } else {
+            error(userResp.status, await userResp.text());
+        }
     } else {
         error(resp.status, await resp.text());
     }

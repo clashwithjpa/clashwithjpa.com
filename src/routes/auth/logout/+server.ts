@@ -11,6 +11,11 @@ export const GET: RequestHandler = async ({ cookies }) => {
         expires: new Date(0)
     });
 
+    cookies.set("user", "", {
+        path: "/",
+        expires: new Date(0)
+    });
+
     return new Response(JSON.stringify({ message: "Logged out" }), {
         status: 200,
         headers: {
