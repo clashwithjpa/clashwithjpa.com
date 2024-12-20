@@ -70,6 +70,18 @@ Now that you have the app running, you can edit the data in the [`data`](./data/
 > [!IMPORTANT]
 > The label name declared in the [`clans.json`](./data/clans.json) file should match the file name in the [`static/labels`](./static/labels/) directory.
 
+## Working with database and drizzle
+
+To make any changes to the database, you have to follow certain steps to avoid issues
+
+- Edit the database schema file with required changes
+- Run `pnpm run db:generate` to generate the migrations file
+- Run `pnpm run db:migrate` to apply the changes to the database
+
+This will ensure that the changes are applied to the database without any issues.
+
+You can also try `pnpm run db:studio` to open a web interface to interact with the database.
+
 ## ⌨️ Contributing
 
 - Things to keep in mind
