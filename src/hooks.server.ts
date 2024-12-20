@@ -2,6 +2,7 @@ import { redirect } from "@sveltejs/kit";
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import type { UserData } from "$lib/auth/user";
+import { db } from "$lib/server/db";
 
 const protectedRoutes = ["/cwl"];
 
@@ -34,6 +35,7 @@ const setLocalsHook: Handle = async ({ event, resolve }) => {
     if (user) {
         event.locals.user = JSON.parse(user) as UserData;
     }
+    event.locals.db = db;
 
     return resolve(event);
 };

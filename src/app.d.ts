@@ -1,10 +1,15 @@
 import "unplugin-icons/types/svelte";
 import type { UserData } from "$lib/auth/user";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type { NeonQueryFunction } from "@neondatabase/serverless";
 
 declare global {
     namespace App {
         // interface Error {}
         interface Locals {
+            db: NeonHttpDatabase<Record<string, never>> & {
+                $client: NeonQueryFunction<false, false>;
+            };
             user: UserData | undefined;
         }
         // interface PageData {}
