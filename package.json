@@ -42,7 +42,6 @@
         "@tailwindcss/typography": "^0.5.15",
         "bits-ui": "^0.22.0",
         "discord-api-types": "^0.37.111",
-        "mongodb": "^6.12.0",
         "nprogress": "^0.2.0",
         "rehype-autolink-headings": "^7.1.0",
         "rehype-slug": "^6.0.0",
