@@ -1,14 +1,14 @@
-import { integer, pgTable, serial, text, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, boolean } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user_table", {
-    id: integer("id").primaryKey(),
-    username: text("username").notNull(),
-    isClanMember: boolean("is_clan_member").notNull().default(false)
+    id: serial("id").primaryKey(),
+    discordId: text("discord_id").notNull().unique(),
+    isActive: boolean("is_active").notNull().default(true)
 });
 
 export const cocTable = pgTable("coc_table", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => userTable.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => userTable.discordId, { onDelete: "cascade" }),
     tag: text("tag").notNull()
 });
 

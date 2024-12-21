@@ -1,0 +1,1 @@
+ALTER TABLE "user_table" RENAME COLUMN "is_clan_member" TO "is_active";

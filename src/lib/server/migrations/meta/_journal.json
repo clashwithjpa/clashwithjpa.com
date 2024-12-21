@@ -5,15 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1734707928546,
-      "tag": "0000_calm_obadiah_stane",
+      "when": 1734812715070,
+      "tag": "0000_brave_goliath",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1734781962723,
-      "tag": "0001_noisy_machine_man",
+      "when": 1734814872249,
+      "tag": "0001_overrated_chronomancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734815434589,
+      "tag": "0002_chief_kinsey_walden",
       "breakpoints": true
     }
   ]

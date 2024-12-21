@@ -1,6 +1,6 @@
 {
-  "id": "d0f3df9b-7302-4ad2-8ae0-e1bc9f176ac1",
-  "prevId": "a7776883-bd4c-482e-8866-db8d7f5d6041",
+  "id": "940b1937-855e-4649-a72e-5001889c46be",
+  "prevId": "d0f3df9b-7302-4ad2-8ae0-e1bc9f176ac1",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -175,12 +175,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "is_clan_member": {
-          "name": "is_clan_member",
+        "is_active": {
+          "name": "is_active",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": true
         }
       },
       "indexes": {},

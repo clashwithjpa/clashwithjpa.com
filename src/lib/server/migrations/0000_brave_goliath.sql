@@ -18,7 +18,18 @@ CREATE TABLE "clan_table" (
 	"channel_id" text NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "users_table" RENAME TO "user_table";--> statement-breakpoint
-ALTER TABLE "coc_table" DROP CONSTRAINT "coc_table_user_id_users_table_id_fk";
+CREATE TABLE "coc_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" text,
+	"tag" text NOT NULL
+);
 --> statement-breakpoint
-ALTER TABLE "coc_table" ADD CONSTRAINT "coc_table_user_id_user_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user_table"("id") ON DELETE cascade ON UPDATE no action;
+CREATE TABLE "user_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"discord_id" text NOT NULL,
+	"username" text NOT NULL,
+	"is_clan_member" boolean DEFAULT false NOT NULL,
+	CONSTRAINT "user_table_discord_id_unique" UNIQUE("discord_id")
+);
+--> statement-breakpoint
+ALTER TABLE "coc_table" ADD CONSTRAINT "coc_table_user_id_user_table_discord_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user_table"("discord_id") ON DELETE cascade ON UPDATE no action;
