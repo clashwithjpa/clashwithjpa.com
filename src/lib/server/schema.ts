@@ -1,6 +1,6 @@
-import { integer, pgTable, serial, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, boolean } from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable("users_table", {
+export const userTable = pgTable("user_table", {
     id: integer("id").primaryKey(),
     username: text("username").notNull(),
     isClanMember: boolean("is_clan_member").notNull().default(false)
@@ -8,12 +8,38 @@ export const usersTable = pgTable("users_table", {
 
 export const cocTable = pgTable("coc_table", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => usersTable.id, { onDelete: "cascade" }),
+    userId: integer("user_id").references(() => userTable.id, { onDelete: "cascade" }),
     tag: text("tag").notNull()
 });
 
-export type InsertUser = typeof usersTable.$inferInsert
-export type SelectUser = typeof usersTable.$inferSelect
+export const clanTable = pgTable("clan_table", {
+    id: serial("id").primaryKey(),
+    clanCode: text("clan_code").notNull(),
+    clanTag: text("clan_tag").notNull(),
+    clanRoleID: text("clan_role_id").notNull(),
+    memberRoleID: text("member_role_id").notNull(),
+    elderRoleID: text("elder_role_id").notNull(),
+    coleaderRoleID: text("coleader_role_id").notNull(),
+    leaderRoleID: text("leader_role_id").notNull(),
+    leaderID: text("leader_id").notNull(),
+    channelID: text("channel_id").notNull()
+});
 
-export type InsertCoc = typeof cocTable.$inferInsert
-export type SelectCoc = typeof cocTable.$inferSelect
+export const baseTable = pgTable("base_table", {
+    id: serial("id").primaryKey(),
+    code: text("code").notNull(),
+    baseLink: text("base_link").notNull(),
+    imageLink: text("image_link").notNull()
+});
+
+export type InsertUser = typeof userTable.$inferInsert;
+export type SelectUser = typeof userTable.$inferSelect;
+
+export type InsertCoc = typeof cocTable.$inferInsert;
+export type SelectCoc = typeof cocTable.$inferSelect;
+
+export type InsertClan = typeof clanTable.$inferInsert;
+export type SelectClan = typeof clanTable.$inferSelect;
+
+export type InsertBase = typeof baseTable.$inferInsert;
+export type SelectBase = typeof baseTable.$inferSelect;
