@@ -49,7 +49,7 @@ Now that you have the app running, you can edit the data in the [`data`](./data/
     - `guildID` (`integer`): The Guild ID of the Discord server where the user must be present.
         - This is used to verify the user's presence in the Discord server.
         - If the user is not present in the server, the user doesn't get access to the panel.
-    - `adminRoleID` (`integer`): The Role ID of the Admin role in the Discord server.
+    - `adminRoleID` (`list of integers`): The Role ID of the Admin role in the Discord server.
         - This role will have access to the admin panel.
 
     </details>

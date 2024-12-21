@@ -1,5 +1,5 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
-export const load = (async () => {
+export const load: PageServerLoad = async () => {
     return {};
-}) satisfies PageServerLoad;
+};

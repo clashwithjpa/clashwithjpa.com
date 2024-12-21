@@ -3,7 +3,7 @@ import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async ({ url, request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
     const { refresh_token: refreshToken } = await request.json();
     if (!refreshToken) {
         error(400, "No refresh token provided");
@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ url, request, cookies }) => {
             client_id: DISCORD_ID,
             client_secret: DISCORD_SECRET,
             grant_type: "refresh_token",
-            refresh_token: refreshToken,
+            refresh_token: refreshToken
         }).toString()
     });
 
