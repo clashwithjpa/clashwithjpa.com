@@ -1,7 +1,6 @@
 <script lang="ts">
     import Button from "$lib/components/Button.svelte";
     import { Popover } from "bits-ui";
-    import { fade } from "svelte/transition";
     import MaterialSymbolsLogoutRounded from "~icons/material-symbols/logout-rounded";
     import MaterialSymbolsLabProfileRounded from "~icons/material-symbols/lab-profile-rounded";
     import MdiSwordCross from "~icons/mdi/sword-cross";
