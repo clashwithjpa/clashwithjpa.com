@@ -27,7 +27,7 @@
         <Popover.Trigger>
             <img src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}.webp" alt="Avatar" class="size-8 rounded-full lg:size-11" />
         </Popover.Trigger>
-        <Popover.Content transition={fade} transitionConfig={{ duration: 100 }} class="z-20 max-w-80 rounded-lg p-2">
+        <Popover.Content class="z-20 max-w-80 rounded-lg p-2">
             <div
                 class="from- flex flex-col gap-5 rounded-lg border border-gray-950 bg-gradient-to-b from-gray-800 to-gray-900 p-5 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)] shadow-gray-950 backdrop-blur-md"
             >
