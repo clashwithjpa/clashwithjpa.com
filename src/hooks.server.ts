@@ -4,7 +4,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import type { UserData } from "$lib/auth/user";
 import { db } from "$lib/server/db";
 
-const protectedRoutes = ["/cwl"];
+const protectedRoutes = ["/apply"];
 
 const protectRoutesHook: Handle = async ({ event, resolve }) => {
     if (protectedRoutes.some((route) => event.url.pathname.startsWith(route))) {
