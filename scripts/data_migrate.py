@@ -10,27 +10,6 @@ from aiohttp import ClientSession, ClientConnectionError
 
 DISCORD_BASE = "https://discord.com/api/v10"
 
-# check_user_exists -> check_guild_member_role -> make_request -> fetch_api
-
-async def fetch_api(url: str, session: ClientSession, **kwargs):
-    try:
-        resp = await session.request(method="GET", url=url, **kwargs)
-    except ClientConnectionError:
-        return (url, 400)
-    return (url, resp.status)
-
-
-async def make_request(urls: set, **kwargs):
-    async with ClientSession() as session:
-        tasks = []
-        for url in urls:
-            tasks.append(fetch_api(url, session, **kwargs))
-        results = await asyncio.gather(*tasks)
-
-    for result in results:
-        print(f"{result[1]} - {str(result[0])}")
-
-
 async def check_guild_member_role(discord_id: str, session: ClientSession, headers: dict):
     guild_id = "1029993902503108678"
     role_id = "1030004174148087878"
