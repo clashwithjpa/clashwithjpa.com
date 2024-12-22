@@ -1,12 +1,62 @@
 # MongoDB to PostgreSQL migration script using Python
-# pip install asyncpg python-dotenv motor
+# pip install asyncpg python-dotenv motor requests
 
 import os
 import asyncio
 import asyncpg
 from dotenv import load_dotenv
 import motor.motor_asyncio
+from aiohttp import ClientSession, ClientConnectionError
 
+DISCORD_BASE = "https://discord.com/api/v10"
+
+# check_user_exists -> check_guild_member_role -> make_request -> fetch_api
+
+async def fetch_api(url: str, session: ClientSession, **kwargs):
+    try:
+        resp = await session.request(method="GET", url=url, **kwargs)
+    except ClientConnectionError:
+        return (url, 400)
+    return (url, resp.status)
+
+
+async def make_request(urls: set, **kwargs):
+    async with ClientSession() as session:
+        tasks = []
+        for url in urls:
+            tasks.append(fetch_api(url, session, **kwargs))
+        results = await asyncio.gather(*tasks)
+
+    for result in results:
+        print(f"{result[1]} - {str(result[0])}")
+
+
+async def check_guild_member_role(discord_id: str, session: ClientSession, headers: dict):
+    guild_id = "1029993902503108678"
+    role_id = "1030004174148087878"
+    
+    try:
+        resp = await session.get(f"{DISCORD_BASE}/guilds/{guild_id}/members/{discord_id}", headers=headers)
+        if resp.status != 200:
+            return False
+            
+        member_data = await resp.json()
+        return str(role_id) in member_data.get("roles", [])
+    except ClientConnectionError:
+        return False
+
+async def check_user_exists(token, cocsData):
+    headers = {"Authorization": "Bot " + token}
+    result = {}
+
+    async with ClientSession() as session:
+        for data in cocsData:
+            discord_id = data["discordId"]
+            has_role = await check_guild_member_role(discord_id, session, headers)
+            print(f"Discord ID {discord_id}: In server with required role: {has_role}")
+            result[discord_id] = has_role
+
+    return result
 
 async def bulk_bases_insert(conn, basesData):
     async with conn.transaction():
@@ -41,14 +91,18 @@ async def bulk_settings_insert(conn, settingsData):
                 setting["channel"],
             )
 
+
 async def bulk_cocs_insert(conn, cocsData):
+    discord_dat = await check_user_exists(os.getenv("DISCORD_BOT_TOKEN"), cocsData)
+
     userData = set()
     for coc in cocsData:
-        userData.add((coc["discordId"], True))
+        userData.add((coc["discordId"], discord_dat[coc["discordId"]]))
 
     cocData = []
     for coc in cocsData:
         cocData.append((coc["discordId"], coc["cocTag"]))
+
 
     async with conn.transaction():
         await conn.executemany(
@@ -56,7 +110,7 @@ async def bulk_cocs_insert(conn, cocsData):
             INSERT INTO user_table (discord_id, is_active)
             VALUES ($1, $2)
             """,
-            userData
+            userData,
         )
 
         await conn.executemany(
@@ -64,8 +118,9 @@ async def bulk_cocs_insert(conn, cocsData):
             INSERT INTO coc_table (user_id, tag)
             VALUES ($1, $2)
             """,
-            cocData
+            cocData,
         )
+
 
 async def main():
     load_dotenv()
