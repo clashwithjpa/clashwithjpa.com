@@ -11,6 +11,15 @@ jobs:
     check:
         name: Run svelte-check
         runs-on: ubuntu-latest
+        env:
+            PUBLIC_API_BASE_URI: ""
+            API_TOKEN: ""
+            PUBLIC_DISCORD_URL: ""
+            DISCORD_ID: ""
+            DISCORD_SECRET: ""
+            DATABASE_URL: ""
+            MONGO_URL: ""
+            DISCORD_BOT_TOKEN: ""
         steps:
             - uses: actions/checkout@v4
             - uses: pnpm/action-setup@v4
