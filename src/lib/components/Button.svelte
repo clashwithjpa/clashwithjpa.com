@@ -49,20 +49,14 @@
         sizeClass,
         className
     )}
-    onclick={() => {
-        if (href != "") {
-            goto(href);
-        }
-        if (onclick != null) {
-            onclick();
-        }
-    }}
+    onclick={onclick}
     {disabled}
 >
-    <div
+    <a
+        href={href}
         class="flex items-center justify-center space-x-1 stroke-gray-950 stroke-[0.5px] shadow-gray-950 drop-shadow-[0_4px_0_var(--tw-shadow-color)]"
         style="-webkit-text-stroke: 1px var(--tw-shadow-color);"
     >
         {@render children?.()}
-    </div>
+    </a>
 </button>

@@ -35,7 +35,13 @@
                         <MaterialSymbolsLogoutRounded class="size-5 rotate-180 transition-transform" />
                         <span class="text-xs">Logout</span>
                     </Button>
-                    <Button href="/apply" class="p-2">
+                    <Button
+                        href="/apply"
+                        class="p-2"
+                        onclick={() => {
+                            user.inGuild || toast.error("Join the server to apply");
+                        }}
+                    >
                         <MaterialSymbolsLabProfileRounded class="size-5 transition-transform" />
                         <span class="text-xs">Apply</span>
                     </Button>

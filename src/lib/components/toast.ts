@@ -7,12 +7,12 @@ let timeout: NodeJS.Timeout;
 
 const createToastFunction =
     (toastFunction: (message: string, options?: ExternalToast) => string | number) => (message: string, options?: ExternalToast) => {
-        const toastId = toastFunction(message, { ...options, duration: 2000 });
+        const toastId = toastFunction(message, { ...options, duration: 4000 });
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             toast.dismiss();
             set(false);
-        }, 2000);
+        }, 4000);
         set(true);
         return toastId;
     };

@@ -52,7 +52,8 @@
             description: "font-coc text-[0.65rem] brightness-75"
         }
     }}
-></Toaster>
+>
+</Toaster>
 
 {#if show}
     <img transition:slide={{ duration: 200 }} src="/villager.webp" alt="Villager" class="fixed -bottom-24 left-0 z-[1000] h-80 lg:h-96" />
