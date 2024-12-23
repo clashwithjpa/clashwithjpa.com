@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { cn } from "$lib/components/utils/cn";
 
     interface Props {
@@ -49,11 +48,11 @@
         sizeClass,
         className
     )}
-    onclick={onclick}
+    {onclick}
     {disabled}
 >
     <a
-        href={href}
+        {href}
         class="flex items-center justify-center space-x-1 stroke-gray-950 stroke-[0.5px] shadow-gray-950 drop-shadow-[0_4px_0_var(--tw-shadow-color)]"
         style="-webkit-text-stroke: 1px var(--tw-shadow-color);"
     >

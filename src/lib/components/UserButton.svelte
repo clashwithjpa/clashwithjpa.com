@@ -39,7 +39,7 @@
                         href="/apply"
                         class="p-2"
                         onclick={() => {
-                            user.inGuild || toast.error("Join the server to apply");
+                            toast.error("Join the server to apply");
                         }}
                     >
                         <MaterialSymbolsLabProfileRounded class="size-5 transition-transform" />
