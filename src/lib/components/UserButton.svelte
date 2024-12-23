@@ -7,6 +7,7 @@
     import { toast } from "$lib/components/toast";
     import { invalidateAll } from "$app/navigation";
     import type { UserData } from "$lib/auth/user";
+    import { fade } from "svelte/transition";
 
     let { user }: { user: UserData | null } = $props();
 
@@ -26,34 +27,37 @@
         <Popover.Trigger>
             <img src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}.webp" alt="Avatar" class="size-8 rounded-full lg:size-11" />
         </Popover.Trigger>
-        <Popover.Content class="z-20 max-w-80 rounded-lg p-2">
-            <div
-                class="from- flex flex-col gap-5 rounded-lg border border-gray-950 bg-gradient-to-b from-gray-800 to-gray-900 p-5 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)] shadow-gray-950 backdrop-blur-md"
-            >
-                <div class="flex gap-x-5">
-                    <Button onclick={logout} class="p-2" type="danger">
-                        <MaterialSymbolsLogoutRounded class="size-5 rotate-180 transition-transform" />
-                        <span class="text-xs">Logout</span>
-                    </Button>
-                    <Button
-                        href="/apply"
-                        class="p-2"
-                        onclick={() => {
-                            if (!user.inGuild) {
-                                toast.error("Join the server to apply");
-                            }
-                        }}
-                    >
-                        <MaterialSymbolsLabProfileRounded class="size-5 transition-transform" />
-                        <span class="text-xs">Apply</span>
+        <Popover.Portal>
+            <Popover.Content class="z-20 max-w-80 rounded-lg p-2">
+                <div
+                    transition:fade
+                    class="flex flex-col gap-5 rounded-lg border border-gray-950 bg-gradient-to-b from-gray-800 to-gray-900 p-5 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)] shadow-gray-950 backdrop-blur-md"
+                >
+                    <div class="flex gap-x-5">
+                        <Button onclick={logout} class="p-2" type="danger">
+                            <MaterialSymbolsLogoutRounded class="size-5 rotate-180 transition-transform" />
+                            <span class="text-xs">Logout</span>
+                        </Button>
+                        <Button
+                            href="/apply"
+                            class="p-2"
+                            onclick={() => {
+                                if (!user.inGuild) {
+                                    toast.error("Join the server to apply");
+                                }
+                            }}
+                        >
+                            <MaterialSymbolsLabProfileRounded class="size-5 transition-transform" />
+                            <span class="text-xs">Apply</span>
+                        </Button>
+                    </div>
+                    <Button href="/cwl" class="p-2">
+                        <MdiSwordCross class="size-5 transition-transform" />
+                        <span class="text-xs">Clan War League</span>
                     </Button>
                 </div>
-                <Button href="/cwl" class="p-2">
-                    <MdiSwordCross class="size-5 transition-transform" />
-                    <span class="text-xs">Clan War League</span>
-                </Button>
-            </div>
-        </Popover.Content>
+            </Popover.Content>
+        </Popover.Portal>
     </Popover.Root>
 {:else}
     <Button href="/auth/login" size="sm">Login</Button>
