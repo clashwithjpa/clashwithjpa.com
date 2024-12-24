@@ -9,7 +9,19 @@ interface TokenValidateResponse {
     cdata: string;
 }
 
-export const GET: RequestHandler = async ({ fetch, url }) => {
+export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
+    if (!cookies.get("access_token")) {
+        return json(
+            {
+                success: false,
+                error: "not_authenticated"
+            },
+            {
+                status: 401
+            }
+        );
+    }
+
     const token = url.searchParams.get("token");
     if (!token) {
         return json(
