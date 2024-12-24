@@ -35,7 +35,6 @@ const toast = Object.assign(toastFunction, {
     message: createToastFunction(svToast.message),
     promise: <ToastData>(promise: PromiseT<ToastData>, data?: PromiseData<ToastData>) => {
         const toastId = svToast.promise(promise, data);
-        console.log(`Toast ID: ${toastId}`);
         return toastId;
     },
     dismiss: (id?: number | string) => {

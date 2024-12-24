@@ -39,6 +39,7 @@ export const baseTable = pgTable("base_table", {
 export const clanApplicationTable = pgTable("clan_application_table", {
     id: serial("id").primaryKey(),
     tag: text("tag").notNull(),
+    accountLevel: integer("account_level").notNull(),
     discordId: text("discord_id").notNull(),
     status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at").notNull().defaultNow()

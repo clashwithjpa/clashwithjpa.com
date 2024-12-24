@@ -17,24 +17,13 @@
 
     let { data, children }: Props = $props();
 
-    onNavigate((navigation) => {
-        if (!document.startViewTransition) return;
-
-        return new Promise((resolve) => {
-            document.startViewTransition(async () => {
-                resolve();
-                await navigation.complete;
-            });
-        });
-    });
-
+    NProgress.configure({ showSpinner: false });
     beforeNavigate(() => {
         NProgress.start();
     });
     afterNavigate(() => {
         NProgress.done();
     });
-    NProgress.configure({ showSpinner: false });
 
     let show: boolean = $state(false);
     subscribeToast((data: boolean) => {
