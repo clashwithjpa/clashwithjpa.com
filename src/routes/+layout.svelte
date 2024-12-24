@@ -1,7 +1,7 @@
 <script lang="ts">
     import "../app.css";
     import "../nprogress.css";
-    import { onNavigate, afterNavigate, beforeNavigate } from "$app/navigation";
+    import { afterNavigate, beforeNavigate } from "$app/navigation";
     import Navbar from "$lib/components/Navbar.svelte";
     import NProgress from "nprogress";
     import type { PageData } from "./$types";

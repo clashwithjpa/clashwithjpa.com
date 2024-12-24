@@ -3,7 +3,7 @@
     import info from "../../../data/info.json";
     import Button from "$lib/components/Button.svelte";
     import { superForm } from "sveltekit-superforms";
-    import { Field, Control, Label, Description, FieldErrors } from "formsnap";
+    import { Field, Control, Description, FieldErrors } from "formsnap";
     import { zodClient } from "sveltekit-superforms/adapters";
     import { clanApplicationSchema } from "$lib/schema";
     import SuperDebug from "sveltekit-superforms";
