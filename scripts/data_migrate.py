@@ -6,77 +6,105 @@ import asyncio
 import asyncpg
 from dotenv import load_dotenv
 import motor.motor_asyncio
-from aiohttp import ClientSession, ClientConnectionError
+from aiohttp import ClientSession
 
 DISCORD_BASE = "https://discord.com/api/v10"
 
+clan_names = {
+    "av": "AvengerS.",
+    "jc": "JOHN CENA",
+    "pb": "Playyboys♥️",
+    "1e": "#1 Elite",
+    "hb": "Hell Boys",
+    "eg": "ELITE GAMERZ",
+    "uc": "űśă ćőļmbîă",
+    "sg": "sports game",
+}
 
-async def check_guild_member_role(
-    discord_id: str, session: ClientSession, headers: dict
-):
+clan_requirements = {
+    "#9JUVCV0L": {"attacks": 70, "donations": 5000, "clangames": 1000},
+    "#PQP2Y2QV": {"attacks": 60, "donations": 5000, "clangames": 1000},
+    "#PCCJUVJQ": {"attacks": 60, "donations": 5000, "clangames": 1000},
+    "#GGUR2Y2": {"attacks": 60, "donations": 5000, "clangames": 1000},
+    "#RCPLRRJ8": {"attacks": 70, "donations": 6000, "clangames": 1000},
+    "#P9RLJR2J": {"attacks": 50, "donations": 3500, "clangames": 1000},
+    "#29VJYRLY8": {"attacks": 20, "donations": 1000, "clangames": 1000},
+    "#GL0RRUC0": {"attacks": 50, "donations": 3500, "clangames": 1000},
+}
+
+
+async def fetch_all_guild_members(session: ClientSession, headers: dict):
+    """
+    List Guild Members
+    GET/guilds/{guild.id}/members
+
+    Returns a list of guild member objects that are members of the guild.
+
+    Guild Member Object
+    Guild Member Structure
+    Field	Type	Description
+    user?	user object	the user this guild member represents
+    nick?	?string	this user's guild nickname
+    avatar?	?string	the member's guild avatar hash
+    banner?	?string	the member's guild banner hash
+    roles	array of snowflakes	array of role object ids
+    joined_at	ISO8601 timestamp	when the user joined the guild
+    premium_since?	?ISO8601 timestamp	when the user started boosting the guild
+    deaf	boolean	whether the user is deafened in voice channels
+    mute	boolean	whether the user is muted in voice channels
+    flags	integer	guild member flags represented as a bit set, defaults to 0
+    pending?	boolean	whether the user has not yet passed the guild's Membership Screening requirements
+    permissions?	string	total permissions of the member in the channel, including overwrites, returned when in the interaction object
+    communication_disabled_until?	?ISO8601 timestamp	when the user's timeout will expire and the user will be able to communicate in the guild again, null or a time in the past if the user is not timed out
+    avatar_decoration_data?	?avatar decoration data object	data for the member's guild avatar decoration
+
+    Example Guild Member
+
+    Copy
+    {
+    "user": {},
+    "nick": "NOT API SUPPORT",
+    "avatar": null,
+    "banner": null,
+    "roles": [],
+    "joined_at": "2015-04-26T06:26:56.936000+00:00",
+    "deaf": false,
+    "mute": false
+    }
+    """
+
+    members = []
+    limit = 1000
+    next_page_params = {"limit": limit}
     guild_id = "1029993902503108678"
-    role_id = "1030004174148087878"
 
-    try:
-        resp = await session.get(
-            f"{DISCORD_BASE}/guilds/{guild_id}/members/{discord_id}", headers=headers
-        )
-        # X-RateLimit-Limit - The number of requests that can be made
-        # X-RateLimit-Remaining - The number of remaining requests that can be made
-        # X-RateLimit-Reset - Epoch time (seconds since 00:00:00 UTC on January 1, 1970) at which the rate limit resets
-        # X-RateLimit-Reset-After - Total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision
-        # X-RateLimit-Bucket - A unique string denoting the rate limit being encountered (non-inclusive of top-level resources in the path)
-        # X-RateLimit-Global - Returned only on HTTP 429 responses if the rate limit encountered is the global rate limit (not per-route)
-        # X-RateLimit-Scope - Returned only on HTTP 429 responses. Value can be user (per bot or user limit), global (per bot or user global limit), or shared (per resource limit)
-
-        x_ratelimit_headers = {
-            "x_ratelimit_limit": resp.headers.get("X-RateLimit-Limit", 0),
-            "x_ratelimit_remaining": resp.headers.get("X-RateLimit-Remaining", 0),
-            "x_ratelimit_reset": resp.headers.get("X-RateLimit-Reset", 0),
-            "x_ratelimit_reset_after": resp.headers.get("X-RateLimit-Reset-After", 0),
-            "x_ratelimit_bucket": resp.headers.get("X-RateLimit-Bucket", 0),
-            "x_ratelimit_global": resp.headers.get("X-RateLimit-Global", 0),
-            "x_ratelimit_scope": resp.headers.get("X-RateLimit-Scope", 0),
-        }
-        retry_after_header = resp.headers.get("Retry-After", 0)
-        print(x_ratelimit_headers, retry_after_header)
+    while True:
+        url = f"{DISCORD_BASE}/guilds/{guild_id}/members"
+        resp = await session.get(url, params=next_page_params, headers=headers)
 
         if resp.status != 200:
-            return (False, x_ratelimit_headers, retry_after_header)
+            raise Exception(f"Failed to fetch members: {await resp.text()}")
 
-        member_data = await resp.json()
-        return (
-            str(role_id) in member_data.get("roles", []),
-            x_ratelimit_headers,
-            retry_after_header,
-        )
-    except ClientConnectionError:
-        return False
+        batch = await resp.json()
+        if not batch:
+            break
+
+        members.extend(batch)
+        next_page_params = {"limit": limit, "after": batch[-1]["user"]["id"]}
+
+    return members
 
 
-async def check_user_exists(token, cocsData):
+async def check_user_exists(token):
     headers = {"Authorization": "Bot " + token}
     result = {}
-    cocsDataLength = len(cocsData)
+    role_id = "1030004174148087878"
 
     async with ClientSession() as session:
-        for data in cocsData:
-            discord_id = data["discordId"]
-            (
-                has_role,
-                x_ratelimit_headers,
-                retry_after_header,
-            ) = await check_guild_member_role(discord_id, session, headers)
-            print(
-                f"Discord ID {discord_id}: In server with required role: {has_role} | {cocsData.index(data) + 1}/{cocsDataLength}"
-            )
-            result[discord_id] = has_role
-
-            remaining_requests = int(x_ratelimit_headers["x_ratelimit_remaining"])
-            if remaining_requests < 2:
-                reset_time_after = float(x_ratelimit_headers["x_ratelimit_reset_after"])
-                print(f"Sleeping for {reset_time_after} seconds")
-                await asyncio.sleep(reset_time_after + 0.1)
+        members = await fetch_all_guild_members(session, headers)
+        for member in members:
+            if role_id in member["roles"]:
+                result[member["user"]["id"]] = True
 
     return result
 
@@ -102,8 +130,8 @@ async def bulk_settings_insert(pool, settingsData):
             for setting in settingsData:
                 await conn.execute(
                     """
-                    INSERT INTO clan_table (clan_code, clan_tag, clan_role_id, member_role_id, elder_role_id, coleader_role_id, leader_role_id, leader_id, channel_id)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    INSERT INTO clan_table (clan_code, clan_tag, clan_role_id, member_role_id, elder_role_id, coleader_role_id, leader_role_id, leader_id, channel_id, clan_name, attacks_requirement, donations_requirement, clangames_requirement)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                 """,
                     setting["clanCode"],
                     setting["clanTag"],
@@ -114,15 +142,20 @@ async def bulk_settings_insert(pool, settingsData):
                     setting["leaderRoleId"],
                     setting["leaderId"],
                     setting["channel"],
+                    clan_names[setting["clanCode"]],
+                    clan_requirements[setting["clanTag"]]["attacks"],
+                    clan_requirements[setting["clanTag"]]["donations"],
+                    clan_requirements[setting["clanTag"]]["clangames"],
                 )
 
 
 async def bulk_cocs_insert(pool, cocsData):
-    discord_dat = await check_user_exists(os.getenv("DISCORD_BOT_TOKEN"), cocsData)
+    discord_dat = await check_user_exists(os.getenv("DISCORD_BOT_TOKEN"))
+    print(f"Total users in discord: {len(discord_dat)}")
 
     userData = set()
     for coc in cocsData:
-        userData.add((coc["discordId"], discord_dat[coc["discordId"]]))
+        userData.add((coc["discordId"], discord_dat.get(coc["discordId"], False)))
 
     cocData = []
     for coc in cocsData:
