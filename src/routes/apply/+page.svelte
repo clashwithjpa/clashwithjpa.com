@@ -26,7 +26,11 @@
         if ($message && page.status === 200) {
             toast.success($message);
         } else if ($message && page.status === 400) {
-            toast.error("There was an error submitting your application");
+            if ($message === "Already in guild") {
+                toast.error("You are already in the guild");
+            } else {
+                toast.error("There was an error submitting your application");
+            }
         }
     });
 

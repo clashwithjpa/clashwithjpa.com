@@ -1,0 +1,1 @@
+ALTER TABLE "clan_application_table" ADD COLUMN "player_data" jsonb NOT NULL;

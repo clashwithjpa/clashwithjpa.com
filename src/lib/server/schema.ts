@@ -1,4 +1,5 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import type { PlayerRoot } from "$lib/clans/types";
 
 export const userTable = pgTable("user_table", {
     id: serial("id").primaryKey(),
@@ -39,7 +40,7 @@ export const baseTable = pgTable("base_table", {
 export const clanApplicationTable = pgTable("clan_application_table", {
     id: serial("id").primaryKey(),
     tag: text("tag").notNull(),
-    accountLevel: integer("account_level").notNull(),
+    playerData: jsonb("player_data").$type<PlayerRoot>().notNull(),
     discordId: text("discord_id").notNull(),
     status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at").notNull().defaultNow()

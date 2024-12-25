@@ -4,3 +4,5 @@ import { DATABASE_URL } from "$env/static/private";
 
 const sql = neon(DATABASE_URL!);
 export const db = drizzle({ client: sql });
+
+export type DB = typeof db;

@@ -1,0 +1,1 @@
+ALTER TABLE "clan_application_table" DROP COLUMN "account_level";

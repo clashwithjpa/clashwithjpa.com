@@ -36,6 +36,20 @@
       "when": 1735031750716,
       "tag": "0004_graceful_frank_castle",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1735122489627,
+      "tag": "0005_solid_master_chief",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1735123851960,
+      "tag": "0006_omniscient_killmonger",
+      "breakpoints": true
     }
   ]
 }
