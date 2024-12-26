@@ -1,5 +1,5 @@
 import { pgTable, serial, text, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
-import type { PlayerRoot } from "$lib/clans/types";
+import type { PlayerRoot } from "$lib/coc/clans/types";
 
 export const userTable = pgTable("user_table", {
     id: serial("id").primaryKey(),

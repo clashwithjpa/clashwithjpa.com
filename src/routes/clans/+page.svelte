@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { getClanTags } from "$lib/clans/info";
+    import { getClanTags } from "$lib/coc/clans/info";
     import type { PageData } from "./$types";
-    import type { ClanTagsType } from "$lib/clans/types";
+    import type { ClanTagsType } from "$lib/coc/clans/types";
     import H1 from "$lib/components/H1.svelte";
     import InlineLink from "$lib/components/InlineLink.svelte";
     import CardBody from "$lib/components/3D/CardBody.svelte";

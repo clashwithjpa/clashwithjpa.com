@@ -1,5 +1,5 @@
-import type { ClanType, ClanMemberType, ClanTagsType } from "$lib/clans/types";
-import clans from "../../../data/clans.json";
+import type { ClanType, ClanMemberType, ClanTagsType } from "$lib/coc/clans/types";
+import clans from "../../../../data/clans.json";
 
 export function getClanTags() {
     return JSON.parse(JSON.stringify(clans)) as ClanTagsType;

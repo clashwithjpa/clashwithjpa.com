@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, type Component } from "svelte";
     import type { PageData } from "./$types";
-    import { categorizeByRole } from "$lib/clans/info";
+    import { categorizeByRole } from "$lib/coc/clans/info";
     import { fade, slide } from "svelte/transition";
     import MaterialSymbolsArrowUpwardRounded from "~icons/material-symbols/arrow-upward-rounded";
     import MaterialSymbolsArrowDownwardRounded from "~icons/material-symbols/arrow-downward-rounded";

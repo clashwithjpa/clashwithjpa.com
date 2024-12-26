@@ -1,8 +1,8 @@
 import type { PageServerLoad } from "./$types";
-import type { ClanType } from "$lib/clans/types";
+import type { ClanType } from "$lib/coc/clans/types";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { API_TOKEN } from "$env/static/private";
-import { getClanTags, getClansInfo } from "$lib/clans/info";
+import { getClanTags, getClansInfo } from "$lib/coc/clans/info";
 
 export const load = (async ({ setHeaders }) => {
     async function getClans(): Promise<ClanType[]> {
