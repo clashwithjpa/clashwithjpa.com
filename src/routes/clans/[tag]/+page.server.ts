@@ -1,8 +1,8 @@
 import { error } from "@sveltejs/kit";
-import type { ClanType } from "$lib/coc/clans/types";
+import type { ClanType } from "$lib/coc/types";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { API_TOKEN } from "$env/static/private";
-import { getClanTags, getClanInfo } from "$lib/coc/clans/info";
+import { getClanTags, getClanInfo } from "$lib/coc/clan";
 
 export async function load({ params, setHeaders }) {
     try {

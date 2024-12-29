@@ -1,0 +1,10 @@
+services:
+    cronjob:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        env_file:
+            - ../.env
+        restart: unless-stopped
+        volumes:
+            - ./cronjob.py:/app/cronjob.py

@@ -1,4 +1,4 @@
-import type { PlayerRoot } from "./clans/types";
+import type { PlayerType } from "./types";
 
 interface SuccessPlayerVerifyToken {
     tag: string;
@@ -41,5 +41,5 @@ export async function getPlayerInfo(baseURI: string, tag: string, apiToken: stri
         }
     });
 
-    return (await response.json()) as PlayerRoot;
+    return (await response.json()) as PlayerType;
 }
