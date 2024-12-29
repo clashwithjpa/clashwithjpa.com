@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { onMount, type Component } from "svelte";
-    import type { PageData } from "./$types";
     import { categorizeByRole } from "$lib/coc/clan";
-    import { fade, slide } from "svelte/transition";
-    import MaterialSymbolsArrowUpwardRounded from "~icons/material-symbols/arrow-upward-rounded";
-    import MaterialSymbolsArrowDownwardRounded from "~icons/material-symbols/arrow-downward-rounded";
-    import PhArrowUpRightBold from "~icons/ph/arrow-up-right-bold";
     import Button from "$lib/components/Button.svelte";
     import InlineLink from "$lib/components/InlineLink.svelte";
+    import { onMount, type Component } from "svelte";
+    import { fade, slide } from "svelte/transition";
+    import MaterialSymbolsArrowDownwardRounded from "~icons/material-symbols/arrow-downward-rounded";
+    import MaterialSymbolsArrowUpwardRounded from "~icons/material-symbols/arrow-upward-rounded";
+    import PhArrowUpRightBold from "~icons/ph/arrow-up-right-bold";
     import order from "../../../../data/clans/components/order.json";
+    import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
 

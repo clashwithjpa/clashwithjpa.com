@@ -1,7 +1,7 @@
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
 import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
-import { error } from "@sveltejs/kit";
+import { PUBLIC_DISCORD_URL } from "$env/static/public";
 import type { RequestHandler } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
     const { refresh_token: refreshToken } = await request.json();

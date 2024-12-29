@@ -1,14 +1,14 @@
 <script lang="ts">
+    import { afterNavigate, beforeNavigate } from "$app/navigation";
+    import type { UserData } from "$lib/auth/user";
+    import Navbar from "$lib/components/Navbar.svelte";
+    import { subscribeToast } from "$lib/components/toast";
+    import NProgress from "nprogress";
+    import { Toaster } from "svelte-sonner";
+    import { slide } from "svelte/transition";
     import "../app.css";
     import "../nprogress.css";
-    import { afterNavigate, beforeNavigate } from "$app/navigation";
-    import Navbar from "$lib/components/Navbar.svelte";
-    import NProgress from "nprogress";
     import type { PageData } from "./$types";
-    import { Toaster } from "svelte-sonner";
-    import { subscribeToast } from "$lib/components/toast";
-    import type { UserData } from "$lib/auth/user";
-    import { slide } from "svelte/transition";
 
     interface Props {
         data: PageData;

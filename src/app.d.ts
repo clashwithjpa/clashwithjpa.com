@@ -1,7 +1,7 @@
-import "unplugin-icons/types/svelte";
 import type { UserData } from "$lib/auth/user";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type { NeonQueryFunction } from "@neondatabase/serverless";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import "unplugin-icons/types/svelte";
 
 declare global {
     namespace App {
@@ -18,4 +18,4 @@ declare global {
     }
 }
 
-export {};
+export { };

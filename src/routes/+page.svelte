@@ -1,12 +1,12 @@
 <script lang="ts">
-    import MaterialSymbolsPauseCircleRounded from "~icons/material-symbols/pause-circle-rounded";
-    import MaterialSymbolsPlayCircleRounded from "~icons/material-symbols/play-circle-rounded";
-    import MaterialSymbolsVolumeUpRounded from "~icons/material-symbols/volume-up-rounded";
-    import MaterialSymbolsVolumeOffRounded from "~icons/material-symbols/volume-off-rounded";
+    import { getClanTags } from "$lib/coc/clan";
     import Button from "$lib/components/Button.svelte";
     import H1 from "$lib/components/H1.svelte";
     import { onMount } from "svelte";
-    import { getClanTags } from "$lib/coc/clan";
+    import MaterialSymbolsPauseCircleRounded from "~icons/material-symbols/pause-circle-rounded";
+    import MaterialSymbolsPlayCircleRounded from "~icons/material-symbols/play-circle-rounded";
+    import MaterialSymbolsVolumeOffRounded from "~icons/material-symbols/volume-off-rounded";
+    import MaterialSymbolsVolumeUpRounded from "~icons/material-symbols/volume-up-rounded";
 
     let isPaused: boolean = $state(false);
     let isMuted: boolean = $state(true);

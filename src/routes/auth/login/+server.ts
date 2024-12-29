@@ -1,6 +1,6 @@
 import { DISCORD_ID } from "$env/static/private";
-import { redirect } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
     const SCOPE = "identify+guilds+guilds.members.read";

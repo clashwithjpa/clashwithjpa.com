@@ -1,17 +1,16 @@
 <script lang="ts">
-    import type { PageData } from "./$types";
-    import info from "../../../data/info.json";
-    import Button from "$lib/components/Button.svelte";
-    import { superForm } from "sveltekit-superforms";
-    import { Field, Control, Description, FieldErrors } from "formsnap";
-    import { zodClient } from "sveltekit-superforms/adapters";
-    import { clanApplicationSchema } from "$lib/schema";
-    import SuperDebug from "sveltekit-superforms";
     import { dev } from "$app/environment";
-    import { Turnstile } from "svelte-turnstile";
-    import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
     import { page } from "$app/state";
+    import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
+    import Button from "$lib/components/Button.svelte";
     import { toast } from "$lib/components/toast";
+    import { clanApplicationSchema } from "$lib/schema";
+    import { Control, Description, Field, FieldErrors } from "formsnap";
+    import { Turnstile } from "svelte-turnstile";
+    import SuperDebug, { superForm } from "sveltekit-superforms";
+    import { zodClient } from "sveltekit-superforms/adapters";
+    import info from "../../../data/info.json";
+    import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
 

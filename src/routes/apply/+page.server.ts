@@ -1,15 +1,14 @@
-import type { PageServerLoad, Actions } from "./$types";
-import { clanApplicationSchema } from "$lib/schema";
-import { superValidate } from "sveltekit-superforms";
-import { zod } from "sveltekit-superforms/adapters";
-import { fail, redirect } from "@sveltejs/kit";
-import { message } from "sveltekit-superforms";
-import { type InsertClanApplication, clanApplicationTable } from "$lib/server/schema";
-import type { DB } from "$lib/server/db";
-import { postVerifyToken, getPlayerInfo } from "$lib/coc/player";
-import { validateCFToken } from "$lib/turnstile";
-import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { API_TOKEN, TURNSTILE_SECRET_KEY } from "$env/static/private";
+import { PUBLIC_API_BASE_URI } from "$env/static/public";
+import { getPlayerInfo, postVerifyToken } from "$lib/coc/player";
+import { clanApplicationSchema } from "$lib/schema";
+import type { DB } from "$lib/server/db";
+import { type InsertClanApplication, clanApplicationTable } from "$lib/server/schema";
+import { validateCFToken } from "$lib/turnstile";
+import { fail, redirect } from "@sveltejs/kit";
+import { message, superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
     const user = locals.user;

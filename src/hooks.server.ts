@@ -1,7 +1,7 @@
-import type { Handle } from "@sveltejs/kit";
-import { sequence } from "@sveltejs/kit/hooks";
 import type { UserData } from "$lib/auth/user";
 import { db } from "$lib/server/db";
+import type { Handle } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
 
 const handleRefreshHook: Handle = async ({ event, resolve }) => {
     const accessToken: string | undefined = event.cookies.get("access_token");

@@ -1,7 +1,7 @@
-import type { RequestHandler } from "./$types";
-import { error } from "@sveltejs/kit";
 import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { error } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
     const code = url.searchParams.get("code");

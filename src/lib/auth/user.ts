@@ -1,7 +1,7 @@
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
-import type { APIUser, APIGuild, APIGuildMember } from "discord-api-types/v10";
-import info from "../../../data/info.json";
 import { error } from "@sveltejs/kit";
+import type { APIGuild, APIGuildMember, APIUser } from "discord-api-types/v10";
+import info from "../../../data/info.json";
 
 export type UserData = APIUser & { inGuild: boolean; isAdmin: boolean };
 
