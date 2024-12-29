@@ -10,6 +10,7 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 from typing import Dict, Any, List, Optional
 from enum import Enum
+from datetime import datetime
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -212,6 +213,20 @@ async def setup_signal_handlers(coc: ClashOfClans):
         asyncio.get_running_loop().add_signal_handler(sig, signal_handler)
 
 
+def get_time_until_next_job(scheduler):
+    """Get the time until the next scheduled job in hours"""
+    next_run_time = None
+    for job in scheduler.get_jobs():
+        if not next_run_time or job.next_run_time < next_run_time:
+            next_run_time = job.next_run_time
+
+    if next_run_time:
+        now = datetime.now(next_run_time.tzinfo)
+        time_delta = next_run_time - now
+        return time_delta.total_seconds() / 3600  # Convert to hours
+    return None
+
+
 async def main():
     load_dotenv()
     DATABASE_URL = os.getenv("DATABASE_URL")
@@ -249,6 +264,10 @@ async def main():
         for job_func, _ in jobs:
             await job_func()
             await asyncio.sleep(5)
+
+        next_job_hours = get_time_until_next_job(scheduler)
+        if next_job_hours is not None:
+            logger.info(f"Time until next job: {next_job_hours} hours")
 
         while not coc._shutdown:
             await asyncio.sleep(1)
