@@ -49,6 +49,11 @@ export const clanApplicationTable = pgTable("clan_application_table", {
     createdAt: timestamp("created_at").notNull().defaultNow()
 });
 
+export const settingsTable = pgTable("settings_table", {
+    key: text("key").primaryKey(),
+    value: text("value").notNull()
+});
+
 export type InsertUser = typeof userTable.$inferInsert;
 export type SelectUser = typeof userTable.$inferSelect;
 
