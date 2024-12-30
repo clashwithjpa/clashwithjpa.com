@@ -1,7 +1,7 @@
 import { API_TOKEN } from "$env/static/private";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { getClanInfo, getClanTags } from "$lib/coc/clan";
-import type { ClanType } from "$lib/coc/types";
+import type { APIClan } from "$lib/coc/types";
 import { error } from "@sveltejs/kit";
 
 export async function load({ params, setHeaders }) {
@@ -24,7 +24,7 @@ export async function load({ params, setHeaders }) {
 
         return {
             tag: clanTag,
-            data: clanInfo as ClanType
+            data: clanInfo as APIClan
         };
     } catch {
         error(404, `Cannot find ${params.tag}`);

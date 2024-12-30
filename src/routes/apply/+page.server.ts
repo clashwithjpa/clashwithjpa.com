@@ -63,11 +63,11 @@ export const actions: Actions = {
 
         const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, playerTag, API_TOKEN);
 
-        // await createClanApplication(event.locals.db, {
-        //     tag: playerData.tag,
-        //     playerData: playerData,
-        //     discordId: event.locals.user?.id as string
-        // });
+        await createClanApplication(event.locals.db, {
+            tag: playerData.tag,
+            playerData: playerData,
+            discordId: event.locals.user?.id as string
+        });
 
         return message(form, "Application submitted successfully!");
     }

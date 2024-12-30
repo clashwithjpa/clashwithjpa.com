@@ -1,11 +1,11 @@
-import type { ClanMemberType, ClanTagsType, ClanType } from "$lib/coc/types";
+import type { APIClanMember, ClanTags, APIClan } from "$lib/coc/types";
 import clans from "../../../data/clans.json";
 
 export function getClanTags() {
-    return JSON.parse(JSON.stringify(clans)) as ClanTagsType;
+    return JSON.parse(JSON.stringify(clans)) as ClanTags;
 }
 
-export async function getClanInfo(baseURI: string, clanTag: string, apiToken: string): Promise<ClanType> {
+export async function getClanInfo(baseURI: string, clanTag: string, apiToken: string): Promise<APIClan> {
     clanTag = clanTag.replace("#", "%23");
     const response = await fetch(`${baseURI}/v1/clans/${clanTag}`, {
         method: "GET",
@@ -21,7 +21,7 @@ export async function getClanInfo(baseURI: string, clanTag: string, apiToken: st
     return await response.json();
 }
 
-export async function getClansInfo(baseURI: string, clanTags: string[], apiToken: string): Promise<ClanType[]> {
+export async function getClansInfo(baseURI: string, clanTags: string[], apiToken: string): Promise<APIClan[]> {
     const promises = clanTags.map((tag) => getClanInfo(baseURI, tag, apiToken));
     return await Promise.all(promises);
 }
@@ -32,8 +32,8 @@ export function formatDate(date: string, dateStyle: Intl.DateTimeFormatOptions["
     return dateFormatter.format(dateToFormat);
 }
 
-export function categorizeByRole(array: ClanMemberType[]) {
-    return array.reduce((acc: { [key: string]: ClanMemberType[] }, curr) => {
+export function categorizeByRole(array: APIClanMember[]) {
+    return array.reduce((acc: { [key: string]: APIClanMember[] }, curr) => {
         const role = curr.role;
         if (["leader", "coLeader", "member"].includes(role)) {
             if (!acc[role]) {

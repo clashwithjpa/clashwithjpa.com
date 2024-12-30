@@ -1,4 +1,4 @@
-import type { PlayerType } from "./types";
+import type { APIPlayer } from "./types";
 
 interface SuccessPlayerVerifyToken {
     tag: string;
@@ -10,7 +10,7 @@ interface ErrorPlayerVerifyToken {
     reason: string;
     message: string;
     type: string;
-    detail: any;
+    detail: object;
 }
 
 export async function postVerifyToken(baseURI: string, tag: string, token: string, apiToken: string) {
@@ -41,5 +41,5 @@ export async function getPlayerInfo(baseURI: string, tag: string, apiToken: stri
         }
     });
 
-    return (await response.json()) as PlayerType;
+    return (await response.json()) as APIPlayer;
 }

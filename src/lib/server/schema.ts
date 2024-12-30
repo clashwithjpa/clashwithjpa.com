@@ -1,4 +1,4 @@
-import type { ClanCurrentWarType, ClanMembersType, ClanType, PlayerType } from "$lib/coc/types";
+import type { APIClanWar, APIClanMemberList, APIClan, APIPlayer } from "$lib/coc/types";
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user_table", {
@@ -28,9 +28,9 @@ export const clanTable = pgTable("clan_table", {
     attacksRequirement: integer("attacks_requirement").notNull(),
     donationsRequirement: integer("donations_requirement").notNull(),
     clangamesRequirement: integer("clangames_requirement").notNull(),
-    clanData: jsonb("clan_data").$type<ClanType>(),
-    clanMembers: jsonb("clan_members").$type<ClanMembersType>(),
-    clanCurrentWar: jsonb("clan_current_war").$type<ClanCurrentWarType>()
+    clanData: jsonb("clan_data").$type<APIClan>(),
+    clanMembers: jsonb("clan_members").$type<APIClanMemberList>(),
+    clanCurrentWar: jsonb("clan_current_war").$type<APIClanWar>()
 });
 
 export const baseTable = pgTable("base_table", {
@@ -43,7 +43,7 @@ export const baseTable = pgTable("base_table", {
 export const clanApplicationTable = pgTable("clan_application_table", {
     id: serial("id").primaryKey(),
     tag: text("tag").notNull(),
-    playerData: jsonb("player_data").$type<PlayerType>().notNull(),
+    playerData: jsonb("player_data").$type<APIPlayer>().notNull(),
     discordId: text("discord_id").notNull(),
     status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at").notNull().defaultNow()

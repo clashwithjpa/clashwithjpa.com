@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getClanTags } from "$lib/coc/clan";
     import type { PageData } from "./$types";
-    import type { ClanTagsType } from "$lib/coc/types";
+    import type { ClanTags } from "$lib/coc/types";
     import H1 from "$lib/components/H1.svelte";
     import InlineLink from "$lib/components/InlineLink.svelte";
     import CardBody from "$lib/components/3D/CardBody.svelte";
@@ -11,7 +11,7 @@
     import IonSkull from "~icons/ion/skull";
     import { fade } from "svelte/transition";
 
-    let clanTags: ClanTagsType = getClanTags();
+    let clanTags: ClanTags = getClanTags();
     let mouseEvents: boolean[] = $state(Array(Object.keys(clanTags).length).fill(false));
     let { data }: { data: PageData } = $props();
 </script>
