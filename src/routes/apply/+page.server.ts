@@ -9,6 +9,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { Actions, PageServerLoad } from "./$types";
+import { eq } from "drizzle-orm";
 
 export const load: PageServerLoad = async ({ locals }) => {
     const user = locals.user;
@@ -21,10 +22,6 @@ export const load: PageServerLoad = async ({ locals }) => {
         user: user
     };
 };
-
-async function createClanApplication(db: DB, data: InsertClanApplication) {
-    await db.insert(clanApplicationTable).values(data);
-}
 
 export const actions: Actions = {
     default: async (event) => {
@@ -63,10 +60,24 @@ export const actions: Actions = {
 
         const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, playerTag, API_TOKEN);
 
-        await createClanApplication(event.locals.db, {
-            tag: playerData.tag,
-            playerData: playerData,
-            discordId: event.locals.user?.id as string
+        await event.locals.db.transaction(async (tx) => {
+            const [alreadyApplied] = await tx
+                .select({ tag: clanApplicationTable.tag })
+                .from(clanApplicationTable)
+                .where(eq(clanApplicationTable.tag, playerData.tag));
+                
+            if (alreadyApplied) {
+                tx.rollback();
+                return message(form, "You have already applied to the clan", {
+                    status: 400
+                });
+            }
+
+            await tx.insert(clanApplicationTable).values({
+                tag: playerData.tag,
+                playerData: playerData,
+                discordId: event.locals.user?.id as string
+            });
         });
 
         return message(form, "Application submitted successfully!");
