@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1734812715070,
-      "tag": "0000_brave_goliath",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1734814872249,
-      "tag": "0001_overrated_chronomancer",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1734815434589,
-      "tag": "0002_chief_kinsey_walden",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1735021101714,
-      "tag": "0003_clean_gorilla_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1735031750716,
-      "tag": "0004_graceful_frank_castle",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1735122489627,
-      "tag": "0005_solid_master_chief",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1735123851960,
-      "tag": "0006_omniscient_killmonger",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1735412707604,
-      "tag": "0007_strong_iron_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1735483170769,
-      "tag": "0008_same_whizzer",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1735503310091,
-      "tag": "0009_organic_moondragon",
+      "when": 1735653506315,
+      "tag": "0000_fuzzy_killmonger",
       "breakpoints": true
     }
   ]

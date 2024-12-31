@@ -1,1 +1,0 @@
-ALTER TABLE "clan_application_table" ADD COLUMN "account_level" integer NOT NULL;

@@ -13,6 +13,11 @@ tables: List[str] = [
     "user_table",
 ]
 
+other_tables: List[str] = [
+    "clan_application_table",
+    "settings_table",
+]
+
 
 async def main():
     load_dotenv()
@@ -32,6 +37,19 @@ async def main():
             for table in tables:
                 await conn.execute(f"DROP TABLE {table}")
                 print(f"Deleted table {table}")
+
+    do_other_tables = input("Do you want to truncate other tables? (yes/no): ")
+    if do_other_tables == "yes":
+        async with pool.acquire() as conn:
+            for table in other_tables:
+                await conn.execute(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE")
+                print(f"Truncated table {table}")
+
+            delete_table = input("Do you also want to delete the tables? (yes/no): ")
+            if delete_table == "yes":
+                for table in other_tables:
+                    await conn.execute(f"DROP TABLE {table}")
+                    print(f"Deleted table {table}")
 
     await pool.close()
 

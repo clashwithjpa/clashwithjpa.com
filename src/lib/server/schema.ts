@@ -49,9 +49,14 @@ export const clanApplicationTable = pgTable("clan_application_table", {
     createdAt: timestamp("created_at").notNull().defaultNow()
 });
 
+interface SettingsMap {
+    applications_enabled: boolean;
+    admin_ids: string[];
+}
+
 export const settingsTable = pgTable("settings_table", {
-    key: text("key").primaryKey(),
-    value: text("value").notNull()
+    key: text("key").$type<keyof SettingsMap>().primaryKey(),
+    value: jsonb("value").$type<SettingsMap[keyof SettingsMap]>().notNull()
 });
 
 export type InsertUser = typeof userTable.$inferInsert;
@@ -68,3 +73,6 @@ export type SelectBase = typeof baseTable.$inferSelect;
 
 export type InsertClanApplication = typeof clanApplicationTable.$inferInsert;
 export type SelectClanApplication = typeof clanApplicationTable.$inferSelect;
+
+export type InsertSettings = typeof settingsTable.$inferInsert;
+export type SelectSettings = typeof settingsTable.$inferSelect;

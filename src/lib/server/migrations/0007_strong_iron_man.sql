@@ -1,1 +1,0 @@
-ALTER TABLE "clan_table" ADD COLUMN "clan_data" jsonb;
