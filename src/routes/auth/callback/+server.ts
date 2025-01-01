@@ -2,6 +2,7 @@ import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
+import { getUserData } from "$lib/auth/user";
 
 export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
     const code = url.searchParams.get("code");
@@ -41,9 +42,8 @@ export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
                 httpOnly: true
             });
 
-            const userResp = await fetch(`/auth/user`);
-            if (userResp.ok) {
-                const userData = await userResp.json();
+            const userData = await getUserData(access_token);
+            if (userData) {
                 cookies.set("user", JSON.stringify(userData), {
                     path: "/",
                     maxAge: expires_in,

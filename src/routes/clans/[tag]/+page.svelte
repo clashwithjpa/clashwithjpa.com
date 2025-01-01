@@ -17,7 +17,7 @@
     const basePath = "../../../../data/clans/components/";
 
     let showCoLeaders: boolean = $state(false);
-    let members = $derived.by(() => categorizeByRole(data.data.memberList));
+    let members = $derived.by(() => categorizeByRole(data.clan.clanData?.memberList ?? []));
 
     const sortedCommonComponentFiles: Record<string, { default: Component }> = Object.entries(commonComponentFiles)
         .sort(([a], [b]) => {
@@ -62,15 +62,15 @@
     {/if}
     <div class="flex w-full flex-col items-start space-y-4 lg:sticky lg:top-32 lg:w-[25%]">
         <div class="flex flex-row items-center justify-start space-x-4">
-            <img class="size-14" src={data.data.badgeUrls.medium} alt={data.data.name} />
+            <img class="size-14" src={data.clan.clanData?.badgeUrls.medium} alt={data.clan.clanData?.name} />
             <div class="flex flex-col items-start justify-center">
-                <h1 class="font-heading text-lg font-semibold md:text-xl lg:text-2xl">{data.data.name}</h1>
-                <p class="text-sm">{data.data.tag}</p>
+                <h1 class="font-heading text-lg font-semibold md:text-xl lg:text-2xl">{data.clan.clanData?.name}</h1>
+                <p class="text-sm">{data.clan.clanData?.tag}</p>
             </div>
         </div>
         <div class="text-sm">
-            <p>Clan LVL. {data.data.clanLevel}</p>
-            <p>Capital LVL. {data.data.clanCapital.capitalHallLevel}</p>
+            <p>Clan LVL. {data.clan.clanData?.clanLevel}</p>
+            <p>Capital LVL. {data.clan.clanData?.clanCapital.capitalHallLevel}</p>
         </div>
         <div class="w-full text-sm">
             <p>
@@ -105,7 +105,7 @@
         </div>
 
         <InlineLink
-            href={`https://link.clashofclans.com/en?action=OpenClanProfile&tag=${data.data.tag}`}
+            href={`https://link.clashofclans.com/en?action=OpenClanProfile&tag=${data.tag}`}
             class="group flex items-center space-x-1 text-sm transition-all duration-300 ease-in-out"
             newTab={true}
         >

@@ -1,19 +1,12 @@
-import { API_TOKEN } from "$env/static/private";
-import { PUBLIC_API_BASE_URI } from "$env/static/public";
-import { getClanTags, getClansInfo } from "$lib/coc/clan";
-import type { APIClan } from "$lib/coc/types";
 import type { PageServerLoad } from "./$types";
+import { getClansPublicData } from "$lib/server/functions";
 
-export const load = (async ({ setHeaders }) => {
-    async function getClans(): Promise<APIClan[]> {
-        const clanTagsArray = Object.keys(getClanTags());
-        const clansInfo = await getClansInfo(PUBLIC_API_BASE_URI, clanTagsArray, API_TOKEN);
-        return clansInfo;
-    }
+export const load = (async ({ setHeaders, locals }) => {
+    const data = await getClansPublicData(locals.db);
 
     setHeaders({
         "cache-control": "max-age=6000" // 100 minutes
     });
 
-    return { data: getClans() as Promise<APIClan[]> };
+    return { clans: data };
 }) satisfies PageServerLoad;

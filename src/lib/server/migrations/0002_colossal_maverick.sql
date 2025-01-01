@@ -1,0 +1,1 @@
+ALTER TABLE "clan_table" ADD COLUMN "clan_level" integer;

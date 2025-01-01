@@ -1,0 +1,1 @@
+ALTER TABLE "clan_table" DROP COLUMN "clan_members";

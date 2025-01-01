@@ -24,7 +24,6 @@ class GracefulExit(SystemExit):
 
 class EndpointType(Enum):
     CLAN_INFO = ("clans/{tag}", "clan_data")
-    CLAN_MEMBERS = ("clans/{tag}/members", "clan_members")
     CLAN_CURRENT_WAR = ("clans/{tag}/currentwar", "clan_current_war")
 
     def __init__(self, endpoint: str, db_column: str):
@@ -116,15 +115,27 @@ class ClashOfClans:
         try:
             async with self.pool.acquire() as con:
                 async with con.transaction():
-                    await con.execute(
-                        f"""
-                        UPDATE clan_table
-                        SET {endpoint_type.db_column} = $1::jsonb
-                        WHERE clan_tag = $2
-                        """,
-                        json.dumps(data),
-                        clan_tag,
-                    )
+                    if data.get("clanLevel"):
+                        await con.execute(
+                            f"""
+                            UPDATE clan_table
+                            SET {endpoint_type.db_column} = $1::jsonb, clan_level = $2
+                            WHERE clan_tag = $3
+                            """,
+                            json.dumps(data),
+                            int(data["clanLevel"]),
+                            clan_tag,
+                        )
+                    else:
+                        await con.execute(
+                            f"""
+                            UPDATE clan_table
+                            SET {endpoint_type.db_column} = $1::jsonb
+                            WHERE clan_tag = $2
+                            """,
+                            json.dumps(data),
+                            clan_tag,
+                        )
                 logger.info(f"Updated {endpoint_type.name} for {clan_tag}")
         except asyncpg.PostgresError as e:
             logger.error(
@@ -193,9 +204,6 @@ class ClashOfClans:
     async def update_all_clans_info(self):
         await self._update_all_clan_data(EndpointType.CLAN_INFO)
 
-    async def update_all_clan_members(self):
-        await self._update_all_clan_data(EndpointType.CLAN_MEMBERS)
-
     async def update_all_clan_current_wars(self):
         await self._update_all_clan_data(EndpointType.CLAN_CURRENT_WAR)
 
@@ -246,7 +254,6 @@ async def main():
 
         jobs = [
             (coc.update_all_clans_info, "0"),  # Runs at midnight
-            (coc.update_all_clan_members, "0"),  # Runs at midnight
             (coc.update_all_clan_current_wars, "*/1"),  # Runs every hour
         ]
 

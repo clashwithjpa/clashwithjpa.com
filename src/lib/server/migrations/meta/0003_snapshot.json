@@ -1,0 +1,340 @@
+{
+  "id": "8970eb78-7cd7-4323-8a35-a3227cd62ecf",
+  "prevId": "979cf34a-cb96-43bd-8d6c-b739dd37a7a8",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.base_table": {
+      "name": "base_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "base_link": {
+          "name": "base_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_link": {
+          "name": "image_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.clan_application_table": {
+      "name": "clan_application_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_data": {
+          "name": "player_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discord_id": {
+          "name": "discord_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "clan_application_table_tag_unique": {
+          "name": "clan_application_table_tag_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "tag"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.clan_table": {
+      "name": "clan_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clan_code": {
+          "name": "clan_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clan_name": {
+          "name": "clan_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clan_level": {
+          "name": "clan_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clan_tag": {
+          "name": "clan_tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clan_role_id": {
+          "name": "clan_role_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "member_role_id": {
+          "name": "member_role_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "elder_role_id": {
+          "name": "elder_role_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coleader_role_id": {
+          "name": "coleader_role_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leader_role_id": {
+          "name": "leader_role_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leader_id": {
+          "name": "leader_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attacks_requirement": {
+          "name": "attacks_requirement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "donations_requirement": {
+          "name": "donations_requirement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clangames_requirement": {
+          "name": "clangames_requirement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clan_data": {
+          "name": "clan_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clan_current_war": {
+          "name": "clan_current_war",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.coc_table": {
+      "name": "coc_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "coc_table_user_id_user_table_discord_id_fk": {
+          "name": "coc_table_user_id_user_table_discord_id_fk",
+          "tableFrom": "coc_table",
+          "tableTo": "user_table",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "discord_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.settings_table": {
+      "name": "settings_table",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_table": {
+      "name": "user_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "discord_id": {
+          "name": "discord_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_table_discord_id_unique": {
+          "name": "user_table_discord_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "discord_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

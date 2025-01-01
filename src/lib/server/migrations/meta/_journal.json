@@ -15,6 +15,20 @@
       "when": 1735735342048,
       "tag": "0001_purple_saracen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1735741205399,
+      "tag": "0002_colossal_maverick",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1735741448304,
+      "tag": "0003_keen_barracuda",
+      "breakpoints": true
     }
   ]
 }

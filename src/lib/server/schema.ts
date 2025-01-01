@@ -17,6 +17,7 @@ export const clanTable = pgTable("clan_table", {
     id: serial("id").primaryKey(),
     clanCode: text("clan_code").notNull(),
     clanName: text("clan_name").notNull(),
+    clanLevel: integer("clan_level"),
     clanTag: text("clan_tag").notNull(),
     clanRoleID: text("clan_role_id").notNull(),
     memberRoleID: text("member_role_id").notNull(),
@@ -29,7 +30,6 @@ export const clanTable = pgTable("clan_table", {
     donationsRequirement: integer("donations_requirement").notNull(),
     clangamesRequirement: integer("clangames_requirement").notNull(),
     clanData: jsonb("clan_data").$type<APIClan>(),
-    clanMembers: jsonb("clan_members").$type<APIClanMemberList>(),
     clanCurrentWar: jsonb("clan_current_war").$type<APIClanWar>()
 });
 
