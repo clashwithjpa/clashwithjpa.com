@@ -27,3 +27,24 @@ export async function validateCFToken(token: string, secret: string) {
         error: data["error-codes"]?.length ? data["error-codes"][0] : null
     };
 }
+
+export async function getNewAccessToken(url: string, refreshToken: string, clienID: string, clientSecret: string) {
+    const resp = await fetch(`${url}/oauth2/token`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            client_id: clienID,
+            client_secret: clientSecret,
+            grant_type: "refresh_token",
+            refresh_token: refreshToken
+        }).toString()
+    });
+
+    if (resp.ok) {
+        return await resp.json();
+    } else {
+        return null;
+    }
+}

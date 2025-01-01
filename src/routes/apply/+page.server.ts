@@ -4,7 +4,7 @@ import { getPlayerInfo, postVerifyToken } from "$lib/coc/player";
 import { clanApplicationSchema } from "$lib/schema";
 import type { DB } from "$lib/server/db";
 import { type InsertClanApplication, clanApplicationTable } from "$lib/server/schema";
-import { validateCFToken } from "$lib/turnstile";
+import { validateCFToken } from "$lib/helpers";
 import { fail, redirect } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";

@@ -2,6 +2,10 @@ import type { UserData } from "$lib/auth/user";
 import { db } from "$lib/server/db";
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
+import { DISCORD_ID, DISCORD_SECRET } from "$env/static/private";
+import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { getNewAccessToken } from "$lib/helpers";
+import { getUserData } from "$lib/auth/user";
 
 const handleRefreshHook: Handle = async ({ event, resolve }) => {
     const accessToken: string | undefined = event.cookies.get("access_token");
@@ -9,7 +13,32 @@ const handleRefreshHook: Handle = async ({ event, resolve }) => {
 
     if (!accessToken && refreshToken) {
         console.log("No access token, but refresh token found. Attempting to refresh...");
-        await fetch(`/auth/refresh`, { method: "POST", body: JSON.stringify({ refresh_token: refreshToken }) });
+        const newToken = await getNewAccessToken(PUBLIC_DISCORD_URL, refreshToken, DISCORD_ID, DISCORD_SECRET);
+
+        if (newToken) {
+            event.cookies.set("access_token", newToken.access_token, {
+                path: "/",
+                maxAge: newToken.expires_in,
+                sameSite: "lax",
+                httpOnly: true
+            });
+            event.cookies.set("refresh_token", newToken.refresh_token, {
+                path: "/",
+                maxAge: 60 * 60 * 24 * 365, // 1 year
+                sameSite: "lax",
+                httpOnly: true
+            });
+
+            const userData = await getUserData(newToken.access_token);
+            event.cookies.set("user", JSON.stringify(userData), {
+                path: "/",
+                maxAge: newToken.expires_in,
+                sameSite: "lax",
+                httpOnly: true
+            });
+
+            console.log("Refreshed token successfully");
+        }
     }
 
     return resolve(event);
