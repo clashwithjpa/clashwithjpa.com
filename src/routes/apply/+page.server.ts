@@ -2,7 +2,7 @@ import { API_TOKEN, TURNSTILE_SECRET_KEY } from "$env/static/private";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { getPlayerInfo, postVerifyToken } from "$lib/coc/player";
 import { clanApplicationSchema } from "$lib/schema";
-import { type InsertClanApplication, clanApplicationTable } from "$lib/server/schema";
+import { type InsertClanApplication } from "$lib/server/schema";
 import { validateCFToken } from "$lib/helpers";
 import { fail, redirect } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";

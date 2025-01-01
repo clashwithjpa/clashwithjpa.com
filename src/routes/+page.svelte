@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { getClanTags } from "$lib/coc/clan";
     import Button from "$lib/components/Button.svelte";
     import H1 from "$lib/components/H1.svelte";
     import { onMount } from "svelte";
@@ -51,9 +50,8 @@
         <div class="flex flex-col items-center text-center sm:w-3/4 md:w-1/2">
             <H1 class="text-4xl lg:text-5xl">Clash With JPA</H1>
             <p class="text-md mt-4 lg:text-lg">
-                FWA experts in War-Farming, offering diverse clans and simultaneous 50v50 FWA wars and CWL action. Join one of the {Object.keys(
-                    getClanTags()
-                ).length} clans in our family today!
+                FWA experts in War-Farming, offering diverse clans and simultaneous 50v50 FWA wars and CWL action. Join one of the clans in our family
+                today!
             </p>
             <Button href="/clans" size="md" class="mt-10">See our clans</Button>
         </div>

@@ -1,4 +1,4 @@
-import type { APIClanWar, APIClanMemberList, APIClan, APIPlayer } from "$lib/coc/types";
+import type { APIClanWar, APIClan, APIPlayer } from "$lib/coc/types";
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user_table", {

@@ -9,6 +9,8 @@
 
     let { data }: { data: PageData } = $props();
     let mouseEvents: boolean[] = $state(Array(data.clans.length).fill(false));
+
+    // $inspect(data);
 </script>
 
 <svelte:head>
