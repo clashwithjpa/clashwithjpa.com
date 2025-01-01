@@ -2,14 +2,13 @@ import { API_TOKEN, TURNSTILE_SECRET_KEY } from "$env/static/private";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 import { getPlayerInfo, postVerifyToken } from "$lib/coc/player";
 import { clanApplicationSchema } from "$lib/schema";
-import type { DB } from "$lib/server/db";
 import { type InsertClanApplication, clanApplicationTable } from "$lib/server/schema";
 import { validateCFToken } from "$lib/helpers";
 import { fail, redirect } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { Actions, PageServerLoad } from "./$types";
-import { eq } from "drizzle-orm";
+import { createClanApplication, getClanApplicationFromTag } from "$lib/server/functions";
 
 export const load: PageServerLoad = async ({ locals }) => {
     const user = locals.user;
@@ -60,25 +59,20 @@ export const actions: Actions = {
 
         const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, playerTag, API_TOKEN);
 
-        await event.locals.db.transaction(async (tx) => {
-            const [alreadyApplied] = await tx
-                .select({ tag: clanApplicationTable.tag })
-                .from(clanApplicationTable)
-                .where(eq(clanApplicationTable.tag, playerData.tag));
-                
-            if (alreadyApplied) {
-                tx.rollback();
-                return message(form, "You have already applied to the clan", {
-                    status: 400
-                });
-            }
-
-            await tx.insert(clanApplicationTable).values({
-                tag: playerData.tag,
-                playerData: playerData,
-                discordId: event.locals.user?.id as string
+        const [alreadyApplied] = await getClanApplicationFromTag(event.locals.db, playerData.tag);
+        if (alreadyApplied) {
+            return message(form, "You have already applied to the clan", {
+                status: 400
             });
-        });
+        }
+
+        const application: InsertClanApplication = {
+            tag: playerData.tag,
+            playerData: playerData,
+            discordId: event.locals.user?.id as string
+        };
+
+        await createClanApplication(event.locals.db, application);
 
         return message(form, "Application submitted successfully!");
     }

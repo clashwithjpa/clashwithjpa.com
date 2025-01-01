@@ -42,7 +42,7 @@ export const baseTable = pgTable("base_table", {
 
 export const clanApplicationTable = pgTable("clan_application_table", {
     id: serial("id").primaryKey(),
-    tag: text("tag").notNull(),
+    tag: text("tag").notNull().unique(),
     playerData: jsonb("player_data").$type<APIPlayer>().notNull(),
     discordId: text("discord_id").notNull(),
     status: text("status").notNull().default("pending"),

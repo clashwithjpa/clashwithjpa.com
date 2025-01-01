@@ -4,5 +4,3 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 const sql = neon(DATABASE_URL!);
 export const db = drizzle({ client: sql });
-
-export type DB = typeof db;
