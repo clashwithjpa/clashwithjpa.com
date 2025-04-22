@@ -21,8 +21,12 @@
         { name: "Discord", href: "https://discord.clashwithjpa.com", newTab: true }
     ];
 
-    let { user, checks, applicationEnabled, cwlEnabled }: { user: APIUser | null; checks: UserChecks; applicationEnabled: boolean; cwlEnabled: boolean } =
-        $props();
+    let {
+        user,
+        checks,
+        applicationEnabled,
+        cwlEnabled
+    }: { user: APIUser | null; checks: UserChecks; applicationEnabled: boolean; cwlEnabled: boolean } = $props();
 
     let isOpen = $state(false);
     function toggleMenu() {
