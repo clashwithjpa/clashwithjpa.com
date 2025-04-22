@@ -1,7 +1,7 @@
-import type { UserData } from "$lib/auth/user";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "$lib/server/schema";
+import type { NeonQueryFunction } from "@neondatabase/serverless";
+import type { APIUser } from "discord-api-types/v10";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import "unplugin-icons/types/svelte";
 
 declare global {
@@ -11,7 +11,7 @@ declare global {
             db: NeonHttpDatabase<typeof schema> & {
                 $client: NeonQueryFunction<false, false>;
             };
-            user: UserData | null;
+            user: APIUser | null;
         }
         // interface PageData {}
         // interface PageState {}
@@ -19,4 +19,5 @@ declare global {
     }
 }
 
-export {};
+export { };
+

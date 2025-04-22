@@ -1,8 +1,8 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, onNavigate } from "$app/navigation";
-    import type { UserData } from "$lib/auth/user";
     import Navbar from "$lib/components/Navbar.svelte";
     import { subscribeToast } from "$lib/components/toast";
+    import type { APIUser } from "discord-api-types/v10";
     import NProgress from "nprogress";
     import type { Snippet } from "svelte";
     import { Toaster } from "svelte-sonner";
@@ -66,6 +66,6 @@
 {/if}
 
 <main class="h-screen w-screen">
-    <Navbar user={data.user as UserData} applicationEnabled={data.applicationEnabled} cwlEnabled={data.cwlEnabled} />
+    <Navbar user={data.user as APIUser} checks={data.checks} applicationEnabled={data.applicationEnabled} cwlEnabled={data.cwlEnabled} />
     {@render children?.()}
 </main>

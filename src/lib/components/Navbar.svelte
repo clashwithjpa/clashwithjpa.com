@@ -1,12 +1,13 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import type { UserData } from "$lib/auth/user";
     import InlineLink from "$lib/components/InlineLink.svelte";
     import UserButton from "$lib/components/UserButton.svelte";
+    import type { APIUser } from "discord-api-types/v10";
     import { slide } from "svelte/transition";
     import AkarIconsCross from "~icons/akar-icons/cross";
     import AkarIconsThreeLineHorizontal from "~icons/akar-icons/three-line-horizontal";
     import SpecialButton from "./SpecialButton.svelte";
+    import type { UserChecks } from "$lib/auth/user";
 
     interface Item {
         name: string;
@@ -20,7 +21,8 @@
         { name: "Discord", href: "https://discord.clashwithjpa.com", newTab: true }
     ];
 
-    let { user, applicationEnabled, cwlEnabled }: { user: UserData | null; applicationEnabled: boolean; cwlEnabled: boolean } = $props();
+    let { user, checks, applicationEnabled, cwlEnabled }: { user: APIUser | null; checks: UserChecks; applicationEnabled: boolean; cwlEnabled: boolean } =
+        $props();
 
     let isOpen = $state(false);
     function toggleMenu() {
@@ -41,7 +43,7 @@
             <p class="text-2xl">JPA</p>
         </a>
         <div class="flex items-center justify-center space-x-4 md:hidden">
-            <UserButton {user} {applicationEnabled} {cwlEnabled} />
+            <UserButton {user} {checks} {applicationEnabled} {cwlEnabled} />
             <button onclick={toggleMenu} aria-label="Toggle menu" class="transition-all">
                 {#if isOpen}
                     <AkarIconsCross class="size-6" />
@@ -57,7 +59,7 @@
                     {item.name}
                 </Component>
             {/each}
-            <UserButton {user} {applicationEnabled} {cwlEnabled} />
+            <UserButton {user} {checks} {applicationEnabled} {cwlEnabled} />
         </div>
     </div>
     {#if isOpen}

@@ -1,16 +1,22 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
-    import type { UserData } from "$lib/auth/user";
+    import type { UserChecks } from "$lib/auth/user";
     import CocButton from "$lib/components/CocButton.svelte";
     import { toast } from "$lib/components/toast";
     import { Popover } from "bits-ui";
+    import type { APIUser } from "discord-api-types/v10";
     import MaterialSymbolsAdminPanelSettingsRounded from "~icons/material-symbols/admin-panel-settings-rounded";
     import MaterialSymbolsCrownRounded from "~icons/material-symbols/crown-rounded";
     import MaterialSymbolsLabProfileRounded from "~icons/material-symbols/lab-profile-rounded";
     import MaterialSymbolsLogoutRounded from "~icons/material-symbols/logout-rounded";
     import MdiSwordCross from "~icons/mdi/sword-cross";
 
-    let { user, applicationEnabled, cwlEnabled }: { user: UserData | null; applicationEnabled: boolean; cwlEnabled: boolean } = $props();
+    let {
+        user,
+        checks,
+        applicationEnabled,
+        cwlEnabled
+    }: { user: APIUser | null; checks: UserChecks; applicationEnabled: boolean; cwlEnabled: boolean } = $props();
 
     async function logout() {
         try {
@@ -26,7 +32,7 @@
 {#if user}
     <Popover.Root>
         <Popover.Trigger class="cursor-pointer">
-            {#if user.isAdmin}
+            {#if checks.isAdmin}
                 <MaterialSymbolsCrownRounded class="-mb-2 size-6 -rotate-[15deg] text-yellow-400" />
             {/if}
             <img src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}" alt="Avatar" class="size-8 rounded-full lg:size-11" />
@@ -66,7 +72,7 @@
                         <MdiSwordCross class="size-5 transition-transform" />
                         <span class="text-sm">Clan War League</span>
                     </CocButton>
-                    {#if user.isAdmin}
+                    {#if checks.isAdmin}
                         <CocButton href="/admin" class="p-2">
                             <MaterialSymbolsAdminPanelSettingsRounded class="size-5 transition-transform" />
                             <span class="text-sm">Admin Panel</span>

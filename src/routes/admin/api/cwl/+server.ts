@@ -1,16 +1,14 @@
-import type { UserData } from "$lib/auth/user";
+import { isAdmin } from "$lib/auth/user";
 import { cwlTable, type InsertCWL } from "$lib/server/schema";
 import { json } from "@sveltejs/kit";
 import { eq, inArray } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
 
-const isAdmin = (user: UserData | null) => user && user.isAdmin;
-
-export const POST: RequestHandler = async ({ locals, request }) => {
-    const user = locals.user;
+export const POST: RequestHandler = async ({ locals, request, fetch }) => {
+    const admin = await isAdmin(fetch);
     const body = await request.json();
 
-    if (!isAdmin(user)) {
+    if (!admin) {
         return json({ error: "Unauthorized" }, { status: 401 });
     }
 

@@ -6,7 +6,7 @@ import { getNewAccessToken } from "$lib/cf/helpers";
 import { redirect } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler = async ({ cookies, locals }) => {
+export const GET: RequestHandler = async ({ cookies }) => {
     const refreshToken: string | undefined = cookies.get("refresh_token");
 
     if (!refreshToken) {
@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ cookies, locals }) => {
             httpOnly: true
         });
 
-        const userData = await getUserData(newToken.access_token, locals.db);
+        const userData = await getUserData(newToken.access_token);
         const token = await signData(userData, JWT_SECRET, `${newToken.expires_in}s`);
 
         cookies.set("user", token, {

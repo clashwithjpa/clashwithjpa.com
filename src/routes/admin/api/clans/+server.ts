@@ -1,15 +1,13 @@
 import { API_TOKEN, DISCORD_BOT_TOKEN } from "$env/static/private";
 import { PUBLIC_API_BASE_URI, PUBLIC_DISCORD_URL } from "$env/static/public";
-import type { UserData } from "$lib/auth/user";
+import { isAdmin } from "$lib/auth/user";
 import { checkClan, getClanWarData } from "$lib/coc/clan";
 import { checkChannel, checkRole, checkUser } from "$lib/discord/check";
+import { getClansPublicData } from "$lib/server/functions";
 import { clanTable, type EditClan, type InsertClan } from "$lib/server/schema";
 import { json } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
-import { getClansPublicData } from "$lib/server/functions";
-
-const isAdmin = (user: UserData | null) => user && user.isAdmin;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleAddClan = async (locals: App.Locals, value: any) => {
@@ -104,11 +102,11 @@ const syncClanData = async (locals: App.Locals) => {
     return { success: true };
 };
 
-export const POST: RequestHandler = async ({ locals, request }) => {
-    const user = locals.user;
+export const POST: RequestHandler = async ({ locals, request, fetch }) => {
+    const admin = isAdmin(fetch);
     const body = await request.json();
 
-    if (!isAdmin(user)) {
+    if (!admin) {
         return json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -137,11 +135,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     return json({ error: "Invalid key" }, { status: 400 });
 };
 
-export const DELETE: RequestHandler = async ({ locals, request }) => {
-    const user = locals.user;
+export const DELETE: RequestHandler = async ({ locals, request, fetch }) => {
+    const admin = isAdmin(fetch);
     const body = await request.json();
 
-    if (!isAdmin(user)) {
+    if (!admin) {
         return json({ error: "Unauthorized" }, { status: 401 });
     }
 

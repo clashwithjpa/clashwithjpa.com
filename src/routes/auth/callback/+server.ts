@@ -5,7 +5,7 @@ import { getUserData } from "$lib/auth/user";
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler = async ({ fetch, url, cookies, locals }) => {
+export const GET: RequestHandler = async ({ fetch, url, cookies }) => {
     const code = url.searchParams.get("code");
     if (!code) {
         error(400, "No code provided");
@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ fetch, url, cookies, locals }) => {
                 httpOnly: true
             });
 
-            const userData = await getUserData(access_token, locals.db);
+            const userData = await getUserData(access_token);
             const token = await signData(userData, JWT_SECRET, `${expires_in}s`);
 
             if (userData) {

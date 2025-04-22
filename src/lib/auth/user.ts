@@ -1,18 +1,13 @@
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
 import { error } from "@sveltejs/kit";
-import type { APIGuild, APIGuildMember, APIUser } from "discord-api-types/v10";
-import { getAdminConfig } from "$lib/server/functions";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import * as schema from "$lib/server/schema";
+import type { APIUser } from "discord-api-types/v10";
 
-type DB = NeonHttpDatabase<typeof schema> & {
-    $client: NeonQueryFunction<false, false>;
+export type UserChecks = {
+    inGuild: boolean;
+    isAdmin: boolean;
 };
 
-export type UserData = APIUser & { inGuild: boolean; isAdmin: boolean };
-
-export async function getUserData(access_token: string, db: DB): Promise<UserData> {
+export async function getUserData(access_token: string): Promise<APIUser> {
     const userDataResponse = await fetch(`${PUBLIC_DISCORD_URL}/users/@me`, {
         headers: {
             Authorization: `Bearer ${access_token}`
@@ -21,34 +16,21 @@ export async function getUserData(access_token: string, db: DB): Promise<UserDat
     if (!userDataResponse.ok) {
         error(userDataResponse.status, userDataResponse.statusText);
     }
-    const userData: UserData = await userDataResponse.json();
-    const guildDataResponse = await fetch(`${PUBLIC_DISCORD_URL}/users/@me/guilds`, {
-        headers: {
-            Authorization: `Bearer ${access_token}`
-        }
-    });
-    if (!guildDataResponse.ok) {
-        error(guildDataResponse.status, guildDataResponse.statusText);
-    }
-    const guildData: APIGuild[] = await guildDataResponse.json();
-    const adminConfig = await getAdminConfig(db);
+    let userData: APIUser = await userDataResponse.json();
 
-    userData.inGuild = guildData.some((guild: APIGuild) => guild.id === adminConfig.guildId);
-    if (userData.inGuild) {
-        const userGuildDataResponse = await fetch(`${PUBLIC_DISCORD_URL}/users/@me/guilds/${adminConfig.guildId}/member`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        });
-        if (!userGuildDataResponse.ok) {
-            error(userGuildDataResponse.status, userGuildDataResponse.statusText);
-        }
-        const userGuildData: APIGuildMember = await userGuildDataResponse.json();
-
-        const adminMembers = adminConfig.adminMembersId;
-        const adminRoles = adminConfig.adminRolesId;
-
-        userData.isAdmin = adminMembers.includes(userData.id) || userGuildData.roles.some((roleID: string) => adminRoles.includes(roleID));
-    }
     return userData;
+}
+
+export async function getUserChecks(fetch: any): Promise<UserChecks> {
+    const resp = await fetch("/api/user/checks");
+    const respData = await resp.json();
+    if (!resp.ok) {
+        error(resp.status, respData.error);
+    }
+    return respData as UserChecks;
+}
+
+export async function isAdmin(fetch: any): Promise<boolean> {
+    const checks = await getUserChecks(fetch);
+    return checks.isAdmin;
 }
