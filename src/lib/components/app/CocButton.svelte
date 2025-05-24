@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils/cn";
+    import { cn } from "$lib/utils";
     import type { Snippet } from "svelte";
     import P from "./ui/P.svelte";
 

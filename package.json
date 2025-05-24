@@ -19,6 +19,7 @@
     "devDependencies": {
         "@eslint/compat": "^1.2.8",
         "@iconify/json": "^2.2.329",
+        "@lucide/svelte": "^0.511.0",
         "@sveltejs/adapter-cloudflare": "^4.9.0",
         "@sveltejs/kit": "^2.20.7",
         "@sveltejs/vite-plugin-svelte": "^5.0.3",
@@ -27,6 +28,7 @@
         "@types/node": "^22.14.1",
         "@types/nprogress": "^0.2.3",
         "ag-grid-svelte5-extended": "^0.0.13",
+        "clsx": "^2.1.1",
         "drizzle-kit": "^0.30.6",
         "esbuild": "^0.25.0",
         "eslint": "^9.25.0",
@@ -40,7 +42,10 @@
         "svelte": "^5.28.1",
         "svelte-check": "^4.1.6",
         "svelte-turnstile": "^0.9.0",
+        "tailwind-merge": "^3.3.0",
+        "tailwind-variants": "^1.0.0",
         "tailwindcss": "^4.1.4",
+        "tw-animate-css": "^1.3.0",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.30.1",
         "unplugin-icons": "^0.21.0",
@@ -66,7 +71,6 @@
         "svelte-motion": "^0.12.2",
         "svelte-sonner": "^0.3.28",
         "sveltekit-superforms": "^2.24.1",
-        "tailwind-merge": "^2.6.0",
         "zod": "^3.24.3"
     },
     "pnpm": {

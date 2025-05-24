@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils/cn";
+    import { cn } from "$lib/utils";
     import { Dialog } from "bits-ui";
     import type { Snippet } from "svelte";
     import { fade } from "svelte/transition";
