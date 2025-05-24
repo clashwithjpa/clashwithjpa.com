@@ -1,107 +1,154 @@
-<script lang="ts">
-    import { page } from "$app/state";
-    import { Popover } from "bits-ui";
-    import type { Component } from "svelte";
-    import MaterialSymbolsAdminPanelSettingsRounded from "~icons/material-symbols/admin-panel-settings-rounded";
-    import MaterialSymbolsBook4SparkRounded from "~icons/material-symbols/book-4-spark-rounded";
-    import MaterialSymbolsGroupsRounded from "~icons/material-symbols/groups-rounded";
-    import MaterialSymbolsMoreVert from "~icons/material-symbols/more-vert";
-    import MaterialSymbolsSettingsRounded from "~icons/material-symbols/settings-rounded";
-    import MaterialSymbolsSheets from "~icons/material-symbols/sheets";
-    import MaterialSymbolsSwordsOutlineRounded from "~icons/material-symbols/swords-outline-rounded";
-    import MaterialSymbolsUserAttributesRounded from "~icons/material-symbols/user-attributes-rounded";
+<script lang="ts" module>
+    import LucideBook from "~icons/lucide/book";
+    import LucideDrama from "~icons/lucide/drama";
+    import LucideFileClock from "~icons/lucide/file-clock";
+    import LucideHouse from "~icons/lucide/house";
+    import LucideSettings from "~icons/lucide/settings";
+    import LucideSwords from "~icons/lucide/swords";
+    import LucideUsers from "~icons/lucide/users";
 
-    interface Item {
-        name: string;
-        icon: Component;
-        href: string;
-        hidden?: boolean;
-        newTab?: boolean;
-    }
-    const items: Item[] = [
+    const data = [
         {
-            name: "Overview",
-            icon: MaterialSymbolsAdminPanelSettingsRounded,
-            href: "/admin"
+            title: "Overview",
+            icon: LucideHouse,
+            url: "/admin"
         },
         {
-            name: "Clans",
-            icon: MaterialSymbolsGroupsRounded,
-            href: "/admin/clans"
+            title: "Clans",
+            icon: LucideDrama,
+            url: "/admin/clans"
         },
         {
-            name: "Users",
-            icon: MaterialSymbolsUserAttributesRounded,
-            href: "/admin/users",
-            hidden: true
+            title: "Users",
+            icon: LucideUsers,
+            url: "/admin/users"
         },
         {
-            name: "Applications",
-            icon: MaterialSymbolsSheets,
-            href: "/admin/applications",
-            hidden: true
+            title: "Applications",
+            icon: LucideFileClock,
+            url: "/admin/applications"
         },
         {
-            name: "CWL",
-            icon: MaterialSymbolsSwordsOutlineRounded,
-            href: "/admin/cwl",
-            hidden: true
+            title: "CWL",
+            icon: LucideSwords,
+            url: "/admin/cwl"
         },
         {
-            name: "Rules",
-            icon: MaterialSymbolsBook4SparkRounded,
-            href: "/admin/rules"
+            title: "Rules",
+            icon: LucideBook,
+            url: "/admin/rules"
         },
         {
-            name: "Settings",
-            icon: MaterialSymbolsSettingsRounded,
-            href: "/admin/settings"
+            title: "Settings",
+            icon: LucideSettings,
+            url: "/admin/settings"
         }
     ];
 </script>
 
-<nav
-    class="fixed inset-x-0 bottom-0 z-100 mt-20 flex w-screen max-w-screen items-center justify-evenly gap-2 bg-gray-900 p-2 backdrop-blur-xs transition-all md:inset-y-0 md:left-0 md:max-h-screen md:w-fit md:max-w-lg md:flex-col md:justify-start md:rounded-t-none md:py-4"
-    class:rounded-t-2xl={page.route.id !== "/admin/rules"}
-    class:md:rounded-br-2xl={page.route.id !== "/admin/rules"}
->
-    {#each items as item}
-        <a
-            href={item.href}
-            class="{page.route.id === item.href
-                ? 'bg-gray-950/50'
-                : ''} flex w-full flex-col items-center justify-start rounded-xl p-2 transition-all duration-200 hover:bg-gray-950/50 md:flex-row md:gap-2 md:px-5"
-            class:hidden={item.hidden}
-            class:md:flex={item.hidden}
-        >
-            <item.icon class="size-6 md:size-8" />
-            <span class="text-[8px] md:text-base">{item.name}</span>
-        </a>
-    {/each}
+<script lang="ts">
+    import { goto, invalidateAll } from "$app/navigation";
+    import { page } from "$app/state";
+    import type { UserData } from "$lib/auth/user";
+    import * as Avatar from "$lib/components/admin/ui/avatar";
+    import * as Breadcrumb from "$lib/components/admin/ui/breadcrumb";
+    import { Button } from "$lib/components/admin/ui/button";
+    import { Separator } from "$lib/components/admin/ui/separator";
+    import * as Sidebar from "$lib/components/admin/ui/sidebar";
+    import * as Tooltip from "$lib/components/admin/ui/tooltip";
+    import type { Snippet } from "svelte";
+    import LucideLogOut from "~icons/lucide/log-out";
 
-    <Popover.Root>
-        <Popover.Trigger class="w-full md:hidden">
-            <div
-                class="flex w-full cursor-pointer flex-col items-center justify-start rounded-xl p-2 transition-all duration-200 hover:bg-gray-950/50 md:flex-row md:gap-2 md:px-5"
-            >
-                <MaterialSymbolsMoreVert class="size-6 md:size-8" />
-                <span class="text-[8px] md:text-base">More</span>
-            </div>
-        </Popover.Trigger>
-        <Popover.Content class="mx-1 flex w-60 items-center justify-evenly gap-2 rounded-xl border border-gray-700 bg-gray-900 p-2 shadow-lg">
-            {#each items as item}
-                {#if item.hidden}
-                    <a
-                        href={item.href}
-                        class="{page.route.id === item.href
-                            ? 'bg-gray-950/50'
-                            : ''} flex w-full flex-col items-center justify-start rounded-xl p-2 transition-all duration-200 hover:bg-gray-950/50 md:flex-row md:gap-2 md:px-5"
-                    >
-                        <item.icon class="size-6 md:size-8" />
-                        <span class="text-[8px] md:text-base">{item.name}</span>
-                    </a>
-                {/if}
-            {/each}
-        </Popover.Content>
-    </Popover.Root>
-</nav>
+    let { user, children }: { user: UserData; children: Snippet } = $props();
+
+    async function logout() {
+        await goto("/");
+        await fetch("/auth/logout");
+        invalidateAll();
+    }
+</script>
+
+<Sidebar.Provider>
+    <Sidebar.Root variant="floating">
+        <Sidebar.Content>
+            <Sidebar.Group>
+                <Sidebar.Menu>
+                    {#each data as item (item.title)}
+                        <Sidebar.MenuItem>
+                            <Sidebar.SidebarMenuButton isActive={item.url === page.url.pathname}>
+                                {#snippet child({ props })}
+                                    <a href={item.url} {...props}>
+                                        <item.icon />
+                                        <span>{item.title}</span>
+                                    </a>
+                                {/snippet}
+                            </Sidebar.SidebarMenuButton>
+                        </Sidebar.MenuItem>
+                    {/each}
+                </Sidebar.Menu>
+            </Sidebar.Group>
+        </Sidebar.Content>
+        <Sidebar.Footer>
+            <Sidebar.Menu>
+                <Sidebar.MenuItem>
+                    <div class="flex items-center justify-between gap-2 px-1 py-1.5 text-left text-sm">
+                        <div class="flex items-center gap-2">
+                            <Avatar.Root class="size-8 rounded-lg">
+                                <Avatar.Image src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}" alt={user.global_name} />
+                                <Avatar.Fallback class="rounded-lg">
+                                    {user.global_name?.slice(0, 2).toUpperCase()}
+                                </Avatar.Fallback>
+                            </Avatar.Root>
+                            <div class="grid flex-1 text-left text-sm leading-tight">
+                                <span class="truncate font-medium">{user.global_name}</span>
+                                <span class="truncate text-xs opacity-50">{user.username}</span>
+                            </div>
+                        </div>
+                        <Tooltip.Provider>
+                            <Tooltip.Root>
+                                <Tooltip.Trigger>
+                                    <Button onclick={logout}>
+                                        <LucideLogOut class="size-5" />
+                                    </Button>
+                                </Tooltip.Trigger>
+                                <Tooltip.Content>
+                                    <p>Logout</p>
+                                </Tooltip.Content>
+                            </Tooltip.Root>
+                        </Tooltip.Provider>
+                    </div>
+                </Sidebar.MenuItem>
+            </Sidebar.Menu>
+        </Sidebar.Footer>
+        <Sidebar.Rail />
+    </Sidebar.Root>
+    <Sidebar.Inset>
+        <header class="flex h-16 shrink-0 items-center gap-2 px-4">
+            <Sidebar.Trigger class="-ml-1" />
+            <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
+            <Breadcrumb.Root>
+                <Breadcrumb.List>
+                    <Breadcrumb.Item class="hidden md:block">
+                        <Breadcrumb.Link href="#">Admin Panel</Breadcrumb.Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Separator class="hidden md:block" />
+                    <Breadcrumb.Item>
+                        <Breadcrumb.Page>
+                            {#if page.url.pathname === "/admin"}
+                                Overview
+                            {:else}
+                                {page.url.pathname
+                                    .replace("/admin/", "") // Remove "/admin/"
+                                    .replace(/^\//, "") // Remove leading slash if any
+                                    .split("/") // Split by "/"
+                                    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1)) // Title case each segment
+                                    .join(" / ")}
+                            {/if}
+                        </Breadcrumb.Page>
+                    </Breadcrumb.Item>
+                </Breadcrumb.List>
+            </Breadcrumb.Root>
+        </header>
+        {@render children()}
+    </Sidebar.Inset>
+</Sidebar.Provider>

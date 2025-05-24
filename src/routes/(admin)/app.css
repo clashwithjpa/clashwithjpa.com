@@ -1,5 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
-
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -116,6 +116,26 @@
         @apply border-border outline-ring/50;
     }
     body {
+        font-family: "Noto Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
         @apply bg-background text-foreground;
+    }
+
+    ::-webkit-scrollbar {
+        @apply w-0 md:w-[0.4rem];
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--color-secondary);
+        border-radius: var(--radius);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-secondary-foreground);
+    }
+    ::-webkit-scrollbar-corner {
+        background: transparent;
     }
 }

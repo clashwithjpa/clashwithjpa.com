@@ -6,7 +6,7 @@
     },
     "aliases": {
         "components": "$lib/components/admin",
-        "utils": "$lib/admin/utils",
+        "utils": "$lib/utils",
         "ui": "$lib/components/admin/ui",
         "hooks": "$lib/admin/hooks",
         "lib": "$lib"
