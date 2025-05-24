@@ -1,8 +1,8 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import AdminItem from "$lib/components/admin/Item.svelte";
-    import Button from "$lib/components/app/ui/Button.svelte";
-    import { toast } from "$lib/components/app/toast";
+    import { Button } from "$lib/components/admin/ui/button";
+    import { toast } from "svelte-sonner";
     import { Switch } from "bits-ui";
     import type { APIGuild, APIRole, APIUser } from "discord-api-types/v10";
     import MaterialSymbolsRefreshRounded from "~icons/material-symbols/refresh-rounded";

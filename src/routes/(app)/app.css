@@ -7,9 +7,6 @@
     --breakpoint-3xl: 2560px;
 
     --font-coc: COC;
-
-    --color-blurple: #5764f2;
-    --color-blurple-light: #c7d2fe;
 }
 
 @font-face {
@@ -118,11 +115,6 @@ input[type="checkbox"]:checked {
     background-color: var(--color-blue-700);
     color: var(--color-gray-50);
     border-color: var(--color-blue-700);
-}
-
-.ag-cell {
-    display: flex;
-    align-items: center;
 }
 
 div[data-bits-floating-content-wrapper] {

@@ -15,57 +15,57 @@ export const clanForm: {
     clanCode: {
         desc: "Clan Code",
         type: "text",
-        placeholder: "Clan Code"
+        placeholder: "JC"
     },
     clanRoleID: {
         desc: "Clan Role ID",
         type: "text",
-        placeholder: "Clan Role ID"
+        placeholder: "1234567890123456789"
     },
     memberRoleID: {
         desc: "Member Role ID",
         type: "text",
-        placeholder: "Member Role ID"
+        placeholder: "1234567890123456789"
     },
     elderRoleID: {
         desc: "Elder Role ID",
         type: "text",
-        placeholder: "Elder Role ID"
+        placeholder: "1234567890123456789"
     },
     coleaderRoleID: {
         desc: "Co-Leader Role ID",
         type: "text",
-        placeholder: "Co-Leader Role ID"
+        placeholder: "1234567890123456789"
     },
     leaderRoleID: {
         desc: "Leader Role ID",
         type: "text",
-        placeholder: "Leader Role ID"
+        placeholder: "1234567890123456789"
     },
     leaderID: {
         desc: "Leader ID",
         type: "text",
-        placeholder: "Leader ID"
+        placeholder: "1234567890123456789"
     },
     channelID: {
         desc: "Channel ID",
         type: "text",
-        placeholder: "Channel ID"
+        placeholder: "1234567890123456789"
     },
     attacksRequirement: {
         desc: "Attacks Requirement",
         type: "number",
-        placeholder: "Attacks Requirement"
+        placeholder: "120"
     },
     donationsRequirement: {
         desc: "Donations Requirement",
         type: "number",
-        placeholder: "Donations Requirement"
+        placeholder: "1000"
     },
     clangamesRequirement: {
         desc: "Clan Games Requirement",
         type: "number",
-        placeholder: "Clan Games Requirement"
+        placeholder: "10000"
     }
 };
 

@@ -1,14 +1,14 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import type { APIPlayer } from "$lib/coc/types";
+    import Grid from "$lib/components/admin/Grid.svelte";
+    import { Button } from "$lib/components/admin/ui/button";
+    import * as Popover from "$lib/components/admin/ui/popover";
     import type { GridOptions } from "@ag-grid-community/core";
-    import { Popover } from "bits-ui";
+    import { toast } from "svelte-sonner";
     import { fade, fly } from "svelte/transition";
     import MaterialSymbolsDeleteRounded from "~icons/material-symbols/delete-rounded";
     import TablerLoader2 from "~icons/tabler/loader-2";
-    import { toast } from "$lib/components/app/toast";
-    import Button from "$lib/components/app/ui/Button.svelte";
-    import Grid from "$lib/components/app/ui/Grid.svelte";
 
     interface Props {
         tags: string[];
@@ -86,54 +86,39 @@
 
 <Popover.Root>
     <Popover.Trigger class="cursor-pointer">
-        <div class="rounded-md bg-gray-800 p-1 font-mono">
+        <div class="bg-background rounded-md p-1 font-mono">
             <p class="text-sm">{tags.length} Account{tags.length > 1 ? "s" : ""}</p>
         </div>
     </Popover.Trigger>
-    <Popover.Portal>
-        <Popover.Content forceMount>
-            {#snippet child({ wrapperProps, props, open })}
-                {#if open}
-                    <div {...wrapperProps}>
-                        <div {...props} transition:fly={{ duration: 200 }} class="size-full rounded-lg border border-gray-700 bg-gray-950">
-                            {#await fetchCocAccounts()}
-                                <div class="flex size-full items-center justify-center p-5">
-                                    <TablerLoader2 class="size-10 animate-spin"></TablerLoader2>
-                                </div>
-                            {:then accs}
-                                <div in:fly class="size-full">
-                                    <div class="flex items-center justify-center gap-2 p-2">
-                                        <Button
-                                            size="sm"
-                                            class="flex items-center justify-center gap-2 hover:not-disabled:!bg-red-500/10 hover:not-disabled:!text-red-500"
-                                            disabled={selectedRows.length <= 0 || disabled}
-                                            onclick={async () => {
-                                                await removeAcc(selectedRows.map((row) => row.tag));
-                                            }}
-                                        >
-                                            <div in:fade class="size-6">
-                                                {#if loading}
-                                                    <span class="size-full">
-                                                        <TablerLoader2 class="size-full animate-spin" />
-                                                    </span>
-                                                {:else}
-                                                    <span class="size-full">
-                                                        <MaterialSymbolsDeleteRounded class="size-full" />
-                                                    </span>
-                                                {/if}
-                                            </div>
-                                        </Button>
-                                    </div>
-                                    <div class="size-full h-[calc(100vh-400px)]">
-                                        <Grid {gridOptions} rowData={accs} />
-                                    </div>
-                                </div>
-                            {/await}
-                            <Popover.Arrow class="text-gray-700" />
+    <Popover.Content class="p-0">
+        {#await fetchCocAccounts()}
+            <div class="flex size-full items-center justify-center py-1">
+                <TablerLoader2 class="size-10 animate-spin"></TablerLoader2>
+            </div>
+        {:then accs}
+            <div in:fly class="flex size-full flex-col">
+                <div class="flex items-center justify-center py-2">
+                    <Button
+                        variant="destructive"
+                        disabled={selectedRows.length <= 0 || disabled}
+                        onclick={async () => {
+                            await removeAcc(selectedRows.map((row) => row.tag));
+                        }}
+                    >
+                        <div in:fade class="size-full">
+                            {#if loading}
+                                <TablerLoader2 class="size-full animate-spin" />
+                            {:else}
+                                <MaterialSymbolsDeleteRounded class="size-full" />
+                            {/if}
                         </div>
-                    </div>
-                {/if}
-            {/snippet}
-        </Popover.Content>
-    </Popover.Portal>
+                        Delete
+                    </Button>
+                </div>
+                <div class="size-full h-[calc(100vh-400px)]">
+                    <Grid {gridOptions} rowData={accs} />
+                </div>
+            </div>
+        {/await}
+    </Popover.Content>
 </Popover.Root>

@@ -103,8 +103,8 @@
                     <Tooltip.Provider>
                         <Tooltip.Root>
                             <Tooltip.Trigger>
-                                <Button onclick={logout}>
-                                    <LucideLogOut class="size-5" />
+                                <Button onclick={logout} size="icon">
+                                    <LucideLogOut />
                                 </Button>
                             </Tooltip.Trigger>
                             <Tooltip.Content>

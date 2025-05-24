@@ -8,10 +8,10 @@
     import MaterialSymbolsSendRounded from "~icons/material-symbols/send-rounded";
     import type { PageData } from "./$types";
     import "./tipex.css";
-    import { toast } from "$lib/components/app/toast";
+    import { toast } from "svelte-sonner";
     import { invalidateAll } from "$app/navigation";
     import { onMount } from "svelte";
-    import Button from "$lib/components/app/ui/Button.svelte";
+    import { Button } from "$lib/components/admin/ui/button";
 
     let { data }: { data: PageData } = $props();
     let rules = $state(data.rules.content);

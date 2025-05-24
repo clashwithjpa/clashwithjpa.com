@@ -1,10 +1,10 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
+    import Grid from "$lib/components/admin/Grid.svelte";
+    import { Button } from "$lib/components/admin/ui/button";
     import CocAccountsUsersFormsWrapper from "$lib/components/admin/wrappers/CocAccountsUsersFormsWrapper.svelte";
     import UserNameUsersFormsWrapper from "$lib/components/admin/wrappers/UserNameUsersFormsWrapper.svelte";
-    import { toast } from "$lib/components/app/toast";
-    import Button from "$lib/components/app/ui/Button.svelte";
-    import Grid from "$lib/components/app/ui/Grid.svelte";
+    import { toast } from "svelte-sonner";
     import type { InsertCoc, InsertUser } from "$lib/server/schema";
     import type { GridOptions } from "@ag-grid-community/core";
     import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
@@ -105,10 +105,10 @@
     }
 </script>
 
-<div class="flex size-full flex-col gap-5 p-5 md:p-11">
+<div class="flex size-full flex-col gap-5">
     <div class="flex w-full items-center justify-between">
         <div class="flex items-center justify-center gap-2">
-            <h1 class="text-3xl font-bold md:text-4xl">Users</h1>
+            <h1 class="text-3xl font-bold">Users</h1>
             <div class="size-8">
                 {#if syncing === "success"}
                     <span in:fade class="size-full">
@@ -127,24 +127,20 @@
         </div>
         <div class="flex items-center justify-center gap-2">
             <Button
-                size="sm"
-                class="flex items-center justify-center gap-2 hover:not-disabled:!bg-red-500/10 hover:not-disabled:!text-red-500"
+                variant="destructive"
                 disabled={selectedRows.length <= 0 || disabled}
                 onclick={async () => {
                     await removeUser(selectedRows.map((row) => row.discordId));
                 }}
             >
-                <div in:fade class="size-6">
+                <div in:fade class="size-full">
                     {#if loading}
-                        <span class="size-full">
-                            <TablerLoader2 class="size-full animate-spin" />
-                        </span>
+                        <TablerLoader2 class="size-full animate-spin" />
                     {:else}
-                        <span class="size-full">
-                            <MaterialSymbolsDeleteRounded class="size-full" />
-                        </span>
+                        <MaterialSymbolsDeleteRounded class="size-full" />
                     {/if}
                 </div>
+                Delete
             </Button>
         </div>
     </div>

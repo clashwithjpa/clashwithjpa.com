@@ -5,6 +5,7 @@
     import * as Breadcrumb from "$lib/components/admin/ui/breadcrumb";
     import { Separator } from "$lib/components/admin/ui/separator";
     import * as Sidebar from "$lib/components/admin/ui/sidebar";
+    import { Toaster } from "$lib/components/admin/ui/sonner";
     import type { Snippet } from "svelte";
     import type { PageData } from "./admin/$types";
     import "./app.css";
@@ -31,6 +32,8 @@
 <svelte:head>
     <title>JPA | Admin</title>
 </svelte:head>
+
+<!-- <Toaster /> -->
 
 <Sidebar.Provider>
     <Bar user={data.user} />
@@ -61,6 +64,8 @@
                 </Breadcrumb.List>
             </Breadcrumb.Root>
         </header>
-        {@render children()}
+        <div class="p-5 size-full">
+            {@render children()}
+        </div>
     </Sidebar.Inset>
 </Sidebar.Provider>

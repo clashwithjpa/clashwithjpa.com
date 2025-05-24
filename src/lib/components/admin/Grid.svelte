@@ -12,22 +12,23 @@
     let { rowData = $bindable(), gridOptions }: Props = $props();
 
     const theme = themeQuartz.withParams({
-        backgroundColor: "#030712", // gray-900
+        backgroundColor: "var(--card)",
         browserColorScheme: "dark",
         chromeBackgroundColor: {
             ref: "foregroundColor",
             mix: 0.07,
             onto: "backgroundColor"
         },
-        foregroundColor: "#F9FAFB", // gray-50
+        foregroundColor: "var(--card-foreground)",
         headerFontSize: 14,
-        borderRadius: 8, // rounded-lg
-        checkboxBorderRadius: 6, // rounded-md
-        focusShadow: "",
+        borderRadius: "var(--radius)",
+        checkboxBorderRadius: "var(--radius)",
+        focusShadow: "var(--background)",
         dropdownShadow: {
             radius: 8,
-            color: "#1F2937" // gray-800
-        }
+            color: "var(--card)"
+        },
+        accentColor: "var(--accent-foreground)",
     });
 
     gridOptions = { ...gridOptions, theme };
