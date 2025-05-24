@@ -1,10 +1,13 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import type { APIPlayer } from "$lib/coc/types";
+    import { Button } from "$lib/components/admin/ui/button";
+    import * as Card from "$lib/components/admin/ui/card";
+    import UserName from "$lib/components/admin/UserName.svelte";
     import type { SelectClanApplication } from "$lib/server/schema";
-    import { Tooltip } from "bits-ui";
-    import { expoIn, expoOut } from "svelte/easing";
-    import { fade, fly, slide } from "svelte/transition";
+    import { textOverflow } from "$lib/utils";
+    import { toast } from "svelte-sonner";
+    import { fade, slide } from "svelte/transition";
     import HugeiconsMoneyReceiveCircle from "~icons/hugeicons/money-receive-circle";
     import HugeiconsMoneySendCircle from "~icons/hugeicons/money-send-circle";
     import LineMdChevronSmallDown from "~icons/line-md/chevron-small-down";
@@ -13,9 +16,6 @@
     import MaterialSymbolsCheckRounded from "~icons/material-symbols/check-rounded";
     import MaterialSymbolsCloseRounded from "~icons/material-symbols/close-rounded";
     import MaterialSymbolsDeleteRounded from "~icons/material-symbols/delete-rounded";
-    import CocButton from "$lib/components/app/CocButton.svelte";
-    import { toast } from "$lib/components/app/toast";
-    import UserName from "./UserName.svelte";
 
     interface Props {
         applications: SelectClanApplication[];
@@ -83,14 +83,14 @@
     }
 </script>
 
-<ul class="mt-5 flex flex-col gap-5">
+<ul class="mt-2 flex flex-col gap-5">
     {#if sortedApps.length === 0}
-        <p class="text-gray-500">No {type} applications found</p>
+        <p class="text-muted-foreground">No {type} applications found</p>
     {:else}
         {#each sortedApps as [date, apps], idx}
             {#if apps.length > 0}
                 <li class="flex w-full flex-col items-start justify-center">
-                    <button class="flex w-full items-center text-gray-500" onclick={() => (hidden[idx] = !hidden[idx])}>
+                    <button class="text-muted-foreground flex w-full items-center" onclick={() => (hidden[idx] = !hidden[idx])}>
                         {#if hidden[idx]}
                             <span>
                                 <LineMdChevronSmallRight class="size-fit" />
@@ -101,142 +101,114 @@
                             </span>
                         {/if}
                         {date}
-                        <span class="mx-2 grow rounded-xl border-t border-gray-500"></span>
+                        <span class="border-muted-foreground mx-2 grow rounded-xl border-t"></span>
                         {apps.length}
                         {apps.length > 1 ? "Applications" : "Application"}
                     </button>
                     {#if !hidden[idx]}
                         <ul transition:slide class="mt-2 flex w-full flex-wrap items-start justify-center gap-2 md:justify-start">
                             {#each apps as application, appIdx}
-                                <div
-                                    in:fly={{ duration: 500, easing: expoIn, x: -100, y: 0 }}
-                                    out:fly={{ duration: 500, easing: expoOut, x: 100, y: 0 }}
-                                    class="flex w-fit flex-col items-center justify-center gap-5 rounded-xl border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-4"
-                                >
-                                    <div class="flex w-full items-center justify-between gap-5">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <Tooltip.Provider>
-                                                <Tooltip.Root delayDuration={200}>
-                                                    <Tooltip.Trigger>
-                                                        <img
-                                                            src="/townhall/{application.playerData.townHallLevel}.webp"
-                                                            alt="TH {application.playerData.townHallLevel}"
-                                                            class="size-15 rounded-lg"
-                                                        />
-                                                    </Tooltip.Trigger>
-                                                    <Tooltip.Content
-                                                        class="rounded-lg border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-2 text-sm"
-                                                    >
-                                                        <p>Townhall {application.playerData.townHallLevel}</p>
-                                                    </Tooltip.Content>
-                                                </Tooltip.Root>
-                                            </Tooltip.Provider>
-                                            <span class="flex flex-col items-start justify-center">
-                                                <Tooltip.Provider>
-                                                    <Tooltip.Root delayDuration={200}>
-                                                        <Tooltip.Trigger class="cursor-default">
-                                                            <p>
-                                                                {application.playerData.name.length >= 6
-                                                                    ? `${application.playerData.name.slice(0, 6).trim()}...`
-                                                                    : application.playerData.name}
-                                                            </p>
-                                                        </Tooltip.Trigger>
-                                                        <Tooltip.Content
-                                                            class="rounded-lg border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-2 text-sm"
-                                                        >
-                                                            <p>{application.playerData.name}</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip.Root>
-                                                </Tooltip.Provider>
-                                                <p class="text-xs">{application.tag}</p>
-                                            </span>
+                                <Card.Root class="gap-2 p-5">
+                                    <Card.Header class="p-0" style="container-type: inherit;">
+                                        <div class="flex w-full items-center justify-between gap-2">
+                                            <img
+                                                src="/townhall/{application.playerData.townHallLevel}.webp"
+                                                alt="TH {application.playerData.townHallLevel}"
+                                                class="size-15 rounded-lg"
+                                            />
+                                            <div class="flex w-full flex-col items-start justify-center">
+                                                <Card.Title class="overflow-hidden text-lg font-bold">
+                                                    {textOverflow(application.playerData.name, 8)}
+                                                </Card.Title>
+                                                <Card.Description class="text-sm">
+                                                    {application.tag}
+                                                </Card.Description>
+                                            </div>
+                                            <p class="text-muted-foreground w-full text-sm">
+                                                {new Date(application.createdAt).toLocaleTimeString("en-IN", {
+                                                    hour: "numeric",
+                                                    minute: "numeric"
+                                                })}
+                                            </p>
                                         </div>
-                                        <p class="text-gray-400">
-                                            {new Date(application.createdAt).toLocaleTimeString("en-IN", {
-                                                hour: "numeric",
-                                                minute: "numeric"
-                                            })}
-                                        </p>
-                                    </div>
-                                    <div class="flex w-full flex-col items-center justify-center text-sm text-gray-400">
-                                        <button
-                                            onclick={() => (hiddenInfo[appIdx + idx] = !hiddenInfo[appIdx + idx])}
-                                            class="flex w-full items-center justify-center gap-1"
-                                        >
-                                            <span class="grow rounded-xl border-t border-gray-400"></span>
-                                            {#if hiddenInfo[appIdx + idx]}
-                                                <span>
-                                                    <LineMdChevronSmallRight class="size-fit" />
-                                                </span>
-                                            {:else}
-                                                <span>
-                                                    <LineMdChevronSmallDown class="size-fit" />
-                                                </span>
-                                            {/if}
-                                            Player Data
-                                            <span class="grow rounded-xl border-t border-gray-400"></span>
-                                        </button>
-                                        {#if !hiddenInfo[appIdx + idx]}
-                                            {#await fetchPlayerInfo(application.tag)}
-                                                <div in:slide class="flex w-full flex-col items-start justify-center gap-1">
-                                                    {#each new Array(5) as _}
-                                                        <div class="flex w-full animate-pulse items-center justify-start gap-1">
-                                                            <div class="size-6 shrink-0 rounded-lg bg-gray-500"></div>
-                                                            <div class="h-4 w-2/3 rounded-md bg-gray-500"></div>
+                                    </Card.Header>
+                                    <Card.Content class="flex flex-col items-start justify-center gap-2 p-0">
+                                        <div class="text-muted-foreground flex w-full flex-col items-center justify-center text-sm">
+                                            <button
+                                                onclick={() => (hiddenInfo[appIdx + idx] = !hiddenInfo[appIdx + idx])}
+                                                class="group flex w-full items-center justify-center gap-1"
+                                            >
+                                                <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                {#if hiddenInfo[appIdx + idx]}
+                                                    <span>
+                                                        <LineMdChevronSmallRight class="size-fit" />
+                                                    </span>
+                                                {:else}
+                                                    <span>
+                                                        <LineMdChevronSmallDown class="size-fit" />
+                                                    </span>
+                                                {/if}
+                                                Player Data
+                                                <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                            </button>
+                                            {#if !hiddenInfo[appIdx + idx]}
+                                                {#await fetchPlayerInfo(application.tag)}
+                                                    <div in:slide class="flex w-full flex-col items-start justify-center gap-1">
+                                                        {#each new Array(5) as _}
+                                                            <div class="flex w-full animate-pulse items-center justify-start gap-1">
+                                                                <div class="bg-muted-foreground size-6 shrink-0 rounded-lg"></div>
+                                                                <div class="bg-muted-foreground h-4 w-2/3 rounded-md"></div>
+                                                            </div>
+                                                        {/each}
+                                                        <div class="flex w-full items-center justify-center gap-1">
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                            Donations
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
                                                         </div>
-                                                    {/each}
-                                                    <div class="flex w-full items-center justify-center gap-1">
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                        Donations
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                    </div>
-                                                    {#each new Array(3) as _}
-                                                        <div class="flex w-full animate-pulse items-center justify-start gap-1">
-                                                            <div class="size-6 shrink-0 rounded-lg bg-gray-500"></div>
-                                                            <div class="h-4 w-2/3 rounded-md bg-gray-500"></div>
+                                                        {#each new Array(3) as _}
+                                                            <div class="flex w-full animate-pulse items-center justify-start gap-1">
+                                                                <div class="bg-muted-foreground size-6 shrink-0 rounded-lg"></div>
+                                                                <div class="bg-muted-foreground h-4 w-2/3 rounded-md"></div>
+                                                            </div>
+                                                        {/each}
+                                                        <div class="flex w-full items-center justify-center gap-1">
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                            Achievements
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
                                                         </div>
-                                                    {/each}
-                                                    <div class="flex w-full items-center justify-center gap-1">
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                        Achievements
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
+                                                        {#each new Array(5) as _}
+                                                            <div class="flex w-full animate-pulse items-center justify-start gap-1">
+                                                                <div class="bg-muted-foreground size-6 shrink-0 rounded-lg"></div>
+                                                                <div class="bg-muted-foreground h-4 w-2/3 rounded-md"></div>
+                                                            </div>
+                                                        {/each}
                                                     </div>
-                                                    {#each new Array(5) as _}
-                                                        <div class="flex w-full animate-pulse items-center justify-start gap-1">
-                                                            <div class="size-6 shrink-0 rounded-lg bg-gray-500"></div>
-                                                            <div class="h-4 w-2/3 rounded-md bg-gray-500"></div>
+                                                {:then playerInfo}
+                                                    <div transition:fade class="flex w-full flex-col items-start justify-center gap-1">
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/trophy.webp" alt="Trophies" class="size-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Trophies:</p>
+                                                            <p class="text-foreground">{playerInfo?.trophies}</p>
                                                         </div>
-                                                    {/each}
-                                                </div>
-                                            {:then playerInfo}
-                                                <div transition:fade class="flex w-full flex-col items-start justify-center gap-1">
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/trophy.webp" alt="Donations" class="w-5.5 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Trophies: {playerInfo?.trophies}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/attack.webp" alt="Donations" class="w-5.5 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Attack Wins: {playerInfo?.attackWins}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/defence.webp" alt="Donations" class="w-5.5 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Defence Wins: {playerInfo?.defenseWins}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <LogosDiscordIcon class="text-blurple size-6 shrink-0" />
-                                                        <p class="text-gray-300">Discord:</p>
-                                                        <UserName userID={application.discordId} />
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/info.webp" alt="CG Donated" class="w-6 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            More Info: <a
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/attack.webp" alt="Attack Wins" class="size-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Attack Wins:</p>
+                                                            <p class="text-foreground">{playerInfo?.attackWins}</p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/defence.webp" alt="Defence Wins" class="size-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Defence Wins:</p>
+                                                            <p class="text-foreground">{playerInfo?.defenseWins}</p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <LogosDiscordIcon class="text-blurple size-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Discord:</p>
+                                                            <UserName userID={application.discordId} />
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/info.webp" alt="More Info" class="w-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">More Info:</p>
+                                                            <a
                                                                 href="https://cc.fwafarm.com/cc_n/member.php?tag={encodeURIComponent(
                                                                     application.tag
                                                                 )}"
@@ -244,108 +216,71 @@
                                                                 rel="noopener noreferrer"
                                                                 class="text-blue-400 hover:underline">Click here</a
                                                             >
-                                                        </p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-center gap-1">
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                            Donations
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <HugeiconsMoneySendCircle class="size-6 shrink-0 text-yellow-400" />
+                                                            <p class="text-secondary-foreground font-bold">Donated:</p>
+                                                            <p class="text-foreground">{playerInfo?.donations}</p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <HugeiconsMoneyReceiveCircle class="size-6 shrink-0 text-yellow-400" />
+                                                            <p class="text-secondary-foreground font-bold">Received:</p>
+                                                            <p class="text-foreground">{playerInfo?.donationsReceived}</p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-center gap-1">
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                            Achievements
+                                                            <span class="border-muted-foreground grow rounded-xl border-t"></span>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/donations.webp" alt="Total Donations" class="w-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Total Donations:</p>
+                                                            <p class="text-foreground">
+                                                                {playerInfo?.achievements.find((ach) => ach.name === "Friend in Need")?.value}
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/trophy2.webp" alt="Best Trophies" class="size-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Best Trophies:</p>
+                                                            <p class="text-foreground">{playerInfo?.bestTrophies}</p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/clangames.webp" alt="Clan Games" class="w-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">Clan Games:</p>
+                                                            <p class="text-foreground">
+                                                                {playerInfo?.achievements.find((ach) => ach.name === "Games Champion")?.value}
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/cg_raid.webp" alt="CG Raided" class="w-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">CG Raided:</p>
+                                                            <p class="text-foreground">
+                                                                {playerInfo?.achievements.find((ach) => ach.name === "Aggressive Capitalism")?.value}
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex w-full items-center justify-start gap-1">
+                                                            <img src="/emoji/cg_donated.webp" alt="CG Donated" class="w-6 shrink-0" />
+                                                            <p class="text-secondary-foreground font-bold">CG Donated:</p>
+                                                            <p class="text-foreground">
+                                                                {playerInfo?.achievements.find((ach) => ach.name === "Most Valuable Clanmate")?.value}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div class="flex w-full items-center justify-center gap-1">
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                        Donations
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
+                                                {:catch error}
+                                                    <div transition:slide class="flex w-full items-center justify-center gap-1">
+                                                        <p class="text-red-400">{error.message}</p>
                                                     </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <HugeiconsMoneySendCircle class="size-6 shrink-0 text-yellow-400" />
-                                                        <p class="text-gray-300">
-                                                            Donated: {playerInfo?.donations}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <HugeiconsMoneyReceiveCircle class="size-6 shrink-0 text-yellow-400" />
-                                                        <p class="text-gray-300">
-                                                            Received: {playerInfo?.donationsReceived}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-center gap-1">
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                        Achievements
-                                                        <span class="grow rounded-xl border-t border-gray-400"></span>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/donations.webp" alt="Total Donations" class="w-6 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Total Donations: {playerInfo?.achievements.find((ach) => ach.name === "Friend in Need")
-                                                                ?.value}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/trophy2.webp" alt="Donations" class="w-5.5 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Best Trophies: {playerInfo?.bestTrophies}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/clangames.webp" alt="CG" class="w-6 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            Clan Games: {playerInfo?.achievements.find((ach) => ach.name === "Games Champion")?.value}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/cg_raid.webp" alt="CG Raided" class="w-6 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            CG Raided: {playerInfo?.achievements.find((ach) => ach.name === "Aggressive Capitalism")
-                                                                ?.value}
-                                                        </p>
-                                                    </div>
-                                                    <div class="flex w-full items-center justify-start gap-1">
-                                                        <img src="/emoji/cg_donated.webp" alt="CG Donated" class="w-6 shrink-0" />
-                                                        <p class="text-gray-300">
-                                                            CG Donated: {playerInfo?.achievements.find((ach) => ach.name === "Most Valuable Clanmate")
-                                                                ?.value}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            {:catch error}
-                                                <div transition:slide class="flex w-full items-center justify-center gap-1">
-                                                    <p class="text-red-400">{error.message}</p>
-                                                </div>
-                                            {/await}
-                                        {/if}
-                                    </div>
-                                    <div class="flex w-full items-center justify-evenly gap-5">
-                                        {#if type === "pending"}
-                                            <CocButton
-                                                type="success"
-                                                size="sm"
-                                                class="w-full"
-                                                {disabled}
-                                                onclick={async () => {
-                                                    await handleApplication(
-                                                        application.tag,
-                                                        application.playerData.name,
-                                                        "accepted",
-                                                        application.discordId
-                                                    );
-                                                }}
-                                            >
-                                                <MaterialSymbolsCheckRounded class="size-6" />
-                                                Accept
-                                            </CocButton>
-                                            <CocButton
-                                                type="danger"
-                                                size="sm"
-                                                class="w-full"
-                                                {disabled}
-                                                onclick={async () => {
-                                                    await handleApplication(application.tag, application.playerData.name, "rejected");
-                                                }}
-                                            >
-                                                <MaterialSymbolsCloseRounded class="size-6" />
-                                                Reject
-                                            </CocButton>
-                                        {:else if type === "accepted" || type === "rejected"}
-                                            {#if type === "rejected"}
-                                                <CocButton
-                                                    type="success"
-                                                    size="sm"
-                                                    class="w-full"
+                                                {/await}
+                                            {/if}
+                                        </div>
+                                        <div class="flex w-full items-center justify-evenly gap-2">
+                                            {#if type === "pending"}
+                                                <Button
                                                     {disabled}
                                                     onclick={async () => {
                                                         await handleApplication(
@@ -358,28 +293,53 @@
                                                 >
                                                     <MaterialSymbolsCheckRounded class="size-6" />
                                                     Accept
-                                                </CocButton>
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    {disabled}
+                                                    onclick={async () => {
+                                                        await handleApplication(application.tag, application.playerData.name, "rejected");
+                                                    }}
+                                                >
+                                                    <MaterialSymbolsCloseRounded class="size-6" />
+                                                    Reject
+                                                </Button>
+                                            {:else if type === "accepted" || type === "rejected"}
+                                                {#if type === "rejected"}
+                                                    <Button
+                                                        {disabled}
+                                                        onclick={async () => {
+                                                            await handleApplication(
+                                                                application.tag,
+                                                                application.playerData.name,
+                                                                "accepted",
+                                                                application.discordId
+                                                            );
+                                                        }}
+                                                    >
+                                                        <MaterialSymbolsCheckRounded class="size-6" />
+                                                        Accept
+                                                    </Button>
+                                                {/if}
+                                                <Button
+                                                    variant="destructive"
+                                                    {disabled}
+                                                    onclick={async () => {
+                                                        await handleApplication(
+                                                            application.tag,
+                                                            application.playerData.name,
+                                                            "deleted",
+                                                            application.discordId
+                                                        );
+                                                    }}
+                                                >
+                                                    <MaterialSymbolsDeleteRounded class="size-6" />
+                                                    Delete
+                                                </Button>
                                             {/if}
-                                            <CocButton
-                                                type="danger"
-                                                size="sm"
-                                                class="w-full"
-                                                {disabled}
-                                                onclick={async () => {
-                                                    await handleApplication(
-                                                        application.tag,
-                                                        application.playerData.name,
-                                                        "deleted",
-                                                        application.discordId
-                                                    );
-                                                }}
-                                            >
-                                                <MaterialSymbolsDeleteRounded class="size-6" />
-                                                Delete
-                                            </CocButton>
-                                        {/if}
-                                    </div>
-                                </div>
+                                        </div>
+                                    </Card.Content>
+                                </Card.Root>
                             {/each}
                         </ul>
                     {/if}

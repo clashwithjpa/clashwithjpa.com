@@ -1,17 +1,17 @@
 <script lang="ts">
+    import { invalidateAll } from "$app/navigation";
+    import { Button } from "$lib/components/admin/ui/button";
     import { Tipex, type TipexEditor } from "@friendofsvelte/tipex";
     import "@friendofsvelte/tipex/styles/CodeBlock.css";
     import "@friendofsvelte/tipex/styles/Controls.css";
     import "@friendofsvelte/tipex/styles/EditLink.css";
     import "@friendofsvelte/tipex/styles/ProseMirror.css";
     import "@friendofsvelte/tipex/styles/Tipex.css";
-    import MaterialSymbolsSendRounded from "~icons/material-symbols/send-rounded";
+    import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
+    import LucideSendHorizontal from "~icons/lucide/send-horizontal";
     import type { PageData } from "./$types";
     import "./tipex.css";
-    import { toast } from "svelte-sonner";
-    import { invalidateAll } from "$app/navigation";
-    import { onMount } from "svelte";
-    import { Button } from "$lib/components/admin/ui/button";
 
     let { data }: { data: PageData } = $props();
     let rules = $state(data.rules.content);
@@ -63,11 +63,11 @@
     });
 </script>
 
-<div class="dark prose-a:text-indigo-400 prose-blockquote:not-italic prose-blockquote:text-green-400 flex size-full marker:text-orange-400">
+<div class="dark prose-a:text-indigo-400 prose-blockquote:not-italic prose-blockquote:text-green-400 marker:text-orange-400">
     <Tipex bind:tipex={editor} body={rules} controls floating focal={false}>
         {#snippet utilities()}
             <Button class="tipex-edit-button disabled:cursor-wait" onclick={save} {disabled}>
-                <MaterialSymbolsSendRounded class="size-6" />
+                <LucideSendHorizontal class="size-6" />
             </Button>
         {/snippet}
     </Tipex>

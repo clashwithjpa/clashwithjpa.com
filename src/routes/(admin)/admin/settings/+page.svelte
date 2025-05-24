@@ -1,12 +1,14 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
-    import AdminItem from "$lib/components/admin/Item.svelte";
+    import Item from "$lib/components/admin/Item.svelte";
     import { Button } from "$lib/components/admin/ui/button";
-    import { toast } from "svelte-sonner";
-    import { Switch } from "bits-ui";
+    import { Input } from "$lib/components/admin/ui/input";
+    import { Separator } from "$lib/components/admin/ui/separator";
+    import { Switch } from "$lib/components/admin/ui/switch";
     import type { APIGuild, APIRole, APIUser } from "discord-api-types/v10";
-    import MaterialSymbolsRefreshRounded from "~icons/material-symbols/refresh-rounded";
-    import MaterialSymbolsSendRounded from "~icons/material-symbols/send-rounded";
+    import { toast } from "svelte-sonner";
+    import LucideRefreshCw from "~icons/lucide/refresh-cw";
+    import LucideSend from "~icons/lucide/send";
     import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
@@ -224,76 +226,71 @@
     }
 </script>
 
-<div class="flex size-full items-start justify-center overflow-auto p-5 md:p-11">
-    <div class="3xl:w-4/5 flex flex-col items-start justify-center gap-5 md:gap-28 lg:flex-row">
-        <div class="flex flex-col items-start justify-center gap-5">
-            <!-- Application Status -->
-            <div class="flex items-center gap-2">
-                <span>Application Status</span>
-                <Switch.Root
-                    name="applicationStatus"
-                    bind:checked={applicationEnabled}
-                    disabled={disabled.applicationStatus}
-                    onCheckedChange={changeAppStatus}
-                    class="inline-flex h-8 w-[60px] cursor-pointer items-center gap-11 rounded-full bg-gray-800 p-1 transition-all disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-green-600"
-                >
-                    <Switch.Thumb
-                        class="pointer-events-none block size-7 shrink-0 rounded-full bg-gray-50 transition-all data-[state=checked]:translate-x-[90%] data-[state=unchecked]:translate-x-0"
-                    />
-                </Switch.Root>
-            </div>
-            <!-- CWL Status -->
-            <div class="flex items-center gap-2">
-                <span>CWL Status</span>
-                <Switch.Root
-                    name="CWLStatus"
-                    bind:checked={cwlEnabled}
-                    disabled={disabled.cwlStatus}
-                    onCheckedChange={changeCWLStatus}
-                    class="inline-flex h-8 w-[60px] cursor-pointer items-center gap-11 rounded-full bg-gray-800 p-1 transition-all disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-green-600"
-                >
-                    <Switch.Thumb
-                        class="pointer-events-none block size-7 shrink-0 rounded-full bg-gray-50 transition-all data-[state=checked]:translate-x-[90%] data-[state=unchecked]:translate-x-0"
-                    />
-                </Switch.Root>
-            </div>
-            <!-- Sync Clan Data -->
-            <div class="flex items-center gap-2">
-                <span>Sync Clan Data</span>
-                <Button class="p-1" onclick={syncClans} disabled={disabled.syncClan}>
-                    <MaterialSymbolsRefreshRounded class="size-6 {syncSpin ? 'animate-spin' : ''}" />
-                </Button>
-            </div>
-            <!-- Guild ID -->
-            <div class="flex flex-col items-start gap-2">
-                <span>Guild ID</span>
-                <div class="flex items-center gap-2">
-                    <input placeholder="Enter Guild ID" maxlength="19" bind:value={guildID} disabled={disabled.guildID.input} />
-                    <Button class="p-2" onclick={setGuildID} disabled={disabled.guildID.button}>
-                        <MaterialSymbolsSendRounded class="size-6" />
-                    </Button>
-                </div>
-            </div>
-        </div>
-        <div class="flex flex-col items-start justify-center gap-5">
-            <!-- Admin Roles -->
-            <AdminItem
-                title="Admin Roles"
-                placeholder="Enter Role ID"
-                bind:inputValue={adminRoleID}
-                onSubmit={setAdminRole}
-                items={adminRoles}
-                removeItem={removeAdminRole}
-            />
-            <!-- Admins -->
-            <AdminItem
-                title="Admins"
-                placeholder="Enter User ID"
-                bind:inputValue={adminID}
-                onSubmit={setAdmin}
-                items={admins}
-                removeItem={removeAdmin}
-            />
-        </div>
+<div class="flex w-full items-center justify-between gap-6">
+    <div>
+        <h2 class="text-2xl font-bold">Application Status</h2>
+        <p class="text-muted-foreground text-sm">Toggle the application status to enable or disable applications.</p>
+    </div>
+    <Switch name="applicationStatus" bind:checked={applicationEnabled} disabled={disabled.applicationStatus} onCheckedChange={changeAppStatus} />
+</div>
+
+<Separator class="my-6" />
+
+<div class="flex w-full items-center justify-between gap-6">
+    <div>
+        <h2 class="text-2xl font-bold">CWL Status</h2>
+        <p class="text-muted-foreground text-sm">Toggle the Clan War League status to enable or disable CWL features.</p>
+    </div>
+    <Switch name="cwlStatus" bind:checked={cwlEnabled} disabled={disabled.cwlStatus} onCheckedChange={changeCWLStatus} />
+</div>
+
+<Separator class="my-6" />
+
+<div class="flex w-full items-center justify-between gap-6">
+    <div>
+        <h2 class="text-2xl font-bold">Sync Clans</h2>
+        <p class="text-muted-foreground text-sm">Sync your clans with the latest data from the server.</p>
+    </div>
+    <Button size="icon" onclick={syncClans} disabled={disabled.syncClan}>
+        <LucideRefreshCw class={syncSpin ? "animate-spin" : ""} />
+    </Button>
+</div>
+
+<Separator class="my-6" />
+
+<div class="flex w-full flex-col justify-between gap-6 md:flex-row md:items-center">
+    <div>
+        <h2 class="text-2xl font-bold">Guild ID</h2>
+        <p class="text-muted-foreground text-sm">Set the Guild ID for the app. This is required for the app to function properly.</p>
+    </div>
+    <div class="flex items-center justify-center gap-2">
+        <Input placeholder="Enter Guild ID" max="19" bind:value={guildID} disabled={disabled.guildID.input} />
+        <Button size="icon" onclick={setGuildID} disabled={disabled.guildID.button}>
+            <LucideSend />
+        </Button>
     </div>
 </div>
+
+<Separator class="my-6" />
+
+<Item
+    title="Admin Roles"
+    description="Add or remove roles that have admin privileges for the whole app."
+    placeholder="Enter Role ID"
+    bind:inputValue={adminRoleID}
+    onSubmit={setAdminRole}
+    items={adminRoles}
+    removeItem={removeAdminRole}
+/>
+
+<Separator class="my-6" />
+
+<Item
+    title="Admins"
+    description="Add or remove users that have admin privileges for the whole app."
+    placeholder="Enter User ID"
+    bind:inputValue={adminID}
+    onSubmit={setAdmin}
+    items={admins}
+    removeItem={removeAdmin}
+/>

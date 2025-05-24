@@ -22,13 +22,13 @@
         foregroundColor: "var(--card-foreground)",
         headerFontSize: 14,
         borderRadius: "var(--radius)",
-        checkboxBorderRadius: "var(--radius)",
+        checkboxBorderRadius: "var(--radius-md)",
         focusShadow: "var(--background)",
         dropdownShadow: {
             radius: 8,
             color: "var(--card)"
         },
-        accentColor: "var(--accent-foreground)",
+        accentColor: "var(--accent-foreground)"
     });
 
     gridOptions = { ...gridOptions, theme };

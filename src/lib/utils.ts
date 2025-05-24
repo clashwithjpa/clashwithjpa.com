@@ -5,6 +5,12 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+export function textOverflow(text: string, maxLength: number, suffix: string = "..."): string {
+    text = text.trim();
+    console.log(text.length, maxLength, suffix);
+    return text.length >= maxLength ? text.slice(0, maxLength - suffix.length) + suffix : text;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

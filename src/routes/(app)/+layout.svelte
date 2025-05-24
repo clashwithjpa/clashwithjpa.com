@@ -5,7 +5,7 @@
     import { subscribeToast } from "$lib/components/app/toast";
     import NProgress from "nprogress";
     import type { Snippet } from "svelte";
-    import { Toaster } from "svelte-sonner";
+    // import { Toaster } from "svelte-sonner";
     import { expoOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import "./app.css";
@@ -44,7 +44,7 @@
     });
 </script>
 
-<Toaster
+<!-- <Toaster
     richColors
     position="bottom-left"
     toastOptions={{
@@ -54,7 +54,7 @@
             description: "font-coc text-[0.65rem] brightness-75"
         }
     }}
-></Toaster>
+></Toaster> -->
 
 {#if show}
     <img

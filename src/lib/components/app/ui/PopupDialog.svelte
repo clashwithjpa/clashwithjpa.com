@@ -8,22 +8,14 @@
     interface Props {
         title: string;
         open?: boolean;
-        style?: "coc";
         trigger?: Snippet;
         children: Snippet;
         class?: string;
     }
-    let { title, open = $bindable(false), style, trigger, children, class: className }: Props = $props();
+    let { title, open = $bindable(false), trigger, children, class: className }: Props = $props();
 
-    let popupStyle: string = $state("");
-    switch (style) {
-        case "coc":
-            popupStyle =
-                "border border-gray-950 bg-linear-to-b from-gray-800 via-gray-900 to-gray-900 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)] shadow-gray-950";
-            break;
-        default:
-            popupStyle = "border border-gray-700 bg-gray-900";
-    }
+    let popupStyle =
+        "border border-gray-950 bg-linear-to-b from-gray-800 via-gray-900 to-gray-900 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)] shadow-gray-950";
 </script>
 
 <Dialog.Root bind:open>

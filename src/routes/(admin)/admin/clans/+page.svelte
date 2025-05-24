@@ -55,6 +55,7 @@
                                     <Tooltip.Trigger class="flex w-full grow">
                                         <Control>
                                             {#snippet children({ props })}
+                                                <input type="hidden" name={key} bind:value={$formData[key as keyof typeof $formData]} />
                                                 <Input
                                                     {...props}
                                                     onclick={() => (openTooltip[idx] = !openTooltip[idx])}
@@ -62,7 +63,6 @@
                                                     placeholder={clanForm[key].placeholder}
                                                     bind:value={$formData[key as keyof typeof $formData]}
                                                 />
-                                                <input type="hidden" name={key} bind:value={$formData[key as keyof typeof $formData]} />
                                             {/snippet}
                                         </Control>
                                     </Tooltip.Trigger>

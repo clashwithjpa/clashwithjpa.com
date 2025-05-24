@@ -2,37 +2,40 @@
 
 .tipex-editor {
     border-radius: 0;
-    background-color: var(--color-gray-950);
-    width: 100%;
+    background-color: var(--color-background);
 }
 
 .tipex-editor-wrap {
-    background-color: var(--color-gray-950);
+    background-color: var(--color-background);
 }
 
 .tipex-editor-section {
-    background-color: var(--color-gray-950);
+    background-color: var(--color-background);
+    padding: 0 !important;
+}
+
+.ProseMirror {
+    padding: 0 !important;
 }
 
 .tipex-controller {
-    background-color: var(--color-gray-900) !important;
+    background-color: var(--color-card) !important;
     border: none;
-    border-radius: 0;
-    @apply rounded-t-2xl md:rounded-tl-none;
+    @apply w-full rounded-t-lg;
 }
+
 .tipex-edit-button {
-    background-color: var(--color-gray-800) !important;
+    background-color: var(--color-card) !important;
     border: none;
     border-radius: var(--radius-lg) !important;
-    padding: 4px !important;
 }
 .tipex-edit-button:hover {
-    background-color: var(--color-gray-700) !important;
+    background-color: var(--color-secondary) !important;
     transform: none;
     transition: all 200ms;
 }
 .tipex-edit-button.active {
-    background-color: var(--color-gray-700) !important;
+    background-color: var(--color-secondary) !important;
 }
 
 .tipex-utilities {
@@ -41,8 +44,8 @@
 
 .tipex-floating-group {
     position: absolute;
-    background-color: var(--color-gray-900) !important;
-    border: 1px solid var(--color-gray-700) !important;
+    background-color: var(--color-card) !important;
+    border: 1px solid var(--color-secondary) !important;
     border-radius: var(--radius-lg);
     margin-left: 11px;
     padding: 4px;
@@ -50,12 +53,12 @@
 }
 
 .tipex-floating-button {
-    background-color: var(--color-gray-800) !important;
-    color: var(--color-gray-50) !important;
+    background-color: var(--color-card) !important;
+    color: var(--color-foreground) !important;
     border: none;
     border-radius: var(--radius-md);
 }
 .tipex-floating-button:hover {
-    background-color: var(--color-gray-700) !important;
+    background-color: var(--color-secondary) !important;
     transition: all 200ms;
 }

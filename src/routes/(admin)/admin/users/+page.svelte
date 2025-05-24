@@ -4,16 +4,16 @@
     import { Button } from "$lib/components/admin/ui/button";
     import CocAccountsUsersFormsWrapper from "$lib/components/admin/wrappers/CocAccountsUsersFormsWrapper.svelte";
     import UserNameUsersFormsWrapper from "$lib/components/admin/wrappers/UserNameUsersFormsWrapper.svelte";
-    import { toast } from "svelte-sonner";
     import type { InsertCoc, InsertUser } from "$lib/server/schema";
     import type { GridOptions } from "@ag-grid-community/core";
     import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
+    import { toast } from "svelte-sonner";
     import { fade } from "svelte/transition";
-    import MaterialSymbolsCloudAlertRounded from "~icons/material-symbols/cloud-alert-rounded";
-    import MaterialSymbolsCloudDoneRounded from "~icons/material-symbols/cloud-done-rounded";
-    import MaterialSymbolsCloudSyncRounded from "~icons/material-symbols/cloud-sync-rounded";
-    import MaterialSymbolsDeleteRounded from "~icons/material-symbols/delete-rounded";
-    import TablerLoader2 from "~icons/tabler/loader-2";
+    import LucideCloud from "~icons/lucide/cloud";
+    import LucideCloudAlert from "~icons/lucide/cloud-alert";
+    import LucideCloudUpload from "~icons/lucide/cloud-upload";
+    import LucideLoaderCircle from "~icons/lucide/loader-circle";
+    import LucideTrash from "~icons/lucide/trash";
     import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
@@ -108,39 +108,39 @@
 <div class="flex size-full flex-col gap-5">
     <div class="flex w-full items-center justify-between">
         <div class="flex items-center justify-center gap-2">
-            <h1 class="text-3xl font-bold">Users</h1>
+            <h1 class="text-2xl font-bold">Users</h1>
             <div class="size-8">
                 {#if syncing === "success"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudDoneRounded class="size-full text-green-500" />
+                        <LucideCloud class="size-full text-green-500" />
                     </span>
                 {:else if syncing === "loading"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudSyncRounded class="size-full text-yellow-500" />
+                        <LucideCloudUpload class="size-full text-yellow-500" />
                     </span>
                 {:else if syncing === "error"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudAlertRounded class="size-full text-red-500" />
+                        <LucideCloudAlert class="size-full text-red-500" />
                     </span>
                 {/if}
             </div>
         </div>
         <div class="flex items-center justify-center gap-2">
             <Button
+                size="icon"
                 variant="destructive"
                 disabled={selectedRows.length <= 0 || disabled}
                 onclick={async () => {
                     await removeUser(selectedRows.map((row) => row.discordId));
                 }}
             >
-                <div in:fade class="size-full">
+                <div in:fade class="size-6">
                     {#if loading}
-                        <TablerLoader2 class="size-full animate-spin" />
+                        <LucideLoaderCircle class="size-full animate-spin" />
                     {:else}
-                        <MaterialSymbolsDeleteRounded class="size-full" />
+                        <LucideTrash class="size-full" />
                     {/if}
                 </div>
-                Delete
             </Button>
         </div>
     </div>

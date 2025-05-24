@@ -1,27 +1,29 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
-    import UserNameCWLFormsWrapper from "$lib/components/admin/wrappers/UserNameCWLFormsWrapper.svelte";
-    import { toast } from "svelte-sonner";
-    import { Button } from "$lib/components/admin/ui/button";
     import Grid from "$lib/components/admin/Grid.svelte";
-    import PopupDialog from "$lib/components/app/ui/PopupDialog.svelte";
+    import { Button } from "$lib/components/admin/ui/button";
+    import * as Dialog from "$lib/components/admin/ui/dialog";
+    import { Input } from "$lib/components/admin/ui/input";
+    import * as Select from "$lib/components/admin/ui/select";
+    import UserNameCWLFormsWrapper from "$lib/components/admin/wrappers/UserNameCWLFormsWrapper.svelte";
     import { customCWLEntrySchema } from "$lib/schema";
     import type { InsertCWL } from "$lib/server/schema";
     import type { GridOptions, IDateFilterParams, ValueFormatterParams } from "@ag-grid-community/core";
     import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
     import { Control, Description, Field, FieldErrors } from "formsnap";
     import { json2csv } from "json-2-csv";
+    import { toast } from "svelte-sonner";
     import { fade, fly } from "svelte/transition";
     import { superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
-    import MaterialSymbolsAdd2Rounded from "~icons/material-symbols/add-2-rounded";
-    import MaterialSymbolsCloudAlertRounded from "~icons/material-symbols/cloud-alert-rounded";
-    import MaterialSymbolsCloudDoneRounded from "~icons/material-symbols/cloud-done-rounded";
-    import MaterialSymbolsCloudSyncRounded from "~icons/material-symbols/cloud-sync-rounded";
-    import MaterialSymbolsDeleteRounded from "~icons/material-symbols/delete-rounded";
-    import MaterialSymbolsDocumentScanner from "~icons/material-symbols/document-scanner";
-    import TablerLoader2 from "~icons/tabler/loader-2";
+    import LucideCloud from "~icons/lucide/cloud";
+    import LucideCloudAlert from "~icons/lucide/cloud-alert";
+    import LucideCloudUpload from "~icons/lucide/cloud-upload";
+    import LucideFileText from "~icons/lucide/file-text";
+    import LucideLoaderCircle from "~icons/lucide/loader-circle";
+    import LucidePlus from "~icons/lucide/plus";
+    import LucideTrash from "~icons/lucide/trash";
     import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
@@ -176,107 +178,120 @@
     let reset = $state<() => void>();
 </script>
 
-<PopupDialog title="New CWL Application" bind:open={openPopup}>
-    <form in:fade method="POST" action="/admin/cwl" use:enhance class="flex flex-col items-stretch justify-center gap-2">
-        <div class="flex w-full flex-wrap items-start justify-center gap-2">
-            <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                <Field {form} name="tag">
-                    <Description>Account Tag</Description>
-                    <Control>
-                        {#snippet children({ props })}
-                            <input {...props} placeholder="Account Tag" bind:value={$formData.tag} />
-                        {/snippet}
-                    </Control>
-                    <FieldErrors class="text-red-400" />
-                </Field>
+<Dialog.Root bind:open={openPopup}>
+    <Dialog.Content>
+        <Dialog.Header>
+            <Dialog.Title>New CWL Application</Dialog.Title>
+        </Dialog.Header>
+        <form in:fade method="POST" action="/admin/cwl" use:enhance class="flex flex-col items-stretch justify-center gap-2">
+            <div class="flex w-full flex-wrap items-start justify-center gap-2">
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="tag">
+                        <Description>Account Tag</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="tag" bind:value={$formData.tag} />
+                                <Input {...props} placeholder="Account Tag" bind:value={$formData.tag} />
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="userId">
+                        <Description>User ID</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="userId" bind:value={$formData.userId} />
+                                <Input {...props} placeholder="Discord User ID" bind:value={$formData.userId} />
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="accountClan">
+                        <Description>Account Clan</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
+                                <Select.Root type="single" bind:value={$formData.accountClan}>
+                                    <Select.Trigger class="w-full" {...props}
+                                        >{$formData.accountClan ? $formData.accountClan : "Select a clan"}</Select.Trigger
+                                    >
+                                    <Select.Content>
+                                        {#each data.clanNames as clanName}
+                                            <Select.Item value={clanName ?? ""} label={clanName ?? ""} />
+                                        {/each}
+                                    </Select.Content>
+                                </Select.Root>
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="accountWeight">
+                        <Description>Account Weight</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="accountWeight" bind:value={$formData.accountWeight} />
+                                <Input {...props} placeholder="1" min={1} bind:value={$formData.accountWeight} />
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="preferenceNum">
+                        <Description>Preference Number</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="preferenceNum" bind:value={$formData.preferenceNum} />
+                                <Input {...props} placeholder="1" min={1} bind:value={$formData.preferenceNum} />
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
             </div>
-            <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                <Field {form} name="userId">
-                    <Description>User ID</Description>
-                    <Control>
-                        {#snippet children({ props })}
-                            <input {...props} placeholder="Discord User ID" bind:value={$formData.userId} />
-                        {/snippet}
-                    </Control>
-                    <FieldErrors class="text-red-400" />
-                </Field>
-            </div>
-            <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                <Field {form} name="accountClan">
-                    <Description>Account Clan</Description>
-                    <Control>
-                        {#snippet children({ props })}
-                            <select {...props} bind:value={$formData.accountClan}>
-                                <option value="" disabled selected hidden>Select a clan</option>
-                                {#each data.clanNames as clanName}
-                                    <option class="bg-gray-900" value={clanName}>{clanName}</option>
-                                {/each}
-                            </select>
-                        {/snippet}
-                    </Control>
-                    <FieldErrors class="text-red-400" />
-                </Field>
-            </div>
-            <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                <Field {form} name="accountWeight">
-                    <Description>Account Weight</Description>
-                    <Control>
-                        {#snippet children({ props })}
-                            <input {...props} type="number" placeholder="1" min={1} bind:value={$formData.accountWeight} />
-                        {/snippet}
-                    </Control>
-                    <FieldErrors class="text-red-400" />
-                </Field>
-            </div>
-            <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                <Field {form} name="preferenceNum">
-                    <Description>Preference Number</Description>
-                    <Control>
-                        {#snippet children({ props })}
-                            <input {...props} type="number" placeholder="1" min={1} bind:value={$formData.preferenceNum} />
-                        {/snippet}
-                    </Control>
-                    <FieldErrors class="text-red-400" />
-                </Field>
-            </div>
-        </div>
-        <Button class="px-4 py-3 text-sm {$delayed ? 'cursor-wait' : ''}" disabled={$delayed} type="submit">
-            {#if $delayed}
-                <span in:fly class="flex size-full items-center justify-center gap-2">
-                    <TablerLoader2 class="size-5 animate-spin"></TablerLoader2>
-                    Submitting...
-                </span>
-            {:else}
-                <span in:fly class="flex size-full items-center justify-center">Submit</span>
-            {/if}
-        </Button>
-    </form>
-</PopupDialog>
+            <Button class={$delayed ? "cursor-wait" : ""} disabled={$delayed} type="submit">
+                {#if $delayed}
+                    <span in:fly class="flex size-full items-center justify-center gap-2">
+                        <LucideLoaderCircle class="size-5 animate-spin"></LucideLoaderCircle>
+                        Submitting...
+                    </span>
+                {:else}
+                    <span in:fly class="flex size-full items-center justify-center">Submit</span>
+                {/if}
+            </Button>
+        </form>
+    </Dialog.Content>
+</Dialog.Root>
 
-<div class="flex size-full flex-col gap-5 p-5 md:p-11">
+<div class="flex size-full flex-col gap-5">
     <div class="flex w-full items-center justify-between">
         <div class="flex items-center justify-center gap-2">
-            <h1 class="text-3xl font-bold md:text-4xl">CWL</h1>
+            <h1 class="text-2xl font-bold">CWL</h1>
             <div class="size-8">
                 {#if syncing === "success"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudDoneRounded class="size-full text-green-500" />
+                        <LucideCloud class="size-full text-green-500" />
                     </span>
                 {:else if syncing === "loading"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudSyncRounded class="size-full text-yellow-500" />
+                        <LucideCloudUpload class="size-full text-yellow-500" />
                     </span>
                 {:else if syncing === "error"}
                     <span in:fade class="size-full">
-                        <MaterialSymbolsCloudAlertRounded class="size-full text-red-500" />
+                        <LucideCloudAlert class="size-full text-red-500" />
                     </span>
                 {/if}
             </div>
         </div>
         <div class="flex items-center justify-center gap-2">
             <Button
-                size="sm"
-                class="flex items-center justify-center gap-2"
+                size="icon"
                 disabled={rowData.length <= 0 || disabled}
                 onclick={() => {
                     const csvRow = rowData.map((row) => ({
@@ -305,17 +320,17 @@
                 }}
             >
                 <div class="size-6">
-                    <MaterialSymbolsDocumentScanner class="size-full" />
+                    <LucideFileText class="size-full" />
                 </div>
             </Button>
-            <Button size="sm" class="flex items-center justify-center gap-2" {disabled} onclick={() => (openPopup = true)}>
+            <Button size="icon" {disabled} onclick={() => (openPopup = true)}>
                 <div class="size-6">
-                    <MaterialSymbolsAdd2Rounded class="size-full" />
+                    <LucidePlus class="size-full" />
                 </div>
             </Button>
             <Button
-                size="sm"
-                class="flex items-center justify-center gap-2 hover:not-disabled:!bg-red-500/10 hover:not-disabled:!text-red-500"
+                size="icon"
+                variant="destructive"
                 disabled={selectedRows.length <= 0 || disabled}
                 onclick={async () => {
                     await removeApp(selectedRows.map((row) => row.accountTag));
@@ -324,11 +339,11 @@
                 <div in:fade class="size-6">
                     {#if loading}
                         <span class="size-full">
-                            <TablerLoader2 class="size-full animate-spin" />
+                            <LucideLoaderCircle class="size-full animate-spin" />
                         </span>
                     {:else}
                         <span class="size-full">
-                            <MaterialSymbolsDeleteRounded class="size-full" />
+                            <LucideTrash class="size-full" />
                         </span>
                     {/if}
                 </div>
