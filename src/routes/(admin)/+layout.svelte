@@ -41,7 +41,7 @@
             <Breadcrumb.Root>
                 <Breadcrumb.List>
                     <Breadcrumb.Item class="hidden md:block">
-                        <Breadcrumb.Link href="#">Admin Panel</Breadcrumb.Link>
+                        <Breadcrumb.Link href="/admin">Admin Panel</Breadcrumb.Link>
                     </Breadcrumb.Item>
                     <Breadcrumb.Separator class="hidden md:block" />
                     <Breadcrumb.Item>
