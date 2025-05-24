@@ -2,10 +2,10 @@
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
     import { clanForm, clanFormSchema } from "$lib/coc/schema";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ClanInfo from "$lib/components/ClanInfo.svelte";
-    import InlineLink from "$lib/components/ui/InlineLink.svelte";
-    import { toast } from "$lib/components/toast";
+    import Button from "$lib/components/app/ui/Button.svelte";
+    import ClanInfo from "$lib/components/app/ClanInfo.svelte";
+    import InlineLink from "$lib/components/app/ui/InlineLink.svelte";
+    import { toast } from "$lib/components/app/toast";
     import { Popover, Tooltip } from "bits-ui";
     import { Control, Description, Field, FieldErrors } from "formsnap";
     import { expoIn, expoOut } from "svelte/easing";

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import CocButton from "$lib/components/CocButton.svelte";
-    import H1 from "$lib/components/ui/H1.svelte";
+    import CocButton from "$lib/components/app/CocButton.svelte";
+    import H1 from "$lib/components/app/ui/H1.svelte";
     import MaterialSymbolsChevronLeftRounded from "~icons/material-symbols/chevron-left-rounded";
 </script>
 

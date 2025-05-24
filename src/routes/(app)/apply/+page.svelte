@@ -2,8 +2,8 @@
     import { dev } from "$app/environment";
     import { page } from "$app/state";
     import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
-    import Button from "$lib/components/ui/Button.svelte";
-    import { toast } from "$lib/components/toast";
+    import Button from "$lib/components/app/ui/Button.svelte";
+    import { toast } from "$lib/components/app/toast";
     import { clanApplicationSchema } from "$lib/schema";
     import { Tooltip } from "bits-ui";
     import { Control, Description, Field, FieldErrors } from "formsnap";

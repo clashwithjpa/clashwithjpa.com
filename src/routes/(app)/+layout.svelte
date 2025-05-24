@@ -1,15 +1,15 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, onNavigate } from "$app/navigation";
     import type { UserData } from "$lib/auth/user";
-    import Navbar from "$lib/components/Navbar.svelte";
-    import { subscribeToast } from "$lib/components/toast";
+    import Navbar from "$lib/components/app/Navbar.svelte";
+    import { subscribeToast } from "$lib/components/app/toast";
     import NProgress from "nprogress";
     import type { Snippet } from "svelte";
     import { Toaster } from "svelte-sonner";
     import { expoOut } from "svelte/easing";
     import { fly } from "svelte/transition";
-    import "../app.css";
-    import "../nprogress.css";
+    import "./app.css";
+    import "./nprogress.css";
     import type { PageData } from "./$types";
 
     interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PageData } from "./$types";
-    import CocButton from "$lib/components/CocButton.svelte";
+    import CocButton from "$lib/components/app/CocButton.svelte";
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import MaterialSymbolsArrowUpwardRounded from "~icons/material-symbols/arrow-upward-rounded";

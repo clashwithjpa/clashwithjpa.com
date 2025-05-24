@@ -5,7 +5,7 @@
     import { fly } from "svelte/transition";
     import MaterialSymbolsCloseRounded from "~icons/material-symbols/close-rounded";
     import MaterialSymbolsSendRounded from "~icons/material-symbols/send-rounded";
-    import Button from "$lib/components/ui/Button.svelte";
+    import Button from "$lib/components/app/ui/Button.svelte";
 
     interface Props {
         title: string;

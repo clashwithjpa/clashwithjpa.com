@@ -1,8 +1,8 @@
 <script lang="ts">
     import { page } from "$app/state";
     import type { UserData } from "$lib/auth/user";
-    import InlineLink from "$lib/components/ui/InlineLink.svelte";
-    import UserButton from "$lib/components/UserButton.svelte";
+    import InlineLink from "$lib/components/app/ui/InlineLink.svelte";
+    import UserButton from "$lib/components/app/UserButton.svelte";
     import type { InsertCoc, InsertUser } from "$lib/server/schema";
     import { slide } from "svelte/transition";
     import AkarIconsCross from "~icons/akar-icons/cross";

@@ -1,11 +1,13 @@
 import { DISCORD_BOT_TOKEN } from "$env/static/private";
 import { PUBLIC_DISCORD_URL } from "$env/static/public";
-import { getAdminConfig } from "$lib/server/functions";
+import { getAdminConfig, isApplicationEnabled, isCWLEnabled } from "$lib/server/functions";
 import type { APIRole, APIUser } from "discord-api-types/v10";
 import type { PageServerLoad } from "./$types";
 
 export const load = (async ({ locals }) => {
     const adminConfig = await getAdminConfig(locals.db);
+    const applicationEnabled = await isApplicationEnabled(locals.db);
+    const cwlEnabled = await isCWLEnabled(locals.db);
 
     const adminRolesPromises: Promise<APIRole>[] = adminConfig.adminRolesId.map((roleID: string) =>
         fetch(`${PUBLIC_DISCORD_URL}/guilds/${adminConfig.guildId}/roles/${roleID}`, {
@@ -28,5 +30,5 @@ export const load = (async ({ locals }) => {
         })
     ]);
 
-    return { adminConfig, adminRoles, admins };
+    return { adminConfig, adminRoles, admins, applicationEnabled, cwlEnabled };
 }) satisfies PageServerLoad;

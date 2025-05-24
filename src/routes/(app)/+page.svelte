@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CocButton from "$lib/components/CocButton.svelte";
-    import H1 from "$lib/components/ui/H1.svelte";
+    import CocButton from "$lib/components/app/CocButton.svelte";
+    import H1 from "$lib/components/app/ui/H1.svelte";
     import { onMount } from "svelte";
     import MaterialSymbolsPauseCircleRounded from "~icons/material-symbols/pause-circle-rounded";
     import MaterialSymbolsPlayCircleRounded from "~icons/material-symbols/play-circle-rounded";

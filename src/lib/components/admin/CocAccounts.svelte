@@ -6,9 +6,9 @@
     import { fade, fly } from "svelte/transition";
     import MaterialSymbolsDeleteRounded from "~icons/material-symbols/delete-rounded";
     import TablerLoader2 from "~icons/tabler/loader-2";
-    import { toast } from "../toast";
-    import Button from "../ui/Button.svelte";
-    import Grid from "../ui/Grid.svelte";
+    import { toast } from "$lib/components/app/toast";
+    import Button from "$lib/components/app/ui/Button.svelte";
+    import Grid from "$lib/components/app/ui/Grid.svelte";
 
     interface Props {
         tags: string[];

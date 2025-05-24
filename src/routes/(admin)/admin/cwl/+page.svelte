@@ -2,10 +2,10 @@
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
     import UserNameCWLFormsWrapper from "$lib/components/admin/wrappers/UserNameCWLFormsWrapper.svelte";
-    import { toast } from "$lib/components/toast";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Grid from "$lib/components/ui/Grid.svelte";
-    import PopupDialog from "$lib/components/ui/PopupDialog.svelte";
+    import { toast } from "$lib/components/app/toast";
+    import Button from "$lib/components/app/ui/Button.svelte";
+    import Grid from "$lib/components/app/ui/Grid.svelte";
+    import PopupDialog from "$lib/components/app/ui/PopupDialog.svelte";
     import { customCWLEntrySchema } from "$lib/schema";
     import type { InsertCWL } from "$lib/server/schema";
     import type { GridOptions, IDateFilterParams, ValueFormatterParams } from "@ag-grid-community/core";

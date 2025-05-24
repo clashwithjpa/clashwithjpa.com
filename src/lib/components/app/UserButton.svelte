@@ -2,8 +2,8 @@
     import { invalidateAll } from "$app/navigation";
     import type { UserData } from "$lib/auth/user";
     import type { APIPlayer } from "$lib/coc/types";
-    import CocButton from "$lib/components/CocButton.svelte";
-    import { toast } from "$lib/components/toast";
+    import CocButton from "$lib/components/app/CocButton.svelte";
+    import { toast } from "$lib/components/app/toast";
     import type { InsertCoc, InsertUser } from "$lib/server/schema";
     import { Popover, Tooltip } from "bits-ui";
     import MaterialSymbolsAdminPanelSettingsRounded from "~icons/material-symbols/admin-panel-settings-rounded";
