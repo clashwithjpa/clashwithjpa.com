@@ -49,7 +49,7 @@
     role={href ? "link" : "button"}
     tabindex="0"
     class={cn(
-        "font-coc z-10 flex cursor-pointer items-center justify-center bg-linear-to-b shadow-[0_0_0_2px_#F3F4F6,0_1px_0_5px_#030712,0_6px_0_5px_#0006] transition-all not-disabled:hover:brightness-110 active:translate-y-[2px] active:shadow-[0_0_0_2px_#F3F4F6,0_1px_0_5px_#030712,0_0px_0_5px_#0006] disabled:cursor-not-allowed disabled:opacity-50",
+        "font-coc flex cursor-pointer items-center justify-center bg-linear-to-b shadow-[0_0_0_2px_#F3F4F6,0_1px_0_5px_#030712,0_6px_0_5px_#0006] transition-all not-disabled:hover:brightness-110 active:translate-y-[2px] active:shadow-[0_0_0_2px_#F3F4F6,0_1px_0_5px_#030712,0_0px_0_5px_#0006] disabled:cursor-not-allowed disabled:opacity-50",
         sizeClass,
         typeClass,
         className
