@@ -6,6 +6,7 @@
     import LucideSettings from "~icons/lucide/settings";
     import LucideSwords from "~icons/lucide/swords";
     import LucideUsers from "~icons/lucide/users";
+    import LucideX from "~icons/lucide/x";
 
     const data = [
         {
@@ -42,6 +43,11 @@
             title: "Settings",
             icon: LucideSettings,
             url: "/admin/settings"
+        },
+        {
+            title: "Exit",
+            icon: LucideX,
+            url: "/"
         }
     ];
 </script>
@@ -87,9 +93,9 @@
     <Sidebar.Footer>
         <Sidebar.Menu>
             <Sidebar.MenuItem>
-                <div class="flex items-center justify-between gap-2 px-1 py-1.5 text-left text-sm">
+                <div class="flex items-center justify-between gap-4 text-left text-sm">
                     <div class="flex items-center gap-2">
-                        <Avatar.Root class="size-8 rounded-lg">
+                        <Avatar.Root class="size-12 rounded-lg">
                             <Avatar.Image src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}" alt={user.global_name} />
                             <Avatar.Fallback class="rounded-lg">
                                 {user.global_name?.slice(0, 2).toUpperCase()}

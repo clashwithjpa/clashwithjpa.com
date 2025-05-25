@@ -8,8 +8,8 @@
     import { Toaster } from "svelte-sonner";
     import { expoOut } from "svelte/easing";
     import { fly } from "svelte/transition";
-    import "./app.css";
-    import "./nprogress.css";
+    import "../../app.css";
+    import "../../nprogress.css";
     import type { PageData } from "./$types";
 
     interface Props {

@@ -1,15 +1,14 @@
 <script lang="ts">
     import { onNavigate } from "$app/navigation";
     import { page } from "$app/state";
-    import Bar from "$lib/components/admin/Bar.svelte";
+    import Bar from "$lib/components/admin/SideBar.svelte";
     import * as Breadcrumb from "$lib/components/admin/ui/breadcrumb";
     import { Separator } from "$lib/components/admin/ui/separator";
     import * as Sidebar from "$lib/components/admin/ui/sidebar";
-// import { Toaster } from "$lib/components/admin/ui/sonner";
     import { Toaster } from "$lib/components/admin/ui/sonner";
     import type { Snippet } from "svelte";
     import type { PageData } from "./admin/$types";
-    import "./app.css";
+    import "../../admin.css";
 
     interface Props {
         data: PageData;
