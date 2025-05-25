@@ -4,6 +4,8 @@
     import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
     import { toast } from "$lib/components/app/toast";
     import Button from "$lib/components/app/ui/Button.svelte";
+    import Input from "$lib/components/app/ui/Input.svelte";
+    import Select from "$lib/components/app/ui/Select.svelte";
     import { cwlApplicationSchema } from "$lib/schema";
     import { Switch, Tooltip } from "bits-ui";
     import { Control, Description, Field, FieldErrors } from "formsnap";
@@ -175,12 +177,13 @@
                             <Description>Select one of your accounts</Description>
                             <Control>
                                 {#snippet children({ props })}
-                                    <select {...props} bind:value={$formData.tag}>
+                                    <input type="hidden" name="tag" bind:value={$formData.tag} />
+                                    <Select {...props} bind:value={$formData.tag}>
                                         <option value="" disabled selected hidden>Select an account</option>
                                         {#each coc as account}
                                             <option class="bg-gray-900" value={account?.tag}>{account?.tag} - {account?.name}</option>
                                         {/each}
-                                    </select>
+                                    </Select>
                                 {/snippet}
                             </Control>
                             <FieldErrors class="text-red-400" />
@@ -191,7 +194,8 @@
                             <Description>Preference number {accounts > 1 ? `( 1 - ${accounts} )` : ``}</Description>
                             <Control>
                                 {#snippet children({ props })}
-                                    <input
+                                    <input type="hidden" name="preferenceNum" bind:value={$formData.preferenceNum} />
+                                    <Input
                                         {...props}
                                         type="number"
                                         placeholder="1"
@@ -210,12 +214,13 @@
                                 <Description>Clan Name</Description>
                                 <Control>
                                     {#snippet children({ props })}
-                                        <select {...props} bind:value={$formData.accountClan}>
+                                        <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
+                                        <Select {...props} bind:value={$formData.accountClan}>
                                             <option value="" disabled selected hidden>Select a clan</option>
                                             {#each data.clanNames as clanName}
                                                 <option class="bg-gray-900" value={clanName}>{clanName}</option>
                                             {/each}
-                                        </select>
+                                        </Select>
                                     {/snippet}
                                 </Control>
                                 <FieldErrors class="text-red-400" />
@@ -225,7 +230,8 @@
                                 <Description>Account Weight</Description>
                                 <Control>
                                     {#snippet children({ props })}
-                                        <input {...props} type="number" placeholder="0" min={0} bind:value={$formData.accountWeight} />
+                                        <input type="hidden" name="accountWeight" bind:value={$formData.accountWeight} />
+                                        <Input {...props} type="number" placeholder="0" min={0} bind:value={$formData.accountWeight} />
                                     {/snippet}
                                 </Control>
                                 <FieldErrors class="text-red-400" />

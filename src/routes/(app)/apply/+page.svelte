@@ -2,8 +2,9 @@
     import { dev } from "$app/environment";
     import { page } from "$app/state";
     import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
-    import Button from "$lib/components/app/ui/Button.svelte";
     import { toast } from "$lib/components/app/toast";
+    import Button from "$lib/components/app/ui/Button.svelte";
+    import Input from "$lib/components/app/ui/Input.svelte";
     import { clanApplicationSchema } from "$lib/schema";
     import { Tooltip } from "bits-ui";
     import { Control, Description, Field, FieldErrors } from "formsnap";
@@ -159,7 +160,8 @@
                         <Description>Your account tag (include #)</Description>
                         <Control>
                             {#snippet children({ props })}
-                                <input {...props} type="text" placeholder="#ABCDEFGHI" bind:value={$formData.tag} />
+                                <input type="hidden" name="tag" bind:value={$formData.tag} />
+                                <Input {...props} type="text" placeholder="#ABCDEFGHI" bind:value={$formData.tag} />
                             {/snippet}
                         </Control>
                         <FieldErrors class="text-red-400" />
@@ -168,7 +170,8 @@
                         <Description>Your API token</Description>
                         <Control>
                             {#snippet children({ props })}
-                                <input {...props} type="text" placeholder="API Token" bind:value={$formData.apiToken} />
+                                <input type="hidden" name="apiToken" bind:value={$formData.apiToken} />
+                                <Input {...props} type="text" placeholder="API Token" bind:value={$formData.apiToken} />
                             {/snippet}
                         </Control>
                         <FieldErrors class="text-red-400" />
