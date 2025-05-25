@@ -1,6 +1,6 @@
 <script lang="ts">
     import CocButton from "$lib/components/app/CocButton.svelte";
-    import H1 from "$lib/components/app/ui/H1.svelte";
+    import H1 from "$lib/components/app/H1.svelte";
     import { onMount } from "svelte";
     import MaterialSymbolsPauseCircleRounded from "~icons/material-symbols/pause-circle-rounded";
     import MaterialSymbolsPlayCircleRounded from "~icons/material-symbols/play-circle-rounded";
@@ -48,12 +48,12 @@
 </svelte:head>
 
 <main class="size-full">
-    <img src="/clips/bg.webp" alt="Clash With JPA" class="fixed inset-0 -z-11 size-full object-cover" />
-    <video bind:this={videoElement} autoplay loop muted class="fixed inset-0 -z-10 size-full object-cover">
+    <img src="/clips/bg.webp" alt="Clash With JPA" class="fixed inset-0 size-full object-cover" />
+    <video bind:this={videoElement} autoplay loop muted class="fixed inset-0 size-full object-cover">
         <source src="/clips/bg.webm" type="video/webm" />
     </video>
 
-    <div class="z-10 flex size-full items-center justify-center bg-gray-950/50 p-5">
+    <div class="bg-background/50 fixed flex size-full items-center justify-center p-5">
         <div class="flex flex-col items-center text-center sm:w-3/4 md:w-1/2">
             <H1 class="text-5xl lg:text-6xl">Clash With JPA</H1>
             <p class="mt-4 text-lg lg:text-xl">
@@ -61,14 +61,14 @@
                 today!
             </p>
             <div class="flex flex-col items-center justify-center gap-1">
-                <CocButton href="/clans" size="md" class="mt-10">See our clans</CocButton>
+                <CocButton href="/clans" class="mt-10">See our clans</CocButton>
                 {#if data?.user}
                     {#if data?.applicationEnabled}
-                        <CocButton href="/apply" size="md" class="mt-4">Clan Application Open!</CocButton>
+                        <CocButton href="/apply" class="mt-4">Clan Application Open!</CocButton>
                     {/if}
 
                     {#if data?.cwlEnabled}
-                        <CocButton href="/cwl" size="md" class="mt-4">CWL Open!</CocButton>
+                        <CocButton href="/cwl" class="mt-4">CWL Open!</CocButton>
                     {/if}
                 {/if}
             </div>
@@ -76,14 +76,14 @@
     </div>
 
     <div class="fixed right-8 bottom-4 z-11 flex space-x-4">
-        <button onclick={togglePause} class="size-6 rounded-full transition-colors hover:text-gray-300">
+        <button onclick={togglePause} class="hover:text-muted-foreground size-6 rounded-full transition-colors">
             {#if isPaused}
                 <MaterialSymbolsPlayCircleRounded class="size-full" />
             {:else}
                 <MaterialSymbolsPauseCircleRounded class="size-full" />
             {/if}
         </button>
-        <button onclick={toggleMute} class="size-6 rounded-full transition-colors hover:text-gray-300">
+        <button onclick={toggleMute} class="hover:text-muted-foreground size-6 rounded-full transition-colors">
             {#if isMuted}
                 <MaterialSymbolsVolumeOffRounded class="size-full" />
             {:else}

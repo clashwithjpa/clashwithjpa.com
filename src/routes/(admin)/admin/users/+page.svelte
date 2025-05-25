@@ -1,7 +1,7 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import Grid from "$lib/components/admin/Grid.svelte";
-    import { Button } from "$lib/components/admin/ui/button";
+    import { Button } from "$lib/components/ui/button";
     import CocAccountsUsersFormsWrapper from "$lib/components/admin/wrappers/CocAccountsUsersFormsWrapper.svelte";
     import UserNameUsersFormsWrapper from "$lib/components/admin/wrappers/UserNameUsersFormsWrapper.svelte";
     import type { InsertCoc, InsertUser } from "$lib/server/schema";

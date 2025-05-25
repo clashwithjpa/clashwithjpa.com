@@ -32,7 +32,7 @@
     };
 </script>
 
-<div class={cn("flex items-center justify-center", containerClassName)} style="perspective: 1000px;">
+<div class={cn("font-coc flex items-center justify-center", containerClassName)} style="perspective: 1000px;">
     <div
         bind:this={containerRef}
         onmouseenter={handleMouseEnter}

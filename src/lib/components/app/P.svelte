@@ -11,7 +11,7 @@
 
 <div
     class={cn(
-        "flex items-center justify-center space-x-1 stroke-gray-950 stroke-[0.5px] shadow-gray-950 drop-shadow-[0_2px_0_var(--tw-shadow-color)]",
+        "font-coc stroke-background shadow-background flex items-center justify-center space-x-1 stroke-[0.5px] drop-shadow-[0_2px_0_var(--tw-shadow-color)]",
         className
     )}
     style="-webkit-text-stroke: 0.6px var(--tw-shadow-color);"

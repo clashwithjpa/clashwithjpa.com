@@ -2,10 +2,10 @@
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
     import Grid from "$lib/components/admin/Grid.svelte";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Dialog from "$lib/components/admin/ui/dialog";
-    import { Input } from "$lib/components/admin/ui/input";
-    import * as Select from "$lib/components/admin/ui/select";
+    import { Button } from "$lib/components/ui/button";
+    import * as Dialog from "$lib/components/ui/dialog";
+    import { Input } from "$lib/components/ui/input";
+    import * as Select from "$lib/components/ui/select";
     import UserNameCWLFormsWrapper from "$lib/components/admin/wrappers/UserNameCWLFormsWrapper.svelte";
     import { customCWLEntrySchema } from "$lib/schema";
     import type { InsertCWL } from "$lib/server/schema";

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import type { APIPlayer } from "$lib/coc/types";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Card from "$lib/components/admin/ui/card";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
     import UserName from "$lib/components/admin/UserName.svelte";
     import type { SelectClanApplication } from "$lib/server/schema";
     import { textOverflow } from "$lib/utils";

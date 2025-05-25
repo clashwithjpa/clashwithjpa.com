@@ -3,10 +3,12 @@
     import { page } from "$app/state";
     import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
     import { toast } from "$lib/components/app/toast";
-    import Button from "$lib/components/app/ui/Button.svelte";
-    import Input from "$lib/components/app/ui/Input.svelte";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
+    import { Input } from "$lib/components/ui/input";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import { clanApplicationSchema } from "$lib/schema";
-    import { Tooltip } from "bits-ui";
+    import { textOverflow } from "$lib/utils";
     import { Control, Description, Field, FieldErrors } from "formsnap";
     import { Turnstile } from "svelte-turnstile";
     import { expoOut } from "svelte/easing";
@@ -74,11 +76,11 @@
             {/if}
         </div>
         <div
-            class="flex size-full flex-col items-center justify-center bg-gray-950/80 backdrop-blur-xs lg:w-1/2 lg:bg-transparent lg:backdrop-blur-none"
+            class="bg-background/80 flex size-full flex-col items-center justify-center backdrop-blur-xs lg:w-1/2 lg:bg-transparent lg:backdrop-blur-none"
         >
             {#if data.applications.length && showPrevApps}
                 <div in:fade class="flex size-full flex-col justify-center">
-                    <h3 class="text-center">Previous Application{data.applications.length > 1 ? "s" : ""}</h3>
+                    <h3 class="text-center text-xl">Previous Application{data.applications.length > 1 ? "s" : ""}</h3>
                     <ul class="mt-5 flex max-h-[60%] flex-col gap-2 overflow-y-scroll rounded-xl px-5">
                         {#each Object.entries(data.applications.reduce((acc: { [key: string]: typeof data.applications }, app) => {
                                 const date = new Date(app.createdAt).toLocaleString("en-IN", { month: "long", day: "numeric", year: "numeric" });
@@ -87,67 +89,61 @@
                                 return acc;
                             }, {})) as [date, applications]}
                             <li class="flex w-full flex-col items-start justify-center">
-                                <p class="flex w-full items-center text-gray-500">
+                                <p class="text-muted-foreground flex w-full items-center">
                                     {date}
-                                    <span class="mx-2 grow rounded-xl border-t border-gray-500"></span>
+                                    <span class="border-muted-foreground mx-2 grow rounded-xl border-t"></span>
                                 </p>
                                 <ul class="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                                     {#each applications as application}
-                                        <div
-                                            class="flex w-fit items-center justify-between gap-5 rounded-xl border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-4"
-                                        >
-                                            <div class="flex items-center justify-center gap-1">
-                                                <span
-                                                    class:text-red-400={application.status === "rejected"}
-                                                    class:text-yellow-400={application.status === "pending"}
-                                                    class:text-green-400={application.status === "accepted"}
-                                                >
-                                                    <Tooltip.Provider>
-                                                        <Tooltip.Root delayDuration={200}>
-                                                            <Tooltip.Trigger class="cursor-default">
-                                                                {#if application.status === "accepted"}
-                                                                    <MaterialSymbolsCheckCircle class="size-10" />
-                                                                {:else if application.status === "rejected"}
-                                                                    <MaterialSymbolsCancelRounded class="size-10" />
-                                                                {:else if application.status === "pending"}
-                                                                    <MaterialSymbolsWarningRounded class="size-10" />
-                                                                {/if}
-                                                            </Tooltip.Trigger>
-                                                            <Tooltip.Content
-                                                                class="rounded-lg border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-2 text-sm"
-                                                            >
-                                                                {application.status.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase())}
-                                                            </Tooltip.Content>
-                                                        </Tooltip.Root>
-                                                    </Tooltip.Provider>
-                                                </span>
-                                                <span class="flex flex-col items-start justify-center">
-                                                    <Tooltip.Provider>
-                                                        <Tooltip.Root delayDuration={200}>
-                                                            <Tooltip.Trigger class="cursor-default">
-                                                                <p>
-                                                                    {application.playerData.name.length >= 6
-                                                                        ? `${application.playerData.name.slice(0, 6).trim()}...`
-                                                                        : application.playerData.name}
-                                                                </p>
-                                                            </Tooltip.Trigger>
-                                                            <Tooltip.Content
-                                                                class="rounded-lg border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-2 text-sm"
-                                                            >
-                                                                <p>{application.playerData.name}</p>
-                                                            </Tooltip.Content>
-                                                        </Tooltip.Root>
-                                                    </Tooltip.Provider>
-                                                    <p class="text-xs">{application.tag}</p>
-                                                </span>
-                                            </div>
-                                            <p class="text-gray-400">
-                                                {new Date(application.createdAt).toLocaleTimeString("en-IN", {
-                                                    hour: "numeric",
-                                                    minute: "numeric"
-                                                })}
-                                            </p>
-                                        </div>
+                                        <Card.Root>
+                                            <Card.Header style="container-type: inherit;">
+                                                <Card.Title class="flex items-center justify-center gap-4">
+                                                    <span
+                                                        class:text-red-400={application.status === "rejected"}
+                                                        class:text-yellow-400={application.status === "pending"}
+                                                        class:text-green-400={application.status === "accepted"}
+                                                    >
+                                                        <Tooltip.Provider>
+                                                            <Tooltip.Root>
+                                                                <Tooltip.Trigger>
+                                                                    {#if application.status === "accepted"}
+                                                                        <MaterialSymbolsCheckCircle class="size-10" />
+                                                                    {:else if application.status === "rejected"}
+                                                                        <MaterialSymbolsCancelRounded class="size-10" />
+                                                                    {:else if application.status === "pending"}
+                                                                        <MaterialSymbolsWarningRounded class="size-10" />
+                                                                    {/if}
+                                                                </Tooltip.Trigger>
+                                                                <Tooltip.Content>
+                                                                    {application.status.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase())}
+                                                                </Tooltip.Content>
+                                                            </Tooltip.Root>
+                                                        </Tooltip.Provider>
+                                                    </span>
+                                                    <span class="flex flex-col items-start justify-center">
+                                                        <Tooltip.Provider>
+                                                            <Tooltip.Root>
+                                                                <Tooltip.Trigger>
+                                                                    <p>
+                                                                        {textOverflow(application.playerData.name, 8)}
+                                                                    </p>
+                                                                </Tooltip.Trigger>
+                                                                <Tooltip.Content>
+                                                                    <p>{application.playerData.name}</p>
+                                                                </Tooltip.Content>
+                                                            </Tooltip.Root>
+                                                        </Tooltip.Provider>
+                                                        <p class="text-xs">{application.tag}</p>
+                                                    </span>
+                                                    <p class="text-muted-foreground text-xs">
+                                                        {new Date(application.createdAt).toLocaleTimeString("en-IN", {
+                                                            hour: "numeric",
+                                                            minute: "numeric"
+                                                        })}
+                                                    </p>
+                                                </Card.Title>
+                                            </Card.Header>
+                                        </Card.Root>
                                     {/each}
                                 </ul>
                             </li>
@@ -188,7 +184,7 @@
                             />
                         </Field>
                     {/if}
-                    <Button class="px-4 py-3 text-sm {$delayed ? 'cursor-wait' : ''}" disabled={buttonDisabled || $delayed} type="submit">
+                    <Button class={$delayed ? "cursor-wait" : ""} disabled={buttonDisabled || $delayed} type="submit">
                         {#if $delayed}
                             <span in:fly class="flex size-full items-center justify-center gap-2">
                                 <TablerLoader2 class="size-5 animate-spin"></TablerLoader2>
@@ -202,10 +198,7 @@
             {/if}
             {#if data.applications.length}
                 <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
-                    <button
-                        class="group w-full cursor-pointer rounded-lg border border-gray-700 px-4 py-3 text-sm text-gray-500"
-                        onclick={() => (showPrevApps = !showPrevApps)}
-                    >
+                    <Button size="lg" class="w-full" variant="outline" onclick={() => (showPrevApps = !showPrevApps)}>
                         {#if showPrevApps}
                             <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
                                 <MaterialSymbolsChevronLeftRounded class="size-6 transition-transform group-hover:-translate-x-1.5 " />
@@ -223,7 +216,7 @@
                                 <MaterialSymbolsChevronRightRounded class="size-6 transition-transform group-hover:translate-x-1.5 " />
                             </span>
                         {/if}
-                    </button>
+                    </Button>
                 </div>
             {/if}
         </div>

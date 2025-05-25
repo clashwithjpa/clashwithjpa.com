@@ -25,7 +25,7 @@
         href="https://discord.com/users/{userID}"
         target="_blank"
         rel="noopener noreferrer"
-        class="bg-blurple/50 text-blurple-light hover:bg-blurple flex shrink-0 cursor-pointer items-center justify-start gap-1 rounded-md p-0.5 font-sans transition-colors hover:text-gray-50"
+        class="bg-blurple/50 text-blurple-light hover:bg-blurple hover:text-foreground flex shrink-0 cursor-pointer items-center justify-start gap-1 rounded-md p-0.5 font-sans transition-colors"
     >
         {#await fetchUserInfo(userID)}
             <div class="bg-blurple size-6 shrink-0 animate-pulse rounded-full"></div>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
-    import { Button } from "$lib/components/admin/ui/button";
+    import { Button } from "$lib/components/ui/button";
     import { Tipex, type TipexEditor } from "@friendofsvelte/tipex";
     import "@friendofsvelte/tipex/styles/CodeBlock.css";
     import "@friendofsvelte/tipex/styles/Controls.css";

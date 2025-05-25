@@ -3,11 +3,14 @@
     import { page } from "$app/state";
     import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
     import { toast } from "$lib/components/app/toast";
-    import Button from "$lib/components/app/ui/Button.svelte";
-    import Input from "$lib/components/app/ui/Input.svelte";
-    import Select from "$lib/components/app/ui/Select.svelte";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
+    import { Input } from "$lib/components/ui/input";
+    import * as Select from "$lib/components/ui/select";
+    import { Switch } from "$lib/components/ui/switch";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import { cwlApplicationSchema } from "$lib/schema";
-    import { Switch, Tooltip } from "bits-ui";
+    import { textOverflow } from "$lib/utils";
     import { Control, Description, Field, FieldErrors } from "formsnap";
     import { Turnstile } from "svelte-turnstile";
     import { expoOut } from "svelte/easing";
@@ -72,11 +75,11 @@
             {/if}
         </div>
         <div
-            class="flex size-full flex-col items-center justify-center bg-gray-950/80 backdrop-blur-xs lg:w-1/2 lg:bg-transparent lg:backdrop-blur-none"
+            class="bg-background/80 flex size-full flex-col items-center justify-center backdrop-blur-xs lg:w-1/2 lg:bg-transparent lg:backdrop-blur-none"
         >
             {#if showPrevApps}
                 <div in:fade class="flex size-full flex-col justify-center">
-                    <h3 class="text-center">Previous Application{data.applications.length > 1 ? "s" : ""}</h3>
+                    <h3 class="text-center text-xl">Previous Application{data.applications.length > 1 ? "s" : ""}</h3>
                     <ul class="mt-5 flex max-h-[60%] flex-col gap-2 overflow-y-scroll rounded-xl px-5">
                         {#each Object.entries(data.applications.reduce((acc: { [key: string]: typeof data.applications }, app) => {
                                 const date = new Date(app.appliedAt).toLocaleString("en-IN", { month: "long", day: "numeric", year: "numeric" });
@@ -85,59 +88,57 @@
                                 return acc;
                             }, {})) as [date, applications]}
                             <li class="flex w-full flex-col items-start justify-center">
-                                <p class="flex w-full items-center text-gray-500">
+                                <p class="text-muted-foreground flex w-full items-center">
                                     {date}
-                                    <span class="mx-2 grow rounded-xl border-t border-gray-500"></span>
+                                    <span class="border-muted-foreground mx-2 grow rounded-xl border-t"></span>
                                 </p>
                                 <ul class="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                                     {#each applications as application}
-                                        <div
-                                            class="flex w-fit flex-col items-start justify-center gap-5 rounded-xl border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-4"
-                                        >
-                                            <div class="flex w-full items-center justify-between gap-5">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <span class="flex flex-col items-start justify-center">
-                                                        <Tooltip.Provider>
-                                                            <Tooltip.Root delayDuration={200}>
-                                                                <Tooltip.Trigger class="cursor-default">
-                                                                    <p>
-                                                                        {application.accountName.length >= 6
-                                                                            ? `${application.accountName.slice(0, 6).trim()}...`
-                                                                            : application.accountName}
-                                                                    </p>
-                                                                </Tooltip.Trigger>
-                                                                <Tooltip.Content
-                                                                    class="rounded-lg border border-gray-700 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 p-2 text-sm"
-                                                                >
-                                                                    <p>{application.accountName}</p>
-                                                                </Tooltip.Content>
-                                                            </Tooltip.Root>
-                                                        </Tooltip.Provider>
-                                                        <p class="text-xs">{application.accountTag}</p>
-                                                    </span>
-                                                </div>
-                                                <p class="text-gray-400">
-                                                    {new Date(application.appliedAt).toLocaleTimeString("en-IN", {
-                                                        hour: "numeric",
-                                                        minute: "numeric"
-                                                    })}
-                                                </p>
-                                            </div>
-                                            <div class="flex w-full flex-col items-start justify-center gap-1 text-sm">
+                                        <Card.Root>
+                                            <Card.Header style="container-type: inherit;">
+                                                <Card.Title class="flex items-center justify-center gap-4">
+                                                    <div class="flex w-full items-center justify-between gap-5">
+                                                        <div class="flex items-center justify-center gap-1">
+                                                            <span class="flex flex-col items-start justify-center">
+                                                                <Tooltip.Provider>
+                                                                    <Tooltip.Root>
+                                                                        <Tooltip.Trigger>
+                                                                            <p>
+                                                                                {textOverflow(application.accountName, 8)}
+                                                                            </p>
+                                                                        </Tooltip.Trigger>
+                                                                        <Tooltip.Content>
+                                                                            <p>{application.accountName}</p>
+                                                                        </Tooltip.Content>
+                                                                    </Tooltip.Root>
+                                                                </Tooltip.Provider>
+                                                                <p class="text-xs">{application.accountTag}</p>
+                                                            </span>
+                                                        </div>
+                                                        <p class="text-muted-foreground text-sm">
+                                                            {new Date(application.appliedAt).toLocaleTimeString("en-IN", {
+                                                                hour: "numeric",
+                                                                minute: "numeric"
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                </Card.Title>
+                                            </Card.Header>
+                                            <Card.Content class="text-sm">
                                                 <p>
-                                                    <span class="font-bold text-gray-300">Clan:</span>
+                                                    <span class="text-muted-foreground font-bold">Clan:</span>
                                                     {application.accountClan}
                                                 </p>
                                                 <p>
-                                                    <span class="font-bold text-gray-300">Preference Number:</span>
+                                                    <span class="text-muted-foreground font-bold">Preference Number:</span>
                                                     {application.preferenceNum}
                                                 </p>
                                                 <p>
-                                                    <span class="font-bold text-gray-300">Account Weight:</span>
+                                                    <span class="text-muted-foreground font-bold">Account Weight:</span>
                                                     {application.accountWeight}
                                                 </p>
-                                            </div>
-                                        </div>
+                                            </Card.Content>
+                                        </Card.Root>
                                     {/each}
                                 </ul>
                             </li>
@@ -157,16 +158,7 @@
                                 <Control>
                                     {#snippet children({ props })}
                                         <input type="hidden" name="isAlt" bind:value={$formData.isAlt} />
-                                        <Switch.Root
-                                            {...props}
-                                            name="CWLStatus"
-                                            bind:checked={$formData.isAlt}
-                                            class="inline-flex h-7 w-[50px] cursor-pointer items-center gap-11 rounded-full bg-gray-800 p-1 transition-all disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-green-600"
-                                        >
-                                            <Switch.Thumb
-                                                class="data-[state=unchecked]:-translate-x-0.3 pointer-events-none block size-6 shrink-0 rounded-full bg-gray-50 transition-all data-[state=checked]:translate-x-[80%]"
-                                            />
-                                        </Switch.Root>
+                                        <Switch {...props} name="CWLStatus" bind:checked={$formData.isAlt} />
                                     {/snippet}
                                 </Control>
                                 <FieldErrors class="text-red-400" />
@@ -178,12 +170,16 @@
                             <Control>
                                 {#snippet children({ props })}
                                     <input type="hidden" name="tag" bind:value={$formData.tag} />
-                                    <Select {...props} bind:value={$formData.tag}>
-                                        <option value="" disabled selected hidden>Select an account</option>
-                                        {#each coc as account}
-                                            <option class="bg-gray-900" value={account?.tag}>{account?.tag} - {account?.name}</option>
-                                        {/each}
-                                    </Select>
+                                    <Select.Root type="single" bind:value={$formData.tag}>
+                                        <Select.Trigger class="w-full" {...props}
+                                            >{$formData.tag ? $formData.tag : "Select an account"}</Select.Trigger
+                                        >
+                                        <Select.Content>
+                                            {#each coc as acc}
+                                                <Select.Item value={acc?.tag ?? ""} label="{acc?.tag ?? ''} - {acc?.name ?? ''}" />
+                                            {/each}
+                                        </Select.Content>
+                                    </Select.Root>
                                 {/snippet}
                             </Control>
                             <FieldErrors class="text-red-400" />
@@ -215,12 +211,16 @@
                                 <Control>
                                     {#snippet children({ props })}
                                         <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
-                                        <Select {...props} bind:value={$formData.accountClan}>
-                                            <option value="" disabled selected hidden>Select a clan</option>
-                                            {#each data.clanNames as clanName}
-                                                <option class="bg-gray-900" value={clanName}>{clanName}</option>
-                                            {/each}
-                                        </Select>
+                                        <Select.Root type="single" bind:value={$formData.accountClan}>
+                                            <Select.Trigger class="w-full" {...props}
+                                                >{$formData.accountClan ? $formData.accountClan : "Select a clan"}</Select.Trigger
+                                            >
+                                            <Select.Content>
+                                                {#each data.clanNames as clanName}
+                                                    <Select.Item value={clanName ?? ""} label={clanName ?? ""} />
+                                                {/each}
+                                            </Select.Content>
+                                        </Select.Root>
                                     {/snippet}
                                 </Control>
                                 <FieldErrors class="text-red-400" />
@@ -251,7 +251,7 @@
                             </Field>
                         {/if}
 
-                        <Button class="px-4 py-3 text-sm {$delayed ? 'cursor-wait' : ''}" disabled={buttonDisabled || $delayed} type="submit">
+                        <Button class={$delayed ? "cursor-wait" : ""} disabled={buttonDisabled || $delayed} type="submit">
                             {#if $delayed}
                                 <span in:fly class="flex size-full items-center justify-center gap-2">
                                     <TablerLoader2 class="size-5 animate-spin"></TablerLoader2>
@@ -266,10 +266,7 @@
             {/if}
             {#if data.applications.length}
                 <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
-                    <button
-                        class="group w-full cursor-pointer rounded-lg border border-gray-700 px-4 py-3 text-sm text-gray-500"
-                        onclick={() => (showPrevApps = !showPrevApps)}
-                    >
+                    <Button size="lg" class="w-full" variant="outline" onclick={() => (showPrevApps = !showPrevApps)}>
                         {#if showPrevApps}
                             <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
                                 <MaterialSymbolsChevronLeftRounded class="size-6 transition-transform group-hover:-translate-x-1.5 " />
@@ -283,7 +280,7 @@
                                 <MaterialSymbolsChevronRightRounded class="size-6 transition-transform group-hover:translate-x-1.5 " />
                             </span>
                         {/if}
-                    </button>
+                    </Button>
                 </div>
             {/if}
         </div>

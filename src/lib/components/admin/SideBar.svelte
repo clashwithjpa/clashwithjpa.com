@@ -56,10 +56,10 @@
     import { goto, invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
     import type { UserData } from "$lib/auth/user";
-    import * as Avatar from "$lib/components/admin/ui/avatar";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Sidebar from "$lib/components/admin/ui/sidebar";
-    import * as Tooltip from "$lib/components/admin/ui/tooltip";
+    import * as Avatar from "$lib/components/ui/avatar";
+    import { Button } from "$lib/components/ui/button";
+    import * as Sidebar from "$lib/components/ui/sidebar";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import LucideLogOut from "~icons/lucide/log-out";
 
     let { user }: { user: UserData } = $props();

@@ -1,10 +1,10 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import Item from "$lib/components/admin/Item.svelte";
-    import { Button } from "$lib/components/admin/ui/button";
-    import { Input } from "$lib/components/admin/ui/input";
-    import { Separator } from "$lib/components/admin/ui/separator";
-    import { Switch } from "$lib/components/admin/ui/switch";
+    import { Button } from "$lib/components/ui/button";
+    import { Input } from "$lib/components/ui/input";
+    import { Separator } from "$lib/components/ui/separator";
+    import { Switch } from "$lib/components/ui/switch";
     import type { APIGuild, APIRole, APIUser } from "discord-api-types/v10";
     import { toast } from "svelte-sonner";
     import LucideRefreshCw from "~icons/lucide/refresh-cw";

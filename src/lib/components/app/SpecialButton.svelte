@@ -31,7 +31,7 @@
     target={newTab ? "_blank" : ""}
     class={cn(
         getClass(page.url.pathname, href),
-        "group animate-bg flex cursor-pointer items-center space-x-1 bg-clip-text text-transparent transition-all duration-300 ease-in-out",
+        "group animate-bg font-coc flex cursor-pointer items-center space-x-1 bg-clip-text text-transparent transition-all duration-300 ease-in-out",
         className
     )}
     {onclick}

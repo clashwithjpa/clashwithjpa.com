@@ -10,7 +10,7 @@
 </script>
 
 <h1
-    class={cn("font-extrabold shadow-gray-950 drop-shadow-[0_4px_0_var(--tw-shadow-color)]", className)}
+    class={cn("font-coc shadow-background font-extrabold drop-shadow-[0_4px_0_var(--tw-shadow-color)]", className)}
     style="-webkit-text-stroke: 2px var(--tw-shadow-color);"
 >
     {@render children?.()}

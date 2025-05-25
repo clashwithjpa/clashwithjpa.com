@@ -33,6 +33,7 @@
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 class="group size-11"
+                size=""
             >
                 <MaterialSymbolsArrowUpwardRounded class="size-5 transition-transform group-hover:-translate-y-1 " />
             </CocButton>

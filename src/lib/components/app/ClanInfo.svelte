@@ -28,7 +28,7 @@
     })();
 </script>
 
-<div class="flex flex-col items-start space-y-4">
+<div class="font-coc flex flex-col items-start space-y-4">
     <div class="flex flex-row items-center justify-start space-x-4">
         <img class="size-14" src={clan.clanData?.badgeUrls.medium} alt={clan.clanData?.name} />
         <div class="flex flex-col items-start justify-center">

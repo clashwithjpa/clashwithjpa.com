@@ -3,11 +3,11 @@
     import { page } from "$app/state";
     import { clanForm, clanFormSchema } from "$lib/coc/schema";
     import Grid from "$lib/components/admin/Grid.svelte";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Card from "$lib/components/admin/ui/card";
-    import { Input } from "$lib/components/admin/ui/input";
-    import { Separator } from "$lib/components/admin/ui/separator";
-    import * as Tooltip from "$lib/components/admin/ui/tooltip";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
+    import { Input } from "$lib/components/ui/input";
+    import { Separator } from "$lib/components/ui/separator";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import type { InsertClan } from "$lib/server/schema";
     import type { GridOptions } from "@ag-grid-community/core";
     import { Control, Description, Field, FieldErrors } from "formsnap";

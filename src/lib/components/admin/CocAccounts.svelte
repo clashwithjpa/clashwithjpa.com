@@ -2,8 +2,8 @@
     import { invalidateAll } from "$app/navigation";
     import type { APIPlayer } from "$lib/coc/types";
     import Grid from "$lib/components/admin/Grid.svelte";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Popover from "$lib/components/admin/ui/popover";
+    import { Button } from "$lib/components/ui/button";
+    import * as Popover from "$lib/components/ui/popover";
     import type { GridOptions } from "@ag-grid-community/core";
     import { toast } from "svelte-sonner";
     import { fade, fly } from "svelte/transition";

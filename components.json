@@ -1,14 +1,14 @@
 {
     "$schema": "https://next.shadcn-svelte.com/schema.json",
     "tailwind": {
-        "css": "src/routes/(admin)/app.css",
+        "css": "src/app.css",
         "baseColor": "zinc"
     },
     "aliases": {
-        "components": "$lib/components/admin",
+        "components": "$lib/components",
         "utils": "$lib/utils",
-        "ui": "$lib/components/admin/ui",
-        "hooks": "$lib/admin/hooks",
+        "ui": "$lib/components/ui",
+        "hooks": "$lib/hooks",
         "lib": "$lib"
     },
     "typescript": true,

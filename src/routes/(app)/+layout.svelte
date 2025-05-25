@@ -1,14 +1,11 @@
 <script lang="ts">
-    import { afterNavigate, beforeNavigate, onNavigate } from "$app/navigation";
     import type { UserData } from "$lib/auth/user";
     import Navbar from "$lib/components/app/Navbar.svelte";
     import { subscribeToast } from "$lib/components/app/toast";
-    import NProgress from "nprogress";
     import type { Snippet } from "svelte";
     import { Toaster } from "svelte-sonner";
     import { expoOut } from "svelte/easing";
     import { fly } from "svelte/transition";
-    import "../../app.css";
     import "../../nprogress.css";
     import type { PageData } from "./$types";
 
@@ -18,25 +15,6 @@
     }
 
     let { data, children }: Props = $props();
-
-    onNavigate((navigation) => {
-        if (!document.startViewTransition) return;
-
-        return new Promise((resolve) => {
-            document.startViewTransition(async () => {
-                resolve();
-                await navigation.complete;
-            });
-        });
-    });
-
-    NProgress.configure({ showSpinner: false });
-    beforeNavigate(() => {
-        NProgress.start();
-    });
-    afterNavigate(() => {
-        NProgress.done();
-    });
 
     let show: boolean = $state(false);
     subscribeToast((data: boolean) => {
@@ -65,7 +43,7 @@
     />
 {/if}
 
-<main class="h-screen w-screen">
+<main class="font-coc h-screen w-screen">
     <Navbar user={data.user as UserData} applicationEnabled={data.applicationEnabled} cwlEnabled={data.cwlEnabled} cocAccs={data.cocAccs} />
     {@render children?.()}
 </main>

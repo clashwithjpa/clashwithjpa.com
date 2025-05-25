@@ -1,8 +1,8 @@
 <script lang="ts">
-    import * as Avatar from "$lib/components/admin/ui/avatar";
-    import { Button } from "$lib/components/admin/ui/button";
-    import * as Card from "$lib/components/admin/ui/card";
-    import { Input } from "$lib/components/admin/ui/input";
+    import * as Avatar from "$lib/components/ui/avatar";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
+    import { Input } from "$lib/components/ui/input";
     import type { APIRole, APIUser } from "discord-api-types/v10";
     import { toast } from "svelte-sonner";
     import { expoIn, expoOut } from "svelte/easing";
