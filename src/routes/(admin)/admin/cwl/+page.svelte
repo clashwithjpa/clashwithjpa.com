@@ -210,27 +210,6 @@
                     </Field>
                 </div>
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="accountClan">
-                        <Description>Account Clan</Description>
-                        <Control>
-                            {#snippet children({ props })}
-                                <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
-                                <Select.Root type="single" bind:value={$formData.accountClan}>
-                                    <Select.Trigger class="w-full" {...props}
-                                        >{$formData.accountClan ? $formData.accountClan : "Select a clan"}</Select.Trigger
-                                    >
-                                    <Select.Content>
-                                        {#each data.clanNames as clanName}
-                                            <Select.Item value={clanName ?? ""} label={clanName ?? ""} />
-                                        {/each}
-                                    </Select.Content>
-                                </Select.Root>
-                            {/snippet}
-                        </Control>
-                        <FieldErrors class="text-destructive text-sm" />
-                    </Field>
-                </div>
-                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
                     <Field {form} name="accountWeight">
                         <Description>Account Weight</Description>
                         <Control>
@@ -249,6 +228,27 @@
                             {#snippet children({ props })}
                                 <input type="hidden" name="preferenceNum" bind:value={$formData.preferenceNum} />
                                 <Input {...props} placeholder="1" min={1} bind:value={$formData.preferenceNum} />
+                            {/snippet}
+                        </Control>
+                        <FieldErrors class="text-destructive text-sm" />
+                    </Field>
+                </div>
+                <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
+                    <Field {form} name="accountClan">
+                        <Description>Account Clan</Description>
+                        <Control>
+                            {#snippet children({ props })}
+                                <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
+                                <Select.Root type="single" bind:value={$formData.accountClan}>
+                                    <Select.Trigger class="w-full" {...props}
+                                        >{$formData.accountClan ? $formData.accountClan : "Select a clan"}</Select.Trigger
+                                    >
+                                    <Select.Content>
+                                        {#each data.clanNames as clanName}
+                                            <Select.Item value={clanName ?? ""} label={clanName ?? ""} />
+                                        {/each}
+                                    </Select.Content>
+                                </Select.Root>
                             {/snippet}
                         </Control>
                         <FieldErrors class="text-destructive text-sm" />
