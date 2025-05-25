@@ -95,8 +95,9 @@
             {/if}
             <img src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}" alt="Avatar" class="size-8 rounded-full lg:size-11" />
         </Popover.Trigger>
+        <!-- "z-40" is used to ensure the popover appears above other elements but below popup dialog -->
         <Popover.Content
-            class="border-background shadow-background from-muted to-primary-background flex w-full flex-col gap-5 rounded-xl border bg-linear-to-b p-5 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)]"
+            class="border-background shadow-background from-muted to-primary-background z-40 flex w-full flex-col gap-5 rounded-xl border bg-linear-to-b p-5 shadow-[0_0_5px_0.5px_var(--tw-shadow-color)]"
         >
             <div class="flex gap-x-5">
                 <CocButton onclick={logout} class="p-2" type="danger" size="sm">

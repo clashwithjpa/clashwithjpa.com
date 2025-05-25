@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <div class="fixed right-8 bottom-4 z-11 flex space-x-4">
+    <div class="fixed right-8 bottom-4 z-10 flex space-x-4">
         <button onclick={togglePause} class="hover:text-muted-foreground size-6 rounded-full transition-colors">
             {#if isPaused}
                 <MaterialSymbolsPlayCircleRounded class="size-full" />

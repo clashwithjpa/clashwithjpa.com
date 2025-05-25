@@ -194,10 +194,6 @@
     }
 }
 
-div[data-bits-floating-content-wrapper] {
-    z-index: 100 !important;
-}
-
 .ag-cell {
     display: flex;
     align-items: center;
