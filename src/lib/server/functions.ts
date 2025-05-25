@@ -80,15 +80,7 @@ export async function deleteApplication(db: DB, tag: schema.SelectClanApplicatio
 
 export async function getClansPublicData(db: DB) {
     return db.query.clanTable.findMany({
-        orderBy: desc(schema.clanTable.clanLevel),
-        columns: {
-            clanTag: true,
-            clanLevel: true,
-            attacksRequirement: true,
-            donationsRequirement: true,
-            clangamesRequirement: true,
-            clanData: true
-        }
+        orderBy: desc(schema.clanTable.clanLevel)
     });
 }
 

@@ -264,7 +264,7 @@
         <p class="text-muted-foreground text-sm">Set the Guild ID for the app. This is required for the app to function properly.</p>
     </div>
     <div class="flex items-center justify-center gap-2">
-        <Input placeholder="Enter Guild ID" max="19" bind:value={guildID} disabled={disabled.guildID.input} />
+        <Input placeholder="Enter Guild ID" bind:value={guildID} disabled={disabled.guildID.input} />
         <Button size="icon" onclick={setGuildID} disabled={disabled.guildID.button}>
             <LucideSend />
         </Button>

@@ -120,11 +120,6 @@ export type InsertCoc = typeof cocTable.$inferInsert;
 export type SelectCoc = typeof cocTable.$inferSelect;
 
 export type InsertClan = typeof clanTable.$inferInsert;
-export type EditClan = {
-    attacksRequirement: typeof clanTable.attacksRequirement;
-    donationsRequirement: typeof clanTable.donationsRequirement;
-    clangamesRequirement: typeof clanTable.clangamesRequirement;
-};
 export type SelectClan = typeof clanTable.$inferSelect;
 
 export type InsertBase = typeof baseTable.$inferInsert;
