@@ -5,8 +5,6 @@
 
 import type { ColumnType } from "kysely";
 
-export type AppPermission = "read.all" | "read.bases" | "read.clans" | "read.coc_accounts" | "read.cwl_applications" | "read.join_applications" | "read.rules" | "read.settings" | "read.users" | "write.all" | "write.bases" | "write.clans" | "write.coc_accounts" | "write.cwl_applications" | "write.join_applications" | "write.rules" | "write.settings" | "write.users";
-
 export type AppRole = "admin" | "base_manager" | "clan_manager" | "coc_account_manager" | "cwl_manager" | "join_manager" | "rule_manager" | "setting_manager" | "user_manager";
 
 export type AuthAalLevel = "aal1" | "aal2" | "aal3";
@@ -435,12 +433,6 @@ export interface RealtimeSubscription {
   subscription_id: string;
 }
 
-export interface RolePermissions {
-  id: Generated<Int8>;
-  permission: AppPermission;
-  role: AppRole;
-}
-
 export interface Settings {
   key: string;
   type: string;
@@ -541,11 +533,6 @@ export interface SupabaseMigrationsSchemaMigrations {
   version: string;
 }
 
-export interface SupabaseMigrationsSeedFiles {
-  hash: string;
-  path: string;
-}
-
 export interface UserRoles {
   id: Generated<Int8>;
   role: AppRole;
@@ -615,7 +602,6 @@ export interface DB {
   "realtime.messages": RealtimeMessages;
   "realtime.schema_migrations": RealtimeSchemaMigrations;
   "realtime.subscription": RealtimeSubscription;
-  role_permissions: RolePermissions;
   settings: Settings;
   "storage.buckets": StorageBuckets;
   "storage.migrations": StorageMigrations;
@@ -626,7 +612,6 @@ export interface DB {
   "supabase_functions.hooks": SupabaseFunctionsHooks;
   "supabase_functions.migrations": SupabaseFunctionsMigrations;
   "supabase_migrations.schema_migrations": SupabaseMigrationsSchemaMigrations;
-  "supabase_migrations.seed_files": SupabaseMigrationsSeedFiles;
   user_roles: UserRoles;
   users: Users;
   "vault.decrypted_secrets": VaultDecryptedSecrets;
