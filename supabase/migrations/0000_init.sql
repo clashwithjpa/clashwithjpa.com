@@ -124,6 +124,7 @@ CREATE TABLE "settings" (
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
+set search_path = ''
 stable
 as $$
   DECLARE
