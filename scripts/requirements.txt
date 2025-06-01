@@ -1,0 +1,7 @@
+asyncpg
+aiohttp
+python-dotenv
+apscheduler
+motor
+requests
+markdown

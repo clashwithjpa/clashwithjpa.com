@@ -1,4 +1,8 @@
 node_modules
+.venv
+env
+venv
+package-lock.json
 
 # Output
 .output
@@ -21,3 +25,5 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+settings_backup.json
