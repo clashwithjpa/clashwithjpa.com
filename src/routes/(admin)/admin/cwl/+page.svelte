@@ -17,10 +17,11 @@
     import { fade, fly } from "svelte/transition";
     import { superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import LucideCheck from "~icons/lucide/check";
     import LucideCloud from "~icons/lucide/cloud";
     import LucideCloudAlert from "~icons/lucide/cloud-alert";
     import LucideCloudUpload from "~icons/lucide/cloud-upload";
-    import LucideFileText from "~icons/lucide/file-text";
+    import LucideDownload from "~icons/lucide/download";
     import LucideLoaderCircle from "~icons/lucide/loader-circle";
     import LucidePlus from "~icons/lucide/plus";
     import LucideTrash from "~icons/lucide/trash";
@@ -125,26 +126,7 @@
             selectedRows = event.api.getSelectedRows();
         },
         async onCellValueChanged(event) {
-            let updatedRow = event.data;
-            const [month, year] = new Date(updatedRow.appliedAt ?? "").toLocaleDateString("en-US", { month: "long", year: "numeric" }).split(" ");
-            updatedRow.month = month;
-            updatedRow.year = year as unknown as number;
-            syncing = "loading";
-            let response = await fetch(`/api/cwl`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    key: "update_application",
-                    value: updatedRow
-                })
-            });
-            if (response.ok) {
-                syncing = "success";
-                invalidateAll();
-            } else {
-                syncing = "error";
-                toast.error("Failed to update application");
-            }
+            await updateApplication(event.data);
         },
         onSortChanged(event) {
             const sortedData: InsertCWL[] = [];
@@ -189,7 +171,6 @@
             reset?.();
         }
     });
-
     const { form: formData, enhance, message, delayed } = form;
     $effect(() => {
         if ($message && (page.status === 200 || page.status == 400)) {
@@ -204,8 +185,37 @@
             }
         }
     });
-
     let reset = $state<() => void>();
+
+    // Extra actions
+    let selectedAccountClan: string = $state("");
+    let selectedAssignClan: string = $state("");
+    let checkLoading: boolean = $state(false);
+
+    const updateApplication = async (updatedRow: InsertCWL | InsertCWL[]) => {
+        disabled = true;
+        syncing = "loading";
+        let key = Array.isArray(updatedRow) ? "update_multi_applications" : "update_application";
+        let value = Array.isArray(updatedRow)
+            ? updatedRow.map((row) => ({ ...row, appliedAt: new Date(row.appliedAt ?? "") }))
+            : { ...updatedRow, appliedAt: new Date(updatedRow.appliedAt ?? "") };
+        let response = await fetch(`/api/cwl`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key, value })
+        });
+        if (response.ok) {
+            syncing = "success";
+            invalidateAll();
+        } else {
+            syncing = "error";
+            toast.error("Failed to update application");
+        }
+        disabled = false;
+        selectedRows = [];
+        selectedAccountClan = "";
+        selectedAssignClan = "";
+    };
 </script>
 
 <Dialog.Root bind:open={openPopup}>
@@ -350,7 +360,7 @@
                     URL.revokeObjectURL(url);
                 }}
             >
-                <LucideFileText />
+                <LucideDownload />
             </Button>
             <Button size="icon" {disabled} onclick={() => (openPopup = true)}>
                 <LucidePlus />
@@ -377,5 +387,67 @@
     </div>
     <div class="size-full">
         <Grid {gridOptions} bind:rowData />
+    </div>
+    <div class="flex w-full items-center justify-between">
+        <div class="flex items-center justify-start gap-2">
+            <Select.Root
+                type="single"
+                bind:value={selectedAccountClan}
+                disabled={selectedRows.length <= 0 || disabled}
+                onValueChange={(value) => {
+                    selectedRows.forEach((row) => {
+                        row.accountClan = value;
+                    });
+                }}
+            >
+                <Select.Trigger>
+                    {selectedAccountClan ? selectedAccountClan : "Select Account Clan"}
+                </Select.Trigger>
+                <Select.Content>
+                    {#each data.clanNames as clanName}
+                        <Select.Item value={clanName ?? ""} label={clanName ?? ""} />
+                    {/each}
+                </Select.Content>
+            </Select.Root>
+            <Select.Root
+                type="single"
+                bind:value={selectedAssignClan}
+                disabled={selectedRows.length <= 0 || disabled}
+                onValueChange={(value) => {
+                    selectedRows.forEach((row) => {
+                        row.assignedTo = value === "Unassigned" ? null : data.cwlClans.find((clan) => clan.clanName === value)?.tag || null;
+                    });
+                }}
+            >
+                <Select.Trigger>
+                    {selectedAssignClan ? selectedAssignClan : "Select CWL Clan"}
+                </Select.Trigger>
+                <Select.Content>
+                    {#each data.cwlClans as clan}
+                        <Select.Item value={clan.clanName} label={clan.clanName} />
+                    {/each}
+                    <Select.Item value="Unassigned" label="Unassigned" />
+                </Select.Content>
+            </Select.Root>
+        </div>
+        <Button
+            size="icon"
+            disabled={selectedRows.length <= 0 || disabled}
+            onclick={async () => {
+                checkLoading = true;
+                await updateApplication(selectedRows);
+                checkLoading = false;
+            }}
+        >
+            {#if checkLoading}
+                <span in:fade={{ duration: 100 }}>
+                    <LucideLoaderCircle class="animate-spin" />
+                </span>
+            {:else}
+                <span in:fade={{ duration: 100 }}>
+                    <LucideCheck />
+                </span>
+            {/if}
+        </Button>
     </div>
 </div>

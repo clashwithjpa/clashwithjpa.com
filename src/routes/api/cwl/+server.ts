@@ -27,5 +27,13 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         cwlData.appliedAt = new Date(cwlData.appliedAt ?? "");
         await locals.db.update(cwlTable).set(cwlData).where(eq(cwlTable.accountTag, cwlData.accountTag));
     }
+    // Update multiple cwl applications with new data
+    else if (key === "update_multi_applications") {
+        const cwlData: InsertCWL[] = value;
+        for (const data of cwlData) {
+            data.appliedAt = new Date(data.appliedAt ?? "");
+            await locals.db.update(cwlTable).set(data).where(eq(cwlTable.accountTag, data.accountTag));
+        }
+    }
     return json({ success: true });
 };
