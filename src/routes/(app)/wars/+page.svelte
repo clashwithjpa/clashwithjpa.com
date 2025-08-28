@@ -103,7 +103,7 @@
                                     {/if}
                                 </div>
 
-                                {#if item.war && ((item.war as APIClanWar).state === 'inWar' || (item.war as APIClanWar).state === 'warEnded')}
+                                {#if item.war && ((item.war as APIClanWar).state === 'preparation' || (item.war as APIClanWar).state === 'inWar' || (item.war as APIClanWar).state === 'warEnded')}
                                     <div class="mx-2 mb-2 flex flex-col">
                                         <p class="p-4 text-center">Opponent</p>
                                         <div class="border-background bg-foreground/10 inset-shadow-foreground flex w-full items-center space-x-3 rounded-xl border-1 p-4 inset-shadow-sm">
