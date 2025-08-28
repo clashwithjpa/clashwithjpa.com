@@ -17,6 +17,7 @@
     const items: Item[] = [
         { name: "Home", href: "/" },
         { name: "Clans", href: "/clans" },
+        { name: "War details", href: "/wars" },
         { name: "Rules", href: "/clans/rules" },
         { name: "Discord", href: "https://discord.clashwithjpa.com", newTab: true }
     ];

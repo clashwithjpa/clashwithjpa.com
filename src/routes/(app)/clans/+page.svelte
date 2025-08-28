@@ -35,6 +35,11 @@
                     <InlineLink href="https://discord.clashwithjpa.com/" class="mt-4 text-xl" arrow={true} newTab={true}>
                         <span>Join our Discord</span>
                     </InlineLink>
+                    <div class="flex gap-4">
+                        <InlineLink href="/wars" class="text-xl" arrow={true}>
+                            <span>View Wars</span>
+                        </InlineLink>
+                    </div>
                 </div>
             </div>
         </div>
