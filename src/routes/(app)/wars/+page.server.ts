@@ -5,6 +5,7 @@ import { API_TOKEN } from "$env/static/private";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
 
 export const load = (async ({ setHeaders, locals }) => {
+    // Always fetch fresh wars so refresh reflects current state
     setHeaders({ "cache-control": "no-store" });
 
     const clans = await getClansPublicData(locals.db);
@@ -15,11 +16,11 @@ export const load = (async ({ setHeaders, locals }) => {
             try {
                 const war = await getClanWarData(PUBLIC_API_BASE_URI, API_TOKEN, tag);
                 if ((war as unknown as { error?: boolean }).error) {
-                    return { clan, war: null } as const;
+                    return { clan, war: clan.clanCurrentWar ?? null } as const;
                 }
                 return { clan, war } as const;
             } catch {
-                return { clan, war: null } as const;
+                return { clan, war: clan.clanCurrentWar ?? null } as const;
             }
         })
     );
