@@ -1,9 +1,0 @@
-services:
-  cronjob:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - ../../.env
-    volumes:
-      - ./cwl-ping.py:/app/cwl-ping.py

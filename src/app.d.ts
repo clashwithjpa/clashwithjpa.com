@@ -8,10 +8,8 @@ declare global {
     namespace App {
         // interface Error {}
         interface Locals {
-            db: NeonHttpDatabase<typeof schema> & {
-                $client: NeonQueryFunction<false, false>;
-            };
-            user: UserData | null;
+            user: import("$lib/server/auth").SessionValidationResult["user"];
+            session: import("$lib/server/auth").SessionValidationResult["session"];
         }
         // interface PageData {}
         // interface PageState {}

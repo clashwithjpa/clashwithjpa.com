@@ -4,6 +4,6 @@ pnpm-lock.yaml
 yarn.lock
 
 *.md
-src/lib/server/migrations/*
-src/lib/components/ui/*
+drizzle
+src/lib/components/ui
 components.json

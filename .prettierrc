@@ -1,19 +1,42 @@
 {
+    "useTabs": false,
     "tabWidth": 4,
+    "singleQuote": false,
     "trailingComma": "none",
-    "printWidth": 150,
+    "printWidth": 100,
+    "endOfLine": "lf",
     "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    "bracketSameLine": true,
     "overrides": [
         {
             "files": "*.svelte",
             "options": {
-                "parser": "svelte"
+                "parser": "svelte",
+                "svelteIndentScriptAndStyle": true,
+                "svelteStrictMode": false,
+                "svelteSortOrder": "scripts-markup-styles-options",
+                "svelteAllowShorthand": true,
+                "htmlWhitespaceSensitivity": "css",
+                "experimentalOperatorPosition": "end"
+            }
+        },
+        {
+            "files": "*.md",
+            "options": {
+                "printWidth": 70
+            }
+        },
+        {
+            "files": "*.html",
+            "options": {
+                "parser": "html",
+                "htmlWhitespaceSensitivity": "ignore"
             }
         },
         {
             "files": "*.yml",
             "options": {
-                "tabWidth": 2
+                "tabWidth": 4
             }
         }
     ]
