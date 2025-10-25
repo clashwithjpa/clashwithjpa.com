@@ -45,7 +45,7 @@
         </div>
     </header>
 
-    <div class="flex w-full flex-col items-center justify-center p-11">
+    <div class="flex w-full flex-col items-center justify-center p-6 md:px-11">
         <div class="flex w-full flex-col items-center">
             <div class="flex w-full flex-wrap items-stretch justify-center gap-5 lg:gap-11">
                 {#each data.clans as clan, idx}

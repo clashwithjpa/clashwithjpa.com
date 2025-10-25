@@ -1,8 +1,8 @@
-import type { PageServerLoad } from "./$types";
-import { getClansPublicData } from "$lib/server/functions";
-import { getClanWarData } from "$lib/coc/clan";
 import { API_TOKEN } from "$env/static/private";
 import { PUBLIC_API_BASE_URI } from "$env/static/public";
+import { getClanWarData } from "$lib/coc/clan";
+import { getClansPublicData } from "$lib/server/functions";
+import type { PageServerLoad } from "./$types";
 
 export const load = (async ({ setHeaders, locals }) => {
     // Always fetch fresh wars so refresh reflects current state

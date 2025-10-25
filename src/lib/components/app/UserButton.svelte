@@ -51,7 +51,7 @@
 </script>
 
 <PopupDialog bind:open={openPopup} title="Linked COC Accounts">
-    <div class="flex max-h-[calc(100vh-400px)] w-full flex-wrap items-center justify-center gap-2 overflow-scroll">
+    <div class="flex max-h-[calc(100vh-400px)] flex-wrap items-center justify-center gap-2 overflow-scroll">
         {#if cocAccs}
             {#each cocAccs.cocAccounts as account}
                 {#await fetchCocAccounts(account.tag)}
