@@ -2,8 +2,10 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+bun.lock
+bun.lockb
 
-*.md
-src/lib/server/migrations/*
-src/lib/components/ui/*
-components.json
+# Miscellaneous
+/static/
+/drizzle/
+src/lib/components/ui

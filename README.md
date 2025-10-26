@@ -1,62 +1,38 @@
-<div align="center">
+# sv
 
-![JPA](./assets/jpa.png)
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-Clash With JPA
+## Creating a project
 
-</div>
+If you're seeing this, you've probably already done this step. Congrats!
 
-## 🚀 Installation
+```sh
+# create a new project in the current directory
+npx sv create
 
-1. Clone this repository
-    ```sh
-    git clone https://github.com/clashwithjpa/clashwithjpa.com clashwithjpa
-    cd clashwithjpa
-    ```
+# create a new project in my-app
+npx sv create my-app
+```
 
-2. Install dependencies
-    ```sh
-    pnpm i
-    ```
+## Developing
 
-3. Start the app
-    ```sh
-    pnpm dev
-    ```
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-## 🌐 Production
+```sh
+npm run dev
 
-1. Follow steps 1 & 2 from the [installation guide](#-installation). *Ignore if already done.*
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
 
-2. Build the app
-    ```sh
-    pnpm build
-    ```
+## Building
 
-3. Preview the app
-    ```sh
-    pnpm preview
-    ```
+To create a production version of your app:
 
-## 📂 Working with database and drizzle
+```sh
+npm run build
+```
 
-To make any changes to the database, you have to follow certain steps to avoid issues
+You can preview the production build with `npm run preview`.
 
-- Edit the database schema file with required changes
-- Run `pnpm run db:push` to apply the changes to the database
-
-This will ensure that the changes are applied to the database without any issues.
-
-You can also try `pnpm run db:studio` to open a web interface to interact with the database.
-
-## ⌨️ Contributing
-
-- Things to keep in mind
-    - Follow our commit message convention.
-    - Write meaningful commit messages.
-    - Keep the code clean and readable.
-    - Make sure the app is working as expected.
-
-- Code Formatting
-    - Run `pnpm format` before committing your changes or use [`Prettier`](https://prettier.io/) extension in your code editor.
-    - Make sure to fix all the linting errors. Run `pnpm lint` to check for linting errors.
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
