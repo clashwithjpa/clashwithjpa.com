@@ -84,13 +84,17 @@ export const clanApplicationTable = pgTable('clan_application_table', {
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
-export const cwlClanInfoTable = pgTable('cwl_clan_info_table', {
-	cocClanTag: text('coc_clan_tag').notNull().primaryKey(),
-	cocClanName: text('coc_clan_name').notNull(),
-	cocClanLeague: text('coc_clan_league').notNull(),
-	cocClanLeader: text('coc_clan_leader').notNull(),
-	email: text('email').notNull()
-});
+export const cwlClanInfoTable = pgTable(
+	'cwl_clan_info_table',
+	{
+		cocClanTag: text('coc_clan_tag').notNull().primaryKey(),
+		cocClanName: text('coc_clan_name').notNull(),
+		cocClanLeague: text('coc_clan_league').notNull(),
+		cocClanLeader: text('coc_clan_leader').notNull(),
+		email: text('email').notNull()
+	},
+	(t) => [index('cwl_clan_info_coc_clan_tag_idx').on(t.cocClanTag)]
+);
 
 export const cwlApplicationTable = pgTable(
 	'cwl_application_table',
