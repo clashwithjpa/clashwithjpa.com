@@ -121,7 +121,8 @@ export const cwlApplicationTable = pgTable(
 			t.month,
 			t.year
 		),
-		index('cwl_application_discord_user_id_idx').on(t.discordUserId)
+		index('cwl_application_discord_user_id_idx').on(t.discordUserId),
+		index('cwl_application_assigned_to_idx').on(t.assignedTo)
 	]
 );
 
