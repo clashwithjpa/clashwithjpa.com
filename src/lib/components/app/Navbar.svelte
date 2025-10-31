@@ -14,13 +14,6 @@
         href: string;
         newTab?: boolean;
     }
-    const items: Item[] = [
-        { name: "Home", href: "/" },
-        { name: "Clans", href: "/clans" },
-        { name: "War details", href: "/wars" },
-        { name: "Rules", href: "/clans/rules" },
-        { name: "Discord", href: "https://discord.clashwithjpa.com", newTab: true }
-    ];
 
     let {
         user,
@@ -37,6 +30,15 @@
         hasAnyCWLApplications: boolean;
         cocAccs: (InsertUser & { cocAccounts: InsertCoc[] }) | undefined;
     } = $props();
+
+    const items = $derived<Item[]>([
+        { name: "Home", href: "/" },
+        { name: "Clans", href: "/clans" },
+        { name: "War details", href: "/wars" },
+        ...(hasAnyCWLApplications ? [{ name: "CWL List", href: "/cwl/list" }] : []),
+        { name: "Rules", href: "/clans/rules" },
+        { name: "Discord", href: "https://discord.clashwithjpa.com", newTab: true }
+    ]);
 
     let isOpen = $state(false);
     function toggleMenu() {

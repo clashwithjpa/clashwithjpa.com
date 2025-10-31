@@ -1,12 +1,12 @@
 <script lang="ts">
     import Grid from "$lib/components/admin/Grid.svelte";
+    import ClanCWLTableWrapper from "$lib/components/admin/wrappers/ClanCWLTableWrapper.svelte";
     import UserCWLTableWrapper from "$lib/components/admin/wrappers/UserCWLTableWrapper.svelte";
     import { Button } from "$lib/components/ui/button";
     import type { InsertCWL } from "$lib/server/schema";
     import type { GridOptions, IDateFilterParams, ValueFormatterParams } from "@ag-grid-community/core";
     import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
     import { json2csv } from "json-2-csv";
-    import MaterialSymbolsChevronLeftRounded from "~icons/material-symbols/chevron-left-rounded";
     import MaterialSymbolsDownloadRounded from "~icons/material-symbols/download-rounded";
 
     let { data } = $props<{ data: any }>();
@@ -50,8 +50,9 @@
                 field: "assignedTo",
                 headerName: "Assigned To",
                 filter: true,
-                valueFormatter: (params: ValueFormatterParams<InsertCWL, string>) => {
-                    return data.cwlClans.find((clan: any) => clan.tag === params.data?.assignedTo)?.clanName || "";
+                cellRenderer: makeSvelteCellRenderer(ClanCWLTableWrapper),
+                cellRendererParams: {
+                    cwlClans: data.cwlClans
                 }
             },
             { field: "accountWeight", filter: "agNumberColumnFilter" },
@@ -99,7 +100,7 @@
 </script>
 
 <svelte:head>
-    <title>JPA | CWL List</title>
+    <title>JPA | CWL Applications</title>
 </svelte:head>
 
 <main class="flex size-full flex-col items-center justify-center p-5">
@@ -107,9 +108,6 @@
         <div class="flex w-full items-center justify-between">
             <div class="flex w-full items-center justify-between pt-20">
                 <div class="flex items-center justify-center gap-2">
-                    <Button size="icon" variant="outline" href={data.hasUserApplications ? "/cwl" : "/"}>
-                        <MaterialSymbolsChevronLeftRounded class="size-6" />
-                    </Button>
                     <h1 class="text-2xl font-bold">CWL Applications</h1>
                 </div>
                 <Button

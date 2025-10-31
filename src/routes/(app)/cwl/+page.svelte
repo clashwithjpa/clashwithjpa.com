@@ -286,7 +286,7 @@
             {/if}
             {#if data.applications.length && data.cwlEnabled}
                 <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
-                    <Button size="lg" class="w-full" variant="outline" onclick={() => (showPrevApps = !showPrevApps)}>
+                    <Button size="lg" class="group w-full" variant="outline" onclick={() => (showPrevApps = !showPrevApps)}>
                         {#if showPrevApps}
                             <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
                                 <MaterialSymbolsChevronLeftRounded class="size-6 transition-transform group-hover:-translate-x-1.5 " />
@@ -304,10 +304,12 @@
                 </div>
             {:else}
                 <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
-                    <Button size="lg" class="w-full" variant="outline" href="/cwl/list">
+                    <Button size="lg" class="group w-full" variant="outline" href="/cwl/list">
                         <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
                             <span>View all applications</span>
-                            <MaterialSymbolsArrowOutwardRounded class="size-4 transition-transform group-hover:-translate-x-1.5 " />
+                            <MaterialSymbolsArrowOutwardRounded
+                                class="size-4 transition-transform group-hover:translate-x-1.5 group-hover:-translate-y-0.5"
+                            />
                         </span>
                     </Button>
                 </div>
