@@ -16,6 +16,7 @@
     import { fade, fly } from "svelte/transition";
     import SuperDebug, { superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import MaterialSymbolsArrowOutwardRounded from "~icons/material-symbols/arrow-outward-rounded";
     import MaterialSymbolsChevronLeftRounded from "~icons/material-symbols/chevron-left-rounded";
     import MaterialSymbolsChevronRightRounded from "~icons/material-symbols/chevron-right-rounded";
     import TablerLoader2 from "~icons/tabler/loader-2";
@@ -299,6 +300,15 @@
                                 <MaterialSymbolsChevronRightRounded class="size-6 transition-transform group-hover:translate-x-1.5 " />
                             </span>
                         {/if}
+                    </Button>
+                </div>
+            {:else}
+                <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
+                    <Button size="lg" class="w-full" variant="outline" href="/cwl/list">
+                        <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
+                            <span>View all applications</span>
+                            <MaterialSymbolsArrowOutwardRounded class="size-4 transition-transform group-hover:-translate-x-1.5 " />
+                        </span>
                     </Button>
                 </div>
             {/if}

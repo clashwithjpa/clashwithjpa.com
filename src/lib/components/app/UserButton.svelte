@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { invalidateAll } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import type { UserData } from "$lib/auth/user";
     import type { APIPlayer } from "$lib/coc/types";
     import CocButton from "$lib/components/app/CocButton.svelte";
@@ -21,12 +21,14 @@
         applicationEnabled,
         cwlEnabled,
         hasCWLApplications,
+        hasAnyCWLApplications,
         cocAccs
     }: {
         user: UserData | null;
         applicationEnabled: boolean;
         cwlEnabled: boolean;
         hasCWLApplications: boolean;
+        hasAnyCWLApplications: boolean;
         cocAccs: (InsertUser & { cocAccounts: InsertCoc[] }) | undefined;
     } = $props();
 
@@ -129,7 +131,11 @@
                 size="sm"
                 onclick={() => {
                     if (!cwlEnabled && !hasCWLApplications) {
-                        toast.error("Clan War League is currently disabled");
+                        if (hasAnyCWLApplications) {
+                            goto("/cwl/list");
+                        } else {
+                            toast.error("Clan War League is currently disabled");
+                        }
                     }
                 }}
                 class="p-2"

@@ -27,12 +27,14 @@
         applicationEnabled,
         cwlEnabled,
         hasCWLApplications,
+        hasAnyCWLApplications,
         cocAccs
     }: {
         user: UserData | null;
         applicationEnabled: boolean;
         cwlEnabled: boolean;
         hasCWLApplications: boolean;
+        hasAnyCWLApplications: boolean;
         cocAccs: (InsertUser & { cocAccounts: InsertCoc[] }) | undefined;
     } = $props();
 
@@ -53,7 +55,7 @@
             <p class="text-2xl">JPA</p>
         </a>
         <div class="flex items-center justify-center space-x-4 md:hidden">
-            <UserButton {user} {applicationEnabled} {cwlEnabled} {hasCWLApplications} {cocAccs} />
+            <UserButton {user} {applicationEnabled} {cwlEnabled} {hasCWLApplications} {hasAnyCWLApplications} {cocAccs} />
             <Button variant="ghost" size="icon" class="![&_svg]:size-10" onclick={toggleMenu}>
                 {#if isOpen}
                     <span in:fade={{ duration: 100 }} class="size-6">
@@ -73,7 +75,7 @@
                     {item.name}
                 </Component>
             {/each}
-            <UserButton {user} {applicationEnabled} {cwlEnabled} {hasCWLApplications} {cocAccs} />
+            <UserButton {user} {applicationEnabled} {cwlEnabled} {hasCWLApplications} {hasAnyCWLApplications} {cocAccs} />
         </div>
     </div>
     {#if isOpen}

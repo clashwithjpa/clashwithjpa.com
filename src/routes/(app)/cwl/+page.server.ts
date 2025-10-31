@@ -30,7 +30,7 @@ export const load = (async ({ locals }) => {
     const enabled = await isCWLEnabled(locals.db);
     const applications = await getCWLApplications(locals.db, user.id);
     if (!enabled && applications.length <= 0) {
-        return redirect(302, "/");
+        return redirect(302, "/cwl/list");
     }
 
     const userAccount = await getUserAccounts(locals.db, user.id);

@@ -49,6 +49,7 @@
         applicationEnabled={data.applicationEnabled}
         cwlEnabled={data.cwlEnabled}
         hasCWLApplications={data.hasCWLApplications}
+        hasAnyCWLApplications={data.hasAnyCWLApplications}
         cocAccs={data.cocAccs}
     />
     {@render children?.()}
