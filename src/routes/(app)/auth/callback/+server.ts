@@ -1,5 +1,5 @@
-import { DISCORD_ID, DISCORD_SECRET, JWT_SECRET } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { signData } from "$lib/auth/jwt";
 import { getUserData } from "$lib/auth/user";
 import { error } from "@sveltejs/kit";
@@ -12,14 +12,14 @@ export const GET: RequestHandler = async ({ fetch, url, cookies, locals }) => {
     }
 
     try {
-        const resp = await fetch(`${PUBLIC_DISCORD_URL}/oauth2/token`, {
+        const resp = await fetch(`${publicEnv.PUBLIC_DISCORD_URL}/oauth2/token`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: new URLSearchParams({
-                client_id: DISCORD_ID,
-                client_secret: DISCORD_SECRET,
+                client_id: env.DISCORD_ID,
+                client_secret: env.DISCORD_SECRET,
                 grant_type: "authorization_code",
                 code,
                 redirect_uri: `${url.origin}/auth/callback`
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ fetch, url, cookies, locals }) => {
             });
 
             const userData = await getUserData(access_token, locals.db);
-            const token = await signData(userData, JWT_SECRET, `${expires_in}s`);
+            const token = await signData(userData, env.JWT_SECRET, `${expires_in}s`);
 
             if (userData) {
                 cookies.set("user", token, {

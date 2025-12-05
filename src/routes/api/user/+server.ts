@@ -1,5 +1,5 @@
-import { DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import type { UserData } from "$lib/auth/user";
 import { checkUser } from "$lib/discord/check";
 import { userTable, type InsertUser } from "$lib/server/schema";
@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
         return json({ error: "User ID not provided" }, { status: 400 });
     }
 
-    const userData = await checkUser(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, userID);
+    const userData = await checkUser(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, userID);
     if ("error" in userData) {
         return json({ error: true }, { status: 500 });
     }

@@ -1,5 +1,5 @@
-import { API_TOKEN } from "$env/static/private";
-import { PUBLIC_API_BASE_URI } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { getClanWarData } from "$lib/coc/clan";
 import { getClansPublicData } from "$lib/server/functions";
 import type { PageServerLoad } from "./$types";
@@ -14,7 +14,7 @@ export const load = (async ({ setHeaders, locals }) => {
         clans.map(async (clan) => {
             const tag = clan.clanData?.tag ?? clan.clanTag;
             try {
-                const war = await getClanWarData(PUBLIC_API_BASE_URI, API_TOKEN, tag);
+                const war = await getClanWarData(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, tag);
                 if ((war as unknown as { error?: boolean }).error) {
                     return { clan, war: clan.clanCurrentWar ?? null } as const;
                 }

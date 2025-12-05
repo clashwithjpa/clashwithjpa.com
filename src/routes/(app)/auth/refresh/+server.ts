@@ -1,5 +1,5 @@
-import { DISCORD_ID, DISCORD_SECRET, JWT_SECRET } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { signData } from "$lib/auth/jwt";
 import { getUserData } from "$lib/auth/user";
 import { getNewAccessToken } from "$lib/cf/helpers";
@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ cookies, locals }) => {
     }
 
     console.log("No access token found, refreshing token...");
-    const newToken = await getNewAccessToken(PUBLIC_DISCORD_URL, refreshToken, DISCORD_ID, DISCORD_SECRET);
+    const newToken = await getNewAccessToken(publicEnv.PUBLIC_DISCORD_URL, refreshToken, env.DISCORD_ID, env.DISCORD_SECRET);
 
     if (newToken) {
         cookies.set("access_token", newToken.access_token, {
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ cookies, locals }) => {
         });
 
         const userData = await getUserData(newToken.access_token, locals.db);
-        const token = await signData(userData, JWT_SECRET, `${newToken.expires_in}s`);
+        const token = await signData(userData, env.JWT_SECRET, `${newToken.expires_in}s`);
 
         cookies.set("user", token, {
             path: "/",

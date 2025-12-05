@@ -1,5 +1,5 @@
-import { DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import * as schema from "$lib/server/schema";
 import type { NeonQueryFunction } from "@neondatabase/serverless";
 import { and, desc, eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
 const HEADERS = {
     "Content-Type": "application/json",
-    Authorization: `Bot ${DISCORD_BOT_TOKEN}`
+    Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`
 };
 
 const GUILD_ID = "1029993902503108678";
@@ -52,7 +52,7 @@ export async function getClanApplicationFromDiscordId(db: DB, discordId: schema.
 }
 
 async function addRole(guildId: string, roleId: string, userId: string) {
-    const response = await fetch(`${PUBLIC_DISCORD_URL}/guilds/${guildId}/members/${userId}/roles/${roleId}`, {
+    const response = await fetch(`${publicEnv.PUBLIC_DISCORD_URL}/guilds/${guildId}/members/${userId}/roles/${roleId}`, {
         method: "PUT",
         headers: HEADERS
     });
