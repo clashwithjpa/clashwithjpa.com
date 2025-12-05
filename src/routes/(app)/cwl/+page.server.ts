@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
-import { API_TOKEN, TURNSTILE_SECRET_KEY } from "$env/static/private";
-import { PUBLIC_API_BASE_URI } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { validateCFToken } from "$lib/cf/helpers";
 import { getFWAStats } from "$lib/coc/fwa";
 import { getPlayerInfo } from "$lib/coc/player";
@@ -50,7 +50,7 @@ export const load = (async ({ locals }) => {
         cwlEnabled: enabled,
         userAccount: userAccount,
         cwlClans: await getCWLClans(locals.db),
-        cocData: Promise.all(userAccount.cocAccounts.map((account) => getPlayerInfo(PUBLIC_API_BASE_URI, API_TOKEN, account.tag))),
+        cocData: Promise.all(userAccount.cocAccounts.map((account) => getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, account.tag))),
         applications: applications,
         clanNames: await getClanNames(locals.db)
     };
@@ -74,7 +74,7 @@ export const actions: Actions = {
             }
 
             const cfToken = form.data["cf-turnstile-response"];
-            const cfData = await validateCFToken(cfToken, TURNSTILE_SECRET_KEY);
+            const cfData = await validateCFToken(cfToken, env.TURNSTILE_SECRET_KEY);
 
             if (!cfData.success) {
                 return message(form, "Invalid captcha response", {
@@ -95,7 +95,7 @@ export const actions: Actions = {
             });
         }
 
-        const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, API_TOKEN, playerTag);
+        const playerData = await getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag);
         if (!playerData) {
             return message(form, "Player not found", {
                 status: 400

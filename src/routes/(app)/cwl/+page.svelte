@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dev } from "$app/environment";
     import { page } from "$app/state";
-    import { PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
+    import { env as publicEnv } from "$env/dynamic/public";
     import { toast } from "$lib/components/app/toast";
     import { Button } from "$lib/components/ui/button";
     import * as Card from "$lib/components/ui/card";
@@ -265,7 +265,7 @@
                                     on:callback={(event) => {
                                         $formData["cf-turnstile-response"] = event.detail.token;
                                     }}
-                                    siteKey={PUBLIC_TURNSTILE_SITE_KEY}
+                                    siteKey={publicEnv.PUBLIC_TURNSTILE_SITE_KEY}
                                     bind:reset
                                 />
                             </Field>

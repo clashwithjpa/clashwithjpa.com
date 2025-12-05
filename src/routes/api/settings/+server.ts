@@ -1,5 +1,5 @@
-import { DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import type { UserData } from "$lib/auth/user";
 import { checkGuild, checkRole, checkUser } from "$lib/discord/check";
 import { getAdminConfig } from "$lib/server/functions";
@@ -12,7 +12,7 @@ const isAdmin = (user: UserData | null) => user && user.isAdmin;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleAddAdminRole = async (locals: App.Locals, value: any, adminConfig: any) => {
-    const roleData = await checkRole(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, locals.db, value);
+    const roleData = await checkRole(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, locals.db, value);
     if ("error" in roleData) {
         return { error: "Invalid Role ID", status: 400 };
     }
@@ -23,7 +23,7 @@ const handleAddAdminRole = async (locals: App.Locals, value: any, adminConfig: a
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleAddAdminMember = async (locals: App.Locals, value: any, adminConfig: any) => {
-    const userData = await checkUser(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, value);
+    const userData = await checkUser(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, value);
     if ("error" in userData) {
         return { error: "Invalid User ID", status: 400 };
     }
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const { key, value } = body;
 
     if (key === "guild_id") {
-        const guildData = await checkGuild(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, value.id);
+        const guildData = await checkGuild(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, value.id);
         if ("error" in guildData) {
             return json({ error: "Invalid Guild ID" }, { status: 400 });
         }

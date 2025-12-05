@@ -1,5 +1,5 @@
-import { API_TOKEN, DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_API_BASE_URI, PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { getPlayerInfo } from "$lib/coc/player";
 import { checkUser } from "$lib/discord/check";
 import { customCWLEntrySchema } from "$lib/schema";
@@ -37,13 +37,13 @@ export const actions: Actions = {
         }
 
         const userID = form.data.userId;
-        const userData = await checkUser(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, userID);
+        const userData = await checkUser(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, userID);
         if ("error" in userData) {
             return message(form, "User not found", {
                 status: 400
             });
         }
-        const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, API_TOKEN, playerTag);
+        const playerData = await getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag);
         if (!playerData) {
             return message(form, "Player not found", {
                 status: 400

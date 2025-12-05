@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
-import { API_TOKEN, TURNSTILE_SECRET_KEY } from "$env/static/private";
-import { PUBLIC_API_BASE_URI } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { validateCFToken } from "$lib/cf/helpers";
 import { getPlayerInfo, postVerifyToken } from "$lib/coc/player";
 import { clanApplicationSchema } from "$lib/schema";
@@ -48,7 +48,7 @@ export const actions: Actions = {
             }
 
             const cfToken = form.data["cf-turnstile-response"];
-            const cfData = await validateCFToken(cfToken, TURNSTILE_SECRET_KEY);
+            const cfData = await validateCFToken(cfToken, env.TURNSTILE_SECRET_KEY);
 
             if (!cfData.success) {
                 return message(form, "Invalid captcha response", {
@@ -60,14 +60,14 @@ export const actions: Actions = {
         const playerTag = form.data.tag;
 
         const playerToken = form.data.apiToken;
-        const playerVerifyData = await postVerifyToken(PUBLIC_API_BASE_URI, API_TOKEN, playerTag, playerToken);
+        const playerVerifyData = await postVerifyToken(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag, playerToken);
         if ("status" in playerVerifyData && playerVerifyData.status !== "ok") {
             return message(form, "Invalid player tag or token", {
                 status: 400
             });
         }
 
-        const playerData = await getPlayerInfo(PUBLIC_API_BASE_URI, API_TOKEN, playerTag);
+        const playerData = await getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag);
 
         if (!playerData) {
             return message(form, "Player not found", {

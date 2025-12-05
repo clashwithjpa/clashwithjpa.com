@@ -1,5 +1,5 @@
-import { DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import type { UserData } from "$lib/auth/user";
 import { checkRole } from "$lib/discord/check";
 import { json } from "@sveltejs/kit";
@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
         return json({ error: "Role ID not provided" }, { status: 400 });
     }
 
-    const roleData = await checkRole(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, locals.db, roleID);
+    const roleData = await checkRole(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, locals.db, roleID);
     if ("error" in roleData) {
         return json({ error: true }, { status: 500 });
     }

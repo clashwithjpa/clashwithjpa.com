@@ -1,5 +1,5 @@
-import { API_TOKEN, DISCORD_BOT_TOKEN } from "$env/static/private";
-import { PUBLIC_API_BASE_URI, PUBLIC_DISCORD_URL } from "$env/static/public";
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import type { UserData } from "$lib/auth/user";
 import { checkClan, getClanWarData } from "$lib/coc/clan";
 import { checkChannel, checkRole, checkUser } from "$lib/discord/check";
@@ -30,27 +30,27 @@ interface NewClanParams extends ClanVerifyPamas {
 }
 
 const verifyClan = async (locals: App.Locals, value: ClanVerifyPamas) => {
-    const clanData = await checkClan(PUBLIC_API_BASE_URI, API_TOKEN, value.clanTag);
+    const clanData = await checkClan(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, value.clanTag);
     if ("error" in clanData) {
         return { error: "Invalid Clan Tag", status: 400 };
     }
-    const clanWarData = await getClanWarData(PUBLIC_API_BASE_URI, API_TOKEN, value.clanTag);
+    const clanWarData = await getClanWarData(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, value.clanTag);
     if ("error" in clanWarData) {
         return { error: "Unable to fetch data", status: 400 };
     }
 
-    const leader = await checkUser(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, value.leaderID);
+    const leader = await checkUser(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, value.leaderID);
     if ("error" in leader) {
         return { error: "Invalid Leader ID", status: 400 };
     }
-    const channel = await checkChannel(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, value.channelID);
+    const channel = await checkChannel(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, value.channelID);
     if ("error" in channel) {
         return { error: "Invalid Channel ID", status: 400 };
     }
 
     for (const role of [value.clanRoleID, value.memberRoleID, value.elderRoleID, value.coleaderRoleID, value.leaderRoleID]) {
         if (role) {
-            const roleData = await checkRole(PUBLIC_DISCORD_URL, DISCORD_BOT_TOKEN, locals.db, role);
+            const roleData = await checkRole(publicEnv.PUBLIC_DISCORD_URL, env.DISCORD_BOT_TOKEN, locals.db, role);
             if ("error" in roleData) {
                 const roleNames = {
                     [value.clanRoleID]: "Clan",
@@ -138,8 +138,8 @@ const syncClanData = async (locals: App.Locals) => {
             new Promise((resolve) => setTimeout(resolve, 500)) // Delay to avoid hitting API rate limits
         );
         const clan = clans[i];
-        const clanData = await checkClan(PUBLIC_API_BASE_URI, API_TOKEN, clan.clanTag);
-        const currentWar = await getClanWarData(PUBLIC_API_BASE_URI, API_TOKEN, clan.clanTag);
+        const clanData = await checkClan(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, clan.clanTag);
+        const currentWar = await getClanWarData(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, clan.clanTag);
         if ("error" in clanData) {
             return { error: clanData.error, status: 400 };
         } else if ("error" in currentWar) {
@@ -151,7 +151,7 @@ const syncClanData = async (locals: App.Locals) => {
 };
 
 const handleAddCWLClan = async (locals: App.Locals, value: InsertCWLClan) => {
-    const clanData = await checkClan(PUBLIC_API_BASE_URI, API_TOKEN, value.tag);
+    const clanData = await checkClan(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, value.tag);
     if ("error" in clanData) {
         return { error: "Invalid Clan Tag", status: 400 };
     }
@@ -166,7 +166,7 @@ const handleAddCWLClan = async (locals: App.Locals, value: InsertCWLClan) => {
 };
 
 const handleCWLClanUpdate = async (locals: App.Locals, value: InsertCWLClan) => {
-    const clanData = await checkClan(PUBLIC_API_BASE_URI, API_TOKEN, value.tag);
+    const clanData = await checkClan(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, value.tag);
     if ("error" in clanData) {
         return { error: "Invalid Clan Tag", status: 400 };
     }
@@ -187,7 +187,7 @@ const syncCWLClanData = async (locals: App.Locals) => {
         await Promise.resolve(
             new Promise((resolve) => setTimeout(resolve, 500)) // Delay to avoid hitting API rate limits
         );
-        const clanData = await checkClan(PUBLIC_API_BASE_URI, API_TOKEN, cwlClan.tag);
+        const clanData = await checkClan(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, cwlClan.tag);
         if ("error" in clanData) {
             return { error: clanData.error, status: 400 };
         }

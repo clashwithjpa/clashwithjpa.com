@@ -1,15 +1,17 @@
 services:
-    clashwithjpa-frontend:
-        # image: clashwithjpa/clashwithjpa.com:lates # Tags: latest/dev/x.x.x
-        build:
-            context: .
-            dockerfile: Dockerfile
-        container_name: clashwithjpa-frontend
-        restart: unless-stopped
-        env_file:
-            - .env.old
-        environment:
-            - TZ=Asia/Kolkata
+  clashwithjpa-frontend:
+    # image: clashwithjpa/clashwithjpa.com:lates # Tags: latest/dev/x.x.x
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clashwithjpa-frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Kolkata
 
-        expose:
-            - 3000
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
