@@ -7,11 +7,13 @@ services:
     container_name: clashwithjpa-frontend
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.old
     environment:
       - TZ=Asia/Kolkata
-
     expose:
       - 3000
-    ports:
-      - 3000:3000
+
+networks:
+    default:
+        name: pangolin
+        external: true
