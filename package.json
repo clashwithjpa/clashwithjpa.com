@@ -28,6 +28,7 @@
         "@tailwindcss/vite": "^4.1.17",
         "@types/node": "^22.19.1",
         "@types/nprogress": "^0.2.3",
+        "@types/pg": "^8.15.6",
         "ag-grid-svelte5-extended": "^0.0.13",
         "bits-ui": "2.14.1",
         "clsx": "^2.1.1",
@@ -60,7 +61,6 @@
         "@ag-grid-community/core": "^32.3.9",
         "@ag-grid-community/theming": "^32.3.9",
         "@friendofsvelte/tipex": "0.0.7-fix-0",
-        "@neondatabase/serverless": "^0.10.4",
         "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/typography": "^0.5.19",
         "discord-api-types": "^0.37.120",
@@ -70,6 +70,7 @@
         "jose": "^5.10.0",
         "json-2-csv": "^5.5.10",
         "nprogress": "^0.2.0",
+        "pg": "^8.16.3",
         "svelte-motion": "^0.12.2",
         "sveltekit-superforms": "^2.28.1",
         "zod": "^3.25.76"

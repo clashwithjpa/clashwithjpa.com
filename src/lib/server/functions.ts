@@ -1,9 +1,9 @@
 import { env } from "$env/dynamic/private";
 import { env as publicEnv } from "$env/dynamic/public";
 import * as schema from "$lib/server/schema";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
 import { and, desc, eq } from "drizzle-orm";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { Pool } from "pg";
 
 const HEADERS = {
     "Content-Type": "application/json",
@@ -13,8 +13,10 @@ const HEADERS = {
 const GUILD_ID = "1029993902503108678";
 const VERIFIED_MEMBER_ROLE_ID = "1367750139527168020";
 
-export type DB = NeonHttpDatabase<typeof schema> & {
-    $client: NeonQueryFunction<false, false>;
+
+
+type DB = NodePgDatabase<typeof schema> & {
+    $client: Pool;
 };
 
 export async function isApplicationEnabled(db: DB) {

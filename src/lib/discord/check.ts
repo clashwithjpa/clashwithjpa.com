@@ -1,11 +1,11 @@
 import { getAdminConfig } from "$lib/server/functions";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
 import type { APIChannel, APIGuild, APIRole, APIUser } from "discord-api-types/v10";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "$lib/server/schema";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { Pool } from "pg";
 
-type DB = NeonHttpDatabase<typeof schema> & {
-    $client: NeonQueryFunction<false, false>;
+type DB = NodePgDatabase<typeof schema> & {
+    $client: Pool;
 };
 
 // Guild check func

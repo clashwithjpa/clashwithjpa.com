@@ -1,13 +1,13 @@
 import { env } from "$env/dynamic/public";
 import { getAdminConfig } from "$lib/server/functions";
 import * as schema from "$lib/server/schema";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
 import { error } from "@sveltejs/kit";
 import type { APIGuild, APIGuildMember, APIUser } from "discord-api-types/v10";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { Pool } from "pg";
 
-type DB = NeonHttpDatabase<typeof schema> & {
-    $client: NeonQueryFunction<false, false>;
+type DB = NodePgDatabase<typeof schema> & {
+    $client: Pool;
 };
 
 export type UserData = APIUser & { inGuild: boolean; isAdmin: boolean };
