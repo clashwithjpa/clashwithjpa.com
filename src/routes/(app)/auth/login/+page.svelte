@@ -17,7 +17,7 @@
 		class="absolute z-1 flex size-full items-center justify-center overflow-hidden backdrop-blur-xs"
 	>
 		<div class="flex size-full flex-col items-center justify-center space-y-1 p-8">
-			<Card.Root class="w-full max-w-sm shadow-lg bg-card/10">
+			<Card.Root class="w-full max-w-sm bg-card/10 shadow-lg">
 				<Card.Content>
 					<Button
 						variant="default"

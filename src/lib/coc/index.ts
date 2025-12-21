@@ -5,8 +5,8 @@ import { env as privateEnv } from '$env/dynamic/private';
 
 export const client = createClient<paths>({
 	baseUrl: `${publicEnv.PUBLIC_COC_API_BASE_URI}/v1`,
-    headers: {
-        'Authorization': `Bearer ${privateEnv.COC_API_TOKEN}`,
-        "Content-Type": "application/json"
-    }
+	headers: {
+		Authorization: `Bearer ${privateEnv.COC_API_TOKEN}`,
+		'Content-Type': 'application/json'
+	}
 });

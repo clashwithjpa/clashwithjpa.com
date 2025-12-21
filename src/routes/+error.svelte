@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-    import { Button } from "$lib/components/ui/button/index.js"
+	import { Button } from '$lib/components/ui/button/index.js';
 </script>
 
 <svelte:head>
@@ -21,16 +21,16 @@
 				{page.error?.message}
 			</h2>
 
-            <Button
-                variant="outline"
-                class="mt-4"
-                size="lg"
-                onclick={() => {
-                    history.back();
-                }}
-            >
-                Go Back
-            </Button>
+			<Button
+				variant="outline"
+				class="mt-4"
+				size="lg"
+				onclick={() => {
+					history.back();
+				}}
+			>
+				Go Back
+			</Button>
 		</div>
 	</div>
 </div>
