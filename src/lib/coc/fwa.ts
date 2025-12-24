@@ -20,7 +20,7 @@ interface FWAStats {
 export async function getFWAStats(fetch: any, clanTag: string) {
     clanTag = clanTag.replace("#", "");
     try {
-        const resp = await fetch(`https://proxy.corsfix.com/?https://fwastats.com/Clan/${clanTag}/Members.json`, {
+        const resp = await fetch(`https://fwastats.com/Clan/${clanTag}/Members.json`, {
             timeout: 5000,
             headers: {
                 "User-Agent":
