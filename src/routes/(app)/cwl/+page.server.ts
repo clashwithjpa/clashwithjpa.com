@@ -15,7 +15,7 @@ import {
     isCWLEnabled
 } from "$lib/server/functions";
 import type { InsertCWL } from "$lib/server/schema";
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { fail, message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { Actions, PageServerLoad } from "./$types";
@@ -83,71 +83,80 @@ export const actions: Actions = {
             }
         }
 
-        const isAlt = form.data.isAlt;
+        try {
+            const isAlt = form.data.isAlt;
 
-        const [month, year] = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }).split(" ");
-        const playerTag = form.data.tag;
+            const [month, year] = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }).split(" ");
+            const playerTag = form.data.tag;
 
-        const existingApplication = await getCWLApplicationByTag(event.locals.db, playerTag, month, parseInt(year));
-        if (existingApplication) {
-            return message(form, "You have already applied for this month", {
-                status: 400
-            });
-        }
-
-        const playerData = await getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag);
-        if (!playerData) {
-            return message(form, "Player not found", {
-                status: 400
-            });
-        }
-
-        let playerAccountWeight: number | undefined = 1;
-        let playerClanName: string | undefined = "";
-
-        if (isAlt) {
-            if (!form.data.accountClan) {
-                return message(form, "Please select a clan", {
-                    status: 400
-                });
-            }
-            playerAccountWeight = form.data.accountWeight;
-            playerClanName = form.data.accountClan;
-        } else {
-            const playerClanTag = playerData.clan!.tag;
-            playerClanName = playerData.clan!.name;
-            const fwaStats = await getFWAStats(playerClanTag as string);
-            const fwaStatsMember = "error" in fwaStats ? undefined : fwaStats[playerTag];
-
-            if (!fwaStatsMember) {
-                return message(form, "You are not in the FWA clan", {
+            const existingApplication = await getCWLApplicationByTag(event.locals.db, playerTag, month, parseInt(year));
+            if (existingApplication) {
+                return message(form, "You have already applied for this month", {
                     status: 400
                 });
             }
 
-            playerAccountWeight = fwaStatsMember.weight;
+            const playerData = await getPlayerInfo(publicEnv.PUBLIC_API_BASE_URI, env.API_TOKEN, playerTag);
+            if (!playerData) {
+                return message(form, "Player not found", {
+                    status: 400
+                });
+            }
+
+            let playerAccountWeight: number | undefined = 1;
+            let playerClanName: string | undefined = "";
+
+            if (isAlt) {
+                if (!form.data.accountClan) {
+                    return message(form, "Please select a clan", {
+                        status: 400
+                    });
+                }
+                playerAccountWeight = form.data.accountWeight;
+                playerClanName = form.data.accountClan;
+            } else {
+                const playerClanTag = playerData.clan!.tag;
+                console.log("Player clan tag: ", playerClanTag);
+                playerClanName = playerData.clan!.name;
+                const fwaStats = await getFWAStats(event.fetch, playerClanTag as string);
+
+                console.log("Fetched FWA stats");
+
+                const fwaStatsMember = "error" in fwaStats ? undefined : fwaStats[playerTag];
+
+                if (!fwaStatsMember) {
+                    return message(form, "You are not in the FWA clan", {
+                        status: 400
+                    });
+                }
+
+                playerAccountWeight = fwaStatsMember.weight;
+            }
+
+            if (!playerAccountWeight || playerAccountWeight < 10000) {
+                return message(form, "Low account weight :/. Apply again later", {
+                    status: 400
+                });
+            }
+
+            const cwlApplication: InsertCWL = {
+                userId: event.locals.user?.id as string,
+                userName: event.locals.user?.username as string,
+                accountName: playerData.name,
+                accountTag: playerData.tag,
+                accountClan: playerClanName as string,
+                accountWeight: playerAccountWeight !== undefined ? playerAccountWeight : 1,
+                month: month,
+                year: year as unknown as number,
+                preferenceNum: form.data.preferenceNum
+            };
+
+            await insertCWLApplication(event.locals.db, cwlApplication);
+
+            return message(form, "Application submitted successfully!");
+        } catch (e) {
+            console.error(e);
+            return error(500, "Something went wrong");
         }
-
-        if (!playerAccountWeight || playerAccountWeight < 10000) {
-            return message(form, "Low account weight :/. Apply again later", {
-                status: 400
-            });
-        }
-
-        const cwlApplication: InsertCWL = {
-            userId: event.locals.user?.id as string,
-            userName: event.locals.user?.username as string,
-            accountName: playerData.name,
-            accountTag: playerData.tag,
-            accountClan: playerClanName as string,
-            accountWeight: playerAccountWeight !== undefined ? playerAccountWeight : 1,
-            month: month,
-            year: year as unknown as number,
-            preferenceNum: form.data.preferenceNum
-        };
-
-        await insertCWLApplication(event.locals.db, cwlApplication);
-
-        return message(form, "Application submitted successfully!");
     }
 };

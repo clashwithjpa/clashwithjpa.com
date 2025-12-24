@@ -11,6 +11,8 @@ LABEL name="clashwithjpa" \
     description="clashwithjpa frontend" \
     url="https://github.com/clashwithjpa/clashwithjpa.com"
 
+RUN apk add --no-cache curl
+
 # Set working directory
 WORKDIR /clashwithjpa
 
