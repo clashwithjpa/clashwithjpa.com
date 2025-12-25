@@ -80,7 +80,7 @@
             {/if}
         </div>
         <div
-            class="bg-background/80 flex size-full flex-col items-center justify-center backdrop-blur-xs lg:w-1/2 lg:bg-transparent lg:backdrop-blur-none"
+            class="bg-background/80 flex size-full flex-col items-center justify-start overflow-y-auto pt-20 backdrop-blur-xs lg:w-1/2 lg:justify-center lg:overflow-visible lg:pt-0 lg:bg-transparent lg:backdrop-blur-none"
         >
             {#if showPrevApps}
                 <div in:fade class="flex size-full flex-col justify-center">
@@ -159,6 +159,7 @@
                                                 </p>
                                             </Card.Content>
                                         </Card.Root>
+                                        
                                     {/each}
                                 </ul>
                             </li>
@@ -292,7 +293,7 @@
                 {/await}
             {/if}
             {#if data.applications.length && data.cwlEnabled}
-                <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
+                <div class="w-full max-w-lg p-5 lg:fixed lg:bottom-0 lg:w-1/2 lg:bg-background/90 lg:backdrop-blur-sm">
                     <Button size="lg" class="group w-full" variant="outline" onclick={() => (showPrevApps = !showPrevApps)}>
                         {#if showPrevApps}
                             <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
@@ -310,7 +311,7 @@
                     </Button>
                 </div>
             {:else}
-                <div class="fixed bottom-0 w-full max-w-lg p-5 lg:w-1/2">
+                <div class="w-full max-w-lg p-5 lg:fixed lg:bottom-0 lg:w-1/2 lg:bg-background/90 lg:backdrop-blur-sm">
                     <Button size="lg" class="group w-full" variant="outline" href="/cwl/list">
                         <span in:fly={{ duration: 500, easing: expoOut, x: -100, y: 0 }} class="flex items-center justify-center gap-2">
                             <span>View all applications</span>
