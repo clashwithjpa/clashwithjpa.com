@@ -79,6 +79,7 @@
         >
             {#if data.applications.length && showPrevApps}
                 <div in:fade class="flex size-full flex-col justify-center">
+                    <h1 class="mb-6 text-center text-3xl font-bold">Clan Application</h1>
                     <h3 class="text-center text-xl">Previous Application{data.applications.length > 1 ? "s" : ""}</h3>
                     <ul class="mt-5 flex max-h-[60%] flex-col gap-2 overflow-y-scroll rounded-xl px-5">
                         {#each Object.entries(data.applications.reduce((acc: { [key: string]: typeof data.applications }, app) => {
@@ -151,6 +152,7 @@
                 </div>
             {:else}
                 <form in:fade method="POST" action="/apply" use:enhance class="flex w-full max-w-lg flex-col gap-2 px-5">
+                    <h1 class="mb-6 text-center text-3xl font-bold">Clan Application</h1>
                     <Field {form} name="tag">
                         <Description>Your account tag (include #)</Description>
                         <Control>
