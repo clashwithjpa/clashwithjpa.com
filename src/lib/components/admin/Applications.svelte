@@ -62,12 +62,12 @@
 
     async function handleApplication(tag: string, name: string, status: "accepted" | "rejected" | "deleted", discordId: string = "") {
         disabled = true;
-        let body: { status: typeof status; discordId?: string } = { status: status };
+        let body: { status: typeof status; discordId?: string; tag: string } = { status: status, tag: tag };
         if (status === "accepted" || status === "deleted") body["discordId"] = discordId;
 
         console.log(`Changing application status of ${tag} to ${status} with body:`, body);
         
-        let response = await fetch(`/api/applications/${encodeURIComponent(tag)}`, {
+        let response = await fetch(`/api/applications`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body)
