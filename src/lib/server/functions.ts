@@ -62,6 +62,13 @@ async function addRole(guildId: string, roleId: string, userId: string) {
 }
 
 export async function acceptApplication(db: DB, tag: schema.SelectClanApplication["tag"], discordId: schema.SelectUser["discordId"]) {
+    const existingAccount = await db.query.cocTable.findFirst({
+        where: eq(schema.cocTable.tag, tag)
+    });
+    if (existingAccount) {
+        throw new Error(`Account with tag ${tag} already exists`);
+    }
+
     await db.update(schema.clanApplicationTable).set({ status: "accepted" }).where(eq(schema.clanApplicationTable.tag, tag));
     await db.insert(schema.userTable).values({ discordId: discordId }).onConflictDoNothing({ target: schema.userTable.discordId });
     await db.insert(schema.cocTable).values({ userId: discordId, tag: tag });

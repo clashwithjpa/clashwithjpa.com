@@ -18,15 +18,19 @@ export const POST: RequestHandler = async ({ locals, request, params, url }) => 
 
     console.log(`User ${user?.username} is updating application with tag ${tag} to status ${body.status}`);
 
-    if (body.status === "accepted") {
-        await acceptApplication(locals.db, tag, body.discordId);
-    } else if (body.status === "rejected") {
-        await rejectApplication(locals.db, tag);
-    } else if (body.status === "deleted") {
-        await deleteApplication(locals.db, tag, body.discordId);
+    try {
+        if (body.status === "accepted") {
+            await acceptApplication(locals.db, tag, body.discordId);
+        } else if (body.status === "rejected") {
+            await rejectApplication(locals.db, tag);
+        } else if (body.status === "deleted") {
+            await deleteApplication(locals.db, tag, body.discordId);
+        }
+
+        console.log(`Application with tag ${tag} updated to status ${body.status} by user ${user?.username}`);
+        return json({ success: true });
+    } catch (error) {
+        console.error(`Error updating application with tag ${tag}:`, error);
+        return json({ error: error instanceof Error ? error.message : "Failed to update application" }, { status: 400 });
     }
-
-    console.log(`Application with tag ${tag} updated to status ${body.status} by user ${user?.username}`);
-
-    return json({ success: true });
 };
