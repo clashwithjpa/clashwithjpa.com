@@ -1,14 +1,14 @@
 services:
-  cwl-ping:
-    container_name: cwl-ping
-    restart: no
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - ../../../.env.old
+    cwl-ping:
+        container_name: cwl-ping
+        restart: no
+        build:
+            context: .
+            dockerfile: Dockerfile
+        env_file:
+            - ../../../.env.old
 
 networks:
-  default:
-    name: pangolin
-    external: true
+    default:
+        name: pangolin
+        external: true

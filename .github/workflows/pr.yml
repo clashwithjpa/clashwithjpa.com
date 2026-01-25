@@ -1,54 +1,54 @@
 name: Pull Request
 
 on:
-  pull_request:
+    pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  check:
-    name: Run svelte-check
-    runs-on: ubuntu-latest
-    env:
-      PUBLIC_API_BASE_URI: ""
-      API_TOKEN: ""
-      PUBLIC_DISCORD_URL: ""
-      DISCORD_ID: ""
-      DISCORD_SECRET: ""
-      DISCORD_BOT_TOKEN: ""
-      DATABASE_URL: ""
-      MONGO_URL: ""
-      JWT_SECRET: ""
-      PUBLIC_TURNSTILE_SITE_KEY: ""
-      TURNSTILE_SECRET_KEY: ""
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
+    check:
+        name: Run svelte-check
+        runs-on: ubuntu-latest
+        env:
+            PUBLIC_API_BASE_URI: ""
+            API_TOKEN: ""
+            PUBLIC_DISCORD_URL: ""
+            DISCORD_ID: ""
+            DISCORD_SECRET: ""
+            DISCORD_BOT_TOKEN: ""
+            DATABASE_URL: ""
+            MONGO_URL: ""
+            JWT_SECRET: ""
+            PUBLIC_TURNSTILE_SITE_KEY: ""
+            TURNSTILE_SECRET_KEY: ""
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+            - name: Install dependencies
+              run: pnpm install
 
-      - name: Run svelte-check
-        run: pnpm check
+            - name: Run svelte-check
+              run: pnpm check
 
-  lint:
-    runs-on: ubuntu-latest
-    name: Lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
+    lint:
+        runs-on: ubuntu-latest
+        name: Lint
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+            - name: Install dependencies
+              run: pnpm install
 
-      - run: pnpm lint
+            - run: pnpm lint

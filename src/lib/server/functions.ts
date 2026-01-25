@@ -13,8 +13,6 @@ const HEADERS = {
 const GUILD_ID = "1029993902503108678";
 const VERIFIED_MEMBER_ROLE_ID = "1367750139527168020";
 
-
-
 type DB = NodePgDatabase<typeof schema> & {
     $client: Pool;
 };
