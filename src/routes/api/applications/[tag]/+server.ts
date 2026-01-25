@@ -10,6 +10,8 @@ export const POST: RequestHandler = async ({ locals, request, params, url }) => 
     const body = await request.json();
     const tag = decodeURIComponent(params.tag);
 
+    console.log(`Received application update request for tag ${tag} with status ${body.status} from user ${user?.username}`);
+
     if (!isAdmin(user)) {
         return json({ error: "Unauthorized" }, { status: 401 });
     }
