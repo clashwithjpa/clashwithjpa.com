@@ -74,6 +74,8 @@
             toast.success(`${status.charAt(0).toUpperCase() + status.slice(1)} application of ${name}`);
             invalidateAll();
         } else {
+            console.error(`Failed to change application status: ${response.statusText}`);
+            console.trace(response.json());
             toast.error(`Failed change application status of ${name}`);
         }
         setTimeout(() => {
