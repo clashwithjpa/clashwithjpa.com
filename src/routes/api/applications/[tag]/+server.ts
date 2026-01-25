@@ -7,10 +7,11 @@ const isAdmin = (user: UserData | null) => user && user.isAdmin;
 
 export const POST: RequestHandler = async ({ locals, request, params, url }) => {
     const user = locals.user;
+
+    console.log(`Received application update request for tag ${params.tag} from user ${user?.username}`);
     const body = await request.json();
     const tag = decodeURIComponent(params.tag);
 
-    console.log(`Received application update request for tag ${tag} with status ${body.status} from user ${user?.username}`);
 
     if (!isAdmin(user)) {
         return json({ error: "Unauthorized" }, { status: 401 });
