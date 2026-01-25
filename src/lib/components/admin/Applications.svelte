@@ -70,6 +70,8 @@
             body: JSON.stringify(body)
         });
 
+        console.trace(`Response for changing application status of ${tag} to ${status}:`, response);
+
         if (response.ok) {
             toast.success(`${status.charAt(0).toUpperCase() + status.slice(1)} application of ${name}`);
             invalidateAll();
