@@ -1,38 +1,32 @@
-# sv
+# Turborepo Svelte starter
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This Turborepo starter is maintained by the Turborepo core team.
 
-## Creating a project
+## Using this example
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Run the following command:
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+npx create-turbo@latest -e with-svelte
 ```
 
-## Building
+## What's inside?
 
-To create a production version of your app:
+This Turborepo includes the following packages/apps:
 
-```sh
-npm run build
-```
+### Apps and Packages
 
-You can preview the production build with `npm run preview`.
+- `docs`: a [svelte-kit](https://kit.svelte.dev/) app
+- `web`: another [svelte-kit](https://kit.svelte.dev/) app
+- `ui`: a stub Svelte component library shared by both `web` and `docs` applications
+- `eslint-config-custom`: `eslint` configurations (includes `eslint-plugin-svelte` and `eslint-config-prettier`)
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Utilities
+
+This Turborepo has some additional tools already setup for you:
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting

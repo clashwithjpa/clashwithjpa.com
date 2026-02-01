@@ -1,1 +1,0 @@
-CREATE INDEX "cwl_clan_info_coc_clan_tag_idx" ON "cwl_clan_info_table" USING btree ("coc_clan_tag");
