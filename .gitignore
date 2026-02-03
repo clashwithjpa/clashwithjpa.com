@@ -1,32 +1,34 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# dependencies (bun install)
 node_modules
-.pnp
-.pnp.js
 
-# testing
+# output
+out
+dist
+*.tgz
+
+# code coverage
 coverage
+*.lcov
 
-# svelte
-.svelte-kit
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env.local
+# dotenv environment variable files
+.env
 .env.development.local
 .env.test.local
 .env.production.local
+.env.local
 
-# turbo
-.turbo
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
 
-dist
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store

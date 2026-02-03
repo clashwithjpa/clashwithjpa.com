@@ -1,21 +1,13 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".svelte-kit/**", ".vercel/**"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "build": {
+            "outputs": ["dist/**", "build/**", ".svelte-kit/**"],
+            "dependsOn": ["^build"]
+        }
     }
-  }
 }

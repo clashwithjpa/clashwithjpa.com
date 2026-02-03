@@ -1,24 +1,25 @@
 {
-  "name": "with-svelte",
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write .",
-    "check-types": "turbo run check-types"
-  },
-  "devDependencies": {
-    "prettier": "^3.7.4",
-    "prettier-plugin-svelte": "^3.4.0",
-    "turbo": "^2.8.1"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "bun@1.3.3",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+    "name": "clashwithjpa.com",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "packageManager": "bun@1.3.3",
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "dev:web": "bun --cwd apps/web run dev",
+        "dev:server": "bun --cwd apps/server run dev"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "turbo": "^2.8.2"
+    },
+    "peerDependencies": {
+        "typescript": "^5"
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ]
 }
+
