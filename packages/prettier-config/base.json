@@ -1,0 +1,14 @@
+{
+    "tabWidth": 4,
+    "trailingComma": "none",
+    "printWidth": 150,
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "overrides": [
+        {
+            "files": "*.yml",
+            "options": {
+                "tabWidth": 4
+            }
+        }
+    ]
+}

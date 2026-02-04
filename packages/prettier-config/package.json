@@ -1,0 +1,17 @@
+{
+    "name": "@repo/prettier-config",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./base.json",
+        "./base": "./base.json",
+        "./svelte": "./svelte.json"
+    },
+    "files": ["base.json", "svelte.json"],
+    "devDependencies": {
+        "prettier": "^3.8.0",
+        "prettier-plugin-svelte": "^3.4.1",
+        "prettier-plugin-tailwindcss": "^0.7.2"
+    }
+}

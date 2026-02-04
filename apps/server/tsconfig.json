@@ -1,7 +1,4 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "extends": ["@repo/typescript-config/hono.json"]
 }
+
