@@ -20,7 +20,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-bun x sv create --template library --types ts --add prettier --install bun ui
+bun x sv create --template library --types ts --add tailwindcss="plugins:typography,forms" --install bun ui
 ```
 
 ## Developing

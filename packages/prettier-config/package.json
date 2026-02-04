@@ -1,0 +1,30 @@
+{
+	"name": "@repo/prettier-config",
+	"version": "0.0.0",
+	"description": "Shared Prettier configuration for the monorepo",
+	"type": "module",
+	"exports": {
+		".": "./index.js",
+		"./svelte-tailwind": "./svelte-tailwind.js"
+	},
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"prettier-plugin-svelte": "^3.4.1",
+		"prettier-plugin-tailwindcss": "^0.7.2"
+	},
+	"peerDependencies": {
+		"prettier": "^3.8.0"
+	},
+	"devDependencies": {
+		"prettier": "^3.8.1"
+	},
+	"keywords": [
+		"prettier",
+		"config",
+		"svelte",
+		"tailwindcss"
+	]
+}

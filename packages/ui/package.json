@@ -1,16 +1,15 @@
 {
-    "name": "@repo/ui",
+    "name": "ui",
     "version": "0.0.1",
     "scripts": {
-        "dev": "vite dev --port 5174",
-        "build": "vite build && npm run prepack",
-        "preview": "vite preview",
+        "dev": "svelte-kit sync && svelte-package --watch --input=src",
+        "build": "svelte-kit sync && svelte-package --input=src",
         "prepare": "svelte-kit sync || echo ''",
         "prepack": "svelte-kit sync && svelte-package && publint",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-        "lint": "prettier --check .",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "files": [
         "dist",
@@ -34,21 +33,24 @@
     },
     "devDependencies": {
         "@sveltejs/adapter-auto": "^7.0.0",
-        "@sveltejs/kit": "^2.50.2",
+        "@sveltejs/kit": "^2.50.1",
         "@sveltejs/package": "^2.5.7",
         "@sveltejs/vite-plugin-svelte": "^6.2.4",
+        "@tailwindcss/forms": "^0.5.11",
+        "@tailwindcss/typography": "^0.5.19",
+        "@tailwindcss/vite": "^4.1.18",
+        "prettier-plugin-tailwindcss": "^0.7.2",
         "publint": "^0.3.17",
-        "svelte": "^5.49.1",
-        "svelte-check": "^4.3.6",
+        "svelte": "^5.48.2",
+        "svelte-check": "^4.3.5",
+        "tailwindcss": "^4.1.18",
         "typescript": "^5.9.3",
         "vite": "^7.3.1",
         "@repo/eslint-config": "workspace:*",
-        "@repo/typescript-config": "workspace:*"
+        "@repo/typescript-config": "workspace:*",
+        "@repo/prettier-config": "workspace:*"
     },
     "keywords": [
         "svelte"
-    ],
-    "dependencies": {
-        "@ark-ui/svelte": "^5.15.0"
-    }
+    ]
 }
