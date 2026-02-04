@@ -1,5 +1,5 @@
 {
-    "name": "ui",
+    "name": "@repo/ui",
     "version": "0.0.1",
     "scripts": {
         "dev": "svelte-kit sync && svelte-package --watch --input=src",
@@ -52,5 +52,8 @@
     },
     "keywords": [
         "svelte"
-    ]
+    ],
+    "dependencies": {
+        "@ark-ui/svelte": "^5.15.0"
+    }
 }
