@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ClashWithJPA</string>
+    <string name="title_activity_main">ClashWithJPA</string>
+    <string name="package_name">com.clashwithjpa.app</string>
+    <string name="custom_url_scheme">com.clashwithjpa.app</string>
+</resources>
