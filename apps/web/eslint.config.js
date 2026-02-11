@@ -1,8 +1,8 @@
-import { config } from '@repo/eslint-config/index.js';
+import { config } from "@repo/eslint-config/index.js";
 
 export default [
     ...config,
     {
-        ignores: ['.svelte-kit/*'],
+        ignores: [".svelte-kit/*"],
     },
 ];

@@ -3,12 +3,16 @@
  * @type {import("prettier").Config}
  */
 const config = {
-    useTabs: false,
     tabWidth: 4,
-    singleQuote: true,
-    trailingComma: "all",
     printWidth: 150,
-    semi: true,
+    overrides: [
+        {
+            files: ["*.yml", "*.yaml"],
+            options: {
+                tabWidth: 2,
+            },
+        },
+    ],
 };
 
 export default config;

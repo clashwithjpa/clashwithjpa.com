@@ -1,1033 +1,992 @@
 {
-  "id": "0f52d077-1a6c-4148-a77d-4f3cbd8d05bd",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.account": {
-      "name": "account",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
+    "id": "0f52d077-1a6c-4148-a77d-4f3cbd8d05bd",
+    "prevId": "00000000-0000-0000-0000-000000000000",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.account": {
+            "name": "account",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "account_id": {
+                    "name": "account_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "provider_id": {
+                    "name": "provider_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "access_token": {
+                    "name": "access_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "refresh_token": {
+                    "name": "refresh_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "id_token": {
+                    "name": "id_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "access_token_expires_at": {
+                    "name": "access_token_expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "refresh_token_expires_at": {
+                    "name": "refresh_token_expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "scope": {
+                    "name": "scope",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "password": {
+                    "name": "password",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "account_userId_idx": {
+                    "name": "account_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "user_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "account_user_id_user_id_fk": {
+                    "name": "account_user_id_user_id_fk",
+                    "tableFrom": "account",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "account_account_id_unique": {
+                    "name": "account_account_id_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["account_id"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "account_id": {
-          "name": "account_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+        "public.session": {
+            "name": "session",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "token": {
+                    "name": "token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "ip_address": {
+                    "name": "ip_address",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "user_agent": {
+                    "name": "user_agent",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "impersonated_by": {
+                    "name": "impersonated_by",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "session_userId_idx": {
+                    "name": "session_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "user_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "session_user_id_user_id_fk": {
+                    "name": "session_user_id_user_id_fk",
+                    "tableFrom": "session",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "session_token_unique": {
+                    "name": "session_token_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["token"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "provider_id": {
-          "name": "provider_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+        "public.user": {
+            "name": "user",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email_verified": {
+                    "name": "email_verified",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "image": {
+                    "name": "image",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "role": {
+                    "name": "role",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "banned": {
+                    "name": "banned",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": false
+                },
+                "ban_reason": {
+                    "name": "ban_reason",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "ban_expires": {
+                    "name": "ban_expires",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "user_email_unique": {
+                    "name": "user_email_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["email"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+        "public.verification": {
+            "name": "verification",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "identifier": {
+                    "name": "identifier",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "value": {
+                    "name": "value",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "verification_identifier_idx": {
+                    "name": "verification_identifier_idx",
+                    "columns": [
+                        {
+                            "expression": "identifier",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "access_token": {
-          "name": "access_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+        "public.base_info_table": {
+            "name": "base_info_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "coc_base_level": {
+                    "name": "coc_base_level",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_base_link": {
+                    "name": "coc_base_link",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_base_image_link": {
+                    "name": "coc_base_image_link",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "base_info_table_coc_base_level_unique": {
+                    "name": "base_info_table_coc_base_level_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_base_level"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+        "public.clan_application_table": {
+            "name": "clan_application_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "coc_account_tag": {
+                    "name": "coc_account_tag",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_data": {
+                    "name": "coc_account_data",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_user_id": {
+                    "name": "discord_user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "status": {
+                    "name": "status",
+                    "type": "clan_application_status",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'pending'"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "clan_application_table_coc_account_tag_unique": {
+                    "name": "clan_application_table_coc_account_tag_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_account_tag"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "id_token": {
-          "name": "id_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+        "public.clan_info_table": {
+            "name": "clan_info_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "coc_clan_code": {
+                    "name": "coc_clan_code",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_clan_name": {
+                    "name": "coc_clan_name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "coc_clan_level": {
+                    "name": "coc_clan_level",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "coc_clan_tag": {
+                    "name": "coc_clan_tag",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_clan_role_id": {
+                    "name": "discord_clan_role_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_clan_channel_id": {
+                    "name": "discord_clan_channel_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_member_role_id": {
+                    "name": "discord_member_role_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_elder_role_id": {
+                    "name": "discord_elder_role_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_coleader_role_id": {
+                    "name": "discord_coleader_role_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_leader_role_id": {
+                    "name": "discord_leader_role_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_leader_id": {
+                    "name": "discord_leader_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "attacks_requirement": {
+                    "name": "attacks_requirement",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "donations_requirement": {
+                    "name": "donations_requirement",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "clangames_requirement": {
+                    "name": "clangames_requirement",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_clan_data": {
+                    "name": "coc_clan_data",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "coc_clan_current_war_data": {
+                    "name": "coc_clan_current_war_data",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "clan_info_coc_clan_code_idx": {
+                    "name": "clan_info_coc_clan_code_idx",
+                    "columns": [
+                        {
+                            "expression": "coc_clan_code",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "clan_info_coc_clan_tag_idx": {
+                    "name": "clan_info_coc_clan_tag_idx",
+                    "columns": [
+                        {
+                            "expression": "coc_clan_tag",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "clan_info_coc_clan_level_idx": {
+                    "name": "clan_info_coc_clan_level_idx",
+                    "columns": [
+                        {
+                            "expression": "coc_clan_level",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "clan_info_table_coc_clan_code_unique": {
+                    "name": "clan_info_table_coc_clan_code_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_clan_code"]
+                },
+                "clan_info_table_coc_clan_tag_unique": {
+                    "name": "clan_info_table_coc_clan_tag_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_clan_tag"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "access_token_expires_at": {
-          "name": "access_token_expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
+        "public.coc_account_table": {
+            "name": "coc_account_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "discord_user_id": {
+                    "name": "discord_user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_tag": {
+                    "name": "coc_account_tag",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "coc_account_discord_user_id_idx": {
+                    "name": "coc_account_discord_user_id_idx",
+                    "columns": [
+                        {
+                            "expression": "discord_user_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "coc_account_table_discord_user_id_account_account_id_fk": {
+                    "name": "coc_account_table_discord_user_id_account_account_id_fk",
+                    "tableFrom": "coc_account_table",
+                    "tableTo": "account",
+                    "columnsFrom": ["discord_user_id"],
+                    "columnsTo": ["account_id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "coc_account_table_coc_account_tag_unique": {
+                    "name": "coc_account_table_coc_account_tag_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_account_tag"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "refresh_token_expires_at": {
-          "name": "refresh_token_expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
+        "public.cwl_application_table": {
+            "name": "cwl_application_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "discord_user_id": {
+                    "name": "discord_user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "discord_username": {
+                    "name": "discord_username",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_name": {
+                    "name": "coc_account_name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_tag": {
+                    "name": "coc_account_tag",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_clan": {
+                    "name": "coc_account_clan",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_account_weight": {
+                    "name": "coc_account_weight",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "month": {
+                    "name": "month",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "year": {
+                    "name": "year",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "preference_num": {
+                    "name": "preference_num",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "applied_at": {
+                    "name": "applied_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "assigned_to": {
+                    "name": "assigned_to",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "cwl_application_discord_user_id_idx": {
+                    "name": "cwl_application_discord_user_id_idx",
+                    "columns": [
+                        {
+                            "expression": "discord_user_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "cwl_application_assigned_to_idx": {
+                    "name": "cwl_application_assigned_to_idx",
+                    "columns": [
+                        {
+                            "expression": "assigned_to",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "cwl_application_table_assigned_to_cwl_clan_info_table_coc_clan_tag_fk": {
+                    "name": "cwl_application_table_assigned_to_cwl_clan_info_table_coc_clan_tag_fk",
+                    "tableFrom": "cwl_application_table",
+                    "tableTo": "cwl_clan_info_table",
+                    "columnsFrom": ["assigned_to"],
+                    "columnsTo": ["coc_clan_tag"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "cwl_table_accountTag_preferenceNum_month_year_unique": {
+                    "name": "cwl_table_accountTag_preferenceNum_month_year_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["coc_account_tag", "preference_num", "month", "year"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "scope": {
-          "name": "scope",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+        "public.cwl_clan_info_table": {
+            "name": "cwl_clan_info_table",
+            "schema": "",
+            "columns": {
+                "coc_clan_tag": {
+                    "name": "coc_clan_tag",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "coc_clan_name": {
+                    "name": "coc_clan_name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_clan_league": {
+                    "name": "coc_clan_league",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "coc_clan_leader": {
+                    "name": "coc_clan_leader",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "cwl_clan_info_coc_clan_tag_idx": {
+                    "name": "cwl_clan_info_coc_clan_tag_idx",
+                    "columns": [
+                        {
+                            "expression": "coc_clan_tag",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
+        "public.settings_table": {
+            "name": "settings_table",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "applications_enabled": {
+                    "name": "applications_enabled",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "cwl_enabled": {
+                    "name": "cwl_enabled",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "site_maintenance_mode": {
+                    "name": "site_maintenance_mode",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "rules_content": {
+                    "name": "rules_content",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "guild_id": {
+                    "name": "guild_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         }
-      },
-      "indexes": {
-        "account_userId_idx": {
-          "name": "account_userId_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "account_user_id_user_id_fk": {
-          "name": "account_user_id_user_id_fk",
-          "tableFrom": "account",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "account_account_id_unique": {
-          "name": "account_account_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "account_id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     },
-    "public.session": {
-      "name": "session",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token": {
-          "name": "token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ip_address": {
-          "name": "ip_address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_agent": {
-          "name": "user_agent",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "impersonated_by": {
-          "name": "impersonated_by",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+    "enums": {
+        "public.clan_application_status": {
+            "name": "clan_application_status",
+            "schema": "public",
+            "values": ["pending", "accepted", "rejected"]
         }
-      },
-      "indexes": {
-        "session_userId_idx": {
-          "name": "session_userId_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "session_user_id_user_id_fk": {
-          "name": "session_user_id_user_id_fk",
-          "tableFrom": "session",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "session_token_unique": {
-          "name": "session_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     },
-    "public.user": {
-      "name": "user",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email_verified": {
-          "name": "email_verified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "banned": {
-          "name": "banned",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "ban_reason": {
-          "name": "ban_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ban_expires": {
-          "name": "ban_expires",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "user_email_unique": {
-          "name": "user_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.verification": {
-      "name": "verification",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "identifier": {
-          "name": "identifier",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "verification_identifier_idx": {
-          "name": "verification_identifier_idx",
-          "columns": [
-            {
-              "expression": "identifier",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.base_info_table": {
-      "name": "base_info_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "coc_base_level": {
-          "name": "coc_base_level",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_base_link": {
-          "name": "coc_base_link",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_base_image_link": {
-          "name": "coc_base_image_link",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "base_info_table_coc_base_level_unique": {
-          "name": "base_info_table_coc_base_level_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_base_level"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.clan_application_table": {
-      "name": "clan_application_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "coc_account_tag": {
-          "name": "coc_account_tag",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_data": {
-          "name": "coc_account_data",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_user_id": {
-          "name": "discord_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "clan_application_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "clan_application_table_coc_account_tag_unique": {
-          "name": "clan_application_table_coc_account_tag_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_account_tag"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.clan_info_table": {
-      "name": "clan_info_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "coc_clan_code": {
-          "name": "coc_clan_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_clan_name": {
-          "name": "coc_clan_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "coc_clan_level": {
-          "name": "coc_clan_level",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "coc_clan_tag": {
-          "name": "coc_clan_tag",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_clan_role_id": {
-          "name": "discord_clan_role_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_clan_channel_id": {
-          "name": "discord_clan_channel_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_member_role_id": {
-          "name": "discord_member_role_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_elder_role_id": {
-          "name": "discord_elder_role_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_coleader_role_id": {
-          "name": "discord_coleader_role_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_leader_role_id": {
-          "name": "discord_leader_role_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_leader_id": {
-          "name": "discord_leader_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "attacks_requirement": {
-          "name": "attacks_requirement",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "donations_requirement": {
-          "name": "donations_requirement",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "clangames_requirement": {
-          "name": "clangames_requirement",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_clan_data": {
-          "name": "coc_clan_data",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "coc_clan_current_war_data": {
-          "name": "coc_clan_current_war_data",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "clan_info_coc_clan_code_idx": {
-          "name": "clan_info_coc_clan_code_idx",
-          "columns": [
-            {
-              "expression": "coc_clan_code",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "clan_info_coc_clan_tag_idx": {
-          "name": "clan_info_coc_clan_tag_idx",
-          "columns": [
-            {
-              "expression": "coc_clan_tag",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "clan_info_coc_clan_level_idx": {
-          "name": "clan_info_coc_clan_level_idx",
-          "columns": [
-            {
-              "expression": "coc_clan_level",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "clan_info_table_coc_clan_code_unique": {
-          "name": "clan_info_table_coc_clan_code_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_clan_code"
-          ]
-        },
-        "clan_info_table_coc_clan_tag_unique": {
-          "name": "clan_info_table_coc_clan_tag_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_clan_tag"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.coc_account_table": {
-      "name": "coc_account_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "discord_user_id": {
-          "name": "discord_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_tag": {
-          "name": "coc_account_tag",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "coc_account_discord_user_id_idx": {
-          "name": "coc_account_discord_user_id_idx",
-          "columns": [
-            {
-              "expression": "discord_user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "coc_account_table_discord_user_id_account_account_id_fk": {
-          "name": "coc_account_table_discord_user_id_account_account_id_fk",
-          "tableFrom": "coc_account_table",
-          "tableTo": "account",
-          "columnsFrom": [
-            "discord_user_id"
-          ],
-          "columnsTo": [
-            "account_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "coc_account_table_coc_account_tag_unique": {
-          "name": "coc_account_table_coc_account_tag_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_account_tag"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.cwl_application_table": {
-      "name": "cwl_application_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "discord_user_id": {
-          "name": "discord_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discord_username": {
-          "name": "discord_username",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_name": {
-          "name": "coc_account_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_tag": {
-          "name": "coc_account_tag",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_clan": {
-          "name": "coc_account_clan",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_account_weight": {
-          "name": "coc_account_weight",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "month": {
-          "name": "month",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "year": {
-          "name": "year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "preference_num": {
-          "name": "preference_num",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "applied_at": {
-          "name": "applied_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "assigned_to": {
-          "name": "assigned_to",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "cwl_application_discord_user_id_idx": {
-          "name": "cwl_application_discord_user_id_idx",
-          "columns": [
-            {
-              "expression": "discord_user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "cwl_application_assigned_to_idx": {
-          "name": "cwl_application_assigned_to_idx",
-          "columns": [
-            {
-              "expression": "assigned_to",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "cwl_application_table_assigned_to_cwl_clan_info_table_coc_clan_tag_fk": {
-          "name": "cwl_application_table_assigned_to_cwl_clan_info_table_coc_clan_tag_fk",
-          "tableFrom": "cwl_application_table",
-          "tableTo": "cwl_clan_info_table",
-          "columnsFrom": [
-            "assigned_to"
-          ],
-          "columnsTo": [
-            "coc_clan_tag"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "cwl_table_accountTag_preferenceNum_month_year_unique": {
-          "name": "cwl_table_accountTag_preferenceNum_month_year_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "coc_account_tag",
-            "preference_num",
-            "month",
-            "year"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.cwl_clan_info_table": {
-      "name": "cwl_clan_info_table",
-      "schema": "",
-      "columns": {
-        "coc_clan_tag": {
-          "name": "coc_clan_tag",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "coc_clan_name": {
-          "name": "coc_clan_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_clan_league": {
-          "name": "coc_clan_league",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "coc_clan_leader": {
-          "name": "coc_clan_leader",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "cwl_clan_info_coc_clan_tag_idx": {
-          "name": "cwl_clan_info_coc_clan_tag_idx",
-          "columns": [
-            {
-              "expression": "coc_clan_tag",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.settings_table": {
-      "name": "settings_table",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "applications_enabled": {
-          "name": "applications_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "cwl_enabled": {
-          "name": "cwl_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "site_maintenance_mode": {
-          "name": "site_maintenance_mode",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "rules_content": {
-          "name": "rules_content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "guild_id": {
-          "name": "guild_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
-  },
-  "enums": {
-    "public.clan_application_status": {
-      "name": "clan_application_status",
-      "schema": "public",
-      "values": [
-        "pending",
-        "accepted",
-        "rejected"
-      ]
-    }
-  },
-  "schemas": {},
-  "sequences": {},
-  "roles": {},
-  "policies": {},
-  "views": {},
-  "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "views": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
 }

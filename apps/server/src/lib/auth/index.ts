@@ -1,15 +1,15 @@
-import { betterAuth } from 'better-auth';
-import { admin as adminPlugin, openAPI, captcha } from 'better-auth/plugins';
-import { db } from '../db';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { ac, admin, unverified, verified, reviewer, manager } from './permissions';
-import 'dotenv/config';
+import { betterAuth } from "better-auth";
+import { admin as adminPlugin, openAPI, captcha } from "better-auth/plugins";
+import { db } from "../db";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { ac, admin, unverified, verified, reviewer, manager } from "./permissions";
+import "dotenv/config";
 
 export const auth = betterAuth({
     secret: process.env.JPA_AUTH_SECRET,
     baseURL: process.env.JPA_AUTH_URL,
     database: drizzleAdapter(db, {
-        provider: 'pg',
+        provider: "pg",
     }),
     account: {
         encryptOAuthTokens: true,
@@ -24,7 +24,7 @@ export const auth = betterAuth({
             clientSecret: process.env.JPA_DISCORD_SECRET!,
             overrideUserInfoOnSignIn: true,
             disableDefaultScope: true,
-            scope: ['identify', 'guilds', 'guilds.members.read'],
+            scope: ["identify", "guilds", "guilds.members.read"],
         },
     },
     plugins: [
@@ -37,17 +37,17 @@ export const auth = betterAuth({
                 reviewer,
                 manager,
             },
-            defaultRole: 'unverified',
-            adminRoles: ['admin'],
+            defaultRole: "unverified",
+            adminRoles: ["admin"],
         }),
         openAPI(),
         captcha({
-            provider: 'cloudflare-turnstile',
+            provider: "cloudflare-turnstile",
             secretKey: process.env.JPA_TURNSTILE_SECRET_KEY!,
         }),
     ],
     advanced: {
-        cookiePrefix: 'jpa',
+        cookiePrefix: "jpa",
         crossSubDomainCookies: {
             enabled: true,
         },
@@ -61,5 +61,5 @@ export const auth = betterAuth({
             maxAge: 1 * 60, // Cache duration in seconds
         },
     },
-    trustedOrigins: ['http://localhost:5173', process.env.JPA_APP_URL!],
+    trustedOrigins: ["http://localhost:5173", process.env.JPA_APP_URL!],
 });
