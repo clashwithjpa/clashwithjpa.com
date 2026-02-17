@@ -138,9 +138,17 @@
 </div>
 
 <style>
-    .avatar-image,
-    .greeting-text {
+    .avatar-image {
         opacity: 0;
         white-space: pre;
+    }
+
+    .greeting-text {
+        opacity: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+        max-width: min(90vw, 70ch);
     }
 </style>
