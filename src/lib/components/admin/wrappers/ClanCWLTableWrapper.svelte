@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { ICellRendererParams } from "@ag-grid-community/core";
+    import LucideExternalLink from "~icons/lucide/external-link";
 
     let params: ICellRendererParams = $props();
 
@@ -13,9 +14,10 @@
         href="https://link.clashofclans.com/en?action=OpenClanProfile&tag={clanTag.slice(1)}"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-sky-500 hover:underline"
+        class="inline-flex items-center gap-1.5 text-sky-500 transition-colors hover:text-sky-600 hover:underline"
     >
-        {clanName}
+        <span>{clanName}</span>
+        <LucideExternalLink class="size-3.5 opacity-70" />
     </a>
 {:else}
     <span class="text-muted-foreground">{clanName}</span>

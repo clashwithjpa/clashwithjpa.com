@@ -34,7 +34,7 @@
 
 <Toaster />
 
-<Sidebar.Provider>
+<Sidebar.Provider open={false}>
     <Bar user={data.user} />
     <Sidebar.Inset>
         <header class="flex h-16 shrink-0 items-center gap-2 px-4">

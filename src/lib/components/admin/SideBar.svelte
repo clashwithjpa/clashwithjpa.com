@@ -84,13 +84,13 @@
     }
 </script>
 
-<Sidebar.Root collapsible="icon">
+<Sidebar.Root collapsible="icon" variant="floating">
     <Sidebar.Content>
         <Sidebar.Group>
             <Sidebar.Menu>
                 {#each data as item (item.title)}
                     <Sidebar.MenuItem>
-                        <Sidebar.SidebarMenuButton isActive={item.url === page.url.pathname}>
+                        <Sidebar.SidebarMenuButton isActive={item.url === page.url.pathname} tooltipContent={item.title}>
                             {#snippet child({ props })}
                                 <a href={item.url} {...props}>
                                     <item.icon />
@@ -109,7 +109,7 @@
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger>
                         {#snippet child({ props })}
-                            <Sidebar.MenuButton size="lg" {...props}>
+                            <Sidebar.MenuButton size="lg" {...props} class="cursor-pointer">
                                 <Avatar.Root class="size-8 rounded-lg">
                                     <Avatar.Image src="https://media.discordapp.net/avatars/{user.id}/{user.avatar}" alt={user.global_name} />
                                     <Avatar.Fallback class="rounded-lg">

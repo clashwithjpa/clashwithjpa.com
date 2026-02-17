@@ -44,6 +44,7 @@
                 field: "cocAccounts",
                 headerName: "COC Accounts",
                 cellRenderer: makeSvelteCellRenderer(CocAccountsUsersTableWrapper),
+                cellRendererParams: {},
                 filter: true
             }
         ],

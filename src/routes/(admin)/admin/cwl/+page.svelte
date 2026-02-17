@@ -1,16 +1,13 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
-    import Grid from "$lib/components/admin/Grid.svelte";
-    import UserCWLTableWrapper from "$lib/components/admin/wrappers/UserCWLTableWrapper.svelte";
+    import CWLTable from "$lib/components/admin/CWLTable.svelte";
     import { Button } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
     import { Input } from "$lib/components/ui/input";
     import * as Select from "$lib/components/ui/select";
     import { customCWLEntrySchema } from "$lib/schema";
     import type { InsertCWL } from "$lib/server/schema";
-    import type { GridOptions, IDateFilterParams, ValueFormatterParams } from "@ag-grid-community/core";
-    import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
     import { Control, Description, Field, FieldErrors } from "formsnap";
     import { json2csv } from "json-2-csv";
     import { toast } from "svelte-sonner";
@@ -28,117 +25,14 @@
     import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();
-    let rowData = $derived<InsertCWL[]>(data.cwlApplications);
+    let rowData = $state<InsertCWL[]>([]);
+    $effect(() => {
+        rowData = data.cwlApplications;
+    });
     let disabled: boolean = $state(false);
     let loading: boolean = $state(false);
     let syncing: "success" | "loading" | "error" = $state("success");
     let openPopup: boolean = $state(false);
-
-    const filterParams: IDateFilterParams = {
-        comparator: (filterDate: Date, cellValue: string) => {
-            const cellDate = new Date(cellValue).getDate();
-            if (cellDate < filterDate.getDate()) {
-                return -1;
-            } else if (cellDate > filterDate.getDate()) {
-                return 1;
-            }
-            return 0;
-        }
-    };
-
-    const gridOptions: GridOptions<InsertCWL> = {
-        columnDefs: [
-            {
-                field: "userName",
-                cellRenderer: makeSvelteCellRenderer(UserCWLTableWrapper),
-                filter: true,
-                filterParams: {
-                    filterPlaceholder: "Search by Discord Username"
-                }
-            },
-            {
-                field: "preferenceNum",
-                headerName: "P.N",
-                headerTooltip: "Preference Number",
-                filter: "agNumberColumnFilter",
-                editable: true
-            },
-            { field: "accountName", filter: true },
-            { field: "accountTag", filter: true },
-            {
-                field: "accountClan",
-                filter: true,
-                editable: true,
-                cellEditor: "agSelectCellEditor",
-                cellEditorParams: {
-                    values: data.clanNames
-                }
-            },
-            {
-                field: "assignedTo",
-                headerName: "Assigned To",
-                filter: true,
-                editable: true,
-                cellEditor: "agSelectCellEditor",
-                cellEditorParams: {
-                    values: data.cwlClans.map((clan) => clan.clanName)
-                },
-                valueFormatter: (params: ValueFormatterParams<InsertCWL, string>) => {
-                    return data.cwlClans.find((clan) => clan.tag === params.data?.assignedTo)?.clanName || "";
-                },
-                valueSetter: (params) => {
-                    const foundClan = data.cwlClans.find((clan) => clan.clanName === params.newValue);
-                    if (foundClan) {
-                        params.data.assignedTo = foundClan.tag;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            { field: "accountWeight", filter: "agNumberColumnFilter", editable: true },
-            {
-                field: "appliedAt",
-                valueFormatter: (params: ValueFormatterParams<InsertCWL, Date>) => {
-                    return new Date(params.data?.appliedAt || "").toLocaleString("en-IN", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit"
-                    });
-                },
-                headerName: "Applied At",
-                filter: "agDateColumnFilter",
-                filterParams,
-                editable: true,
-                cellEditor: "agDateCellEditor",
-                cellDataType: "date"
-            }
-        ],
-        autoSizeStrategy: {
-            type: "fitCellContents",
-            skipHeader: false
-        },
-        pagination: true,
-        paginationAutoPageSize: true,
-        rowSelection: {
-            mode: "multiRow"
-        },
-        onRowSelected(event) {
-            selectedRows = event.api.getSelectedRows();
-        },
-        async onCellValueChanged(event) {
-            await updateApplication(event.data);
-        },
-        onSortChanged(event) {
-            const sortedData: InsertCWL[] = [];
-            event.api.forEachNodeAfterFilterAndSort((node) => {
-                if (node.data) {
-                    sortedData.push(node.data);
-                }
-            });
-            rowData = sortedData;
-        }
-    };
-
     let selectedRows: InsertCWL[] = $state([]);
 
     async function removeApp(tags: string[]) {
@@ -165,13 +59,18 @@
     }
 
     // New CWL Form
-    const form = superForm(data.form, {
-        validators: zodClient(customCWLEntrySchema),
-        onUpdated() {
-            reset?.();
-        }
-    });
-    const { form: formData, enhance, message, delayed } = form;
+    const formInstance = $derived.by(() =>
+        superForm(data.form, {
+            validators: zodClient(customCWLEntrySchema as any),
+            onUpdated() {
+                reset?.();
+            }
+        })
+    );
+    const formData = $derived(formInstance.form);
+    const enhance = $derived(formInstance.enhance);
+    const message = $derived(formInstance.message);
+    const delayed = $derived(formInstance.delayed);
     $effect(() => {
         if ($message && (page.status === 200 || page.status == 400)) {
             switch (page.status) {
@@ -224,7 +123,7 @@
         <form in:fade method="POST" action="/admin/cwl" use:enhance class="flex flex-col items-stretch justify-center gap-2">
             <div class="flex w-full flex-wrap items-start justify-center gap-2">
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="tag">
+                    <Field form={formInstance} name="tag">
                         <Description>Account Tag</Description>
                         <Control>
                             {#snippet children({ props })}
@@ -236,7 +135,7 @@
                     </Field>
                 </div>
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="userId">
+                    <Field form={formInstance} name="userId">
                         <Description>User ID</Description>
                         <Control>
                             {#snippet children({ props })}
@@ -248,7 +147,7 @@
                     </Field>
                 </div>
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="accountWeight">
+                    <Field form={formInstance} name="accountWeight">
                         <Description>Account Weight</Description>
                         <Control>
                             {#snippet children({ props })}
@@ -260,7 +159,7 @@
                     </Field>
                 </div>
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="preferenceNum">
+                    <Field form={formInstance} name="preferenceNum">
                         <Description>Preference Number</Description>
                         <Control>
                             {#snippet children({ props })}
@@ -272,12 +171,12 @@
                     </Field>
                 </div>
                 <div class="flex w-full grow cursor-default flex-col gap-2 md:w-fit">
-                    <Field {form} name="accountClan">
+                    <Field form={formInstance} name="accountClan">
                         <Description>Account Clan</Description>
                         <Control>
                             {#snippet children({ props })}
                                 <input type="hidden" name="accountClan" bind:value={$formData.accountClan} />
-                                <Select.Root type="single" bind:value={$formData.accountClan}>
+                                <Select.Root type="single" value={$formData.accountClan as string} onValueChange={(v) => ($formData.accountClan = v)}>
                                     <Select.Trigger class="w-full" {...props}
                                         >{$formData.accountClan ? $formData.accountClan : "Select a clan"}</Select.Trigger
                                     >
@@ -384,7 +283,19 @@
         </div>
     </div>
     <div class="size-full">
-        <Grid {gridOptions} bind:rowData />
+        <CWLTable
+            bind:rowData
+            cwlClans={data.cwlClans}
+            clanNames={data.clanNames.filter((name): name is string => name !== null)}
+            editable={true}
+            onCellValueChanged={updateApplication}
+            onSortChanged={(sortedData) => {
+                rowData = sortedData;
+            }}
+            onRowSelected={(rows) => {
+                selectedRows = rows;
+            }}
+        />
     </div>
     <div class="flex w-full items-center justify-between">
         <div class="flex items-center justify-start gap-2">

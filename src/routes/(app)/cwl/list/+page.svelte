@@ -1,102 +1,16 @@
 <script lang="ts">
-    import Grid from "$lib/components/admin/Grid.svelte";
-    import ClanCWLTableWrapper from "$lib/components/admin/wrappers/ClanCWLTableWrapper.svelte";
-    import UserCWLTableWrapper from "$lib/components/admin/wrappers/UserCWLTableWrapper.svelte";
+    import CWLTable from "$lib/components/admin/CWLTable.svelte";
     import { Button } from "$lib/components/ui/button";
     import type { InsertCWL } from "$lib/server/schema";
-    import type { GridOptions, IDateFilterParams, ValueFormatterParams } from "@ag-grid-community/core";
-    import { makeSvelteCellRenderer } from "ag-grid-svelte5-extended";
     import { json2csv } from "json-2-csv";
     import MaterialSymbolsDownloadRounded from "~icons/material-symbols/download-rounded";
 
     let { data } = $props<{ data: any }>();
-    let rowData = $derived<InsertCWL[]>(data.cwlApplications);
+    let rowData = $state<InsertCWL[]>([]);
 
-    const filterParams: IDateFilterParams = {
-        comparator: (filterDate: Date, cellValue: string) => {
-            const cellDate = new Date(cellValue).getDate();
-            if (cellDate < filterDate.getDate()) {
-                return -1;
-            } else if (cellDate > filterDate.getDate()) {
-                return 1;
-            }
-            return 0;
-        }
-    };
-
-    const gridOptions: GridOptions<InsertCWL> = {
-        columnDefs: [
-            {
-                field: "userName",
-                cellRenderer: makeSvelteCellRenderer(UserCWLTableWrapper),
-                filter: true,
-                filterParams: {
-                    filterPlaceholder: "Search by Discord Username"
-                }
-            },
-            {
-                field: "preferenceNum",
-                headerName: "P.N",
-                headerTooltip: "Preference Number",
-                filter: "agNumberColumnFilter"
-            },
-            { field: "accountName", filter: true },
-            { field: "accountTag", filter: true },
-            {
-                field: "accountClan",
-                filter: true
-            },
-            {
-                field: "assignedTo",
-                headerName: "Assigned To",
-                filter: true,
-                cellRenderer: makeSvelteCellRenderer(ClanCWLTableWrapper),
-                cellRendererParams: {
-                    cwlClans: data.cwlClans
-                }
-            },
-            { field: "accountWeight", filter: "agNumberColumnFilter" },
-            {
-                field: "appliedAt",
-                valueFormatter: (params: ValueFormatterParams<InsertCWL, Date>) => {
-                    return new Date(params.data?.appliedAt || "").toLocaleString("en-IN", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit"
-                    });
-                },
-                headerName: "Applied At",
-                filter: "agDateColumnFilter",
-                filterParams
-            }
-        ],
-        autoSizeStrategy: {
-            type: "fitCellContents",
-            skipHeader: false
-        },
-        pagination: true,
-        paginationAutoPageSize: true,
-        rowSelection: {
-            mode: "singleRow",
-            checkboxes: false,
-            enableClickSelection: false
-        },
-        getRowStyle: (params) => {
-            if (params.data?.userId === data.userId) {
-                return { background: "#3B82F619" };
-            }
-            return undefined;
-        },
-        onSortChanged(event) {
-            const sortedData: InsertCWL[] = [];
-            event.api.forEachNodeAfterFilterAndSort((node) => {
-                if (node.data) {
-                    sortedData.push(node.data);
-                }
-            });
-            rowData = sortedData;
-        }
-    };
+    $effect(() => {
+        rowData = data.cwlApplications;
+    });
 </script>
 
 <svelte:head>
@@ -145,7 +59,15 @@
             </div>
         </div>
         <div class="size-full">
-            <Grid {gridOptions} bind:rowData />
+            <CWLTable
+                bind:rowData
+                cwlClans={data.cwlClans}
+                editable={false}
+                currentUserId={data.userId}
+                onSortChanged={(sortedData) => {
+                    rowData = sortedData;
+                }}
+            />
         </div>
     </div>
 </main>
