@@ -64,6 +64,8 @@
         "@friendofsvelte/tipex": "0.0.7-fix-0",
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",
+        "@types/animejs": "^3.1.13",
+        "animejs": "^4.3.6",
         "discord-api-types": "^0.37.120",
         "dotenv": "^16.6.1",
         "drizzle-orm": "^0.38.4",
