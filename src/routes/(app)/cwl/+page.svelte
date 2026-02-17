@@ -61,6 +61,10 @@
     let buttonDisabled = $derived.by(() => {
         return dev ? false : !$formData.tag || !$formData.preferenceNum || !$formData["cf-turnstile-response"];
     });
+
+    let selectedWeight = $derived(
+        data.userAccount.cocAccounts.find((a) => a.tag === $formData.tag)?.weight ?? null
+    );
 </script>
 
 <svelte:head>
@@ -187,13 +191,6 @@
                             </div>
                         </Field>
 
-                        <div class="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-200">
-                            <p class="font-semibold">⚠️ Important Notice</p>
-                            <p class="mt-1 text-amber-200/80">
-                                Due to issues with the FWA Stats API, everyone must sign up as <strong>Alt</strong>. Please enable the toggle above.
-                            </p>
-                        </div>
-
                         <Field {form} name="tag">
                             <Description>Select one of your accounts</Description>
                             <Control>
@@ -213,6 +210,10 @@
                             </Control>
                             <FieldErrors class="text-sm text-red-400" />
                         </Field>
+
+                        {#if selectedWeight !== null}
+                            <p class="text-muted-foreground text-sm">War Weight: <span class="text-foreground font-medium">{selectedWeight.toLocaleString()}</span></p>
+                        {/if}
 
                         <Field {form} name="preferenceNum">
                             {@const accounts = data.userAccount.cocAccounts.length}

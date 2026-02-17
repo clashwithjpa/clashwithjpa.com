@@ -2,7 +2,6 @@ import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import { env as publicEnv } from "$env/dynamic/public";
 import { validateCFToken } from "$lib/cf/helpers";
-import { getFWAStats } from "$lib/coc/fwa";
 import { getPlayerInfo } from "$lib/coc/player";
 import { cwlApplicationSchema } from "$lib/schema";
 import {
@@ -115,22 +114,19 @@ export const actions: Actions = {
                 playerAccountWeight = form.data.accountWeight;
                 playerClanName = form.data.accountClan;
             } else {
-                const playerClanTag = playerData.clan!.tag;
-                console.log("Player clan tag: ", playerClanTag);
-                playerClanName = playerData.clan!.name;
-                const fwaStats = await getFWAStats(event.fetch, playerClanTag as string);
+                const playerClanName_ = playerData.clan?.name;
+                playerClanName = playerClanName_;
 
-                console.log("Fetched FWA stats");
+                const userAccount = await getUserAccounts(event.locals.db, event.locals.user!.id);
+                const cocAccount = userAccount?.cocAccounts.find((a) => a.tag === playerTag);
 
-                const fwaStatsMember = "error" in fwaStats ? undefined : fwaStats[playerTag];
-
-                if (!fwaStatsMember) {
-                    return message(form, "You are not in the FWA clan", {
+                if (!cocAccount) {
+                    return message(form, "Account not linked", {
                         status: 400
                     });
                 }
 
-                playerAccountWeight = fwaStatsMember.weight;
+                playerAccountWeight = cocAccount.weight;
             }
 
             if (!playerAccountWeight || playerAccountWeight < 10000) {

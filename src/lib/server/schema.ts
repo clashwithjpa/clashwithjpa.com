@@ -13,7 +13,8 @@ export const cocTable = pgTable("coc_table", {
     userId: text("user_id")
         .notNull()
         .references(() => userTable.discordId, { onDelete: "cascade" }),
-    tag: text("tag").notNull().unique()
+    tag: text("tag").notNull().unique(),
+    weight: integer("weight").notNull().default(0),
 });
 
 export const cwlClanTable = pgTable("cwl_clan_table", {
