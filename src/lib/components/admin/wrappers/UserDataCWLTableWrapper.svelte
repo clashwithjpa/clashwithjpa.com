@@ -1,17 +1,12 @@
 <script lang="ts">
     import type { APIPlayer } from "$lib/coc/types";
-    import { Button } from "$lib/components/ui/button";
-    import { Input } from "$lib/components/ui/input";
     import * as Popover from "$lib/components/ui/popover";
     import type { ICellRendererParams } from "@ag-grid-community/core";
-    import { toast } from "svelte-sonner";
     import { fly } from "svelte/transition";
     import LucideCastle from "~icons/lucide/castle";
-    import LucideCheck from "~icons/lucide/check";
     import LucideCrown from "~icons/lucide/crown";
     import LucideInfo from "~icons/lucide/info";
     import LucideLoaderCircle from "~icons/lucide/loader-circle";
-    import LucideSave from "~icons/lucide/save";
     import LucideTrophy from "~icons/lucide/trophy";
     import LucideUser from "~icons/lucide/user";
     import LucideWeight from "~icons/lucide/weight";
@@ -19,9 +14,6 @@
     let params: ICellRendererParams = $props();
     let tag: string = params.data.accountTag;
     let accountWeight = $state<number>(params.data.accountWeight || 0);
-    let saving = $state(false);
-    let saved = $state(false);
-    let editable = $state<boolean>((params as any).editable ?? true);
 
     async function fetchCocAccount(): Promise<APIPlayer> {
         return Promise.resolve(
@@ -29,38 +21,6 @@
                 .then((res) => res.json())
                 .then((data) => data as APIPlayer)
         );
-    }
-
-    async function saveWeights() {
-        saving = true;
-        try {
-            const response = await fetch(`/api/cwl`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    key: "update_application",
-                    value: {
-                        ...params.data,
-                        accountWeight,
-                        appliedAt: new Date(params.data.appliedAt)
-                    }
-                })
-            });
-
-            if (response.ok) {
-                params.data.accountWeight = accountWeight;
-                params.api.refreshCells({ rowNodes: [params.node], force: true });
-                saved = true;
-                toast.success("Weight updated successfully");
-                setTimeout(() => (saved = false), 2000);
-            } else {
-                toast.error("Failed to update weight");
-            }
-        } catch (error) {
-            toast.error("Error updating weight");
-        } finally {
-            saving = false;
-        }
     }
 </script>
 
@@ -150,36 +110,9 @@
                             <LucideWeight class="text-muted-foreground size-3" />
                             <span class="text-muted-foreground text-xs font-medium">Account Weight</span>
                         </div>
-                        {#if editable}
-                            <div class="flex items-center gap-2">
-                                <Input
-                                    id="accountWeight"
-                                    type="number"
-                                    bind:value={accountWeight}
-                                    class="h-8 flex-1 text-sm"
-                                    disabled={saving}
-                                    placeholder="Enter weight"
-                                />
-                                <Button
-                                    onclick={saveWeights}
-                                    disabled={saving || saved}
-                                    size="sm"
-                                    class="h-8 px-3 {saved ? 'bg-green-600 hover:bg-green-600' : ''}"
-                                >
-                                    {#if saving}
-                                        <LucideLoaderCircle class="size-3.5 animate-spin"></LucideLoaderCircle>
-                                    {:else if saved}
-                                        <LucideCheck class="size-3.5"></LucideCheck>
-                                    {:else}
-                                        <LucideSave class="size-3.5"></LucideSave>
-                                    {/if}
-                                </Button>
-                            </div>
-                        {:else}
-                            <div class="bg-muted/50 rounded-md px-2.5 py-2">
-                                <span class="text-sm font-medium">{accountWeight}</span>
-                            </div>
-                        {/if}
+                        <div class="bg-muted/50 rounded-md px-2.5 py-2">
+                            <span class="text-sm font-medium">{accountWeight}</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -105,13 +105,12 @@
                     : undefined
             },
             {
-                field: "accountTag",
-                headerName: "Account Detail",
-                cellRenderer: makeSvelteCellRenderer(UserDataCWLTableWrapper),
-                cellRendererParams: {
-                    editable: editable
-                },
-                filter: true
+                field: "accountWeight",
+                headerName: "Account Weight",
+                filter: "agNumberColumnFilter",
+                editable: editable,
+                cellEditor: editable ? "agNumberCellEditor" : undefined,
+                cellDataType: editable ? "number" : undefined
             },
             {
                 field: "appliedAt",
@@ -128,6 +127,12 @@
                 editable: editable,
                 cellEditor: editable ? "agDateCellEditor" : undefined,
                 cellDataType: editable ? "date" : undefined
+            },
+            {
+                field: "accountTag",
+                headerName: "Account Details",
+                cellRenderer: makeSvelteCellRenderer(UserDataCWLTableWrapper),
+                filter: true
             }
         ],
         autoSizeStrategy: {
