@@ -22,6 +22,21 @@
                 .then((data) => data as APIPlayer)
         );
     }
+
+    function getRole(role: string): string {
+        switch (role) {
+            case "leader":
+                return "Leader";
+            case "coLeader":
+                return "Co Leader";
+            case "admin":
+                return "Elder";
+            case "member":
+                return "Member";
+            default:
+                return role;
+        }
+    }
 </script>
 
 <Popover.Root>
@@ -70,7 +85,7 @@
                             {#if acc.role}
                                 <div class="flex items-center gap-2">
                                     <LucideCrown class="text-muted-foreground size-3.5 shrink-0" />
-                                    <span class="text-xs font-medium capitalize">{acc.role}</span>
+                                    <span class="text-xs font-medium capitalize">{getRole(acc.role)}</span>
                                 </div>
                             {/if}
                         </div>
