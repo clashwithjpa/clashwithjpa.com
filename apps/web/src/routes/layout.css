@@ -2,3 +2,33 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
+
+*:focus {
+    outline: none;
+}
+
+@font-face {
+    font-family: "COC";
+    font-style: normal;
+    font-display: swap;
+    src: url("/fonts/clash_regular.otf") format("opentype");
+    font-weight: 100 600;
+}
+
+@font-face {
+    font-family: "COC";
+    font-style: normal;
+    font-display: swap;
+    src: url("/fonts/clash_bold.otf") format("opentype");
+    font-weight: 700 900;
+}
+
+body {
+    font-family: "COC", sans-serif;
+    background-color: var(--color-stone-950);
+    color: var(--color-stone-50);
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

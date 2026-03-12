@@ -1,9 +1,9 @@
 <script lang="ts">
-    import favicon from "$lib/assets/favicon.svg";
     import "./layout.css";
 
     let { children } = $props();
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
-{@render children()}
+<div class="flex h-screen w-screen flex-col overflow-x-hidden">
+    {@render children()}
+</div>
