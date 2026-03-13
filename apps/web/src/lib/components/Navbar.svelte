@@ -1,5 +1,6 @@
 <script lang="ts">
     import { fadeUp, wavyBounce } from "$lib/utils/animations";
+    import CocBtn from "./ui/CocBtn.svelte";
     import Link from "./ui/Link.svelte";
 
     let links: { name: string; href: string }[] = [
@@ -37,5 +38,5 @@
         {/each}
     </div>
 
-    <div class="flex items-center gap-4 **:text-sm">Login</div>
+    <CocBtn variant="orange" size="xs">Login</CocBtn>
 </nav>
