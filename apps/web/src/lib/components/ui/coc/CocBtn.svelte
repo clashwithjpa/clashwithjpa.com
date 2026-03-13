@@ -56,7 +56,7 @@
 
 <a
     {href}
-    class={`relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black leading-[1.2] font-bold tracking-wide text-white uppercase shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
+    class={`relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-[1.2] font-bold tracking-wide text-white uppercase shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
     onpointerdown={(e) => {
         isPressed = true;
         bounceDown(e.currentTarget as Element);

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fadeUp, wavyBounce } from "$lib/utils/animations";
-    import CocBtn from "./ui/CocBtn.svelte";
-    import Link from "./ui/Link.svelte";
+    import CocBtn from "../ui/coc/CocBtn.svelte";
+    import Link from "../ui/Link.svelte";
 
     let links: { name: string; href: string }[] = [
         { name: "Home", href: "/" },
@@ -18,7 +18,7 @@
     });
 </script>
 
-<nav class="font-coc sticky top-0 z-40 flex items-center justify-between p-4 transition-all duration-200 md:p-6">
+<nav class="sticky top-0 z-40 flex items-center justify-between p-4 font-coc transition-all duration-200 md:p-6">
     <a href="/" class="flex h-10 items-center gap-4">
         <div class="size-10 bg-cover" style="background-image: url('/logo.webp');" bind:this={logo}></div>
         <div class="h-full border-l-2 border-stone-700/50"></div>

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CocBtn from "$lib/components/ui/CocBtn.svelte";
-    import H1 from "$lib/components/ui/H1.svelte";
+    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
+    import H1 from "$lib/components/ui/coc/H1.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { fadeIn, fadeUp, textGlide } from "$lib/utils/animations";
     import SimpleIconsAppstore from "~icons/simple-icons/appstore";
