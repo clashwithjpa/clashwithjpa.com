@@ -1,30 +1,41 @@
 <script lang="ts">
+    import { fadeUp, wavyBounce } from "$lib/utils/animations";
     import Link from "./ui/Link.svelte";
 
     let links: { name: string; href: string }[] = [
         { name: "Home", href: "/" },
         { name: "Clans", href: "/clans" },
         { name: "War Details", href: "/wars" },
-        { name: "CWL List", href: "/cwl-list" },
         { name: "Rules", href: "/rules" },
     ];
+
+    let logo: HTMLElement;
+    let menuOpen = $state(false);
+
+    $effect(() => {
+        fadeUp(document.querySelectorAll(".animate-desktop"));
+        wavyBounce(logo);
+    });
 </script>
 
-<nav class="sticky top-0 flex items-center justify-between p-4 md:p-6">
+<nav class="sticky top-0 z-40 flex items-center justify-between p-4 transition-all duration-200 md:p-6" class:backdrop-blur-md={menuOpen}>
     <a href="/" class="flex h-10 items-center gap-4">
-        <img src="/logo.webp" alt="Logo" class="size-10" />
-        <div class="h-full border border-l border-stone-500"></div>
+        <div class="size-10 bg-cover" style="background-image: url('/logo.webp');" bind:this={logo}></div>
+        <div class="h-full border-l-2 border-stone-700/50"></div>
         <div class="flex flex-col">
             <span class="text-xl font-bold">JPA</span>
-            <span class="text-xs text-stone-500">FWA Clans</span>
+            <span class="text-xs text-stone-400">FWA Clans</span>
         </div>
     </a>
-    <div class="absolute left-1/2 flex -translate-x-1/2 items-center gap-8 **:text-sm">
+
+    <!-- Desktop nav links -->
+    <div class="hidden **:text-sm md:absolute md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-8">
         {#each links as link}
-            <Link href={link.href}>
+            <Link href={link.href} class="animate-desktop opacity-0">
                 {link.name}
             </Link>
         {/each}
     </div>
+
     <div class="flex items-center gap-4 **:text-sm">Login</div>
 </nav>

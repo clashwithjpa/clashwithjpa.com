@@ -14,7 +14,7 @@
 
     function getClass(pathname: string, href: string | null): string {
         const baseClass =
-            "relative text-base after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-stone-50 after:transition-transform after:duration-300 after:ease-in-out after:will-change-transform";
+            "relative text-base after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-stone-50 after:transition-transform after:duration-200 after:ease-in-out after:will-change-transform";
         const activeClass = "after:origin-bottom-left after:scale-x-100 hover:after:origin-bottom-right hover:after:scale-x-0";
         const inactiveClass = "after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100";
         return `${baseClass} ${pathname === (href || "") ? activeClass : inactiveClass}`;
@@ -27,7 +27,7 @@
     tabindex={0}
     {href}
     target={newTab ? "_blank" : ""}
-    class={cn(getClass(page.url.pathname, href), "group flex items-center space-x-1 transition-all duration-300 ease-in-out", className)}
+    class={cn(getClass(page.url.pathname, href), "group flex items-center space-x-1 transition-all duration-200 ease-in-out", className)}
     {onclick}
     data-sveltekit-preload-data="hover"
 >

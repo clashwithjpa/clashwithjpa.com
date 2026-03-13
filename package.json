@@ -23,8 +23,5 @@
     "workspaces": [
         "apps/*",
         "packages/*"
-    ],
-    "dependencies": {
-        "@ark-ui/svelte": "^5.19.1"
-    }
+    ]
 }
