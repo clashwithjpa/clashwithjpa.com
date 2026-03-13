@@ -8,6 +8,7 @@
         trigger,
         children,
         placement = "bottom",
+        open = $bindable(false),
         class: className = "",
         contentClass = "",
         onOpenChange,
@@ -27,19 +28,20 @@
             | "right"
             | "right-start"
             | "right-end";
+        open?: boolean;
         class?: string;
         contentClass?: string;
         onOpenChange?: (details: { open: boolean }) => void;
     } = $props();
 </script>
 
-<Popover.Root positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
+<Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
     <Popover.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
         {@render trigger()}
     </Popover.Trigger>
 
     <Portal>
-        <Popover.Positioner class="z-50">
+        <Popover.Positioner class="z-60">
             <Popover.Content
                 class={cn(
                     "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",

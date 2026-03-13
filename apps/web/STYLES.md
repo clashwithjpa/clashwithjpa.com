@@ -9,6 +9,7 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 - **Secondary Text:** `text-stone-200`
 - **Tertiary Text:** `text-stone-400`
 - **Borders:** `border-stone-700/50`
+- **Backdrop Blur:** `backdrop-blur-sm`
 
 > **Note:** DO NOT use any text colors other than the 3 defined above. The `CocBtn` component has its own independent theme variations (Green, Orange, Red, Blurple) and is an exception to the strict Stone palette rule.
 
@@ -57,7 +58,7 @@ To prevent z-index wars and spaghetti overlay positioning, adhere strictly to th
 | **`z-0`**   | Standard page content                 | Text, standard images, grids, inline buttons                     |
 | **`z-10`**  | Elevated content, sticky headers      | Sticky section headers (rarely needed)                           |
 | **`z-40`**  | Global persistent floating UI         | `Navbar`, `ControlsPopup` trigger (the floating button itself)   |
-| **`z-50`**  | Floating overlays (Popovers/Tooltips) | `Tooltip.Positioner`, `Popover.Positioner` (Tooltips, Dropdowns) |
+| **`z-60`**  | Floating overlays (Popovers/Tooltips) | `Tooltip.Positioner`, `Popover.Positioner` (Tooltips, Dropdowns) |
 
 Do not invent intermediate z-indexes (like `z-70` or `z-80`) outside of this scale.
 

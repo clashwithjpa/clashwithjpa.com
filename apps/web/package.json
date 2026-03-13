@@ -23,9 +23,11 @@
         "@capacitor/android": "^8.0.2",
         "@capacitor/core": "^8.0.2",
         "@capacitor/ios": "^8.0.2",
+        "@neodrag/svelte": "^3.0.0-next.8",
         "@repo/ui": "workspace:*",
         "animejs": "^4.3.6",
-        "runed": "^0.37.1"
+        "runed": "^0.37.1",
+        "vaul-svelte": "^0.3.2"
     },
     "devDependencies": {
         "@capacitor/cli": "^8.0.2",

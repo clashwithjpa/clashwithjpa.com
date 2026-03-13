@@ -11,7 +11,6 @@
     ];
 
     let logo: HTMLElement;
-    let menuOpen = $state(false);
 
     $effect(() => {
         fadeUp(document.querySelectorAll(".animate-desktop"));
@@ -19,7 +18,7 @@
     });
 </script>
 
-<nav class="sticky top-0 z-40 flex items-center justify-between p-4 transition-all duration-200 md:p-6" class:backdrop-blur-md={menuOpen}>
+<nav class="sticky top-0 z-40 flex items-center justify-between p-4 transition-all duration-200 md:p-6">
     <a href="/" class="flex h-10 items-center gap-4">
         <div class="size-10 bg-cover" style="background-image: url('/logo.webp');" bind:this={logo}></div>
         <div class="h-full border-l-2 border-stone-700/50"></div>
