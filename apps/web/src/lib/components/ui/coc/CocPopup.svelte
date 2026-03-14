@@ -1,0 +1,156 @@
+<script lang="ts">
+    import { cn } from "$lib/utils";
+    import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import { Popover } from "@ark-ui/svelte/popover";
+    import { Portal } from "@ark-ui/svelte/portal";
+    import { onMount, type Snippet } from "svelte";
+    import { Drawer } from "vaul-svelte";
+
+    let {
+        trigger,
+        children,
+        placement = "bottom",
+        open = $bindable(false),
+        class: className = "",
+        contentClass = "",
+        title = "",
+        onOpenChange,
+    }: {
+        trigger: Snippet;
+        children: Snippet;
+        placement?:
+            | "top"
+            | "top-start"
+            | "top-end"
+            | "bottom"
+            | "bottom-start"
+            | "bottom-end"
+            | "left"
+            | "left-start"
+            | "left-end"
+            | "right"
+            | "right-start"
+            | "right-end";
+        open?: boolean;
+        class?: string;
+        contentClass?: string;
+        title?: string;
+        onOpenChange?: (details: { open: boolean }) => void;
+    } = $props();
+
+    let isMobile = $state(false);
+
+    onMount(() => {
+        const cleanup = createMobileMediaQuery((mobile) => {
+            isMobile = mobile;
+        });
+        return cleanup;
+    });
+
+    const v = {
+        bg: "from-[#dcb897] via-[#9e5f37] to-[#3b1d0d]",
+        overlay: "from-[#bd7a50] to-[#713f21]",
+        gloss: "from-[#f2d0b5] to-[rgba(158,95,55,0.7)]",
+    };
+    const contentBg = "from-[#e4cca3] to-[#c7ad85]";
+</script>
+
+{#if isMobile}
+    <Drawer.Root bind:open onClose={() => onOpenChange?.({ open: false })}>
+        <Drawer.Trigger>
+            <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
+                {@render trigger()}
+            </div>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+            <Drawer.Overlay class="fixed inset-0 z-60 bg-stone-950/60 backdrop-blur-sm transition-all duration-200" />
+            <Drawer.Content
+                class="fixed inset-x-0 bottom-0 z-60 mt-24 overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)] outline-none focus:outline-none"
+            >
+                <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
+                <span class={`absolute inset-0.5 rounded-t-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
+                <span class={`absolute inset-x-1.5 top-1.5 h-1/2 rounded-t-[14px] rounded-b-xl bg-linear-to-b ${v.gloss} opacity-70`}></span>
+
+                <div class="relative z-10 flex h-full flex-col">
+                    {#if title}
+                        <div class="flex items-center justify-center p-3 pt-5 pb-3">
+                            <h2 class="text-shadow font-coc text-[26px] font-black tracking-wider text-white uppercase">
+                                {title}
+                            </h2>
+                        </div>
+                    {:else}
+                        <div class="h-2.5"></div>
+                    {/if}
+
+                    <div
+                        class={`mx-2 mb-2 flex-1 overflow-hidden rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`}
+                    >
+                        <div class={cn("h-full overflow-x-hidden overflow-y-auto p-4 text-stone-900", contentClass)}>
+                            {@render children()}
+                        </div>
+                    </div>
+                </div>
+            </Drawer.Content>
+        </Drawer.Portal>
+    </Drawer.Root>
+{:else}
+    <Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
+        <Popover.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
+            {@render trigger()}
+        </Popover.Trigger>
+
+        <Portal>
+            <Popover.Positioner class="z-60">
+                <Popover.Content
+                    class={cn(
+                        "relative overflow-hidden rounded-[20px] border border-black outline-none",
+                        "transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+                        "shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_8px_24px_rgba(0,0,0,0.5)]",
+                    )}
+                >
+                    <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
+                    <span class={`absolute inset-0.5 rounded-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
+                    <span class={`absolute inset-x-1.5 top-1.5 h-1/2 rounded-[14px] bg-linear-to-b ${v.gloss} opacity-70`}></span>
+
+                    <div class="relative z-10 flex h-full flex-col">
+                        {#if title}
+                            <div class="flex items-center justify-center p-3 pt-5 pb-3">
+                                <h2 class="text-shadow font-coc text-[26px] font-black tracking-wider text-white uppercase">
+                                    {title}
+                                </h2>
+                            </div>
+                        {:else}
+                            <div class="h-2.5"></div>
+                        {/if}
+
+                        <div
+                            class={`mx-2 mb-2 flex-1 overflow-hidden rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`}
+                        >
+                            <div class={cn("h-full overflow-x-hidden overflow-y-auto p-4 text-stone-900", contentClass)}>
+                                {@render children()}
+                            </div>
+                        </div>
+                    </div>
+                </Popover.Content>
+            </Popover.Positioner>
+        </Portal>
+    </Popover.Root>
+{/if}
+
+<style>
+    .text-shadow {
+        text-shadow:
+            0 -2px #000,
+            0 0 #000,
+            0 2px #000,
+            0 4px #000,
+            -1px -1px #000,
+            1px -1px #000,
+            1px 0 #000,
+            -1px 0 #000,
+            1px 1px #000,
+            -1px 1px #000,
+            1px 2px #000,
+            -1px 2px #000;
+    }
+</style>

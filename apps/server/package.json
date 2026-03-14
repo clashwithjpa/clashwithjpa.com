@@ -4,8 +4,8 @@
     "prettier": "@repo/prettier-config",
     "scripts": {
         "dev": "bun run --hot src/index.ts",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format": "prettier --write . --ignore-path ../../.prettierignore",
+        "format:check": "prettier --check . --ignore-path ../../.prettierignore",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:studio": "drizzle-kit studio",

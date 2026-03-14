@@ -5,9 +5,9 @@
 The entire application relies primarily on Tailwind CSS's **Stone** color palette (`stone-50` through `stone-950`).
 - **Main Backgrounds:** `bg-stone-950`
 - **Surface/Elevated Backgrounds:** `bg-stone-900`
-- **Primary Text:** `text-stone-50`
-- **Secondary Text:** `text-stone-200`
-- **Tertiary Text:** `text-stone-400`
+- **Primary Text:** `text-stone-50` (*`text-stone-950` for light bg*)
+- **Secondary Text:** `text-stone-200` (*`text-stone-400` for light bg*)
+- **Tertiary Text:** `text-stone-400` (*`text-stone-600` for light bg*)
 - **Borders:** `border-stone-700/50`
 - **Backdrop Blur:** `backdrop-blur-sm`
 
@@ -21,17 +21,17 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 ## Buttons & Contrast
 
 - **Variants:** Buttons must strictly fall into these variants:
-  - **base:** `bg-stone-800`
-  - **ghost:** `bg-stone-900`
+    - **base:** `bg-stone-800`
+    - **ghost:** `bg-stone-900`
 - **Hover States:** Both the `base` and `ghost` variants use `hover:bg-stone-700` and `hover:text-stone-50` for their hover states.
 
 ## Border Radius (Rounded Corners)
 
 - **Standard Radius:** `rounded-lg`
-  - **Apply to:** Buttons, Tooltips, Popovers, Cards, Menus, Navbars.
+    - **Apply to:** Buttons, Tooltips, Popovers, Cards, Menus, Navbars.
 - **Exceptions:**
-  - `ControlsPopup.svelte` (The audio/video controls trigger) is the **only** component allowed to use `rounded-full` for its floating trigger button. Inner buttons within the popup should adhere to `rounded-lg`.
-  - `CocBtn` may maintain its specific radius (`rounded-[10px]` or `rounded-xl`) as it has an independent theme.
+    - `ControlsPopup.svelte` (The audio/video controls trigger) is the **only** component allowed to use `rounded-full` for its floating trigger button. Inner buttons within the popup should adhere to `rounded-lg`.
+    - `CocBtn` may maintain its specific radius (`rounded-[10px]` or `rounded-xl`) as it has an independent theme.
 
 ## Animations & Transitions
 

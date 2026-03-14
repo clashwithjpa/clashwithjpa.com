@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Popup from "$lib/components/ui/Popup.svelte";
+    import Popup from "$lib/components/ui/RawPopup.svelte";
     import { spinOnce } from "$lib/utils/animations";
     import { draggable, events } from "@neodrag/svelte";
     import { onMount } from "svelte";
