@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
-import { admin as adminPlugin, openAPI, captcha } from "better-auth/plugins";
-import { db } from "../db";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { ac, admin, unverified, verified, reviewer, manager } from "./permissions";
+import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
 import "dotenv/config";
+import { db } from "../db";
+import { ac, admin, manager, reviewer, unverified, verified } from "./permissions";
 
 export const auth = betterAuth({
     secret: process.env.JPA_AUTH_SECRET,
@@ -24,7 +24,7 @@ export const auth = betterAuth({
             clientSecret: process.env.JPA_DISCORD_SECRET!,
             overrideUserInfoOnSignIn: true,
             disableDefaultScope: true,
-            scope: ["identify", "guilds", "guilds.members.read"],
+            scope: ["identify", "email", "guilds", "guilds.members.read"],
         },
     },
     plugins: [

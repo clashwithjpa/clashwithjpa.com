@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { authClient } from "$lib/auth";
     import { fadeUp, wavyBounce } from "$lib/utils/animations";
     import CocBtn from "../ui/coc/CocBtn.svelte";
     import Link from "../ui/Link.svelte";
+    import Popup from "../ui/Popup.svelte";
 
     let links: { name: string; href: string }[] = [
         { name: "Home", href: "/" },
@@ -12,10 +14,20 @@
 
     let logo: HTMLElement;
 
+    const session = authClient.useSession();
+
     $effect(() => {
         fadeUp(document.querySelectorAll(".animate-desktop"));
         wavyBounce(logo);
     });
+
+    const roleLabels: Record<string, string> = {
+        admin: "Admin",
+        manager: "Manager",
+        reviewer: "Reviewer",
+        verified: "Verified",
+        unverified: "Member",
+    };
 </script>
 
 <nav class="sticky top-0 z-40 flex items-center justify-between p-4 font-coc transition-all duration-200 md:p-6">
@@ -37,5 +49,35 @@
         {/each}
     </div>
 
-    <CocBtn variant="orange" size="xs">Login</CocBtn>
+    {#if $session.isPending}
+        <div class="h-9 w-20 animate-pulse rounded-xl bg-stone-700/50 md:h-10 md:w-24"></div>
+    {:else if $session.data?.user}
+        <Popup placement="bottom-end">
+            {#snippet trigger()}
+                <img
+                    src={$session.data!.user.image ?? `https://api.dicebear.com/9.x/initials/svg?seed=${$session.data!.user.name}`}
+                    alt={$session.data!.user.name}
+                    class="size-9 rounded-full border-2 border-stone-600 object-cover"
+                />
+            {/snippet}
+            {#snippet children()}
+                <div class="flex min-w-48 flex-col gap-3">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="font-coc text-sm font-bold text-white">{$session.data!.user.name}</span>
+                        {#if $session.data!.user.role}
+                            <span class="text-xs text-stone-400">
+                                {roleLabels[$session.data!.user.role] ?? $session.data!.user.role}
+                            </span>
+                        {/if}
+                    </div>
+                    <div class="h-px bg-stone-700/50"></div>
+                    <CocBtn variant="red" size="xs" onclick={() => authClient.signOut()}>Logout</CocBtn>
+                </div>
+            {/snippet}
+        </Popup>
+    {:else}
+        <CocBtn variant="blurple" size="xs" onclick={() => authClient.signIn.social({ provider: "discord", callbackURL: window.location.origin })}>
+            Login
+        </CocBtn>
+    {/if}
 </nav>
