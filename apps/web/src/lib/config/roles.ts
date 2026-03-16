@@ -14,7 +14,7 @@ export interface RoleConfig {
 
 export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     unverified: {
-        label: "Member",
+        label: "Unverified",
         decoration: {
             gradient: "linear-gradient(135deg, #44403c, #78716c)",
             animated: false,
@@ -44,7 +44,7 @@ export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     admin: {
         label: "Admin",
         decoration: {
-            gradient: "conic-gradient(from 0deg, #4c1d95, #a78bfa, #4c1d95)",
+            gradient: "conic-gradient(from 0deg, #f59e0b, #fde68a, #b45309, #fde68a, #f59e0b)",
             animated: true,
         },
     },
