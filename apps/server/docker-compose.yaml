@@ -1,0 +1,24 @@
+volumes:
+  jpa-pg-data:
+
+services:
+  jpa-db:
+    image: postgres:18-alpine
+    container_name: jpa-db
+    shm_size: 2G
+    restart: unless-stopped
+    environment:
+      PGDATA: /var/lib/postgresql/18/docker
+      POSTGRES_USER: ${JPA_DB_USER}
+      POSTGRES_PASSWORD: ${JPA_DB_PASSWORD}
+      POSTGRES_DB: ${JPA_DB_NAME}
+    ports:
+      - 7101:5432
+    volumes:
+      - jpa-pg-data:/var/lib/postgresql/18/docker
+    env_file: .env.server
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
