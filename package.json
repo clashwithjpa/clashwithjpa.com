@@ -16,6 +16,8 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@types/bun": "latest",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
