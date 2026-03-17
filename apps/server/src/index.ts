@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "@lib/instrument";
+require("@lib/instrument");
 import { logger } from "@lib/logger";
 import { auth } from "@lib/auth";
 import { Hono } from "hono";
@@ -58,6 +58,10 @@ app.get("/session", (c) => {
         session,
         user,
     });
+});
+
+app.get("/debug-sentry", () => {
+    throw new Error("My first Sentry error!");
 });
 
 export default app;
