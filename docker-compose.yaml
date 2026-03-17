@@ -11,7 +11,7 @@ services:
     image: ghcr.io/getsentry/spotlight:latest
     restart: unless-stopped
     ports:
-      - 8969:8969
+      - 7102:8969
     profiles:
       - all
       - analytics
