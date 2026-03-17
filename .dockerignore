@@ -8,3 +8,4 @@ yarn.lock
 bun.lock
 bun.lockb
 *.md
+logs

@@ -16,10 +16,23 @@ services:
       - all
       - analytics
 
+  drizzle-gateway:
+    container_name: drizzle-gateway
+    image: ghcr.io/drizzle-team/gateway:latest
+    restart: unless-stopped
+    ports:
+      - 7103:4983
+    volumes:
+      - drizzle-gateway-data:/app
+    profiles:
+      - all
+      - analytics
+
 volumes:
   jpa-pg-data:
+  drizzle-gateway-data:
 
 networks:
-  clash-net:
+  default:
     name: clashwithjpa-network
     driver: bridge

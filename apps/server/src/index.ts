@@ -1,7 +1,11 @@
-import { auth } from "@lib/auth";
 import "dotenv/config";
+import "@lib/instrument";
+import { logger } from "@lib/logger";
+import { auth } from "@lib/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+
+logger.info("Starting server...");
 
 const app = new Hono<{
     Variables: {
@@ -40,6 +44,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.get("/", (c) => {
+    logger.http(`${c.req.method} ${c.req.url}`);
     return c.text("Hello Hono!");
 });
 

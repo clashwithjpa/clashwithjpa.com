@@ -1,7 +1,7 @@
+import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
-import "dotenv/config";
 import { db } from "../db";
 import { ac, admin, manager, reviewer, unverified, verified } from "./permissions";
 

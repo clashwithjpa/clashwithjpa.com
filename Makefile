@@ -46,6 +46,13 @@ endif
 	@echo "→ Stopping:  docker compose $(PROFILE_FLAGS) down"
 	docker compose $(PROFILE_FLAGS) down
 
+.PHONY: migrate
+migrate: ## Run server database migrations
+	bun --filter server db:migrate
+
+.PHONY: generate
+generate: ## Generate server database types
+	bun --filter server db:generate
 
 # Prevent make from treating profile names as unknown build targets
 %:

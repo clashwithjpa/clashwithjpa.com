@@ -1,7 +1,25 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "jsxImportSource": "hono/jsx",
+
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "target": "esnext",
+        "verbatimModuleSyntax": true,
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "moduleDetection": "force",
+
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+
+        "moduleResolution": "Bundler",
+        "module": "ESNext",
+        "noEmit": true,
+
+        "lib": ["esnext"],
+
+        "declaration": false
+    }
 }
