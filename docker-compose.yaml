@@ -11,7 +11,7 @@ services:
     image: ghcr.io/getsentry/spotlight:latest
     restart: unless-stopped
     ports:
-      - 7102:8969
+      - 8969:8969
     extra_hosts:
       - "host.docker.internal:host-gateway"
     profiles:

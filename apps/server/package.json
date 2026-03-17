@@ -5,19 +5,18 @@
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:studio": "drizzle-kit studio",
-        "dev": "bun run --hot src/index.ts",
+        "dev": "NODE_ENV=development bun run --hot --preload ./src/lib/instrument.ts src/index.ts",
         "format": "prettier --write . --ignore-path ../../.prettierignore",
         "format:check": "prettier --check . --ignore-path ../../.prettierignore"
     },
     "prettier": "@repo/prettier-config",
     "dependencies": {
-        "@sentry/node": "^10.43.0",
+        "@sentry/bun": "^10.43.0",
         "better-auth": "^1.4.18",
         "dotenv": "^17.2.3",
         "drizzle-orm": "^0.45.1",
         "hono": "^4.11.7",
         "pg": "^8.18.0",
-        "winston": "^3.19.0",
         "zod": "^4.3.6"
     },
     "devDependencies": {

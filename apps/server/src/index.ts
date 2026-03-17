@@ -1,18 +1,24 @@
 import "dotenv/config";
-require("@lib/instrument");
-import { logger } from "@lib/logger";
+import * as Sentry from "@sentry/bun";
 import { auth } from "@lib/auth";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { cors } from "hono/cors";
-
-logger.info("Starting server...");
 
 const app = new Hono<{
     Variables: {
         user: typeof auth.$Infer.Session.user | null;
         session: typeof auth.$Infer.Session.session | null;
     };
-}>();
+}>().onError((err, c) => {
+    Sentry.captureException(err);
+    if (err instanceof HTTPException) {
+        return err.getResponse();
+    }
+    // Or just report errors which are not instances of HTTPException
+    // Sentry.captureException(err);
+    return c.json({ error: "Internal server error" }, 500);
+});
 
 app.use(
     "*",
@@ -36,6 +42,14 @@ app.use("*", async (c, next) => {
     }
     c.set("user", session.user);
     c.set("session", session.session);
+
+    if (session?.user?.email) {
+        Sentry.setUser({
+            email: session.user.email,
+            id: session.user.id,
+        });
+    }
+
     await next();
 });
 
@@ -44,7 +58,6 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.get("/", (c) => {
-    logger.http(`${c.req.method} ${c.req.url}`);
     return c.text("Hello Hono!");
 });
 
@@ -61,7 +74,7 @@ app.get("/session", (c) => {
 });
 
 app.get("/debug-sentry", () => {
-    throw new Error("My first Sentry error!");
+    throw new Error("works!");
 });
 
 export default app;
