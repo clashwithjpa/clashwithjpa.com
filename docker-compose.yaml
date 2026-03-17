@@ -1,0 +1,25 @@
+services:
+  jpa-db:
+    extends:
+      file: ./apps/server/docker-compose.yaml
+      service: jpa-db
+    profiles:
+      - all
+      - db
+  spotlight:
+    container_name: spotlight
+    image: ghcr.io/getsentry/spotlight:latest
+    restart: unless-stopped
+    ports:
+      - 8969:8969
+    profiles:
+      - all
+      - analytics
+
+volumes:
+  jpa-pg-data:
+
+networks:
+  clash-net:
+    name: clashwithjpa-network
+    driver: bridge

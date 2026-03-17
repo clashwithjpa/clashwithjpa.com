@@ -1,5 +1,7 @@
 #  Contributing
 
+## Running the project
+
 ## Web App Styling Guidelines
 
 ### Theme Palette: **Stone**

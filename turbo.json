@@ -1,6 +1,7 @@
 {
     "$schema": "./node_modules/turbo/schema.json",
-    "globalEnv": ["JPA_*"],
+    "globalEnv": ["NODE_ENV"],
+    "globalPassThroughEnv": ["DEBUG"],
     "tasks": {
         "dev": {
             "cache": false,
