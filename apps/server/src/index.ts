@@ -20,8 +20,6 @@ const app = new Hono<{
     if (err instanceof HTTPException) {
         return err.getResponse();
     }
-    // Or just report errors which are not instances of HTTPException
-    // Sentry.captureException(err);
     return c.json({ error: "Internal server error" }, 500);
 });
 
@@ -59,6 +57,7 @@ app.use("*", async (c, next) => {
 });
 
 app.use(
+    "*",
     rateLimiter({
         windowMs: 1 * 60 * 1000, // 1 minute
         limit: 60, // Limit each client to 60 requests per window
