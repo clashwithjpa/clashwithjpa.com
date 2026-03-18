@@ -56,6 +56,7 @@ export const auth = betterAuth({
         cookiePrefix: "jpa",
         crossSubDomainCookies: {
             enabled: true,
+            domains: ["clashwithjpa.com", ".localhost"],
         },
     },
     telemetry: {
@@ -64,8 +65,9 @@ export const auth = betterAuth({
     session: {
         cookieCache: {
             enabled: true,
-            maxAge: 1 * 60, // Cache duration in seconds
+            maxAge: 1 * 30, // Cache duration in seconds
         },
     },
     trustedOrigins: ["http://localhost:5173", process.env.JPA_APP_URL!],
+    experimental: { joins: true },
 });

@@ -14,3 +14,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  jpa-redis:
+    image: redis:8-alpine
+    container_name: jpa-redis
+    restart: unless-stopped
+    volumes:
+      - jpa-redis-data:/data
+    ports:
+      - 7102:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

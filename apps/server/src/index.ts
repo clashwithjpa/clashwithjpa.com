@@ -4,6 +4,11 @@ import { auth } from "@lib/auth";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { cors } from "hono/cors";
+import { rateLimiter } from "hono-rate-limiter";
+import { RedisStore, type RedisReply } from "rate-limit-redis";
+import RedisClient from "ioredis";
+
+const client = new RedisClient("redis://default@localhost:7102");
 
 const app = new Hono<{
     Variables: {
@@ -52,6 +57,18 @@ app.use("*", async (c, next) => {
 
     await next();
 });
+
+app.use(
+    rateLimiter({
+        windowMs: 1 * 60 * 1000, // 1 minute
+        limit: 60, // Limit each client to 60 requests per window
+        keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "", // Use IP address as key
+        // @ts-expect-error - The type definitions for rate-limit-redis are not compatible with the way we're using it, but it works at runtime.
+        store: new RedisStore({
+            sendCommand: (command: string, ...args: string[]) => client.call(command, ...args) as Promise<RedisReply>,
+        }),
+    }),
+);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
     return auth.handler(c.req.raw);

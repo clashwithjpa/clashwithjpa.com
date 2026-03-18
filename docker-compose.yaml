@@ -5,18 +5,16 @@ services:
       service: jpa-db
     profiles:
       - all
+      - services
       - db
-  spotlight:
-    container_name: spotlight
-    image: ghcr.io/getsentry/spotlight:latest
-    restart: unless-stopped
-    ports:
-      - 8969:8969
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+
+  jpa-redis:
+    extends:
+      file: ./apps/server/docker-compose.yaml
+      service: jpa-redis
     profiles:
       - all
-      - analytics
+      - services
 
   drizzle-gateway:
     container_name: drizzle-gateway
@@ -30,9 +28,38 @@ services:
       - all
       - analytics
 
+  redis-insight:
+    container_name: redis-insight
+    image: redis/redisinsight:latest
+    restart: unless-stopped
+    ports:
+      - 7104:5540
+    volumes:
+      - redis-insight-data:/data
+    profiles:
+      - all
+      - analytics
+    depends_on:
+      jpa-redis:
+        condition: service_healthy
+
+  spotlight:
+    container_name: spotlight
+    image: ghcr.io/getsentry/spotlight:latest
+    restart: unless-stopped
+    ports:
+      - 8969:8969
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    profiles:
+      - all
+      - analytics
+
 volumes:
   jpa-pg-data:
+  jpa-redis-data:
   drizzle-gateway-data:
+  redis-insight-data:
 
 networks:
   default:
