@@ -1,2 +1,4 @@
 # deps
 node_modules/
+scripts/migrations/datasets/*
+!scripts/migrations/datasets/.gitkeep

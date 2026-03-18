@@ -8,15 +8,8 @@ interface CheckUserInGuildResult {
     error?: string;
 }
 
-/**
- * Checks if a user exists in a Discord guild and retrieves their roles
- * @param guildId - The Discord guild (server) ID
- * @param userId - The Discord user ID to check
- * @param botToken - Discord bot token for authentication (optional if using env var)
- * @returns Result containing user existence, member data, and roles
- */
-export async function checkUserInGuild(guildId: string, userId: string, botToken?: string): Promise<CheckUserInGuildResult> {
-    const token = botToken || process.env.JPA_DISCORD_BOT_TOKEN;
+export async function checkUserInGuild(guildId: string, userId: string): Promise<CheckUserInGuildResult> {
+    const token = process.env.JPA_DISCORD_BOT_TOKEN;
 
     if (!token) {
         return {
@@ -27,10 +20,8 @@ export async function checkUserInGuild(guildId: string, userId: string, botToken
 
     try {
         const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}`, {
-            method: "GET",
             headers: {
                 Authorization: `Bot ${token}`,
-                "Content-Type": "application/json",
             },
         });
 
@@ -64,19 +55,10 @@ export async function checkUserInGuild(guildId: string, userId: string, botToken
     }
 }
 
-/**
- * Checks if a user has specific role(s) in a Discord guild
- * @param guildId - The Discord guild ID
- * @param userId - The Discord user ID
- * @param roleIds - Single role ID or array of role IDs to check
- * @param botToken - Discord bot token (optional if using env var)
- * @returns Object indicating if user has all roles, any role, and which roles they have
- */
 export async function checkUserRoles(
     guildId: string,
     userId: string,
     roleIds: string | string[],
-    botToken?: string,
 ): Promise<{
     hasAllRoles: boolean;
     hasAnyRole: boolean;
@@ -84,7 +66,7 @@ export async function checkUserRoles(
     matchingRoles: string[];
     error?: string;
 }> {
-    const result = await checkUserInGuild(guildId, userId, botToken);
+    const result = await checkUserInGuild(guildId, userId);
 
     if (!result.exists || result.error) {
         return {
@@ -105,5 +87,24 @@ export async function checkUserRoles(
         hasAnyRole: matchingRoles.length > 0,
         userRoles,
         matchingRoles,
+    };
+}
+
+export async function checkJPAMember(userId: string): Promise<{
+    isAuthorized: boolean;
+    userRoles: string[];
+    matchingRoles: string[];
+    error?: string;
+}> {
+    const GUILD_ID = "1029993902503108678";
+    const REQUIRED_ROLE_IDS = ["1252896435913883760", "1367750139527168020", "1030004174148087878"];
+
+    const result = await checkUserRoles(GUILD_ID, userId, REQUIRED_ROLE_IDS);
+
+    return {
+        isAuthorized: result.hasAnyRole,
+        userRoles: result.userRoles,
+        matchingRoles: result.matchingRoles,
+        error: result.error,
     };
 }

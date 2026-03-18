@@ -31,7 +31,7 @@ export const cocAccountTable = pgTable(
     (t) => [index("coc_account_discord_user_id_idx").on(t.discordUserId)],
 );
 
-export const clanTable = pgTable(
+export const clanInfoTable = pgTable(
     "clan_info_table",
     {
         id: serial("id").primaryKey(),

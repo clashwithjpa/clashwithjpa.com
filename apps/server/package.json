@@ -2,6 +2,8 @@
     "name": "server",
     "scripts": {
         "ba:generate": "bunx auth@latest generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schema/ba-auth.ts --yes && bun run scripts/fix-ba-schema.ts",
+        "dataset:convert-coc": "bun run scripts/migrations/convert-coc-to-json.ts",
+        "dataset:migrate": "bun run scripts/migrations/migrate.ts",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:studio": "drizzle-kit studio",
@@ -29,6 +31,7 @@
         "@repo/typescript-config": "workspace:*",
         "@types/bun": "latest",
         "@types/pg": "^8.16.0",
+        "csv-parse": "^6.2.0",
         "discord-api-types": "^0.38.42",
         "drizzle-kit": "^0.31.8"
     },
