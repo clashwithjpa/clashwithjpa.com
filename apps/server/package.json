@@ -1,7 +1,7 @@
 {
     "name": "server",
     "scripts": {
-        "ba:generate": "bunx @better-auth/cli generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schema/ba-auth.ts --yes",
+        "ba:generate": "bunx auth@latest generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schema/ba-auth.ts --yes && bun run scripts/fix-ba-schema.ts",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:studio": "drizzle-kit studio",
@@ -11,6 +11,7 @@
     },
     "prettier": "@repo/prettier-config",
     "dependencies": {
+        "@scalar/hono-api-reference": "^0.10.3",
         "@sentry/bun": "^10.43.0",
         "better-auth": "^1.4.18",
         "dotenv": "^17.2.3",

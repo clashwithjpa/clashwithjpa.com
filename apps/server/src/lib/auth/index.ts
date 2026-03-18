@@ -13,6 +13,12 @@ export const auth = betterAuth({
     }),
     account: {
         encryptOAuthTokens: true,
+        accountLinking: {
+            enabled: true,
+            disableImplicitLinking: false,
+            trustedProviders: ["discord"],
+            updateUserInfoOnLink: true,
+        },
     },
     emailAndPassword: {
         enabled: false,

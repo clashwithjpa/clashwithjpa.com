@@ -61,20 +61,4 @@ app.get("/", (c) => {
     return c.text("Hello Hono!");
 });
 
-app.get("/session", (c) => {
-    const session = c.get("session");
-    const user = c.get("user");
-
-    if (!user) return c.body(null, 401);
-
-    return c.json({
-        session,
-        user,
-    });
-});
-
-app.get("/debug-sentry", () => {
-    throw new Error("works!");
-});
-
 export default app;
