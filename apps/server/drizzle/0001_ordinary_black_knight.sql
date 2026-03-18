@@ -1,1 +1,0 @@
-ALTER TABLE "coc_account_table" ALTER COLUMN "discord_user_id" DROP NOT NULL;

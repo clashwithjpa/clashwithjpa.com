@@ -54,6 +54,10 @@ migrate: ## Run server database migrations
 generate: ## Generate server database types
 	bun --filter server db:generate
 
+.PHONY: db-reset
+db-reset: ## Reset server database
+	docker compose --profile db down -v
+
 # Prevent make from treating profile names as unknown build targets
 %:
 	@:
