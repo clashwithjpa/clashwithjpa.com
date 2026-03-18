@@ -8,6 +8,13 @@
             "when": 1770218630877,
             "tag": "0000_happy_jocasta",
             "breakpoints": true
+        },
+        {
+            "idx": 1,
+            "version": "7",
+            "when": 1773835542401,
+            "tag": "0001_ordinary_black_knight",
+            "breakpoints": true
         }
     ]
 }

@@ -23,9 +23,7 @@ export const cocAccountTable = pgTable(
     "coc_account_table",
     {
         id: serial("id").primaryKey(),
-        discordUserId: text("discord_user_id")
-            .notNull()
-            .references(() => account.accountId, { onDelete: "cascade" }),
+        discordUserId: text("discord_user_id").references(() => account.accountId, { onDelete: "cascade" }),
         cocAccountTag: text("coc_account_tag").notNull().unique(),
     },
     (t) => [index("coc_account_discord_user_id_idx").on(t.discordUserId)],
