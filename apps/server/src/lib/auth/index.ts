@@ -56,7 +56,6 @@ export const auth = betterAuth({
         cookiePrefix: "jpa",
         crossSubDomainCookies: {
             enabled: true,
-            domains: ["clashwithjpa.com", ".localhost"],
         },
     },
     telemetry: {

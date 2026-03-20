@@ -42,7 +42,7 @@ app.use(
             credentials: true,
         }),
         csrf({
-            origin: [process.env.JPA_APP_URL!, "http://localhost:5173"],
+            origin: [process.env.JPA_AUTH_URL!, process.env.JPA_APP_URL!],
         }),
 
         // Use cloudflare ray id in production - https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/
@@ -107,6 +107,24 @@ app.get(
     },
 );
 
+app.get(
+    "/login",
+    describeRoute({
+        operationId: "login",
+        description: "Initiates the social login process. Currently supports Discord as the provider.",
+    }),
+    async (c) => {
+        const socialLogin = await auth.api.signInSocial({
+            body: {
+                provider: "discord",
+            },
+            asResponse: true,
+        });
+
+        return socialLogin;
+    },
+);
+
 app.route("/coc", coc);
 
 app.get(
@@ -130,7 +148,6 @@ app.get(
         return {
             pageTitle: "ClashWithJPA API Documentation",
             url: "/openapi",
-            proxyUrl: process.env.NODE_ENV === "development" ? "https://proxy.scalar.com" : undefined,
             theme: "saturn",
         };
     }),
