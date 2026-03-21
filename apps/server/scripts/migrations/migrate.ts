@@ -87,8 +87,6 @@ async function migrateClanInfo() {
         attacksRequirement: parseInt(row.attacks_requirement, 10),
         donationsRequirement: parseInt(row.donations_requirement, 10),
         clangamesRequirement: parseInt(row.clangames_requirement, 10),
-        cocClanData: row.clan_data ? JSON.parse(row.clan_data) : null,
-        cocClanCurrentWarData: row.clan_current_war ? JSON.parse(row.clan_current_war) : null,
     }));
 
     console.log("Inserting into clan_info_table...");
