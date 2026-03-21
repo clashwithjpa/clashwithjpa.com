@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { cocClient } from "@/lib/coc";
 import { verifiedAuthMiddleware } from "@/lib/middlewares";
 import * as Sentry from "@sentry/bun";
 import z4 from "zod/v4";
@@ -18,44 +17,44 @@ const getCOCPlayerData = z4.object({
     player: z4.object({}),
 });
 
-app.get(
-    "/player/:tag",
-    describeRoute({
-        operationId: "getCOCPlayer",
-        description: "Fetches a Clash of Clans player's data by their tag. The tag must start with #.",
-        responses: {
-            200: {
-                description: "Successful response with the player's data.",
-                content: {
-                    "application/json": {
-                        schema: resolver(SuccessResponseSchema(getCOCPlayerData)),
-                    },
-                },
-            },
-            500: {
-                description: "Server error response when fetching player data fails.",
-                content: {
-                    "application/json": {
-                        schema: resolver(ErrorResponseSchema),
-                    },
-                },
-            },
-        },
-    }),
-    zValidator("param", getCOCPlayerQuerySchema),
-    async (c) => {
-        const tag = c.req.param("tag");
-        try {
-            const player = await cocClient.getPlayer(tag);
-            return c.json({
-                success: true,
-                data: player,
-            });
-        } catch (error) {
-            Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to fetch player data" }, 500);
-        }
-    },
-);
+// app.get(
+//     "/player/:tag",
+//     describeRoute({
+//         operationId: "getCOCPlayer",
+//         description: "Fetches a Clash of Clans player's data by their tag. The tag must start with #.",
+//         responses: {
+//             200: {
+//                 description: "Successful response with the player's data.",
+//                 content: {
+//                     "application/json": {
+//                         schema: resolver(SuccessResponseSchema(getCOCPlayerData)),
+//                     },
+//                 },
+//             },
+//             500: {
+//                 description: "Server error response when fetching player data fails.",
+//                 content: {
+//                     "application/json": {
+//                         schema: resolver(ErrorResponseSchema),
+//                     },
+//                 },
+//             },
+//         },
+//     }),
+//     zValidator("param", getCOCPlayerQuerySchema),
+//     async (c) => {
+//         const tag = c.req.param("tag");
+//         try {
+//             const player = await cocClient.getPlayer(tag);
+//             return c.json({
+//                 success: true,
+//                 data: player,
+//             });
+//         } catch (error) {
+//             Sentry.captureException(error);
+//             return c.json({ success: false, error: "Failed to fetch player data" }, 500);
+//         }
+//     },
+// );
 
 export default app;

@@ -20,7 +20,6 @@ export const betterAuthMiddleware = createMiddleware(async (c, next) => {
             id: session.user.id,
         });
     }
-
     await next();
 });
 
