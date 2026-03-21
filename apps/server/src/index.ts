@@ -80,12 +80,12 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 const getRootData = z4.object({
     message: z4.string(),
 });
-
 app.get(
     "/",
     describeRoute({
         operationId: "getRoot",
         description: "Welcome route for the API. This route is used to verify that the API is up and running.",
+        tags: ["root"],
         responses: {
             200: {
                 description: "Successful response with a welcome message.",
@@ -112,6 +112,7 @@ app.get(
     describeRoute({
         operationId: "login",
         description: "Initiates the social login process. Currently supports Discord as the provider.",
+        tags: ["root"],
     }),
     async (c) => {
         const socialLogin = await auth.api.signInSocial({
@@ -125,10 +126,52 @@ app.get(
     },
 );
 
+const postLogoutData = z4.object({
+    message: z4.string(),
+});
+app.post(
+    "/logout",
+    describeRoute({
+        operationId: "logout",
+        description: "Logs out the current user.",
+        tags: ["root"],
+        responses: {
+            200: {
+                description: "Successful response with a logout message.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(postLogoutData)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when logging out fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        const logout = await auth.api.signOut();
+        if (logout.success) {
+            return c.json({
+                success: true,
+                data: {
+                    message: "Logged out successfully",
+                },
+            });
+        }
+        return c.json({ success: false, error: "Failed to log out" }, 500);
+    },
+);
+
 app.route("/coc", coc);
 
 app.get(
-    "/openapi",
+    "/openapi.json",
     openAPIRouteHandler(app, {
         documentation: {
             info: {
@@ -137,7 +180,10 @@ app.get(
                 description:
                     "API Documentation for ClashWithJPA. This API is used by the frontend hosted at https://clashwithjpa.com. You can find better-auth reference at /api/auth/reference",
             },
-            servers: [{ url: "http://localhost:3000", description: "Local Server" }],
+            servers: [
+                { url: "http://localhost:3000", description: "Local Server" },
+                { url: "https://api.clashwithjpa.com", description: "Production Server" },
+            ],
         },
     }),
 );
@@ -147,7 +193,7 @@ app.get(
     Scalar((c) => {
         return {
             pageTitle: "ClashWithJPA API Documentation",
-            url: "/openapi",
+            url: "/openapi.json",
             theme: "saturn",
         };
     }),

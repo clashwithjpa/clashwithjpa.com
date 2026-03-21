@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { verifiedAuthMiddleware } from "@/lib/middlewares";
+import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { isAuthenticated } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import {
     APIPlayerSchema,
@@ -27,10 +28,11 @@ const getCOCPlayerData = z4.object({
 });
 app.get(
     "/player/:tag",
-    verifiedAuthMiddleware,
+    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCPlayer",
         description: "Fetches a Clash of Clans player's data by their tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the player's data.",
@@ -77,10 +79,11 @@ const postCOCPlayerVerifyData = z4.object({
 });
 app.post(
     "/player/:tag/verifytoken",
-    verifiedAuthMiddleware,
+    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "postCOCPlayerVerify",
         description: "Verifies a Clash of Clans player's API token.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the verification token.",
@@ -126,10 +129,11 @@ const getCOCPlayerBattleLogData = z4.object({
 });
 app.get(
     "/player/:tag/battlelog",
-    verifiedAuthMiddleware,
+    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCPlayerBattleLog",
         description: "Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the player's battle log.",
@@ -176,6 +180,7 @@ app.get(
     describeRoute({
         operationId: "getCOCClan",
         description: "Fetches a Clash of Clans clan's data by its tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the clan's data.",
@@ -222,6 +227,7 @@ app.get(
     describeRoute({
         operationId: "getCOCClanMembers",
         description: "Fetches a Clash of Clans clan's members by its tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the clan's members.",
@@ -268,6 +274,7 @@ app.get(
     describeRoute({
         operationId: "getCOCClanCurrentWar",
         description: "Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the clan's current war data.",
@@ -311,10 +318,11 @@ const getCOCClanCWLGroupData = z4.object({
 });
 app.get(
     "/clan/:tag/currentwar/leaguegroup",
-    verifiedAuthMiddleware,
+    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCClanCWLGroup",
         description: "Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the clan's CWL league group data.",
@@ -358,10 +366,11 @@ const getCOCCWLWarData = z4.object({
 });
 app.get(
     "/cwl/wars/:warTag",
-    verifiedAuthMiddleware,
+    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCCWLWar",
         description: "Fetches a CWL war's details by its war tag. The tag must start with #.",
+        tags: ["coc"],
         responses: {
             200: {
                 description: "Successful response with the CWL war data.",

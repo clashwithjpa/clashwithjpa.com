@@ -23,16 +23,21 @@ export const betterAuthMiddleware = createMiddleware(async (c, next) => {
     await next();
 });
 
-export const verifiedAuthMiddleware = createMiddleware(async (c, next) => {
-    const user = c.get("user");
-    if (!user) {
-        return c.json({ success: false, error: "Unauthorized" }, 401);
-    }
+type AuthCheckFn = (userId: string) => Promise<{ success: boolean }>;
 
-    const authResult = await isAuthenticated(user.id);
-    if (!authResult.success) {
-        return c.json({ success: false, error: "Unauthorized" }, 401);
-    }
+export const hasAccessAuthMiddleware = (checkFn: AuthCheckFn = isAuthenticated) =>
+    createMiddleware(async (c, next) => {
+        const user = c.get("user");
+        const session = c.get("session");
 
-    await next();
-});
+        if (!user || !session) {
+            return c.json({ success: false, error: "Unauthorized" }, 401);
+        }
+
+        const authResult = await checkFn(user.id);
+        if (!authResult.success) {
+            return c.json({ success: false, error: "Unauthorized" }, 401);
+        }
+
+        await next();
+    });
