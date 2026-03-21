@@ -24,7 +24,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getUser",
-        description: "Fetches the current user's data.",
+        description: "[Authenticated] Fetches the current user's data.",
         tags: ["user"],
         responses: {
             200: {
@@ -77,7 +77,7 @@ app.get(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "getUserAccounts",
-        description: "Fetches the current user's Clash of Clans accounts.",
+        description: "[Verified] Fetches the current user's Clash of Clans accounts.",
         tags: ["user"],
         responses: {
             200: {
@@ -156,7 +156,7 @@ app.post(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "applyUserAccount",
-        description: "Submits a clan application for a Clash of Clans account after verifying ownership.",
+        description: "[Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.",
         tags: ["user"],
         responses: {
             200: {

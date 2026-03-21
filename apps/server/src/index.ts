@@ -81,7 +81,7 @@ app.get(
     "/",
     describeRoute({
         operationId: "getRoot",
-        description: "Welcome route for the API. This route is used to verify that the API is up and running.",
+        description: "[Public] Welcome route for the API. This route is used to verify that the API is up and running.",
         tags: ["root"],
         responses: {
             200: {
@@ -104,12 +104,26 @@ app.get(
     },
 );
 
+const getLoginData = z4.object({
+    url: z4.url(),
+    redirect: z4.literal(true),
+});
 app.get(
     "/login",
     describeRoute({
         operationId: "login",
-        description: "Initiates the social login process. Currently supports Discord as the provider.",
+        description: "[Public] Use this only for backend/scalar usage. For frontend, authClient should be used.",
         tags: ["root"],
+        responses: {
+            200: {
+                description: "Successful response with a login URL.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getLoginData)),
+                    },
+                },
+            },
+        },
     }),
     async (c) => {
         const socialLogin = await auth.api.signInSocial({
@@ -130,7 +144,7 @@ app.post(
     "/logout",
     describeRoute({
         operationId: "logout",
-        description: "Logs out the current user.",
+        description: "[Public] Use this only for backend/scalar usage. For frontend, authClient should be used.",
         tags: ["root"],
         responses: {
             200: {
@@ -152,16 +166,23 @@ app.post(
         },
     }),
     async (c) => {
-        const logout = await auth.api.signOut();
-        if (logout.success) {
-            return c.json({
-                success: true,
-                data: {
-                    message: "Logged out successfully",
-                },
+        try {
+            const logout = await auth.api.signOut({
+                headers: c.req.raw.headers,
             });
+            if (logout.success) {
+                return c.json({
+                    success: true,
+                    data: {
+                        message: "Logged out successfully",
+                    },
+                });
+            }
+            return c.json({ success: false, error: "Failed to log out" }, 500);
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to log out" }, 500);
         }
-        return c.json({ success: false, error: "Failed to log out" }, 500);
     },
 );
 
@@ -183,6 +204,10 @@ app.get(
                 { url: "http://localhost:3000", description: "Local Server" },
                 { url: "https://api.clashwithjpa.com", description: "Production Server" },
             ],
+            externalDocs: {
+                url: "/api/auth/reference",
+                description: "Better Auth Reference",
+            },
         },
     }),
 );
@@ -194,6 +219,21 @@ app.get(
             pageTitle: "ClashWithJPA API Documentation",
             url: "/openapi.json",
             theme: "saturn",
+            agent: {
+                disabled: true,
+            },
+            darkMode: true,
+            favicon: "https://avatars.githubusercontent.com/u/154704188?s=200&v=4",
+            showOperationId: true,
+            metaData: {
+                title: "ClashWithJPA API Documentation",
+                description:
+                    "API Documentation for ClashWithJPA. This API is used by the frontend hosted at https://clashwithjpa.com. You can find better-auth reference at /api/auth/reference",
+                ogDescription:
+                    "API Documentation for ClashWithJPA. This API is used by the frontend hosted at https://clashwithjpa.com. You can find better-auth reference at /api/auth/reference",
+                ogTitle: "ClashWithJPA API Documentation",
+            },
+            telemetry: false,
         };
     }),
 );

@@ -32,7 +32,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCPlayer",
-        description: "Fetches a Clash of Clans player's data by their tag. The tag must start with #.",
+        description: "[Authenticated] Fetches a Clash of Clans player's data by their tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -83,7 +83,7 @@ app.post(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "postCOCPlayerVerify",
-        description: "Verifies a Clash of Clans player's API token.",
+        description: "[Authenticated] Verifies a Clash of Clans player's API token.",
         tags: ["coc"],
         responses: {
             200: {
@@ -133,7 +133,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCPlayerBattleLog",
-        description: "Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.",
+        description: "[Authenticated] Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -180,7 +180,7 @@ app.get(
     "/clan/:tag",
     describeRoute({
         operationId: "getCOCClan",
-        description: "Fetches a Clash of Clans clan's data by its tag. The tag must start with #.",
+        description: "[Public] Fetches a Clash of Clans clan's data by its tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -227,7 +227,7 @@ app.get(
     "/clan/:tag/members",
     describeRoute({
         operationId: "getCOCClanMembers",
-        description: "Fetches a Clash of Clans clan's members by its tag. The tag must start with #.",
+        description: "[Public] Fetches a Clash of Clans clan's members by its tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -274,7 +274,7 @@ app.get(
     "/clan/:tag/currentwar",
     describeRoute({
         operationId: "getCOCClanCurrentWar",
-        description: "Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.",
+        description: "[Public] Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -322,7 +322,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCClanCWLGroup",
-        description: "Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.",
+        description: "[Authenticated] Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -370,7 +370,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getCOCCWLWar",
-        description: "Fetches a CWL war's details by its war tag. The tag must start with #.",
+        description: "[Authenticated] Fetches a CWL war's details by its war tag. The tag must start with #.",
         tags: ["coc"],
         responses: {
             200: {
@@ -415,7 +415,7 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getJPAClans",
-        description: "Fetches all JPA clans.",
+        description: "[Authenticated] Fetches all JPA clans.",
         tags: ["coc"],
         responses: {
             200: {
