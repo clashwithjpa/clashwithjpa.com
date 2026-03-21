@@ -13,12 +13,13 @@ import {
 } from "@repo/clashofclans-api";
 import * as Sentry from "@sentry/bun";
 import z4 from "zod/v4";
+import { getClanTags } from "@/lib/db/functions";
 import { validator as zValidator, resolver, describeRoute } from "hono-openapi";
-import { SuccessResponseSchema, ErrorResponseSchema } from "@/lib/types";
+import { SuccessResponseSchema, ErrorResponseSchema, type AppEnv } from "@/lib/types";
 
 // All routes have /coc as a prefix
 // For routes you need to have specific auth requirements add the middleware
-const app = new Hono();
+const app = new Hono<AppEnv>();
 
 const getCOCPlayerPathSchema = z4.object({
     tag: z4.string().min(1, "Player tag is required").startsWith("#", "Player tag must start with #"),
@@ -402,6 +403,49 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch CWL war data" }, 500);
+        }
+    },
+);
+
+const getJPAClansData = z4.object({
+    clans: z4.array(z4.string()),
+});
+app.get(
+    "/jpa/clans",
+    hasAccessAuthMiddleware(isAuthenticated),
+    describeRoute({
+        operationId: "getJPAClans",
+        description: "Fetches all JPA clans.",
+        tags: ["coc"],
+        responses: {
+            200: {
+                description: "Successful response with the JPA clans.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getJPAClansData)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when fetching JPA clans fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const clans = await getClanTags();
+            return c.json({
+                success: true,
+                data: { clans },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch JPA clans" }, 500);
         }
     },
 );

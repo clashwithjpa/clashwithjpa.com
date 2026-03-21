@@ -49,8 +49,6 @@ export const clanInfoTable = pgTable(
         attacksRequirement: integer("attacks_requirement").notNull(),
         donationsRequirement: integer("donations_requirement").notNull(),
         clangamesRequirement: integer("clangames_requirement").notNull(),
-        cocClanData: jsonb("coc_clan_data"),
-        cocClanCurrentWarData: jsonb("coc_clan_current_war_data"),
     },
     (t) => [
         index("clan_info_coc_clan_code_idx").on(t.cocClanCode),

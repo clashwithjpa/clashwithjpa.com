@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { config } from "@/lib/config";
 import * as Sentry from "@sentry/bun";
 import { auth } from "@lib/auth";
 import { Hono } from "hono";
@@ -15,26 +16,22 @@ import { compress } from "@hono/bun-compress";
 import { betterAuthMiddleware } from "@/lib/middlewares";
 import { openAPIRouteHandler } from "hono-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import { validator as zValidator, resolver, describeRoute } from "hono-openapi";
+import { resolver, describeRoute } from "hono-openapi";
 import z4 from "zod/v4";
-import { ApiResponseSchema, SuccessResponseSchema, ErrorResponseSchema } from "@/lib/types";
+import { type AppEnv, SuccessResponseSchema, ErrorResponseSchema } from "@/lib/types";
 import coc from "./routes/coc";
+import user from "./routes/user";
 
 const client = new RedisClient("redis://default@localhost:7102");
 
-const app = new Hono<{
-    Variables: {
-        user: typeof auth.$Infer.Session.user | null;
-        session: typeof auth.$Infer.Session.session | null;
-    } & RequestIdVariables;
-}>();
+const app = new Hono<AppEnv>();
 
 app.use(
     "*",
     every(
         logger(),
         cors({
-            origin: [process.env.JPA_AUTH_URL!, process.env.JPA_APP_URL!],
+            origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
             allowHeaders: ["Content-Type", "Authorization"],
             allowMethods: ["POST", "GET", "OPTIONS"],
             exposeHeaders: ["Content-Length"],
@@ -42,7 +39,7 @@ app.use(
             credentials: true,
         }),
         csrf({
-            origin: [process.env.JPA_AUTH_URL!, process.env.JPA_APP_URL!],
+            origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
         }),
 
         // Use cloudflare ray id in production - https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/
@@ -168,7 +165,9 @@ app.post(
     },
 );
 
+// Routes here
 app.route("/coc", coc);
+app.route("/user", user);
 
 app.get(
     "/openapi.json",

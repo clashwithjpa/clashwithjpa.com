@@ -1,5 +1,6 @@
 import type { APIGuildMember } from "discord-api-types/v10";
 import type { RESTGetAPIGuildMemberResult } from "discord-api-types/v10";
+import { config } from "@/lib/config";
 
 interface CheckUserInGuildResult {
     exists: boolean;
@@ -9,7 +10,7 @@ interface CheckUserInGuildResult {
 }
 
 export async function checkUserInGuild(guildId: string, userId: string): Promise<CheckUserInGuildResult> {
-    const token = process.env.JPA_DISCORD_BOT_TOKEN;
+    const token = config.JPA_DISCORD_BOT_TOKEN;
 
     if (!token) {
         return {

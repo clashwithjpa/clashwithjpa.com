@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/bun";
 import { createMiddleware } from "hono/factory";
 import { auth } from "@lib/auth";
 import { isAuthenticated } from "@/lib/auth/functions";
@@ -14,12 +13,6 @@ export const betterAuthMiddleware = createMiddleware(async (c, next) => {
     c.set("user", session.user);
     c.set("session", session.session);
 
-    if (session?.user?.email) {
-        Sentry.setUser({
-            email: session.user.email,
-            id: session.user.id,
-        });
-    }
     await next();
 });
 

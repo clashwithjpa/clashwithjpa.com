@@ -1,13 +1,13 @@
-import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
-import { db } from "../db";
+import { db } from "@lib/db";
 import { ac, admin, manager, reviewer, unverified, verified } from "./permissions";
+import { config } from "@/lib/config";
 
 export const auth = betterAuth({
-    secret: process.env.JPA_AUTH_SECRET,
-    baseURL: process.env.JPA_AUTH_URL,
+    secret: config.JPA_AUTH_SECRET,
+    baseURL: config.JPA_AUTH_URL,
     database: drizzleAdapter(db, {
         provider: "pg",
     }),
@@ -26,8 +26,8 @@ export const auth = betterAuth({
     },
     socialProviders: {
         discord: {
-            clientId: process.env.JPA_DISCORD_ID!,
-            clientSecret: process.env.JPA_DISCORD_SECRET!,
+            clientId: config.JPA_DISCORD_ID,
+            clientSecret: config.JPA_DISCORD_SECRET,
             overrideUserInfoOnSignIn: true,
             disableDefaultScope: true,
             scope: ["identify", "email", "guilds", "guilds.members.read"],
@@ -49,7 +49,7 @@ export const auth = betterAuth({
         openAPI(),
         captcha({
             provider: "cloudflare-turnstile",
-            secretKey: process.env.JPA_TURNSTILE_SECRET_KEY!,
+            secretKey: config.JPA_TURNSTILE_SECRET_KEY,
         }),
     ],
     advanced: {
@@ -67,6 +67,6 @@ export const auth = betterAuth({
             maxAge: 1 * 30, // Cache duration in seconds
         },
     },
-    trustedOrigins: ["http://localhost:5173", process.env.JPA_APP_URL!],
+    trustedOrigins: ["http://localhost:5173", config.JPA_APP_URL],
     experimental: { joins: true },
 });
