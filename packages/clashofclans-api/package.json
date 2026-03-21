@@ -1,0 +1,18 @@
+{
+    "name": "@repo/clashofclans-api",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "dependencies": {
+        "ioredis": "^5.10.0",
+        "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "@repo/typescript-config": "workspace:*"
+    }
+}

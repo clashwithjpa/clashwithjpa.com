@@ -25,6 +25,7 @@
       "dependencies": {
         "@hono/bun-compress": "^0.1.0",
         "@hono/standard-validator": "^0.2.2",
+        "@repo/clashofclans-api": "workspace:*",
         "@scalar/hono-api-reference": "^0.10.3",
         "@sentry/bun": "^10.43.0",
         "better-auth": "^1.4.18",
@@ -88,6 +89,17 @@
         "typescript": "^5.9.3",
         "unplugin-icons": "^23.0.1",
         "vite": "^7.3.1",
+      },
+    },
+    "packages/clashofclans-api": {
+      "name": "@repo/clashofclans-api",
+      "version": "0.0.1",
+      "dependencies": {
+        "ioredis": "^5.10.0",
+        "zod": "^4.3.6",
+      },
+      "devDependencies": {
+        "@repo/typescript-config": "workspace:*",
       },
     },
     "packages/eslint-config": {
@@ -412,6 +424,8 @@
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
     "@prisma/instrumentation": ["@prisma/instrumentation@7.4.2", "", { "dependencies": { "@opentelemetry/instrumentation": "^0.207.0" }, "peerDependencies": { "@opentelemetry/api": "^1.8" } }, "sha512-r9JfchJF1Ae6yAxcaLu/V1TGqBhAuSDe3mRNOssBfx1rMzfZ4fdNvrgUBwyb/TNTGXFxlH9AZix5P257x07nrg=="],
+
+    "@repo/clashofclans-api": ["@repo/clashofclans-api@workspace:packages/clashofclans-api"],
 
     "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
 
