@@ -111,6 +111,7 @@ export {
     APIPlayerClanSchema,
     APIPlayerAchievementSchema,
     APIPlayerItemSchema,
+    APIPlayerEquipmentItemSchema,
     APIVerifyTokenSchema,
     APIBattleLogEntrySchema,
     APIBattleLogEntryListSchema,

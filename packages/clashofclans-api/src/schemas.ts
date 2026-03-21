@@ -415,12 +415,20 @@ export const APIPlayerAchievementSchema: z4.ZodType<APIPlayerAchievement> = z4.o
     village: z4.enum(["home", "builderBase"]),
 }) as unknown as z4.ZodType<APIPlayerAchievement>;
 
+export const APIPlayerEquipmentItemSchema = z4.object({
+    name: z4.string(),
+    level: z4.number(),
+    maxLevel: z4.number(),
+    superTroopIsActive: z4.boolean().optional(),
+    village: z4.enum(["home", "builderBase"]),
+});
+
 export const APIPlayerItemSchema: z4.ZodType<APIPlayerItem> = z4.object({
     name: z4.string(),
     level: z4.number(),
     maxLevel: z4.number(),
     superTroopIsActive: z4.boolean().optional(),
-    equipment: z4.lazy(() => z4.array(APIPlayerItemSchema)).optional(),
+    equipment: z4.array(APIPlayerEquipmentItemSchema).optional(),
     village: z4.enum(["home", "builderBase"]),
 });
 

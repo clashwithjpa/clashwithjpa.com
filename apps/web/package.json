@@ -1,22 +1,21 @@
 {
     "name": "web",
-    "private": true,
     "version": "0.0.1",
+    "private": true,
     "type": "module",
-    "packageManager": "bun@1.3.3",
     "scripts": {
-        "dev": "vite dev",
         "build": "vite build",
         "build:cap": "cross-env CAPACITOR=true bun run build && bunx cap sync",
-        "preview": "vite preview",
-        "prepare": "svelte-kit sync || echo ''",
+        "cap:run:android": "bunx cap run android",
+        "cap:run:ios": "bunx cap run ios",
+        "cap:sync": "bunx cap sync",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+        "dev": "vite dev",
         "format": "prettier --write . --ignore-path ../../.prettierignore",
         "format:check": "prettier --check . --ignore-path ../../.prettierignore",
-        "cap:sync": "bunx cap sync",
-        "cap:run:android": "bunx cap run android",
-        "cap:run:ios": "bunx cap run ios"
+        "prepare": "svelte-kit sync || echo ''",
+        "preview": "vite preview"
     },
     "dependencies": {
         "@ark-ui/svelte": "^5.19.1",
@@ -33,6 +32,12 @@
         "@capacitor/cli": "^8.0.2",
         "@iconify-json/simple-icons": "^1.2.73",
         "@iconify-json/tabler": "^1.2.31",
+        "@kubb/cli": "^4.36.2",
+        "@kubb/core": "^4.36.2",
+        "@kubb/plugin-client": "^4.36.2",
+        "@kubb/plugin-oas": "^4.36.2",
+        "@kubb/plugin-svelte-query": "^4.36.2",
+        "@kubb/plugin-ts": "^4.36.2",
         "@repo/eslint-config": "workspace:*",
         "@repo/prettier-config": "workspace:*",
         "@repo/typescript-config": "workspace:*",
@@ -53,5 +58,6 @@
         "typescript": "^5.9.3",
         "unplugin-icons": "^23.0.1",
         "vite": "^7.3.1"
-    }
+    },
+    "packageManager": "bun@1.3.3"
 }
