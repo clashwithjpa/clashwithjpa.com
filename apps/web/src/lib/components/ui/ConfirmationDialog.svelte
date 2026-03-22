@@ -70,9 +70,9 @@
         </Dialog.Trigger>
         <Portal>
             <Dialog.Backdrop
-                class="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-sm transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:animate-in data-[state=open]:fade-in"
+                class="fixed inset-0 z-9999 bg-stone-950/60 backdrop-blur-sm transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:animate-in data-[state=open]:fade-in"
             />
-            <Dialog.Positioner class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <Dialog.Positioner class="fixed inset-0 z-9999 flex items-center justify-center p-4">
                 <Dialog.Content
                     class="flex w-full max-w-md flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-6 shadow-2xl transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                 >
