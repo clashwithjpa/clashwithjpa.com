@@ -15,7 +15,9 @@
         "prepare": "husky"
     },
     "prettier": "./packages/prettier-config",
-    "dependencies": {},
+    "dependencies": {
+        "@typescript/native-preview": "^7.0.0-dev.20260322.1"
+    },
     "devDependencies": {
         "@commitlint/cli": "^20.5.0",
         "@commitlint/config-conventional": "^20.5.0",
