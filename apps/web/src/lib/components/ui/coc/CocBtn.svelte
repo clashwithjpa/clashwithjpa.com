@@ -3,7 +3,7 @@
     import type { Snippet } from "svelte";
 
     let {
-        href = "#",
+        href = "",
         variant = "green",
         size = "base",
         class: className = "",
