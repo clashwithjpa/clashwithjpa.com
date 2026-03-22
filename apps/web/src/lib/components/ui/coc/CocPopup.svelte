@@ -40,8 +40,8 @@
         aboveNavbar?: boolean;
     } = $props();
 
-    // Z-index: z-30 for body popups (below navbar), z-[9999] for navbar popups (above navbar and everything)
-    const zIndex = $derived(aboveNavbar ? "z-[9999]" : "z-30");
+    // Z-index: z-30 for body popups (below navbar), z-9999 for navbar popups (above navbar and everything)
+    const zIndex = $derived(aboveNavbar ? "z-9999" : "z-30");
 
     let isMobile = $state(false);
 

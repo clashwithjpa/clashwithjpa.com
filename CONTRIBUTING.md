@@ -116,21 +116,22 @@ To prevent a messy combination of different margin/padding/gap and sizing values
 
 To prevent z-index wars and spaghetti overlay positioning, adhere strictly to the following mapped scale:
 
-| Z-Index        | Usage                              | Examples                                                                   |
-| :------------- | :--------------------------------- | :------------------------------------------------------------------------- |
-| **`-z-10`**    | Background artwork, videos         | Background video loops (`#bg-video`), ambient gradients                    |
-| **`z-0`**      | Standard page content              | Text, standard images, grids, inline buttons                               |
-| **`z-10`**     | Elevated content, sticky headers   | Sticky section headers (*rarely needed*)                                   |
-| **`z-30`**     | Body-level floating overlays       | `CocPopup` in body content (*stays below navbar*)                          |
-| **`z-40`**     | Global persistent floating UI      | `Navbar` component only                                                    |
-| **`z-60`**     | Tooltips, popovers, drawers etc... | `ControlsPopup`, `Button` (*for tooltips*), `Popover`, `Drawer` components |
-| **`z-[9999]`** | Navbar-level floating overlays     | `CocPopup` with `aboveNavbar={true}` (*user avatar dropdown*)              |
+| Z-Index      | Usage                                                 | Examples                                                                                    |
+| :----------- | :---------------------------------------------------- | :------------------------------------------------------------------------------------------ |
+| **`-z-10`**  | Background artwork, videos                            | Background video loops (`#bg-video`), ambient gradients                                     |
+| **`z-0`**    | Standard page content                                 | Text, standard images, grids, inline buttons                                                |
+| **`z-10`**   | Elevated content, sticky headers                      | Sticky section headers (*rarely needed*)                                                    |
+| **`z-30`**   | Body-level floating overlays                          | `CocPopup` in body content (*stays below navbar*)                                           |
+| **`z-40`**   | Global persistent floating UI                         | `Navbar` component only                                                                     |
+| **`z-60`**   | Tooltips, popovers, drawers etc...                    | `ControlsPopup`, `Button` (*for tooltips*), `Popover`, `Drawer` components                  |
+| **`z-9999`** | Top level floating components appears over everything | `CocPopup` with `aboveNavbar={true}` (*user avatar dropdown*) and `ControlsPopup` component |
 
 Do not invent intermediate z-indexes outside of this scale.
 
-**Note:** The `CocPopup` component accepts an `aboveNavbar` prop:
-- `aboveNavbar={false}` (default): Uses `z-30` for body popups that should stay below the navbar
-- `aboveNavbar={true}`: Uses `z-[9999]` for navbar popups that should appear above the navbar
+> [!NOTE]
+> The `CocPopup` component accepts an `aboveNavbar` prop
+>   - `aboveNavbar={false}` (default): Uses `z-30` for body popups that should stay below the navbar
+>   - `aboveNavbar={true}`: Uses `z-9999` for navbar popups that should appear above the navbar
 
 ---
 
