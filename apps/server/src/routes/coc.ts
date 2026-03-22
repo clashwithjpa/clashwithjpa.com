@@ -412,10 +412,9 @@ const getJPAClansData = z4.object({
 });
 app.get(
     "/jpa/clans",
-    hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getJPAClans",
-        description: "[Authenticated] Fetches all JPA clans.",
+        description: "[Public] Fetches all JPA clans.",
         tags: ["coc"],
         responses: {
             200: {
