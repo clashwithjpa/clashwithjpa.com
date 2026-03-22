@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
     GetCOCPlayerBattleLogQueryResponse,
     GetCOCPlayerBattleLogPathParams,
@@ -11,27 +10,13 @@ import type {
 } from "../models/GetCOCPlayerBattleLog.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCPlayerBattleLog } from "../clients/getCOCPlayerBattleLog.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCPlayerBattleLogQueryKey = (tag: GetCOCPlayerBattleLogPathParams["tag"]) =>
     [{ url: "/coc/player/:tag/battlelog", params: { tag: tag } }] as const;
 
 export type GetCOCPlayerBattleLogQueryKey = ReturnType<typeof getCOCPlayerBattleLogQueryKey>;
-
-/**
- * @description [Authenticated] Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.
- * {@link /coc/player/:tag/battlelog}
- */
-export async function getCOCPlayerBattleLog(tag: GetCOCPlayerBattleLogPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCPlayerBattleLogQueryResponse, ResponseErrorConfig<GetCOCPlayerBattleLog500>, unknown>({
-        method: "GET",
-        url: `/coc/player/${tag}/battlelog`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCPlayerBattleLogQueryOptions(
     tag: GetCOCPlayerBattleLogPathParams["tag"],

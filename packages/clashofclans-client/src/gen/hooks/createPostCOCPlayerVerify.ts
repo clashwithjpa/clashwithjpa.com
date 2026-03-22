@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
     PostCOCPlayerVerifyMutationRequest,
     PostCOCPlayerVerifyMutationResponse,
@@ -12,33 +11,12 @@ import type {
 } from "../models/PostCOCPlayerVerify.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { postCOCPlayerVerify } from "../clients/postCOCPlayerVerify.ts";
 import { createMutation } from "@tanstack/svelte-query";
 
 export const postCOCPlayerVerifyMutationKey = () => [{ url: "/coc/player/:tag/verifytoken" }] as const;
 
 export type PostCOCPlayerVerifyMutationKey = ReturnType<typeof postCOCPlayerVerifyMutationKey>;
-
-/**
- * @description [Authenticated] Verifies a Clash of Clans player's API token.
- * {@link /coc/player/:tag/verifytoken}
- */
-export async function postCOCPlayerVerify(
-    tag: PostCOCPlayerVerifyPathParams["tag"],
-    data: PostCOCPlayerVerifyMutationRequest,
-    config: Partial<RequestConfig<PostCOCPlayerVerifyMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const requestData = data;
-
-    const res = await request<PostCOCPlayerVerifyMutationResponse, ResponseErrorConfig<PostCOCPlayerVerify500>, PostCOCPlayerVerifyMutationRequest>({
-        method: "POST",
-        url: `/coc/player/${tag}/verifytoken`,
-        data: requestData,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 /**
  * @description [Authenticated] Verifies a Clash of Clans player's API token.

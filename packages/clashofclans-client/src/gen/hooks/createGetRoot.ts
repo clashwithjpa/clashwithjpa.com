@@ -3,26 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetRootQueryResponse } from "../models/GetRoot.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getRoot } from "../clients/getRoot.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getRootQueryKey = () => [{ url: "/" }] as const;
 
 export type GetRootQueryKey = ReturnType<typeof getRootQueryKey>;
-
-/**
- * @description [Public] Welcome route for the API. This route is used to verify that the API is up and running.
- * {@link /}
- */
-export async function getRoot(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetRootQueryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/`, ...requestConfig });
-    return res.data;
-}
 
 export function getRootQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getRootQueryKey();

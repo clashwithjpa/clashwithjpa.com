@@ -3,30 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetCOCClanQueryResponse, GetCOCClanPathParams, GetCOCClan500 } from "../models/GetCOCClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCClan } from "../clients/getCOCClan.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCClanQueryKey = (tag: GetCOCClanPathParams["tag"]) => [{ url: "/coc/clan/:tag", params: { tag: tag } }] as const;
 
 export type GetCOCClanQueryKey = ReturnType<typeof getCOCClanQueryKey>;
-
-/**
- * @description [Public] Fetches a Clash of Clans clan's data by its tag. The tag must start with #.
- * {@link /coc/clan/:tag}
- */
-export async function getCOCClan(tag: GetCOCClanPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCClanQueryResponse, ResponseErrorConfig<GetCOCClan500>, unknown>({
-        method: "GET",
-        url: `/coc/clan/${tag}`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCClanQueryOptions(tag: GetCOCClanPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getCOCClanQueryKey(tag);

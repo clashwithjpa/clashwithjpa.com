@@ -3,30 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetUserAccountsQueryResponse, GetUserAccounts401, GetUserAccounts500 } from "../models/GetUserAccounts.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getUserAccounts } from "../clients/getUserAccounts.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getUserAccountsQueryKey = () => [{ url: "/user/accounts" }] as const;
 
 export type GetUserAccountsQueryKey = ReturnType<typeof getUserAccountsQueryKey>;
-
-/**
- * @description [Verified] Fetches the current user's Clash of Clans accounts.
- * {@link /user/accounts}
- */
-export async function getUserAccounts(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetUserAccountsQueryResponse, ResponseErrorConfig<GetUserAccounts401 | GetUserAccounts500>, unknown>({
-        method: "GET",
-        url: `/user/accounts`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getUserAccountsQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getUserAccountsQueryKey();

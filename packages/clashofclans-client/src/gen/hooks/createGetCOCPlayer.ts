@@ -3,30 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetCOCPlayerQueryResponse, GetCOCPlayerPathParams, GetCOCPlayer500 } from "../models/GetCOCPlayer.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCPlayer } from "../clients/getCOCPlayer.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCPlayerQueryKey = (tag: GetCOCPlayerPathParams["tag"]) => [{ url: "/coc/player/:tag", params: { tag: tag } }] as const;
 
 export type GetCOCPlayerQueryKey = ReturnType<typeof getCOCPlayerQueryKey>;
-
-/**
- * @description [Authenticated] Fetches a Clash of Clans player's data by their tag. The tag must start with #.
- * {@link /coc/player/:tag}
- */
-export async function getCOCPlayer(tag: GetCOCPlayerPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCPlayerQueryResponse, ResponseErrorConfig<GetCOCPlayer500>, unknown>({
-        method: "GET",
-        url: `/coc/player/${tag}`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCPlayerQueryOptions(tag: GetCOCPlayerPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getCOCPlayerQueryKey(tag);

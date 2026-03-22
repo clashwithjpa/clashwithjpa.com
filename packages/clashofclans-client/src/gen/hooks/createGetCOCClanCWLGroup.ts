@@ -3,31 +3,16 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetCOCClanCWLGroupQueryResponse, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroup500 } from "../models/GetCOCClanCWLGroup.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCClanCWLGroup } from "../clients/getCOCClanCWLGroup.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCClanCWLGroupQueryKey = (tag: GetCOCClanCWLGroupPathParams["tag"]) =>
     [{ url: "/coc/clan/:tag/currentwar/leaguegroup", params: { tag: tag } }] as const;
 
 export type GetCOCClanCWLGroupQueryKey = ReturnType<typeof getCOCClanCWLGroupQueryKey>;
-
-/**
- * @description [Authenticated] Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
- * {@link /coc/clan/:tag/currentwar/leaguegroup}
- */
-export async function getCOCClanCWLGroup(tag: GetCOCClanCWLGroupPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCClanCWLGroupQueryResponse, ResponseErrorConfig<GetCOCClanCWLGroup500>, unknown>({
-        method: "GET",
-        url: `/coc/clan/${tag}/currentwar/leaguegroup`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCClanCWLGroupQueryOptions(tag: GetCOCClanCWLGroupPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getCOCClanCWLGroupQueryKey(tag);

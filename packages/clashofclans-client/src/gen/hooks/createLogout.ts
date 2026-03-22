@@ -3,26 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { LogoutMutationResponse, Logout500 } from "../models/Logout.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { logout } from "../clients/logout.ts";
 import { createMutation } from "@tanstack/svelte-query";
 
 export const logoutMutationKey = () => [{ url: "/logout" }] as const;
 
 export type LogoutMutationKey = ReturnType<typeof logoutMutationKey>;
-
-/**
- * @description [Public] Use this only for backend/scalar usage. For frontend, authClient should be used.
- * {@link /logout}
- */
-export async function logout(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<LogoutMutationResponse, ResponseErrorConfig<Logout500>, unknown>({ method: "POST", url: `/logout`, ...requestConfig });
-    return res.data;
-}
 
 /**
  * @description [Public] Use this only for backend/scalar usage. For frontend, authClient should be used.

@@ -1,7 +1,8 @@
 import { defineConfig } from "@kubb/core";
+import { pluginClient } from "@kubb/plugin-client";
 import { pluginOas } from "@kubb/plugin-oas";
-import { pluginTs } from "@kubb/plugin-ts";
 import { pluginSvelteQuery } from "@kubb/plugin-svelte-query";
+import { pluginTs } from "@kubb/plugin-ts";
 import { pluginZod } from "@kubb/plugin-zod";
 
 export default defineConfig({
@@ -23,6 +24,9 @@ export default defineConfig({
         }),
         pluginZod({
             output: { path: "zod" },
+        }),
+        pluginClient({
+            client: "fetch",
         }),
     ],
 });

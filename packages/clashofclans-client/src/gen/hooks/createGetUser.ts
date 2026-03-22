@@ -3,30 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetUserQueryResponse, GetUser401, GetUser500 } from "../models/GetUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getUser } from "../clients/getUser.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getUserQueryKey = () => [{ url: "/user" }] as const;
 
 export type GetUserQueryKey = ReturnType<typeof getUserQueryKey>;
-
-/**
- * @description [Authenticated] Fetches the current user's data.
- * {@link /user}
- */
-export async function getUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetUserQueryResponse, ResponseErrorConfig<GetUser401 | GetUser500>, unknown>({
-        method: "GET",
-        url: `/user`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getUserQueryKey();

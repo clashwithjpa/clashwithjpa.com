@@ -3,31 +3,16 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetCOCCWLWarQueryResponse, GetCOCCWLWarPathParams, GetCOCCWLWar500 } from "../models/GetCOCCWLWar.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCCWLWar } from "../clients/getCOCCWLWar.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCCWLWarQueryKey = (warTag: GetCOCCWLWarPathParams["warTag"]) =>
     [{ url: "/coc/cwl/wars/:warTag", params: { warTag: warTag } }] as const;
 
 export type GetCOCCWLWarQueryKey = ReturnType<typeof getCOCCWLWarQueryKey>;
-
-/**
- * @description [Authenticated] Fetches a CWL war's details by its war tag. The tag must start with #.
- * {@link /coc/cwl/wars/:warTag}
- */
-export async function getCOCCWLWar(warTag: GetCOCCWLWarPathParams["warTag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCCWLWarQueryResponse, ResponseErrorConfig<GetCOCCWLWar500>, unknown>({
-        method: "GET",
-        url: `/coc/cwl/wars/${warTag}`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCCWLWarQueryOptions(warTag: GetCOCCWLWarPathParams["warTag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getCOCCWLWarQueryKey(warTag);

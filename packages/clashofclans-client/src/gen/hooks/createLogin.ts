@@ -3,26 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { LoginQueryResponse } from "../models/Login.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { login } from "../clients/login.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const loginQueryKey = () => [{ url: "/login" }] as const;
 
 export type LoginQueryKey = ReturnType<typeof loginQueryKey>;
-
-/**
- * @description [Public] Use this only for backend/scalar usage. For frontend, authClient should be used.
- * {@link /login}
- */
-export async function login(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<LoginQueryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/login`, ...requestConfig });
-    return res.data;
-}
 
 export function loginQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = loginQueryKey();

@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
     ApplyUserAccountMutationRequest,
     ApplyUserAccountMutationResponse,
@@ -14,31 +13,12 @@ import type {
 } from "../models/ApplyUserAccount.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { applyUserAccount } from "../clients/applyUserAccount.ts";
 import { createMutation } from "@tanstack/svelte-query";
 
 export const applyUserAccountMutationKey = () => [{ url: "/user/accounts/apply" }] as const;
 
 export type ApplyUserAccountMutationKey = ReturnType<typeof applyUserAccountMutationKey>;
-
-/**
- * @description [Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.
- * {@link /user/accounts/apply}
- */
-export async function applyUserAccount(
-    data: ApplyUserAccountMutationRequest,
-    config: Partial<RequestConfig<ApplyUserAccountMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const requestData = data;
-
-    const res = await request<
-        ApplyUserAccountMutationResponse,
-        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500>,
-        ApplyUserAccountMutationRequest
-    >({ method: "POST", url: `/user/accounts/apply`, data: requestData, ...requestConfig });
-    return res.data;
-}
 
 /**
  * @description [Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.

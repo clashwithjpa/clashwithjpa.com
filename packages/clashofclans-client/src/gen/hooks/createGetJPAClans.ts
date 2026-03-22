@@ -3,30 +3,15 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetJPAClansQueryResponse, GetJPAClans500 } from "../models/GetJPAClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getJPAClans } from "../clients/getJPAClans.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getJPAClansQueryKey = () => [{ url: "/coc/jpa/clans" }] as const;
 
 export type GetJPAClansQueryKey = ReturnType<typeof getJPAClansQueryKey>;
-
-/**
- * @description [Public] Fetches all JPA clans.
- * {@link /coc/jpa/clans}
- */
-export async function getJPAClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetJPAClansQueryResponse, ResponseErrorConfig<GetJPAClans500>, unknown>({
-        method: "GET",
-        url: `/coc/jpa/clans`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getJPAClansQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getJPAClansQueryKey();

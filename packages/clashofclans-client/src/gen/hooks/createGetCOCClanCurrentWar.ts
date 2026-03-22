@@ -3,31 +3,16 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetCOCClanCurrentWarQueryResponse, GetCOCClanCurrentWarPathParams, GetCOCClanCurrentWar500 } from "../models/GetCOCClanCurrentWar.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
+import { getCOCClanCurrentWar } from "../clients/getCOCClanCurrentWar.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCOCClanCurrentWarQueryKey = (tag: GetCOCClanCurrentWarPathParams["tag"]) =>
     [{ url: "/coc/clan/:tag/currentwar", params: { tag: tag } }] as const;
 
 export type GetCOCClanCurrentWarQueryKey = ReturnType<typeof getCOCClanCurrentWarQueryKey>;
-
-/**
- * @description [Public] Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
- * {@link /coc/clan/:tag/currentwar}
- */
-export async function getCOCClanCurrentWar(tag: GetCOCClanCurrentWarPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
-
-    const res = await request<GetCOCClanCurrentWarQueryResponse, ResponseErrorConfig<GetCOCClanCurrentWar500>, unknown>({
-        method: "GET",
-        url: `/coc/clan/${tag}/currentwar`,
-        ...requestConfig,
-    });
-    return res.data;
-}
 
 export function getCOCClanCurrentWarQueryOptions(
     tag: GetCOCClanCurrentWarPathParams["tag"],
