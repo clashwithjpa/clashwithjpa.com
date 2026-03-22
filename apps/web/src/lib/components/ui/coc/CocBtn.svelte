@@ -4,6 +4,7 @@
 
     let {
         href = "",
+        target = "_blank",
         variant = "green",
         size = "base",
         class: className = "",
@@ -11,6 +12,7 @@
         children,
     }: {
         href?: string;
+        target?: string;
         variant?: "green" | "orange" | "red" | "blurple";
         size?: "xs" | "sm" | "base" | "lg";
         class?: string;
@@ -54,26 +56,29 @@
     let isPressed = false;
 </script>
 
-<a
+<svelte:element
+    this={href ? "a" : "button"}
     {href}
+    {target}
+    role={href ? "link" : "button"}
     class={`relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-[1.2] font-bold tracking-wide text-white shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
-    onpointerdown={(e) => {
+    onpointerdown={(e: PointerEvent) => {
         isPressed = true;
         bounceDown(e.currentTarget as Element);
     }}
-    onpointerup={(e) => {
+    onpointerup={(e: PointerEvent) => {
         if (isPressed) {
             isPressed = false;
             bounceUp(e.currentTarget as Element);
         }
     }}
-    onpointerleave={(e) => {
+    onpointerleave={(e: PointerEvent) => {
         if (isPressed) {
             isPressed = false;
             bounceUp(e.currentTarget as Element);
         }
     }}
-    onclick={(e) => {
+    onclick={() => {
         onclick?.();
     }}
 >
@@ -81,7 +86,7 @@
     <span class={`absolute inset-0.5 rounded-[10px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
     <span class={`absolute inset-x-1.5 top-1.5 h-1/2 rounded-lg bg-linear-to-b ${v.gloss} opacity-70`}></span>
     <span class="text-shadow relative flex items-center gap-2 px-1.25">{@render children()}</span>
-</a>
+</svelte:element>
 
 <style>
     .text-shadow {

@@ -82,10 +82,6 @@
         return map[freq] || freq;
     };
 
-    const openClanInGame = () => {
-        window.open(`https://link.clashofclans.com/?action=OpenClanProfile&tag=${encodedClanTag}`, "_blank");
-    };
-
     const copyTagToClipboard = async () => {
         try {
             await navigator.clipboard.writeText(clanTag);
@@ -278,7 +274,13 @@
                     {/snippet}
                 </CocPopup>
 
-                <CocBtn variant="green" size="sm" class="w-full" onclick={openClanInGame}>
+                <CocBtn
+                    variant="green"
+                    size="sm"
+                    class="w-full"
+                    href="https://link.clashofclans.com/?action=OpenClanProfile&tag={encodedClanTag}"
+                    target="_blank"
+                >
                     <span>Open</span>
                 </CocBtn>
             </div>
