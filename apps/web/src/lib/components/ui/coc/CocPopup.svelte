@@ -15,6 +15,7 @@
         contentClass = "",
         title = "",
         onOpenChange,
+        aboveNavbar = false,
     }: {
         trigger: Snippet;
         children: Snippet;
@@ -36,7 +37,11 @@
         contentClass?: string;
         title?: string;
         onOpenChange?: (details: { open: boolean }) => void;
+        aboveNavbar?: boolean;
     } = $props();
+
+    // Z-index: z-30 for body popups (below navbar), z-[9999] for navbar popups (above navbar and everything)
+    const zIndex = $derived(aboveNavbar ? "z-[9999]" : "z-30");
 
     let isMobile = $state(false);
 
@@ -63,9 +68,12 @@
             </div>
         </Drawer.Trigger>
         <Drawer.Portal>
-            <Drawer.Overlay class="fixed inset-0 z-60 bg-stone-950/60 backdrop-blur-sm transition-all duration-200" />
+            <Drawer.Overlay class={cn("fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200", zIndex)} />
             <Drawer.Content
-                class="fixed inset-x-0 bottom-0 z-60 mt-24 overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)] outline-none focus:outline-none"
+                class={cn(
+                    "fixed inset-x-0 bottom-0 mt-24 overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)] outline-none focus:outline-none",
+                    zIndex,
+                )}
             >
                 <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
                 <span class={`absolute inset-0.5 rounded-t-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
@@ -74,7 +82,7 @@
                 <div class="relative z-10 flex h-full flex-col">
                     {#if title}
                         <div class="flex items-center justify-center p-3 pt-5 pb-3">
-                            <h2 class="text-shadow font-coc text-[26px] font-black tracking-wider text-white uppercase">
+                            <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
                                 {title}
                             </h2>
                         </div>
@@ -100,12 +108,13 @@
         </Popover.Trigger>
 
         <Portal>
-            <Popover.Positioner class="z-60">
+            <Popover.Positioner class={cn("absolute", zIndex)}>
                 <Popover.Content
                     class={cn(
                         "relative overflow-hidden rounded-[20px] border border-black outline-none",
                         "transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
                         "shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_8px_24px_rgba(0,0,0,0.5)]",
+                        zIndex,
                     )}
                 >
                     <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
@@ -115,7 +124,7 @@
                     <div class="relative z-10 flex h-full flex-col">
                         {#if title}
                             <div class="flex items-center justify-center p-3 pt-5 pb-3">
-                                <h2 class="text-shadow font-coc text-[26px] font-black tracking-wider text-white uppercase">
+                                <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
                                     {title}
                                 </h2>
                             </div>
@@ -126,7 +135,7 @@
                         <div
                             class={`mx-2 mb-2 flex-1 overflow-hidden rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`}
                         >
-                            <div class={cn("h-full overflow-x-hidden overflow-y-auto p-4 text-stone-900", contentClass)}>
+                            <div class={cn("h-full max-w-96 overflow-x-hidden overflow-y-auto p-4  text-stone-900", contentClass)}>
                                 {@render children()}
                             </div>
                         </div>

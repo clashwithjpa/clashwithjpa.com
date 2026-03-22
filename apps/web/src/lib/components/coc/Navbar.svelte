@@ -1,6 +1,8 @@
 <script lang="ts">
+    import { page } from "$app/stores";
     import { authClient } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
+    import { cn } from "$lib/utils";
     import { fadeUp, wavyBounce } from "$lib/utils/animations";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
@@ -18,13 +20,20 @@
 
     const session = authClient.useSession();
 
+    const isHomePage = $derived($page.url.pathname === "/");
+
     $effect(() => {
         fadeUp(document.querySelectorAll(".animate-desktop"));
         wavyBounce(logo);
     });
 </script>
 
-<nav class="sticky top-0 z-40 flex items-center justify-between p-4 font-coc transition-all duration-200 md:p-6">
+<nav
+    class={cn(
+        "sticky top-0 z-40 flex items-center justify-between p-4 font-coc transition-all duration-200 md:p-6",
+        !isHomePage && "bg-stone-950/50 backdrop-blur-sm",
+    )}
+>
     <a href="/" class="flex h-12 items-center gap-4">
         <div class="size-12 bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');" bind:this={logo}></div>
         <div class="h-full border-l-2 border-stone-700/50"></div>
@@ -47,7 +56,7 @@
     {:else if $session.data?.user}
         {@const user = $session.data.user}
         {@const role = (user.role ?? null) as Role | null}
-        <CocPopup placement="bottom-end">
+        <CocPopup placement="bottom-end" aboveNavbar={true}>
             {#snippet trigger()}
                 <Avatar src={user.image} name={user.name} {role} size="md" />
             {/snippet}
@@ -58,7 +67,7 @@
                         <div class="flex flex-col gap-0.5">
                             <span class="font-coc font-bold">{user.name}</span>
                             {#if role && role in ROLE_CONFIG}
-                                <span class="font-coc text-sm text-stone-600">
+                                <span class="font-coc text-sm text-stone-700">
                                     {ROLE_CONFIG[role].label}
                                 </span>
                             {/if}

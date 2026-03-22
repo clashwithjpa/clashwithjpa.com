@@ -109,3 +109,16 @@ export const spinOnce = (el: Element) => {
         easing: "out(3)",
     });
 };
+
+export const cardSlideIn = (el: Element) => {
+    const children = Array.from(el.children);
+
+    animate(children, {
+        opacity: [0, 1],
+        y: [{ from: 30, to: 0 }],
+        scale: [{ from: 0.95, to: 1 }],
+        easing: "out(4)",
+        duration: DURATION.MEDIUM,
+        delay: stagger(80, { start: 100 }),
+    });
+};

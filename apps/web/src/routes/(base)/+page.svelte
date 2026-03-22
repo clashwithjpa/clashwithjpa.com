@@ -23,7 +23,10 @@
     });
 </script>
 
-<Seo title="Home" />
+<Seo
+    title="Home"
+    description="FWA experts in War-Farming, offering diverse clans and simultaneous 50v50 FWA wars and CWL action. Join one of the clans in our family today!"
+/>
 
 <video id="bg-video" autoplay muted loop class="absolute inset-0 -z-10 h-full w-full object-cover">
     <source src="/video/bg.mp4" type="video/mp4" />
