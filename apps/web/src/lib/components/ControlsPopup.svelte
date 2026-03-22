@@ -203,7 +203,7 @@
     }
 </script>
 
-<div {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])} class="fixed right-4 bottom-4 z-40">
+<div {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])} class="fixed right-4 bottom-4 z-60">
     <Popup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
             <Button class="size-14 rounded-full" size="" variant="ghost" onclick={(e) => spinOnce(e.currentTarget as Element)}>
