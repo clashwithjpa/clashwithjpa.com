@@ -16,6 +16,7 @@
         title = "",
         onOpenChange,
         aboveNavbar = false,
+        maxWidth = "max-w-96",
     }: {
         trigger: Snippet;
         children: Snippet;
@@ -38,6 +39,7 @@
         title?: string;
         onOpenChange?: (details: { open: boolean }) => void;
         aboveNavbar?: boolean;
+        maxWidth?: string;
     } = $props();
 
     // Z-index: z-30 for body popups (below navbar), z-9999 for navbar popups (above navbar and everything)
@@ -135,7 +137,7 @@
                         <div
                             class={`mx-2 mb-2 flex-1 overflow-hidden rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`}
                         >
-                            <div class={cn("h-full max-w-96 overflow-x-hidden overflow-y-auto p-4  text-stone-900", contentClass)}>
+                            <div class={cn("h-full overflow-x-hidden overflow-y-auto p-4 text-stone-900", maxWidth, contentClass)}>
                                 {@render children()}
                             </div>
                         </div>
