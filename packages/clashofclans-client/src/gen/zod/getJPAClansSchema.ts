@@ -11,7 +11,15 @@ import { z } from "zod/v4";
 export const getJPAClans200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        clans: z.array(z.string()),
+        clans: z.array(
+            z.object({}).catchall(
+                z.object({
+                    requiredAttacks: z.union([z.number(), z.null()]),
+                    requiredClangames: z.union([z.number(), z.null()]),
+                    requiredDonations: z.union([z.number(), z.null()]),
+                }),
+            ),
+        ),
     }),
 });
 

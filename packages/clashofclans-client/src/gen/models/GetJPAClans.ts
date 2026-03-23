@@ -18,7 +18,13 @@ export type GetJPAClans200 = {
         /**
          * @type array
          */
-        clans: string[];
+        clans: {
+            [key: string]: {
+                requiredAttacks: number | null;
+                requiredClangames: number | null;
+                requiredDonations: number | null;
+            };
+        }[];
     };
 };
 

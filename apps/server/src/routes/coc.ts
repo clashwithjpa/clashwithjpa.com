@@ -1,21 +1,21 @@
-import { Hono } from "hono";
-import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { isAuthenticated } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
+import { getClansWithRequirements } from "@/lib/db/functions";
+import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import {
+    APIBattleLogEntryListSchema,
+    APIClanMemberListSchema,
+    APIClanSchema,
+    APIClanWarLeagueGroupSchema,
+    APIClanWarSchema,
     APIPlayerSchema,
     APIVerifyTokenSchema,
-    APIClanSchema,
-    APIClanMemberListSchema,
-    APIClanWarSchema,
-    APIClanWarLeagueGroupSchema,
-    APIBattleLogEntryListSchema,
 } from "@repo/clashofclans-api";
 import * as Sentry from "@sentry/bun";
+import { Hono } from "hono";
+import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
-import { getClanTags } from "@/lib/db/functions";
-import { validator as zValidator, resolver, describeRoute } from "hono-openapi";
-import { SuccessResponseSchema, ErrorResponseSchema, type AppEnv } from "@/lib/types";
 
 // All routes have /coc as a prefix
 // For routes you need to have specific auth requirements add the middleware
@@ -408,13 +408,22 @@ app.get(
 );
 
 const getJPAClansData = z4.object({
-    clans: z4.array(z4.string()),
+    clans: z4.array(
+        z4.record(
+            z4.string(),
+            z4.object({
+                requiredAttacks: z4.number().nullable(),
+                requiredClangames: z4.number().nullable(),
+                requiredDonations: z4.number().nullable(),
+            }),
+        ),
+    ),
 });
 app.get(
     "/jpa/clans",
     describeRoute({
         operationId: "getJPAClans",
-        description: "[Public] Fetches all JPA clans.",
+        description: "[Public] Fetches all JPA clans and their requirements.",
         tags: ["coc"],
         responses: {
             200: {
@@ -437,7 +446,7 @@ app.get(
     }),
     async (c) => {
         try {
-            const clans = await getClanTags();
+            const clans = await getClansWithRequirements();
             return c.json({
                 success: true,
                 data: { clans },

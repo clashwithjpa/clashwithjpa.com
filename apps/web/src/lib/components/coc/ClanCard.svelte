@@ -5,7 +5,7 @@
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import { cn } from "$lib/utils";
     import { cardSlideIn } from "$lib/utils/animations";
-    import type { GetCOCClan200 } from "@repo/clashofclans-client";
+    import type { GetCOCClan200, GetJPAClans200 } from "@repo/clashofclans-client";
     import { getCOCClan } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
@@ -14,15 +14,17 @@
     import Icon from "../ui/Icon.svelte";
 
     let {
-        clanTag,
+        clan,
         class: className = "",
         delay = 0,
     }: {
-        clanTag: string;
+        clan: GetJPAClans200["data"]["clans"][0];
         class?: string;
         delay?: number;
     } = $props();
 
+    const requirements = $derived(clan[Object.keys(clan)[0]]);
+    const clanTag = $derived(Object.keys(clan)[0]);
     const encodedClanTag = $derived(encodeURIComponent(clanTag));
     let clanData: GetCOCClan200["data"]["clan"] | null = $state(null);
     let loading = $state(true);
@@ -159,25 +161,25 @@
                 <h4 class="font-coc text-sm font-bold text-stone-800 uppercase">Minimum Requirements</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                        <Icon name="labels/trophypushing" class="size-12" />
+                        <Icon name="labels/attacks" class="size-12" />
                         <div class="flex flex-col">
-                            <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
-                            <span class="font-coc text-base font-black text-stone-900">{formatNumber(clanData.requiredTrophies)}</span>
+                            <span class="font-coc text-xs font-bold text-stone-700">Attacks</span>
+                            <span class="font-coc text-base font-black text-stone-900">{requirements.requiredAttacks}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                         <Icon name="labels/donations" class="size-12" />
                         <div class="flex flex-col">
-                            <span class="font-coc text-xs font-bold text-stone-700">Town Hall</span>
-                            <span class="font-coc text-base font-black text-stone-900">{clanData.requiredTownhallLevel ?? "Any"}</span>
+                            <span class="font-coc text-xs font-bold text-stone-700">Donations</span>
+                            <span class="font-coc text-base font-black text-stone-900">{requirements.requiredDonations}</span>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                    <Icon name="labels/attacks" class="size-12" />
+                    <Icon name="labels/clangames" class="size-12" />
                     <div class="flex flex-col">
-                        <span class="font-coc text-xs font-bold text-stone-700">War Frequency</span>
-                        <span class="font-coc text-sm font-black text-stone-900">{formatWarFrequency(clanData.warFrequency)}</span>
+                        <span class="font-coc text-xs font-bold text-stone-700">Clan Game Points</span>
+                        <span class="font-coc text-sm font-black text-stone-900">{requirements.requiredClangames}</span>
                     </div>
                 </div>
             </div>
@@ -293,7 +295,7 @@
                                         {#if coLeaders.length > 0}
                                             <div class="flex flex-col gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                                 <div class="flex items-center gap-1">
-                                                    <Icon name="labels/donations" class="size-8" />
+                                                    <Icon name="labels/competitive" class="size-8" />
                                                     <span class="font-coc text-sm font-bold text-stone-700">Co-Leaders</span>
                                                     <span class="font-coc text-xs font-bold text-stone-700">({coLeaders.length})</span>
                                                 </div>

@@ -30,9 +30,9 @@
     <!-- Clans Grid -->
     {#if data.clans.success && data.clans.data.clans.length > 0}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {#each data.clans.data.clans as clanTag, index}
+            {#each data.clans.data.clans as clan, index}
                 <div class="clan-card opacity-0">
-                    <ClanCard {clanTag} delay={index * 200} />
+                    <ClanCard {clan} delay={index * 200} />
                 </div>
             {/each}
         </div>

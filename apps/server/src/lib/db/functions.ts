@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { cocAccountTable, clanApplicationTable, account, clanInfoTable } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { account, clanApplicationTable, clanInfoTable, cocAccountTable } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -30,8 +30,21 @@ export async function addClanApplication(discordUserId: string, cocAccountTag: s
     return result[0];
 }
 
-export async function getClanTags() {
-    const result = await db.select({ cocClanTag: clanInfoTable.cocClanTag }).from(clanInfoTable);
+export async function getClansWithRequirements() {
+    const result = await db
+        .select({
+            cocClanTag: clanInfoTable.cocClanTag,
+            requiredAttacks: clanInfoTable.attacksRequirement,
+            requiredClangames: clanInfoTable.clangamesRequirement,
+            requiredDonations: clanInfoTable.donationsRequirement,
+        })
+        .from(clanInfoTable);
 
-    return result.map((clan) => clan.cocClanTag);
+    return result.map((clan) => ({
+        [clan.cocClanTag]: {
+            requiredAttacks: clan.requiredAttacks,
+            requiredClangames: clan.requiredClangames,
+            requiredDonations: clan.requiredDonations,
+        },
+    }));
 }

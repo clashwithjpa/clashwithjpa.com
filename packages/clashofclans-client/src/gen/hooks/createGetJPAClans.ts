@@ -24,7 +24,7 @@ export function getJPAClansQueryOptions(config: Partial<RequestConfig> & { clien
 }
 
 /**
- * @description [Public] Fetches all JPA clans.
+ * @description [Public] Fetches all JPA clans and their requirements.
  * {@link /coc/jpa/clans}
  */
 export function createGetJPAClans<
