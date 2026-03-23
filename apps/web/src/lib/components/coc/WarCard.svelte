@@ -264,14 +264,6 @@
                 </div>
             </div>
 
-            <!-- War Size -->
-            <div class="flex items-center justify-center">
-                <div class="flex items-center justify-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                    <Icon name="swords" class="size-8" />
-                    <span class="font-coc text-lg font-black text-stone-900">{teamSize > 0 ? `${teamSize}v${teamSize}` : "N/A"}</span>
-                </div>
-            </div>
-
             <!-- Timer -->
             {#if warState === "inWar" || warState === "preparation"}
                 <div class="flex items-center justify-center gap-6 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
