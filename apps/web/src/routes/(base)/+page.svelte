@@ -8,7 +8,6 @@
     import SimpleIconsGoogleplay from "~icons/simple-icons/googleplay";
 
     let links: { name: string; href: string }[] = [
-        { name: "Home", href: "/" },
         { name: "Clans", href: "/clans" },
         { name: "War Details", href: "/wars" },
         { name: "Rules", href: "/rules" },

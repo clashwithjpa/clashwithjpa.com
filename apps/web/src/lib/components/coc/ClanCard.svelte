@@ -29,6 +29,9 @@
     let error = $state<string | null>(null);
     let tagCopied = $state(false);
 
+    let leader = $derived(clanData!.memberList?.find((m: GetCOCClan200["data"]["clan"]["memberList"][0]) => m.role === "leader"));
+    let coLeaders = $derived(clanData!.memberList?.filter((m: GetCOCClan200["data"]["clan"]["memberList"][0]) => m.role === "coLeader") || []);
+
     onMount(async () => {
         if (delay > 0) {
             await new Promise((resolve) => setTimeout(resolve, delay));
@@ -145,7 +148,7 @@
             </div>
 
             <!-- Member Count -->
-            <div class="flex items-center justify-center gap-2 rounded-lg border-2 border-stone-700/30 bg-stone-900/20 py-3">
+            <div class="flex items-center justify-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                 <Icon name="international" class="size-10" />
                 <span class="font-coc text-2xl font-black text-stone-900">{clanData.members}</span>
                 <span class="font-coc text-base font-bold text-stone-700">/50</span>
@@ -155,14 +158,14 @@
             <div class="flex flex-col gap-2">
                 <h4 class="font-coc text-sm font-bold text-stone-800 uppercase">Minimum Requirements</h4>
                 <div class="grid grid-cols-2 gap-2">
-                    <div class="flex items-center gap-2 rounded-lg border border-stone-700/30 bg-stone-900/20 p-2.5">
+                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                         <Icon name="trophypushing" class="size-12" />
                         <div class="flex flex-col">
                             <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
                             <span class="font-coc text-base font-black text-stone-900">{formatNumber(clanData.requiredTrophies)}</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 rounded-lg border border-stone-700/30 bg-stone-900/20 p-2.5">
+                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                         <Icon name="donations" class="size-12" />
                         <div class="flex flex-col">
                             <span class="font-coc text-xs font-bold text-stone-700">Town Hall</span>
@@ -170,11 +173,48 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 rounded-lg border border-stone-700/30 bg-stone-900/20 p-2.5">
+                <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                     <Icon name="attacks" class="size-12" />
                     <div class="flex flex-col">
                         <span class="font-coc text-xs font-bold text-stone-700">War Frequency</span>
                         <span class="font-coc text-sm font-black text-stone-900">{formatWarFrequency(clanData.warFrequency)}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- War League & Location -->
+            <div>
+                <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Additional Details</h4>
+                <div class="flex flex-col gap-2">
+                    {#if clanData?.warLeague}
+                        <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                            <div class="flex items-center gap-1">
+                                <Icon name="clanwarleague" class="size-8" />
+                                <span class="font-coc text-sm font-bold text-stone-700">War League</span>
+                            </div>
+                            <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
+                        </div>
+                    {/if}
+                    {#if clanData?.location}
+                        <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                            <div class="flex items-center gap-1">
+                                <Icon name="basedesigning" class="size-8" />
+                                <span class="font-coc text-sm font-bold text-stone-700">Location</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <TablerMapPin class="size-4 text-red-700" />
+                                <span class="font-coc text-sm font-black text-stone-900">{clanData.location.name}</span>
+                            </div>
+                        </div>
+                    {/if}
+                    <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                        <div class="flex items-center gap-1">
+                            <Icon name="farming" class="size-8" />
+                            <span class="font-coc text-sm font-bold text-stone-700">War Frequency</span>
+                        </div>
+                        <span class="font-coc text-sm font-black text-stone-900 capitalize">
+                            {clanData?.type === "open" ? "Open" : clanData?.type === "inviteOnly" ? "Invite Only" : "Closed"}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -191,7 +231,7 @@
                         <div class="flex flex-col gap-4">
                             <!-- Description -->
                             {#if clanData?.description}
-                                <div class="rounded-lg bg-stone-900/10 p-3">
+                                <div class="rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                     <p class="font-coc text-sm leading-relaxed text-stone-900">
                                         {clanData.description}
                                     </p>
@@ -202,14 +242,14 @@
                             <div>
                                 <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Clan Statistics</h4>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3">
+                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                         <Icon name="international" class="size-12" />
                                         <div class="flex flex-col">
                                             <span class="font-coc text-xs font-bold text-stone-700">Members</span>
                                             <span class="font-coc text-base font-black text-stone-900">{clanData?.members}/50</span>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3">
+                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                         <Icon name="trophypushing" class="size-12" />
                                         <div class="flex flex-col">
                                             <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
@@ -217,14 +257,14 @@
                                             >
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3">
+                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                         <Icon name="clancapital" class="size-12" />
                                         <div class="flex flex-col">
                                             <span class="font-coc text-xs font-bold text-stone-700">War Wins</span>
                                             <span class="font-coc text-base font-black text-stone-900">{clanData?.warWins}</span>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3">
+                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                         <Icon name="clanwarleague" class="size-12" />
                                         <div class="flex flex-col">
                                             <span class="font-coc text-xs font-bold text-stone-700">Win Streak</span>
@@ -234,42 +274,43 @@
                                 </div>
                             </div>
 
-                            <!-- War League & Location -->
-                            <div>
-                                <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Additional Details</h4>
-                                <div class="flex flex-col gap-2">
-                                    {#if clanData?.warLeague}
-                                        <div class="flex items-center justify-between rounded-lg bg-stone-900/10 px-3 py-2">
-                                            <div class="flex items-center gap-1">
-                                                <Icon name="clanwarleague" class="size-8" />
-                                                <span class="font-coc text-sm font-bold text-stone-700">War League</span>
+                            <!-- Leadership Section -->
+                            {#if leader || coLeaders.length > 0}
+                                <div>
+                                    <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Leadership</h4>
+                                    <div class="flex flex-col gap-2">
+                                        {#if leader}
+                                            <div
+                                                class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
+                                            >
+                                                <div class="flex items-center gap-1">
+                                                    <Icon name="trophypushing" class="size-8" />
+                                                    <span class="font-coc text-sm font-bold text-stone-700">Leader</span>
+                                                </div>
+                                                <span class="font-coc text-sm font-black text-stone-900">{leader.name}</span>
                                             </div>
-                                            <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
-                                        </div>
-                                    {/if}
-                                    {#if clanData?.location}
-                                        <div class="flex items-center justify-between rounded-lg bg-stone-900/10 px-3 py-2">
-                                            <div class="flex items-center gap-1">
-                                                <Icon name="basedesigning" class="size-8" />
-                                                <span class="font-coc text-sm font-bold text-stone-700">Location</span>
+                                        {/if}
+                                        {#if coLeaders.length > 0}
+                                            <div class="flex flex-col gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                                <div class="flex items-center gap-1">
+                                                    <Icon name="donations" class="size-8" />
+                                                    <span class="font-coc text-sm font-bold text-stone-700">Co-Leaders</span>
+                                                    <span class="font-coc text-xs font-bold text-stone-700">({coLeaders.length})</span>
+                                                </div>
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    {#each coLeaders as cl}
+                                                        <span
+                                                            class="rounded bg-stone-900/10 px-2 py-1 font-coc text-xs font-bold text-stone-900 inset-shadow-sm shadow-stone-900"
+                                                        >
+                                                            {cl.name}
+                                                        </span>
+                                                    {/each}
+                                                </div>
                                             </div>
-                                            <div class="flex items-center gap-1">
-                                                <TablerMapPin class="size-4 text-red-700" />
-                                                <span class="font-coc text-sm font-black text-stone-900">{clanData.location.name}</span>
-                                            </div>
-                                        </div>
-                                    {/if}
-                                    <div class="flex items-center justify-between rounded-lg bg-stone-900/10 px-3 py-2">
-                                        <div class="flex items-center gap-1">
-                                            <Icon name="farming" class="size-8" />
-                                            <span class="font-coc text-sm font-bold text-stone-700">War Frequency</span>
-                                        </div>
-                                        <span class="font-coc text-sm font-black text-stone-900 capitalize">
-                                            {clanData?.type === "open" ? "Open" : clanData?.type === "inviteOnly" ? "Invite Only" : "Closed"}
-                                        </span>
+                                        {/if}
                                     </div>
                                 </div>
-                            </div>
+                            {/if}
                         </div>
                     {/snippet}
                 </CocPopup>
