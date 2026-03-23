@@ -14,6 +14,9 @@ export default defineConfig({
         path: "./src/gen",
         clean: true,
     },
+    hooks: {
+        done: ["prettier --write ./src/gen"],
+    },
     plugins: [
         pluginOas(),
         pluginTs({

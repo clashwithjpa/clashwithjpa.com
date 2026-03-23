@@ -4,7 +4,7 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetJPAClansQueryResponse, GetJPAClans500 } from "../models/GetJPAClans.ts";
+import type { GetJPAClansQueryResponse, GetJPAClansQueryParams, GetJPAClans500 } from "../models/GetJPAClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetJPAClansUrl() {
@@ -16,12 +16,13 @@ function getGetJPAClansUrl() {
  * @description [Public] Fetches all JPA clans and their requirements.
  * {@link /coc/jpa/clans}
  */
-export async function getJPAClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getJPAClans(params?: GetJPAClansQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = config;
 
     const res = await request<GetJPAClansQueryResponse, ResponseErrorConfig<GetJPAClans500>, unknown>({
         method: "GET",
         url: getGetJPAClansUrl().url.toString(),
+        params,
         ...requestConfig,
     });
     return res.data;

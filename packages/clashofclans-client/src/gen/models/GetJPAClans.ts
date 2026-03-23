@@ -3,6 +3,48 @@
  * Do not edit manually.
  */
 
+export const getJPAClansQueryParamsExtendedEnum = {
+    true: "true",
+    false: "false",
+} as const;
+
+export type GetJPAClansQueryParamsExtendedEnumKey = (typeof getJPAClansQueryParamsExtendedEnum)[keyof typeof getJPAClansQueryParamsExtendedEnum];
+
+export type GetJPAClansQueryParams = {
+    /**
+     * @type string | undefined
+     */
+    extended?: GetJPAClansQueryParamsExtendedEnumKey;
+};
+
+export const cocDataTypeEnum = {
+    open: "open",
+    inviteOnly: "inviteOnly",
+    closed: "closed",
+} as const;
+
+export type CocDataTypeEnumKey = (typeof cocDataTypeEnum)[keyof typeof cocDataTypeEnum];
+
+export const cocDataWarFrequencyEnum = {
+    always: "always",
+    moreThanOncePerWeek: "moreThanOncePerWeek",
+    oncePerWeek: "oncePerWeek",
+    lessThanOncePerWeek: "lessThanOncePerWeek",
+    never: "never",
+    unknown: "unknown",
+} as const;
+
+export type CocDataWarFrequencyEnumKey = (typeof cocDataWarFrequencyEnum)[keyof typeof cocDataWarFrequencyEnum];
+
+export const memberListRoleEnum2 = {
+    member: "member",
+    admin: "admin",
+    coLeader: "coLeader",
+    leader: "leader",
+} as const;
+
+export type MemberListRoleEnum2Key = (typeof memberListRoleEnum2)[keyof typeof memberListRoleEnum2];
+
 /**
  * @description Successful response with the JPA clans.
  */
@@ -16,15 +58,343 @@ export type GetJPAClans200 = {
      */
     data: {
         /**
-         * @type array
+         * @type object
          */
         clans: {
             [key: string]: {
                 requiredAttacks: number | null;
                 requiredClangames: number | null;
                 requiredDonations: number | null;
+                /**
+                 * @type object | undefined
+                 */
+                cocData?: {
+                    /**
+                     * @type string
+                     */
+                    tag: string;
+                    /**
+                     * @type string
+                     */
+                    name: string;
+                    /**
+                     * @type string
+                     */
+                    type: CocDataTypeEnumKey;
+                    /**
+                     * @type string
+                     */
+                    description: string;
+                    /**
+                     * @type object | undefined
+                     */
+                    location?: {
+                        /**
+                         * @type string | undefined
+                         */
+                        localizedName?: string;
+                        /**
+                         * @type number
+                         */
+                        id: number;
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                        /**
+                         * @type boolean
+                         */
+                        isCountry: boolean;
+                        /**
+                         * @type string | undefined
+                         */
+                        countryCode?: string;
+                    };
+                    /**
+                     * @type object | undefined
+                     */
+                    chatLanguage?: {
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                        /**
+                         * @type number
+                         */
+                        id: number;
+                        /**
+                         * @type string
+                         */
+                        languageCode: string;
+                    };
+                    /**
+                     * @type object
+                     */
+                    badgeUrls: {
+                        /**
+                         * @type string
+                         */
+                        small: string;
+                        /**
+                         * @type string
+                         */
+                        large: string;
+                        /**
+                         * @type string
+                         */
+                        medium: string;
+                    };
+                    /**
+                     * @type number
+                     */
+                    clanLevel: number;
+                    /**
+                     * @type number
+                     */
+                    clanPoints: number;
+                    /**
+                     * @type number
+                     */
+                    clanBuilderBasePoints: number;
+                    /**
+                     * @type number
+                     */
+                    requiredTrophies: number;
+                    /**
+                     * @type number | undefined
+                     */
+                    requiredTownhallLevel?: number;
+                    /**
+                     * @type number | undefined
+                     */
+                    requiredBuilderBaseTrophies?: number;
+                    /**
+                     * @type string | undefined
+                     */
+                    warFrequency?: CocDataWarFrequencyEnumKey;
+                    /**
+                     * @type number
+                     */
+                    warWinStreak: number;
+                    /**
+                     * @type number
+                     */
+                    warWins: number;
+                    /**
+                     * @type number | undefined
+                     */
+                    warTies?: number;
+                    /**
+                     * @type number | undefined
+                     */
+                    warLosses?: number;
+                    /**
+                     * @type boolean
+                     */
+                    isWarLogPublic: boolean;
+                    /**
+                     * @type object | undefined
+                     */
+                    warLeague?: {
+                        /**
+                         * @type number
+                         */
+                        id: number;
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                    };
+                    /**
+                     * @type number
+                     */
+                    members: number;
+                    /**
+                     * @type array
+                     */
+                    labels: {
+                        /**
+                         * @type number
+                         */
+                        id: number;
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                        /**
+                         * @type object
+                         */
+                        iconUrls: {
+                            /**
+                             * @type string
+                             */
+                            small: string;
+                            /**
+                             * @type string | undefined
+                             */
+                            tiny?: string;
+                            /**
+                             * @type string | undefined
+                             */
+                            medium?: string;
+                        };
+                    }[];
+                    /**
+                     * @type array
+                     */
+                    memberList: {
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                        /**
+                         * @type string
+                         */
+                        tag: string;
+                        /**
+                         * @type string
+                         */
+                        role: MemberListRoleEnum2Key;
+                        /**
+                         * @type number
+                         */
+                        expLevel: number;
+                        /**
+                         * @type number
+                         */
+                        townHallLevel: number;
+                        /**
+                         * @type object | undefined
+                         */
+                        leagueTier?: {
+                            /**
+                             * @type number
+                             */
+                            id: number;
+                            /**
+                             * @type string
+                             */
+                            name: string;
+                            /**
+                             * @type object
+                             */
+                            iconUrls: {
+                                /**
+                                 * @type string
+                                 */
+                                small: string;
+                                /**
+                                 * @type string
+                                 */
+                                large: string;
+                            };
+                        };
+                        /**
+                         * @type object | undefined
+                         */
+                        builderBaseLeague?: {
+                            /**
+                             * @type number
+                             */
+                            id: number;
+                            /**
+                             * @type string
+                             */
+                            name: string;
+                        };
+                        /**
+                         * @type number
+                         */
+                        trophies: number;
+                        /**
+                         * @type number | undefined
+                         */
+                        builderBaseTrophies?: number;
+                        /**
+                         * @type number
+                         */
+                        clanRank: number;
+                        /**
+                         * @type number
+                         */
+                        previousClanRank: number;
+                        /**
+                         * @type number
+                         */
+                        donations: number;
+                        /**
+                         * @type number
+                         */
+                        donationsReceived: number;
+                        /**
+                         * @type object | undefined
+                         */
+                        playerHouse?: {
+                            /**
+                             * @type array
+                             */
+                            elements: {
+                                /**
+                                 * @type string
+                                 */
+                                type: string;
+                                /**
+                                 * @type number
+                                 */
+                                id: number;
+                            }[];
+                        };
+                    }[];
+                    /**
+                     * @type object
+                     */
+                    clanCapital: {
+                        /**
+                         * @type number | undefined
+                         */
+                        capitalHallLevel?: number;
+                        /**
+                         * @type array | undefined
+                         */
+                        districts?: {
+                            /**
+                             * @type number
+                             */
+                            id: number;
+                            /**
+                             * @type string
+                             */
+                            name: string;
+                            /**
+                             * @type number
+                             */
+                            districtHallLevel: number;
+                        }[];
+                    };
+                    /**
+                     * @type boolean
+                     */
+                    isFamilyFriendly: boolean;
+                    /**
+                     * @type number
+                     */
+                    clanCapitalPoints: number;
+                    /**
+                     * @type object | undefined
+                     */
+                    capitalLeague?: {
+                        /**
+                         * @type number
+                         */
+                        id: number;
+                        /**
+                         * @type string
+                         */
+                        name: string;
+                    };
+                };
             };
-        }[];
+        };
     };
 };
 
@@ -47,5 +417,6 @@ export type GetJPAClansQueryResponse = GetJPAClans200;
 
 export type GetJPAClansQuery = {
     Response: GetJPAClans200;
+    QueryParams: GetJPAClansQueryParams;
     Errors: GetJPAClans500;
 };

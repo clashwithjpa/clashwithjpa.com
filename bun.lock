@@ -127,6 +127,7 @@
         "@kubb/plugin-ts": "^4.36.2",
         "@kubb/plugin-zod": "^4.36.2",
         "@types/bun": "latest",
+        "prettier": "^3.8.1",
       },
       "peerDependencies": {
         "typescript": "^5",
