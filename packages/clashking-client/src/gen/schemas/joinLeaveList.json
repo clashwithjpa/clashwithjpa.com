@@ -1,0 +1,26 @@
+{
+    "properties": {
+        "items": {
+            "items": {
+                "properties": {
+                    "name": { "type": "string", "title": "Name" },
+                    "tag": { "type": "string", "title": "Tag" },
+                    "th": { "type": "integer", "title": "Th" },
+                    "time": { "type": "string", "format": "date-time", "title": "Time" },
+                    "clan": { "type": "string", "title": "Clan" },
+                    "type": { "type": "string", "title": "Type" }
+                },
+                "type": "object",
+                "required": ["name", "tag", "th", "time", "clan", "type"],
+                "title": "JoinLeaveEntry",
+                "x-readme-ref-name": "JoinLeaveEntry"
+            },
+            "type": "array",
+            "title": "Items"
+        }
+    },
+    "type": "object",
+    "required": ["items"],
+    "title": "JoinLeaveList",
+    "x-readme-ref-name": "JoinLeaveList"
+}

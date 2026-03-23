@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "grant_type": { "anyOf": [{ "type": "string", "pattern": "password" }, { "type": "null" }], "title": "Grant Type" },
+        "username": { "type": "string", "title": "Username" },
+        "password": { "type": "string", "title": "Password" },
+        "scope": { "type": "string", "title": "Scope", "default": "" },
+        "client_id": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Client Id" },
+        "client_secret": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Client Secret" }
+    },
+    "type": "object",
+    "required": ["username", "password"],
+    "title": "Body_login_token_post",
+    "x-readme-ref-name": "Body_login_token_post"
+}

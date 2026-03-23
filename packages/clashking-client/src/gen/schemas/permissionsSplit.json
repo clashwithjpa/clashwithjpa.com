@@ -1,0 +1,10 @@
+{
+    "properties": {
+        "read": { "type": "boolean", "title": "Read", "default": false },
+        "write": { "type": "boolean", "title": "Write", "default": false },
+        "delete": { "type": "boolean", "title": "Delete", "default": false }
+    },
+    "type": "object",
+    "title": "PermissionsSplit",
+    "x-readme-ref-name": "PermissionsSplit"
+}

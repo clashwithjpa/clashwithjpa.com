@@ -1,0 +1,55 @@
+{
+    "properties": {
+        "username": { "type": "string", "title": "Username" },
+        "permissions": {
+            "allOf": [
+                {
+                    "properties": {
+                        "rosters": {
+                            "allOf": [
+                                {
+                                    "properties": {
+                                        "read": { "type": "boolean", "title": "Read", "default": false },
+                                        "write": { "type": "boolean", "title": "Write", "default": false },
+                                        "delete": { "type": "boolean", "title": "Delete", "default": false }
+                                    },
+                                    "type": "object",
+                                    "title": "PermissionsSplit",
+                                    "x-readme-ref-name": "PermissionsSplit"
+                                }
+                            ],
+                            "default": { "read": false, "write": false, "delete": false }
+                        },
+                        "ticketing": {
+                            "allOf": [
+                                {
+                                    "properties": {
+                                        "read": { "type": "boolean", "title": "Read", "default": false },
+                                        "write": { "type": "boolean", "title": "Write", "default": false },
+                                        "delete": { "type": "boolean", "title": "Delete", "default": false }
+                                    },
+                                    "type": "object",
+                                    "title": "PermissionsSplit",
+                                    "x-readme-ref-name": "PermissionsSplit"
+                                }
+                            ],
+                            "default": { "read": false, "write": false, "delete": false }
+                        }
+                    },
+                    "type": "object",
+                    "title": "Permissions",
+                    "x-readme-ref-name": "Permissions"
+                }
+            ],
+            "default": {
+                "rosters": { "delete": false, "read": false, "write": false },
+                "ticketing": { "delete": false, "read": false, "write": false }
+            }
+        },
+        "admin": { "type": "boolean", "title": "Admin", "default": false }
+    },
+    "type": "object",
+    "required": ["username"],
+    "title": "User",
+    "x-readme-ref-name": "User"
+}

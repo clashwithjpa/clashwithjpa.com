@@ -1,0 +1,37 @@
+{
+    "properties": {
+        "rosters": {
+            "allOf": [
+                {
+                    "properties": {
+                        "read": { "type": "boolean", "title": "Read", "default": false },
+                        "write": { "type": "boolean", "title": "Write", "default": false },
+                        "delete": { "type": "boolean", "title": "Delete", "default": false }
+                    },
+                    "type": "object",
+                    "title": "PermissionsSplit",
+                    "x-readme-ref-name": "PermissionsSplit"
+                }
+            ],
+            "default": { "read": false, "write": false, "delete": false }
+        },
+        "ticketing": {
+            "allOf": [
+                {
+                    "properties": {
+                        "read": { "type": "boolean", "title": "Read", "default": false },
+                        "write": { "type": "boolean", "title": "Write", "default": false },
+                        "delete": { "type": "boolean", "title": "Delete", "default": false }
+                    },
+                    "type": "object",
+                    "title": "PermissionsSplit",
+                    "x-readme-ref-name": "PermissionsSplit"
+                }
+            ],
+            "default": { "read": false, "write": false, "delete": false }
+        }
+    },
+    "type": "object",
+    "title": "Permissions",
+    "x-readme-ref-name": "Permissions"
+}
