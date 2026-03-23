@@ -35,6 +35,13 @@ endif
 	docker compose $(PROFILE_FLAGS) down
 	@echo "→ Starting:  docker compose $(PROFILE_FLAGS) up -d"
 	docker compose $(PROFILE_FLAGS) up -d
+	@echo "→ Service URLs:"
+	@CONTAINERS=$$(docker compose $(PROFILE_FLAGS) ps -q); \
+	if [ -n "$$CONTAINERS" ]; then \
+		docker inspect -f '{{.Name}} |{{range $$p, $$conf := .NetworkSettings.Ports}}{{if $$conf}}  http://localhost:{{(index $$conf 0).HostPort}}{{end}}{{end}}' $$CONTAINERS \
+			| sed 's/^\///' \
+			| awk -F'|' '{ printf " \033[1;34m\033[0m  \033[1;32m%-25s\033[0m%s\n", $$1, $$2 }'; \
+	fi
 
 
 .PHONY: stop
@@ -45,6 +52,18 @@ endif
 	$(eval PROFILE_FLAGS := $(call build_profiles,$(ARGS)))
 	@echo "→ Stopping:  docker compose $(PROFILE_FLAGS) down"
 	docker compose $(PROFILE_FLAGS) down
+
+.PHONY: show
+show: ## Show running container URLs
+	@printf "\033[1;34m\033[0m  \033[1mActive Services\033[0m\n"
+	@CONTAINERS=$$(docker ps -q --filter "label=com.docker.compose.project.working_dir=$(PWD)"); \
+	if [ -n "$$CONTAINERS" ]; then \
+		docker inspect -f '{{.Name}} |{{range $$p, $$conf := .NetworkSettings.Ports}}{{if $$conf}}  http://localhost:{{(index $$conf 0).HostPort}}{{end}}{{end}}' $$CONTAINERS \
+			| sed 's/^\///' \
+			| awk -F'|' '{ printf " \033[1m\033[1;32m%-25s\033[0m%s\n", $$1, $$2 }'; \
+	else \
+		printf "  󰅖 No services currently running.\n"; \
+	fi
 
 .PHONY: migrate
 migrate: ## Run server database migrations
