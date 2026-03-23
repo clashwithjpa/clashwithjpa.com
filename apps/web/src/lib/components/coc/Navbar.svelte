@@ -30,7 +30,7 @@
 
 <nav
     class={cn(
-        "sticky top-0 z-40 flex items-center justify-between p-4 font-coc transition-all duration-200 md:p-6",
+        "fixed top-0 z-40 flex h-20 w-full items-center justify-between p-4 font-coc transition-all duration-200 md:h-24 md:p-6",
         !isHomePage && "bg-stone-950/50 backdrop-blur-sm",
     )}
 >

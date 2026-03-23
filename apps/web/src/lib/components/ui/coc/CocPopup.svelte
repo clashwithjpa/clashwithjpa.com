@@ -68,11 +68,11 @@
             </div>
         </Drawer.Trigger>
         <Drawer.Portal>
-            <Drawer.Overlay class={cn("fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200", zIndex)} />
+            <Drawer.Overlay class={cn("fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200", "z-9999")} />
             <Drawer.Content
                 class={cn(
                     "fixed inset-x-0 bottom-0 mt-24 overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)] outline-none focus:outline-none",
-                    zIndex,
+                    "z-9999",
                 )}
             >
                 <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>

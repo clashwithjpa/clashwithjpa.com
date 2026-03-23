@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { page } from "$app/stores";
+    import { page } from "$app/state";
     import Navbar from "$lib/components/coc/Navbar.svelte";
     import { cn } from "$lib/utils";
 
     let { children } = $props();
 
-    const isHomePage = $derived($page.url.pathname === "/");
+    const isHomePage = $derived(page.url.pathname === "/");
 </script>
 
-<div class={cn("flex min-h-screen flex-col", !isHomePage && "bg-stone-950")}>
+<div class={cn("min-h-screen", !isHomePage && "bg-stone-950")}>
     <Navbar />
 
-    <div class="min-h-0 flex-1 overflow-auto p-2 font-coc md:p-4">
+    <div class="size-full p-2 pt-20 font-coc md:p-4 md:pt-24">
         {@render children()}
     </div>
 </div>

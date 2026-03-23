@@ -23,10 +23,10 @@
 <Drawer.Root bind:open {onClose}>
     <Drawer.Trigger>{@render trigger()}</Drawer.Trigger>
     <Drawer.Portal>
-        <Drawer.Overlay class="fixed inset-0 z-60 bg-stone-950/60 backdrop-blur-sm transition-all duration-200" />
+        <Drawer.Overlay class="fixed inset-0 z-9999! bg-stone-950/60 backdrop-blur-sm transition-all duration-200" />
         <Drawer.Content
             class={cn(
-                "fixed inset-x-0 bottom-0 z-60 mt-24 flex h-auto flex-col rounded-t-2xl border-t-2 border-stone-700/50 bg-stone-900 outline-none focus:outline-none",
+                "fixed inset-x-0 bottom-0 z-9999! mt-24 flex h-auto flex-col rounded-t-2xl border-t-2 border-stone-700/50 bg-stone-900 outline-none focus:outline-none",
                 className,
             )}
         >
