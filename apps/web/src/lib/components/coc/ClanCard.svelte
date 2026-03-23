@@ -10,7 +10,6 @@
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import TablerMapPin from "~icons/tabler/map-pin";
     import Icon from "../ui/Icon.svelte";
 
     let {
@@ -184,43 +183,6 @@
                 </div>
             </div>
 
-            <!-- War League & Location -->
-            <div>
-                <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Additional Details</h4>
-                <div class="flex flex-col gap-2">
-                    {#if clanData?.warLeague}
-                        <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                            <div class="flex items-center gap-1">
-                                <Icon name="labels/clanwarleague" class="size-8" />
-                                <span class="font-coc text-sm font-bold text-stone-700">War League</span>
-                            </div>
-                            <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
-                        </div>
-                    {/if}
-                    {#if clanData?.location}
-                        <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                            <div class="flex items-center gap-1">
-                                <Icon name="labels/basedesigning" class="size-8" />
-                                <span class="font-coc text-sm font-bold text-stone-700">Location</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <TablerMapPin class="size-4 text-red-700" />
-                                <span class="font-coc text-sm font-black text-stone-900">{clanData.location.name}</span>
-                            </div>
-                        </div>
-                    {/if}
-                    <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                        <div class="flex items-center gap-1">
-                            <Icon name="labels/farming" class="size-8" />
-                            <span class="font-coc text-sm font-bold text-stone-700">War Frequency</span>
-                        </div>
-                        <span class="font-coc text-sm font-black text-stone-900 capitalize">
-                            {clanData?.type === "open" ? "Open" : clanData?.type === "inviteOnly" ? "Invite Only" : "Closed"}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
             <!-- Action Buttons -->
             <div class="grid grid-cols-2 gap-2">
                 <CocPopup title="{clanData.name}'s Info" placement="right">
@@ -241,7 +203,7 @@
                             {/if}
 
                             <!-- Stats Grid -->
-                            <div>
+                            <div class="flex flex-col gap-2">
                                 <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Clan Statistics</h4>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
@@ -267,13 +229,24 @@
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                        <Icon name="labels/clanwarleague" class="size-12" />
+                                        <Icon name="labels/relaxed" class="size-12" />
                                         <div class="flex flex-col">
                                             <span class="font-coc text-xs font-bold text-stone-700">Win Streak</span>
                                             <span class="font-coc text-base font-black text-stone-900">{clanData?.warWinStreak}</span>
                                         </div>
                                     </div>
                                 </div>
+                                {#if clanData?.warLeague}
+                                    <div
+                                        class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
+                                    >
+                                        <div class="flex items-center gap-1">
+                                            <Icon name="labels/clanwarleague" class="size-8" />
+                                            <span class="font-coc text-sm font-bold text-stone-700">War League</span>
+                                        </div>
+                                        <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
+                                    </div>
+                                {/if}
                             </div>
 
                             <!-- Leadership Section -->
