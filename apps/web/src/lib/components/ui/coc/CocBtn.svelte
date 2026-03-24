@@ -4,7 +4,7 @@
 
     let {
         href = "",
-        target = "_blank",
+        target = "",
         variant = "green",
         size = "base",
         class: className = "",

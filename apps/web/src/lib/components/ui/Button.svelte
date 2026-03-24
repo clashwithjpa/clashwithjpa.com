@@ -2,9 +2,11 @@
     let {
         children,
         onclick,
+        href = "",
+        target = "",
         class: className = "",
         disabled = false,
-        title = "",
+        tooltip = "",
         animateClick = true,
         tooltipPlacement = "left",
         variant = "base",
@@ -12,9 +14,11 @@
     }: {
         children: Snippet;
         onclick?: (e: MouseEvent) => void;
+        href?: string;
+        target?: string;
         class?: string;
         disabled?: boolean;
-        title?: string;
+        tooltip?: string;
         animateClick?: boolean;
         tooltipPlacement?:
             | "top"
@@ -83,11 +87,11 @@
     );
 </script>
 
-{#if title}
+{#if tooltip}
     <Tooltip.Root openDelay={200} interactive={false} closeOnPointerDown={true} positioning={{ placement: tooltipPlacement, gutter: 12 }}>
         <Tooltip.Trigger
             {disabled}
-            aria-label={title}
+            aria-label={tooltip}
             class={buttonClass}
             onclick={handleClick}
             onpointerdown={handlePointerDown}
@@ -105,15 +109,19 @@
                     <Tooltip.Arrow>
                         <Tooltip.ArrowTip class="border-t-2 border-l-2 border-stone-700/50" />
                     </Tooltip.Arrow>
-                    {title}
+                    {tooltip}
                 </Tooltip.Content>
             </Tooltip.Positioner>
         </Portal>
     </Tooltip.Root>
 {:else}
-    <button
-        type="button"
+    <svelte:element
+        this={href ? "a" : "button"}
+        type={href ? undefined : "button"}
+        role={href ? "link" : "button"}
         {disabled}
+        {href}
+        {target}
         class={buttonClass}
         onclick={handleClick}
         onpointerdown={handlePointerDown}
@@ -121,5 +129,5 @@
         onpointerleave={handlePointerUp}
     >
         {@render children()}
-    </button>
+    </svelte:element>
 {/if}

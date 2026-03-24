@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Popup from "$lib/components/ui/RawPopup.svelte";
+    import RawPopup from "$lib/components/ui/RawPopup.svelte";
     import { spinOnce } from "$lib/utils/animations";
     import { draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
@@ -204,7 +204,7 @@
 </script>
 
 <div {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])} class="fixed right-4 bottom-4 z-9999">
-    <Popup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-9999" bind:open onOpenChange={handleOpenChange}>
+    <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-9999" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
             <Button class="size-14 rounded-full" size="" variant="ghost" onclick={(e) => spinOnce(e.currentTarget as Element)}>
                 <TablerIcons class="pointer-events-none size-6" />
@@ -219,13 +219,13 @@
                 onConfirm={clearSiteCache}
             >
                 {#snippet trigger()}
-                    <Button title="Clear Website Cache" class="size-12 rounded-full" size="">
+                    <Button tooltip="Clear Website Cache" class="size-12 rounded-full" size="">
                         <TablerTrash class="size-6" />
                     </Button>
                 {/snippet}
             </ConfirmationDialog>
 
-            <Button title="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
+            <Button tooltip="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
                 {#if isFullscreen}
                     <TablerMinimize class="size-6" />
                 {:else}
@@ -234,7 +234,7 @@
             </Button>
 
             {#if hasVideo}
-                <Button title="Toggle Background Video" class="size-12 rounded-full" size="" onclick={toggleVideo}>
+                <Button tooltip="Toggle Background Video" class="size-12 rounded-full" size="" onclick={toggleVideo}>
                     {#if isVideoPlaying}
                         <TablerPlayerPause class="size-6" />
                     {:else}
@@ -244,7 +244,7 @@
             {/if}
 
             <span bind:this={musicBtnWrapper}>
-                <Button title="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
+                <Button tooltip="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
                     {#if isMusicPlaying}
                         <TablerMusic class="size-6 animate-spin animation-duration-8000" />
                     {:else}
@@ -253,5 +253,5 @@
                 </Button>
             </span>
         {/snippet}
-    </Popup>
+    </RawPopup>
 </div>

@@ -53,7 +53,7 @@
                 {@render trigger()}
             </div>
         {/snippet}
-        <div class="flex flex-col gap-4 pt-2">
+        <div class="flex flex-col gap-4">
             <p class="text-sm text-stone-200">
                 {description}
             </p>
