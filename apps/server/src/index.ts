@@ -1,24 +1,23 @@
-import "dotenv/config";
 import { config } from "@/lib/config";
-import * as Sentry from "@sentry/bun";
+import { betterAuthMiddleware } from "@/lib/middlewares";
+import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
+import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
+import { Scalar } from "@scalar/hono-api-reference";
+import * as Sentry from "@sentry/bun";
+import "dotenv/config";
 import { Hono } from "hono";
+import { describeRoute, openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
+import { every } from "hono/combine";
 import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
 import { HTTPException } from "hono/http-exception";
+import { logger } from "hono/logger";
+import { requestId } from "hono/request-id";
 import RedisClient from "ioredis";
 import { RedisStore, type RedisReply } from "rate-limit-redis";
-import { every } from "hono/combine";
-import { csrf } from "hono/csrf";
-import { requestId, type RequestIdVariables } from "hono/request-id";
-import { logger } from "hono/logger";
-import { compress } from "@hono/bun-compress";
-import { betterAuthMiddleware } from "@/lib/middlewares";
-import { openAPIRouteHandler } from "hono-openapi";
-import { Scalar } from "@scalar/hono-api-reference";
-import { resolver, describeRoute } from "hono-openapi";
 import z4 from "zod/v4";
-import { type AppEnv, SuccessResponseSchema, ErrorResponseSchema } from "@/lib/types";
 import coc from "./routes/coc";
 import user from "./routes/user";
 
@@ -51,6 +50,7 @@ app.use(
         rateLimiter({
             windowMs: 1 * 60 * 1000, // 1 minute
             limit: 60, // Limit each client to 60 requests per window
+            skip: (c) => config.NODE_ENV === "development" && c.req.header("origin") === config.JPA_APP_URL, // Skip rate limiting in development for requests from the frontend
             // TODO: https://honohub.dev/docs/rate-limiter/troubleshooting#solution-2
             keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "",
             store: new RedisStore({
