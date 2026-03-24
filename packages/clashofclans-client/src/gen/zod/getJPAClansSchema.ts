@@ -5,144 +5,20 @@
 
 import { z } from "zod/v4";
 
-export const getJPAClansQueryParamsSchema = z
-    .object({
-        extended: z.optional(z.enum(["true", "false"])),
-    })
-    .optional();
-
 /**
  * @description Successful response with the JPA clans.
  */
 export const getJPAClans200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        clans: z.object({}).catchall(
-            z.object({
-                requiredAttacks: z.union([z.number(), z.null()]),
-                requiredClangames: z.union([z.number(), z.null()]),
-                requiredDonations: z.union([z.number(), z.null()]),
-                cocData: z.optional(
-                    z.object({
-                        tag: z.string(),
-                        name: z.string(),
-                        type: z.enum(["open", "inviteOnly", "closed"]),
-                        description: z.string(),
-                        location: z.optional(
-                            z.object({
-                                localizedName: z.optional(z.string()),
-                                id: z.number(),
-                                name: z.string(),
-                                isCountry: z.boolean(),
-                                countryCode: z.optional(z.string()),
-                            }),
-                        ),
-                        chatLanguage: z.optional(
-                            z.object({
-                                name: z.string(),
-                                id: z.number(),
-                                languageCode: z.string(),
-                            }),
-                        ),
-                        badgeUrls: z.object({
-                            small: z.string(),
-                            large: z.string(),
-                            medium: z.string(),
-                        }),
-                        clanLevel: z.number(),
-                        clanPoints: z.number(),
-                        clanBuilderBasePoints: z.number(),
-                        requiredTrophies: z.number(),
-                        requiredTownhallLevel: z.optional(z.number()),
-                        requiredBuilderBaseTrophies: z.optional(z.number()),
-                        warFrequency: z.optional(z.enum(["always", "moreThanOncePerWeek", "oncePerWeek", "lessThanOncePerWeek", "never", "unknown"])),
-                        warWinStreak: z.number(),
-                        warWins: z.number(),
-                        warTies: z.optional(z.number()),
-                        warLosses: z.optional(z.number()),
-                        isWarLogPublic: z.boolean(),
-                        warLeague: z.optional(
-                            z.object({
-                                id: z.number(),
-                                name: z.string(),
-                            }),
-                        ),
-                        members: z.number(),
-                        labels: z.array(
-                            z.object({
-                                id: z.number(),
-                                name: z.string(),
-                                iconUrls: z.object({
-                                    small: z.string(),
-                                    tiny: z.optional(z.string()),
-                                    medium: z.optional(z.string()),
-                                }),
-                            }),
-                        ),
-                        memberList: z.array(
-                            z.object({
-                                name: z.string(),
-                                tag: z.string(),
-                                role: z.enum(["member", "admin", "coLeader", "leader"]),
-                                expLevel: z.number(),
-                                townHallLevel: z.number(),
-                                leagueTier: z.optional(
-                                    z.object({
-                                        id: z.number(),
-                                        name: z.string(),
-                                        iconUrls: z.object({
-                                            small: z.string(),
-                                            large: z.string(),
-                                        }),
-                                    }),
-                                ),
-                                builderBaseLeague: z.optional(
-                                    z.object({
-                                        id: z.number(),
-                                        name: z.string(),
-                                    }),
-                                ),
-                                trophies: z.number(),
-                                builderBaseTrophies: z.optional(z.number()),
-                                clanRank: z.number(),
-                                previousClanRank: z.number(),
-                                donations: z.number(),
-                                donationsReceived: z.number(),
-                                playerHouse: z.optional(
-                                    z.object({
-                                        elements: z.array(
-                                            z.object({
-                                                type: z.string(),
-                                                id: z.number(),
-                                            }),
-                                        ),
-                                    }),
-                                ),
-                            }),
-                        ),
-                        clanCapital: z.object({
-                            capitalHallLevel: z.optional(z.number()),
-                            districts: z.optional(
-                                z.array(
-                                    z.object({
-                                        id: z.number(),
-                                        name: z.string(),
-                                        districtHallLevel: z.number(),
-                                    }),
-                                ),
-                            ),
-                        }),
-                        isFamilyFriendly: z.boolean(),
-                        clanCapitalPoints: z.number(),
-                        capitalLeague: z.optional(
-                            z.object({
-                                id: z.number(),
-                                name: z.string(),
-                            }),
-                        ),
-                    }),
-                ),
-            }),
+        clans: z.array(
+            z.object({}).catchall(
+                z.object({
+                    requiredAttacks: z.union([z.number(), z.null()]),
+                    requiredClangames: z.union([z.number(), z.null()]),
+                    requiredDonations: z.union([z.number(), z.null()]),
+                }),
+            ),
         ),
     }),
 });

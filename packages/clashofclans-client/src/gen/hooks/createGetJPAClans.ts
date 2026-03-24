@@ -3,22 +3,22 @@
  * Do not edit manually.
  */
 
-import type { GetJPAClansQueryResponse, GetJPAClansQueryParams, GetJPAClans500 } from "../models/GetJPAClans.ts";
+import type { GetJPAClansQueryResponse, GetJPAClans500 } from "../models/GetJPAClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
 import { getJPAClans } from "../clients/getJPAClans.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
-export const getJPAClansQueryKey = (params?: GetJPAClansQueryParams) => [{ url: "/coc/jpa/clans" }, ...(params ? [params] : [])] as const;
+export const getJPAClansQueryKey = () => [{ url: "/coc/jpa/clans" }] as const;
 
 export type GetJPAClansQueryKey = ReturnType<typeof getJPAClansQueryKey>;
 
-export function getJPAClansQueryOptions(params?: GetJPAClansQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const queryKey = getJPAClansQueryKey(params);
+export function getJPAClansQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+    const queryKey = getJPAClansQueryKey();
     return queryOptions<GetJPAClansQueryResponse, ResponseErrorConfig<GetJPAClans500>, GetJPAClansQueryResponse, typeof queryKey>({
         queryKey,
         queryFn: async ({ signal }) => {
-            return getJPAClans(params, { ...config, signal: config.signal ?? signal });
+            return getJPAClans({ ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -32,7 +32,6 @@ export function createGetJPAClans<
     TQueryData = GetJPAClansQueryResponse,
     TQueryKey extends QueryKey = GetJPAClansQueryKey,
 >(
-    params?: GetJPAClansQueryParams,
     options: {
         query?: Partial<CreateBaseQueryOptions<GetJPAClansQueryResponse, ResponseErrorConfig<GetJPAClans500>, TData, TQueryData, TQueryKey>> & {
             client?: QueryClient;
@@ -42,11 +41,11 @@ export function createGetJPAClans<
 ) {
     const { query: queryConfig = {}, client: config = {} } = options ?? {};
     const { client: queryClient, ...resolvedOptions } = queryConfig;
-    const queryKey = resolvedOptions?.queryKey ?? getJPAClansQueryKey(params);
+    const queryKey = resolvedOptions?.queryKey ?? getJPAClansQueryKey();
 
     const query = createQuery(
         {
-            ...getJPAClansQueryOptions(params, config),
+            ...getJPAClansQueryOptions(config),
             ...resolvedOptions,
             queryKey,
         } as unknown as CreateBaseQueryOptions,

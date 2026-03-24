@@ -407,20 +407,17 @@ app.get(
     },
 );
 
-const getJPAClansDataQuerySchema = z4.object({
-    extended: z4
-        .enum(["true", "false"])
-        .optional()
-        .transform((v) => v === "true")
-        .default(false),
-});
-const clanRequirementsSchema = z4.object({
-    requiredAttacks: z4.number().nullable(),
-    requiredClangames: z4.number().nullable(),
-    requiredDonations: z4.number().nullable(),
-});
-const getJPAClansDataExtended = z4.object({
-    clans: z4.record(z4.string(), clanRequirementsSchema.extend({ cocData: APIClanSchema.optional() })),
+const getJPAClansData = z4.object({
+    clans: z4.array(
+        z4.record(
+            z4.string(),
+            z4.object({
+                requiredAttacks: z4.number().nullable(),
+                requiredClangames: z4.number().nullable(),
+                requiredDonations: z4.number().nullable(),
+            }),
+        ),
+    ),
 });
 app.get(
     "/jpa/clans",
@@ -428,21 +425,12 @@ app.get(
         operationId: "getJPAClans",
         description: "[Public] Fetches all JPA clans and their requirements.",
         tags: ["coc"],
-        parameters: [
-            {
-                name: "extended",
-                in: "query",
-                required: false,
-                description: "If true, also fetches full CoC clan data for each clan from the CoC API.",
-                schema: { type: "string", enum: ["true", "false"], default: "false" },
-            },
-        ],
         responses: {
             200: {
                 description: "Successful response with the JPA clans.",
                 content: {
                     "application/json": {
-                        schema: resolver(SuccessResponseSchema(getJPAClansDataExtended)),
+                        schema: resolver(SuccessResponseSchema(getJPAClansData)),
                     },
                 },
             },
@@ -456,30 +444,13 @@ app.get(
             },
         },
     }),
-    zValidator("query", getJPAClansDataQuerySchema),
     async (c) => {
-        const { extended } = c.req.valid("query");
         try {
             const clans = await getClansWithRequirements();
-            if (!extended) {
-                return c.json({ success: true, data: { clans } });
-            }
-            const entries = await Promise.all(
-                clans.map(async (clanRecord) => {
-                    const rawTag = Object.keys(clanRecord)[0];
-                    if (!rawTag) return null;
-                    const tag: string = rawTag;
-                    const clanData = clanRecord[tag]!;
-                    try {
-                        const cocData = await cocClient.getClan(tag);
-                        return [tag, { ...clanData, cocData }] as const;
-                    } catch {
-                        return [tag, clanData] as const;
-                    }
-                }),
-            );
-            const clansDict = Object.fromEntries(entries.filter((e) => e !== null));
-            return c.json({ success: true, data: { clans: clansDict } });
+            return c.json({
+                success: true,
+                data: { clans },
+            });
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch JPA clans" }, 500);

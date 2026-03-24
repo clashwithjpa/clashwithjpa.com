@@ -34,7 +34,7 @@ export {
     getCOCPlayerBattleLogQueryResponseSchema,
 } from "./getCOCPlayerBattleLogSchema.ts";
 export { getCOCPlayer200Schema, getCOCPlayer500Schema, getCOCPlayerPathParamsSchema, getCOCPlayerQueryResponseSchema } from "./getCOCPlayerSchema.ts";
-export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryParamsSchema, getJPAClansQueryResponseSchema } from "./getJPAClansSchema.ts";
+export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./getJPAClansSchema.ts";
 export { getRoot200Schema, getRootQueryResponseSchema } from "./getRootSchema.ts";
 export {
     getUserAccounts200Schema,

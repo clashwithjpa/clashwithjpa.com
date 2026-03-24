@@ -89,17 +89,7 @@ export type {
     GetCOCPlayerBattleLogQueryResponse,
     ItemsBattleTypeEnumKey,
 } from "./models/GetCOCPlayerBattleLog.ts";
-export type {
-    CocDataTypeEnumKey,
-    CocDataWarFrequencyEnumKey,
-    GetJPAClans200,
-    GetJPAClans500,
-    GetJPAClansQuery,
-    GetJPAClansQueryParams,
-    GetJPAClansQueryParamsExtendedEnumKey,
-    GetJPAClansQueryResponse,
-    MemberListRoleEnum2Key,
-} from "./models/GetJPAClans.ts";
+export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./models/GetJPAClans.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./models/GetRoot.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
 export type {
@@ -194,10 +184,6 @@ export { playerWarPreferenceEnum } from "./models/GetCOCPlayer.ts";
 export { spellsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { troopsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
-export { cocDataTypeEnum } from "./models/GetJPAClans.ts";
-export { cocDataWarFrequencyEnum } from "./models/GetJPAClans.ts";
-export { getJPAClansQueryParamsExtendedEnum } from "./models/GetJPAClans.ts";
-export { memberListRoleEnum2 } from "./models/GetJPAClans.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
 export {
     applyUserAccount200Schema,
@@ -245,7 +231,7 @@ export {
     getCOCPlayerPathParamsSchema,
     getCOCPlayerQueryResponseSchema,
 } from "./zod/getCOCPlayerSchema.ts";
-export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryParamsSchema, getJPAClansQueryResponseSchema } from "./zod/getJPAClansSchema.ts";
+export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./zod/getJPAClansSchema.ts";
 export { getRoot200Schema, getRootQueryResponseSchema } from "./zod/getRootSchema.ts";
 export {
     getUserAccounts200Schema,
