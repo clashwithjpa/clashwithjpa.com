@@ -41,10 +41,10 @@
     <span class={`absolute inset-0.5 rounded-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
     <span class={`absolute inset-x-1.5 top-1.5 h-1/2 rounded-[14px] rounded-b-xl bg-linear-to-b ${v.gloss} opacity-70`}></span>
 
-    <div class="relative h-full">
+    <div class="relative flex h-full flex-1 flex-col p-2">
         <div
             class={cn(
-                `m-2 overflow-hidden rounded-xl border border-black bg-linear-to-b font-coc ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`,
+                `flex-1 overflow-hidden rounded-xl border border-black bg-linear-to-b font-coc ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)]`,
                 contentClass,
             )}
         >

@@ -168,23 +168,27 @@
     const displayBadge = $derived(clanData?.badgeUrls?.large || warData?.clan?.badgeUrls?.large || "");
 </script>
 
-<CocCard class={cn("origin-center transform transition-all duration-200 hover:scale-102", className)}>
+<CocCard
+    variant="dark"
+    class={cn("flex h-full origin-center transform flex-col transition-all duration-200 hover:scale-102", className)}
+    contentClass="flex flex-col h-full"
+>
     {#if loading}
-        <div class="flex min-h-64 items-center justify-center p-6" in:fade={{ duration: 200 }}>
+        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fade={{ duration: 200 }}>
             <div class="flex flex-col items-center gap-4">
                 <SvgSpinnersBlocksScale class="size-12 text-stone-700" />
                 <p class="font-coc text-lg font-bold text-stone-700">Loading war...</p>
             </div>
         </div>
     {:else if error || !warData}
-        <div class="flex min-h-64 items-center justify-center p-6" in:fade={{ duration: 200 }}>
+        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fade={{ duration: 200 }}>
             <div class="flex flex-col items-center gap-4 text-center">
                 <p class="font-coc text-xl font-bold text-red-700">Error Loading War</p>
                 <p class="font-coc text-sm text-stone-700">{error || "War data not found"}</p>
             </div>
         </div>
     {:else}
-        <div class="flex min-h-64 flex-col gap-4 overflow-hidden p-5" in:fade={{ duration: 200 }} use:cardSlideIn>
+        <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fade={{ duration: 200 }} use:cardSlideIn>
             <!-- Header with Badge, Name, Tag and War State -->
             <div class="flex items-center gap-4">
                 {#if displayBadge}
@@ -314,7 +318,7 @@
             {/if}
 
             <!-- Action Buttons -->
-            <div class="grid grid-cols-2 gap-2">
+            <div class="mt-auto grid grid-cols-2 gap-2">
                 <CocBtn
                     variant="orange"
                     size="sm"

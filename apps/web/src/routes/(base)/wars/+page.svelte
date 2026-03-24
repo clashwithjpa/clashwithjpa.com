@@ -31,8 +31,8 @@
     {#if data.clans.success && data.clans.data.clans.length > 0}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {#each data.clans.data.clans as clan, index}
-                <div class="war-card opacity-0">
-                    <WarCard clanTag={Object.keys(clan)[0]} delay={index * 200} />
+                <div class="war-card h-full opacity-0">
+                    <WarCard clanTag={Object.keys(clan)[0]} delay={index * 200} class="h-full" />
                 </div>
             {/each}
         </div>
