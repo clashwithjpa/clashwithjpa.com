@@ -8,11 +8,13 @@ export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetRootQueryKey } from "./hooks/createGetRoot.ts";
+export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
 export type { LoginQueryKey } from "./hooks/createLogin.ts";
 export type { LogoutMutationKey } from "./hooks/createLogout.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type {
     ApplyUserAccount200,
     ApplyUserAccount400,
@@ -91,6 +93,7 @@ export type {
 } from "./models/GetCOCPlayerBattleLog.ts";
 export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./models/GetJPAClans.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./models/GetRoot.ts";
+export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
 export type {
     GetUserAccounts200,
@@ -110,6 +113,7 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./models/PostCOCPlayerVerify.ts";
+export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export { applyUserAccount } from "./clients/applyUserAccount.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
@@ -120,11 +124,13 @@ export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getRoot } from "./clients/getRoot.ts";
+export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
 export { login } from "./clients/login.ts";
 export { logout } from "./clients/logout.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
+export { setRules } from "./clients/setRules.ts";
 export { applyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
 export { createApplyUserAccount } from "./hooks/createApplyUserAccount.ts";
 export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
@@ -154,6 +160,9 @@ export { getJPAClansQueryOptions } from "./hooks/createGetJPAClans.ts";
 export { createGetRoot } from "./hooks/createGetRoot.ts";
 export { getRootQueryKey } from "./hooks/createGetRoot.ts";
 export { getRootQueryOptions } from "./hooks/createGetRoot.ts";
+export { createGetRules } from "./hooks/createGetRules.ts";
+export { getRulesQueryKey } from "./hooks/createGetRules.ts";
+export { getRulesQueryOptions } from "./hooks/createGetRules.ts";
 export { createGetUser } from "./hooks/createGetUser.ts";
 export { getUserQueryKey } from "./hooks/createGetUser.ts";
 export { getUserQueryOptions } from "./hooks/createGetUser.ts";
@@ -167,6 +176,8 @@ export { createLogout } from "./hooks/createLogout.ts";
 export { logoutMutationKey } from "./hooks/createLogout.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export { createSetRules } from "./hooks/createSetRules.ts";
+export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
 export { warStateEnum } from "./models/GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./models/GetCOCClan.ts";
@@ -233,6 +244,7 @@ export {
 } from "./zod/getCOCPlayerSchema.ts";
 export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./zod/getJPAClansSchema.ts";
 export { getRoot200Schema, getRootQueryResponseSchema } from "./zod/getRootSchema.ts";
+export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
     getUserAccounts401Schema,
@@ -249,3 +261,4 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./zod/postCOCPlayerVerifySchema.ts";
+export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";

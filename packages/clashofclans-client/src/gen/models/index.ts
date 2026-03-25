@@ -76,6 +76,7 @@ export type {
 } from "./GetCOCPlayerBattleLog.ts";
 export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./GetJPAClans.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./GetRoot.ts";
+export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./GetUser.ts";
 export type {
     GetUserAccounts200,
@@ -95,6 +96,7 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
+export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export { warBattleModifierEnum } from "./GetCOCCWLWar.ts";
 export { warStateEnum } from "./GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./GetCOCClan.ts";

@@ -36,6 +36,7 @@ export {
 export { getCOCPlayer200Schema, getCOCPlayer500Schema, getCOCPlayerPathParamsSchema, getCOCPlayerQueryResponseSchema } from "./getCOCPlayerSchema.ts";
 export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./getJPAClansSchema.ts";
 export { getRoot200Schema, getRootQueryResponseSchema } from "./getRootSchema.ts";
+export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
     getUserAccounts401Schema,
@@ -52,3 +53,4 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./postCOCPlayerVerifySchema.ts";
+export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";

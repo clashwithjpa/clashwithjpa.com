@@ -1,11 +1,11 @@
+import "dotenv/config";
+import * as Sentry from "@sentry/bun";
 import { config } from "@/lib/config";
 import { betterAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
 import { Scalar } from "@scalar/hono-api-reference";
-import * as Sentry from "@sentry/bun";
-import "dotenv/config";
 import { Hono } from "hono";
 import { describeRoute, openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
@@ -19,9 +19,11 @@ import RedisClient from "ioredis";
 import { RedisStore, type RedisReply } from "rate-limit-redis";
 import z4 from "zod/v4";
 import coc from "./routes/coc";
+import manage from "./routes/manage";
 import user from "./routes/user";
 
 const client = new RedisClient("redis://default@localhost:7102");
+import { getRules } from "@/lib/db/functions";
 
 const app = new Hono<AppEnv>();
 
@@ -186,8 +188,51 @@ app.post(
     },
 );
 
+const getRulesData = z4.object({
+    rules: z4.string().nullable(),
+});
+app.get(
+    "/rules",
+    describeRoute({
+        operationId: "getRules",
+        description: "[Public] Fetches the current rules content.",
+        tags: ["root"],
+        responses: {
+            200: {
+                description: "Successful response with the rules content.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getRulesData)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when fetching rules fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const rules = await getRules();
+            return c.json({
+                success: true,
+                data: { rules },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch rules" }, 500);
+        }
+    },
+);
+
 // Routes here
 app.route("/coc", coc);
+app.route("/manage", manage);
 app.route("/user", user);
 
 app.get(

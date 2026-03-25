@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { account, clanApplicationTable, clanInfoTable, cocAccountTable } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { account, clanApplicationTable, clanInfoTable, cocAccountTable, settingsTable } from "@/lib/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -47,4 +47,23 @@ export async function getClansWithRequirements() {
             requiredDonations: clan.requiredDonations,
         },
     }));
+}
+
+export async function getRules(): Promise<string | null> {
+    const result = await db.select({ rulesContent: settingsTable.rulesContent }).from(settingsTable).limit(1);
+
+    return result[0]?.rulesContent ?? null;
+}
+
+export async function setRules(rulesContent: string): Promise<string> {
+    const result = await db
+        .insert(settingsTable)
+        .values({ rulesContent, updatedAt: new Date() })
+        .onConflictDoUpdate({
+            target: settingsTable.id,
+            set: { rulesContent, updatedAt: new Date() },
+        })
+        .returning({ rulesContent: settingsTable.rulesContent });
+
+    return result[0]!.rulesContent!;
 }
