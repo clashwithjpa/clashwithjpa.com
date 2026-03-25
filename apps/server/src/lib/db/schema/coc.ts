@@ -1,6 +1,6 @@
 import { boolean, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { account } from "./ba-auth";
+import { account, user } from "./ba-auth";
 
 export const settingsTable = pgTable("settings_table", {
     id: serial("id").primaryKey(), // Only one row expected
@@ -11,6 +11,24 @@ export const settingsTable = pgTable("settings_table", {
     guildId: text("guild_id"),
     updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const guidesTable = pgTable(
+    "guides_table",
+    {
+        id: serial("id").primaryKey(),
+        title: text("title").notNull(),
+        slug: text("slug").notNull().unique(),
+        imageLink: text("image_link"),
+        addedAt: timestamp("added_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+        author: text("author")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        description: text("description"),
+        isPublished: boolean("is_published").notNull().default(false),
+    },
+    (t) => [index("guides_author_idx").on(t.author)],
+);
 
 export const baseInfoTable = pgTable("base_info_table", {
     id: serial("id").primaryKey(),
@@ -119,5 +137,12 @@ export const cocAccountRelations = relations(cocAccountTable, ({ one }) => ({
     user: one(account, {
         fields: [cocAccountTable.discordUserId],
         references: [account.accountId],
+    }),
+}));
+
+export const guidesRelations = relations(guidesTable, ({ one }) => ({
+    authorUser: one(user, {
+        fields: [guidesTable.author],
+        references: [user.id],
     }),
 }));
