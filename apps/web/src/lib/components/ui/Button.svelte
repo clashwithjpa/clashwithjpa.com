@@ -39,9 +39,8 @@
 
     import { cn } from "$lib/utils";
     import { bounceDown, bounceUp } from "$lib/utils/animations";
-    import { Portal } from "@ark-ui/svelte/portal";
-    import { Tooltip } from "@ark-ui/svelte/tooltip";
     import type { Snippet } from "svelte";
+    import Tooltip from "./Tooltip.svelte";
 
     let isPressed = false;
 
@@ -87,34 +86,7 @@
     );
 </script>
 
-{#if tooltip}
-    <Tooltip.Root openDelay={200} interactive={false} closeOnPointerDown={true} positioning={{ placement: tooltipPlacement, gutter: 12 }}>
-        <Tooltip.Trigger
-            {disabled}
-            aria-label={tooltip}
-            class={buttonClass}
-            onclick={handleClick}
-            onpointerdown={handlePointerDown}
-            onpointerup={handlePointerUp}
-            onpointerleave={handlePointerUp}
-        >
-            {@render children()}
-        </Tooltip.Trigger>
-        <Portal>
-            <Tooltip.Positioner class="z-60">
-                <Tooltip.Content
-                    style="--arrow-background: var(--color-stone-900); --arrow-size: 12px;"
-                    class="rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
-                >
-                    <Tooltip.Arrow>
-                        <Tooltip.ArrowTip class="border-t-2 border-l-2 border-stone-700/50" />
-                    </Tooltip.Arrow>
-                    {tooltip}
-                </Tooltip.Content>
-            </Tooltip.Positioner>
-        </Portal>
-    </Tooltip.Root>
-{:else}
+{#snippet button()}
     <svelte:element
         this={href ? "a" : "button"}
         type={href ? undefined : "button"}
@@ -130,4 +102,12 @@
     >
         {@render children()}
     </svelte:element>
+{/snippet}
+
+{#if tooltip}
+    <Tooltip title={tooltip} placement={tooltipPlacement}>
+        {@render button()}
+    </Tooltip>
+{:else}
+    {@render button()}
 {/if}
