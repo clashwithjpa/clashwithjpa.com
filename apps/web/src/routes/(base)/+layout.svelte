@@ -8,10 +8,10 @@
     const isHomePage = $derived(page.url.pathname === "/");
 </script>
 
-<div class={cn("min-h-screen", !isHomePage && "bg-stone-950")}>
+<div class={cn("min-h-screen pt-20", !isHomePage && "bg-stone-950")}>
     <Navbar />
 
-    <div class="size-full p-2 pt-20 font-coc md:p-4 md:pt-20">
+    <div class="size-full p-2 font-coc md:p-4">
         {@render children()}
     </div>
 </div>
