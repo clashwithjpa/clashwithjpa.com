@@ -1,3 +1,4 @@
+export type { ApplyCwlMutationKey } from "./hooks/createApplyCwl.ts";
 export type { ApplyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
 export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
@@ -11,10 +12,21 @@ export type { GetRootQueryKey } from "./hooks/createGetRoot.ts";
 export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
+export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export type { LoginQueryKey } from "./hooks/createLogin.ts";
 export type { LogoutMutationKey } from "./hooks/createLogout.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
+export type {
+    ApplyCwl200,
+    ApplyCwl400,
+    ApplyCwl401,
+    ApplyCwl409,
+    ApplyCwl500,
+    ApplyCwlMutation,
+    ApplyCwlMutationRequest,
+    ApplyCwlMutationResponse,
+} from "./models/ApplyCwl.ts";
 export type {
     ApplyUserAccount200,
     ApplyUserAccount400,
@@ -102,6 +114,13 @@ export type {
     GetUserAccountsQuery,
     GetUserAccountsQueryResponse,
 } from "./models/GetUserAccounts.ts";
+export type {
+    GetUserCwlApplications200,
+    GetUserCwlApplications401,
+    GetUserCwlApplications500,
+    GetUserCwlApplicationsQuery,
+    GetUserCwlApplicationsQueryResponse,
+} from "./models/GetUserCwlApplications.ts";
 export type { Login200, LoginQuery, LoginQueryResponse } from "./models/Login.ts";
 export type { Logout200, Logout500, LogoutMutation, LogoutMutationResponse } from "./models/Logout.ts";
 export type {
@@ -114,6 +133,7 @@ export type {
     VerifyTokenStatusEnumKey,
 } from "./models/PostCOCPlayerVerify.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
+export { applyCwl } from "./clients/applyCwl.ts";
 export { applyUserAccount } from "./clients/applyUserAccount.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
@@ -127,10 +147,13 @@ export { getRoot } from "./clients/getRoot.ts";
 export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
+export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { login } from "./clients/login.ts";
 export { logout } from "./clients/logout.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { setRules } from "./clients/setRules.ts";
+export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
+export { createApplyCwl } from "./hooks/createApplyCwl.ts";
 export { applyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
 export { createApplyUserAccount } from "./hooks/createApplyUserAccount.ts";
 export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
@@ -169,6 +192,9 @@ export { getUserQueryOptions } from "./hooks/createGetUser.ts";
 export { createGetUserAccounts } from "./hooks/createGetUserAccounts.ts";
 export { getUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
 export { getUserAccountsQueryOptions } from "./hooks/createGetUserAccounts.ts";
+export { createGetUserCwlApplications } from "./hooks/createGetUserCwlApplications.ts";
+export { getUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
+export { getUserCwlApplicationsQueryOptions } from "./hooks/createGetUserCwlApplications.ts";
 export { createLogin } from "./hooks/createLogin.ts";
 export { loginQueryKey } from "./hooks/createLogin.ts";
 export { loginQueryOptions } from "./hooks/createLogin.ts";
@@ -196,6 +222,15 @@ export { spellsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { troopsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
+export {
+    applyCwl200Schema,
+    applyCwl400Schema,
+    applyCwl401Schema,
+    applyCwl409Schema,
+    applyCwl500Schema,
+    applyCwlMutationRequestSchema,
+    applyCwlMutationResponseSchema,
+} from "./zod/applyCwlSchema.ts";
 export {
     applyUserAccount200Schema,
     applyUserAccount400Schema,
@@ -251,6 +286,12 @@ export {
     getUserAccounts500Schema,
     getUserAccountsQueryResponseSchema,
 } from "./zod/getUserAccountsSchema.ts";
+export {
+    getUserCwlApplications200Schema,
+    getUserCwlApplications401Schema,
+    getUserCwlApplications500Schema,
+    getUserCwlApplicationsQueryResponseSchema,
+} from "./zod/getUserCwlApplicationsSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./zod/getUserSchema.ts";
 export { login200Schema, loginQueryResponseSchema } from "./zod/loginSchema.ts";
 export { logout200Schema, logout500Schema, logoutMutationResponseSchema } from "./zod/logoutSchema.ts";

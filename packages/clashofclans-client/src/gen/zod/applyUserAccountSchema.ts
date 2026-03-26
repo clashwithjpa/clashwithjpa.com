@@ -55,8 +55,8 @@ export const applyUserAccount500Schema = z.object({
 });
 
 export const applyUserAccountMutationRequestSchema = z.object({
-    cocAccountTag: z.string().min(1).regex(/^#.*/),
-    apiToken: z.string().min(1),
+    cocAccountTag: z.string().min(1).max(20).regex(/^#.*/),
+    apiToken: z.string().min(1).max(500),
     captchaToken: z.optional(z.union([z.string(), z.null()])),
 });
 

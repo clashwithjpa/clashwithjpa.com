@@ -1,3 +1,4 @@
+export { applyCwl } from "./applyCwl.ts";
 export { applyUserAccount } from "./applyUserAccount.ts";
 export { getCOCCWLWar } from "./getCOCCWLWar.ts";
 export { getCOCClan } from "./getCOCClan.ts";
@@ -11,6 +12,7 @@ export { getRoot } from "./getRoot.ts";
 export { getRules } from "./getRules.ts";
 export { getUser } from "./getUser.ts";
 export { getUserAccounts } from "./getUserAccounts.ts";
+export { getUserCwlApplications } from "./getUserCwlApplications.ts";
 export { login } from "./login.ts";
 export { logout } from "./logout.ts";
 export { postCOCPlayerVerify } from "./postCOCPlayerVerify.ts";

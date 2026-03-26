@@ -4,9 +4,9 @@
  */
 
 /**
- * @description Application submitted successfully.
+ * @description CWL application submitted successfully.
  */
-export type ApplyUserAccount200 = {
+export type ApplyCwl200 = {
     /**
      * @type boolean
      */
@@ -27,27 +27,42 @@ export type ApplyUserAccount200 = {
              * @type string
              */
             cocAccountTag: string;
-            cocAccountData: any;
             /**
              * @type string
              */
-            discordUserId: string;
+            cocAccountClan: string;
+            /**
+             * @type number
+             */
+            cocAccountWeight: number;
+            /**
+             * @type boolean
+             */
+            isAlt: boolean;
+            /**
+             * @type number
+             */
+            preferenceNum: number;
             /**
              * @type string
              */
-            status: string;
+            month: string;
+            /**
+             * @type number
+             */
+            year: number;
             /**
              * @type string, date-time
              */
-            createdAt: string;
+            appliedAt: string;
         };
     };
 };
 
 /**
- * @description Bad request (captcha failed or token verification failed).
+ * @description Bad request (invalid tag or failed to fetch player data).
  */
-export type ApplyUserAccount400 = {
+export type ApplyCwl400 = {
     /**
      * @type boolean
      */
@@ -62,7 +77,7 @@ export type ApplyUserAccount400 = {
 /**
  * @description Unauthorized.
  */
-export type ApplyUserAccount401 = {
+export type ApplyCwl401 = {
     /**
      * @type boolean
      */
@@ -75,9 +90,9 @@ export type ApplyUserAccount401 = {
 };
 
 /**
- * @description Application already exists for this account.
+ * @description Duplicate preference number for this account or user.
  */
-export type ApplyUserAccount409 = {
+export type ApplyCwl409 = {
     /**
      * @type boolean
      */
@@ -92,7 +107,7 @@ export type ApplyUserAccount409 = {
 /**
  * @description Internal server error.
  */
-export type ApplyUserAccount500 = {
+export type ApplyCwl500 = {
     /**
      * @type boolean
      */
@@ -104,27 +119,42 @@ export type ApplyUserAccount500 = {
           };
 };
 
-export type ApplyUserAccountMutationRequest = {
+export type ApplyCwlMutationRequest = {
+    /**
+     * @type boolean
+     */
+    isAlt: boolean;
+    /**
+     * @minLength 1
+     * @maxLength 99
+     * @type integer
+     */
+    preferenceNum: number;
     /**
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
      * @type string
      */
-    cocAccountTag: string;
+    tag: string;
     /**
      * @minLength 1
-     * @maxLength 500
+     * @maxLength 50
      * @type string
      */
-    apiToken: string;
-    captchaToken?: string | null;
+    accountClan: string;
+    /**
+     * @minLength 1
+     * @maxLength 9999999
+     * @type integer
+     */
+    accountWeight: number;
 };
 
-export type ApplyUserAccountMutationResponse = ApplyUserAccount200;
+export type ApplyCwlMutationResponse = ApplyCwl200;
 
-export type ApplyUserAccountMutation = {
-    Response: ApplyUserAccount200;
-    Request: ApplyUserAccountMutationRequest;
-    Errors: ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500;
+export type ApplyCwlMutation = {
+    Response: ApplyCwl200;
+    Request: ApplyCwlMutationRequest;
+    Errors: ApplyCwl400 | ApplyCwl401 | ApplyCwl409 | ApplyCwl500;
 };

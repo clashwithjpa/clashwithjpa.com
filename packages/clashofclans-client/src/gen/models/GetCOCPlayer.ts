@@ -6,6 +6,7 @@
 export type GetCOCPlayerPathParams = {
     /**
      * @minLength 1
+     * @maxLength 20
      * @pattern ^#.*
      * @type string
      */

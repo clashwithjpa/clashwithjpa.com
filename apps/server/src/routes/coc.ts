@@ -22,7 +22,7 @@ import z4 from "zod/v4";
 const app = new Hono<AppEnv>();
 
 const getCOCPlayerPathSchema = z4.object({
-    tag: z4.string().min(1, "Player tag is required").startsWith("#", "Player tag must start with #"),
+    tag: z4.string().min(1, "Player tag is required").max(20).startsWith("#", "Player tag must start with #"),
 });
 const getCOCPlayerData = z4.object({
     player: APIPlayerSchema,
@@ -70,7 +70,7 @@ app.get(
 );
 
 const postCOCPlayerVerifyPathSchema = z4.object({
-    tag: z4.string().min(1, "Player tag is required").startsWith("#", "Player tag must start with #"),
+    tag: z4.string().min(1, "Player tag is required").max(20).startsWith("#", "Player tag must start with #"),
 });
 const postCOCPlayerVerifyBodySchema = z4.object({
     apiToken: z4.string(),
@@ -123,7 +123,7 @@ app.post(
 );
 
 const getCOCPlayerBattleLogPathSchema = z4.object({
-    tag: z4.string().min(1, "Player tag is required").startsWith("#", "Player tag must start with #"),
+    tag: z4.string().min(1, "Player tag is required").max(20).startsWith("#", "Player tag must start with #"),
 });
 const getCOCPlayerBattleLogData = z4.object({
     battleLog: APIBattleLogEntryListSchema,
@@ -171,7 +171,7 @@ app.get(
 );
 
 const getCOCClanPathSchema = z4.object({
-    tag: z4.string().min(1, "Clan tag is required").startsWith("#", "Clan tag must start with #"),
+    tag: z4.string().min(1, "Clan tag is required").max(20).startsWith("#", "Clan tag must start with #"),
 });
 const getCOCClanData = z4.object({
     clan: APIClanSchema,
@@ -218,7 +218,7 @@ app.get(
 );
 
 const getCOCClanMembersPathSchema = z4.object({
-    tag: z4.string().min(1, "Clan tag is required").startsWith("#", "Clan tag must start with #"),
+    tag: z4.string().min(1, "Clan tag is required").max(20).startsWith("#", "Clan tag must start with #"),
 });
 const getCOCClanMembersData = z4.object({
     clanMembers: APIClanMemberListSchema,
@@ -265,7 +265,7 @@ app.get(
 );
 
 const getCOCClanCurrentWarPathSchema = z4.object({
-    tag: z4.string().min(1, "Clan tag is required").startsWith("#", "Clan tag must start with #"),
+    tag: z4.string().min(1, "Clan tag is required").max(20).startsWith("#", "Clan tag must start with #"),
 });
 const getCOCClanCurrentWarData = z4.object({
     currentWar: APIClanWarSchema,
@@ -312,7 +312,7 @@ app.get(
 );
 
 const getCOCClanCWLGroupPathSchema = z4.object({
-    tag: z4.string().min(1, "Clan tag is required").startsWith("#", "Clan tag must start with #"),
+    tag: z4.string().min(1, "Clan tag is required").max(20).startsWith("#", "Clan tag must start with #"),
 });
 const getCOCClanCWLGroupData = z4.object({
     leagueGroup: APIClanWarLeagueGroupSchema,
@@ -360,7 +360,7 @@ app.get(
 );
 
 const getCOCCWLWarPathSchema = z4.object({
-    warTag: z4.string().min(1, "War tag is required").startsWith("#", "War tag must start with #"),
+    warTag: z4.string().min(1, "War tag is required").max(20).startsWith("#", "War tag must start with #"),
 });
 const getCOCCWLWarData = z4.object({
     war: APIClanWarSchema,

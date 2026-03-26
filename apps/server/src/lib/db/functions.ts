@@ -1,11 +1,21 @@
 import { db } from "@/lib/db";
-import { account, clanApplicationTable, clanInfoTable, cocAccountTable, settingsTable } from "@/lib/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { account, clanApplicationTable, clanInfoTable, cocAccountTable, cwlApplicationTable, cwlClanInfoTable, settingsTable } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
 
     return cocAccounts;
+}
+
+export async function getCocAccountOwner(cocAccountTag: string) {
+    const result = await db
+        .select({ discordUserId: cocAccountTable.discordUserId })
+        .from(cocAccountTable)
+        .where(eq(cocAccountTable.cocAccountTag, cocAccountTag))
+        .limit(1);
+
+    return result[0]?.discordUserId ?? null;
 }
 
 export async function getDiscordAccountId(userId: string): Promise<string | null> {
@@ -66,4 +76,43 @@ export async function setRules(rulesContent: string): Promise<string> {
         .returning({ rulesContent: settingsTable.rulesContent });
 
     return result[0]!.rulesContent!;
+}
+
+export async function addCwlApplication(data: {
+    discordUserId: string;
+    discordUsername: string;
+    cocAccountName: string;
+    cocAccountTag: string;
+    cocAccountClan: string;
+    cocAccountWeight: number;
+    isAlt: boolean;
+    preferenceNum: number;
+}) {
+    const now = new Date();
+    const month = now.toLocaleString("en-US", { month: "long" });
+    const year = now.getFullYear();
+
+    const result = await db
+        .insert(cwlApplicationTable)
+        .values({
+            ...data,
+            month,
+            year,
+        })
+        .returning();
+
+    return result[0];
+}
+
+export async function getUserCwlApplications(discordUserId: string) {
+    const now = new Date();
+    const month = now.toLocaleString("en-US", { month: "long" });
+    const year = now.getFullYear();
+
+    const applications = await db
+        .select()
+        .from(cwlApplicationTable)
+        .where(and(eq(cwlApplicationTable.discordUserId, discordUserId), eq(cwlApplicationTable.month, month), eq(cwlApplicationTable.year, year)));
+
+    return applications;
 }

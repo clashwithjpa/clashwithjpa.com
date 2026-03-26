@@ -6,6 +6,7 @@
 export type GetCOCPlayerBattleLogPathParams = {
     /**
      * @minLength 1
+     * @maxLength 20
      * @pattern ^#.*
      * @type string
      */

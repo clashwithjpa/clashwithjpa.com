@@ -1,0 +1,2 @@
+ALTER TABLE "cwl_application_table" ADD COLUMN "is_alt" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "cwl_application_table" ADD CONSTRAINT "cwl_table_userId_preferenceNum_month_year_unique" UNIQUE("discord_user_id","preference_num","month","year");

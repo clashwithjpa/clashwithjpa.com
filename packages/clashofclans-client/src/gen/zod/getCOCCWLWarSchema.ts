@@ -6,7 +6,7 @@
 import { z } from "zod/v4";
 
 export const getCOCCWLWarPathParamsSchema = z.object({
-    warTag: z.string().min(1).regex(/^#.*/),
+    warTag: z.string().min(1).max(20).regex(/^#.*/),
 });
 
 /**

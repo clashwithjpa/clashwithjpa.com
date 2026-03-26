@@ -107,6 +107,7 @@ export const cwlApplicationTable = pgTable(
         cocAccountTag: text("coc_account_tag").notNull(),
         cocAccountClan: text("coc_account_clan").notNull(),
         cocAccountWeight: integer("coc_account_weight").notNull(),
+        isAlt: boolean("is_alt").notNull().default(false),
         month: text("month").notNull(),
         year: integer("year").notNull(),
         preferenceNum: integer("preference_num").notNull(),
@@ -117,6 +118,7 @@ export const cwlApplicationTable = pgTable(
     },
     (t) => [
         unique("cwl_table_accountTag_preferenceNum_month_year_unique").on(t.cocAccountTag, t.preferenceNum, t.month, t.year),
+        unique("cwl_table_userId_preferenceNum_month_year_unique").on(t.discordUserId, t.preferenceNum, t.month, t.year),
         index("cwl_application_discord_user_id_idx").on(t.discordUserId),
         index("cwl_application_assigned_to_idx").on(t.assignedTo),
     ],

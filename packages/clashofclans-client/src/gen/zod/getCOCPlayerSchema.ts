@@ -6,7 +6,7 @@
 import { z } from "zod/v4";
 
 export const getCOCPlayerPathParamsSchema = z.object({
-    tag: z.string().min(1).regex(/^#.*/),
+    tag: z.string().min(1).max(20).regex(/^#.*/),
 });
 
 /**
