@@ -32,8 +32,8 @@
 </video>
 <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.8)_100%)] p-0!"></div>
 
-<div class="flex size-full flex-col items-center justify-between pt-20 sm:pt-0 lg:pt-20">
-    <div class="flex flex-col items-center justify-center">
+<div class="flex size-full flex-col items-center justify-between p-0!">
+    <div class="flex flex-col items-center justify-center pt-20 sm:pt-10 lg:pt-30">
         <H1 class="text-4xl font-bold md:text-6xl lg:text-8xl">
             <span class="clash-with opacity-0">Clash With</span>
             <span class="jpa-txt"> JPA</span>
@@ -52,7 +52,7 @@
             </CocBtn>
         {/each}
     </div>
-    <div class="flex items-center justify-center gap-4">
+    <div class="flex items-center justify-center gap-4 pb-4">
         <CocBtn variant="green" size="sm" class="social-btn">
             <SimpleIconsGoogleplay />
         </CocBtn>
