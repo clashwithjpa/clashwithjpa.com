@@ -10,7 +10,7 @@
     let { children } = $props();
 </script>
 
-<div class="flex h-screen w-screen flex-col overflow-x-hidden">
+<div class="h-screen w-screen overflow-x-hidden">
     {@render children()}
 </div>
 
