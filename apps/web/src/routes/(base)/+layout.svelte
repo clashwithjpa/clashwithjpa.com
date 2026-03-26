@@ -11,7 +11,7 @@
 <div class={cn("min-h-screen pt-20", !isHomePage && "bg-stone-950")}>
     <Navbar />
 
-    <div class="size-full p-2 font-coc md:p-4">
+    <div class="size-full px-2 font-coc *:py-4 md:px-4 *:md:py-8 lg:px-8 *:lg:py-12">
         {@render children()}
     </div>
 </div>

@@ -1,23 +1,35 @@
 <script lang="ts">
+    import H1 from "$lib/components/ui/coc/H1.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { fadeIn } from "$lib/utils/animations";
+    import { fadeIn, fadeUp } from "$lib/utils/animations";
     import { PreRendered } from "carta-md";
-    import { onMount } from "svelte";
     import type { PageProps } from "./$types";
 
     let { data }: PageProps = $props();
 
-    let content: HTMLElement | null = null;
-
-    onMount(() => {
-        if (content) fadeIn(content);
+    $effect(() => {
+        fadeIn(document.querySelector(".page-title") as HTMLElement);
+        fadeUp(document.querySelector(".page-desc") as HTMLElement);
+        fadeIn(document.querySelector(".rules") as HTMLElement);
     });
 </script>
 
 <Seo title="Rules" description="The rules of JPA FWA Clans" />
 
-<div class="typography rules container mx-auto max-w-7xl! py-4" bind:this={content}>
-    <PreRendered html={data.rules} />
+<div class="container mx-auto">
+    <div class="flex flex-col items-center gap-4 text-center">
+        <H1 class="page-title text-4xl opacity-0 md:text-6xl">JPA Clans</H1>
+        <p class="page-desc max-w-2xl font-coc text-lg text-stone-200 opacity-0 md:text-xl">
+            Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming
+            experience.
+        </p>
+    </div>
+
+    <br />
+
+    <div class="typography rules max-w-7xl!">
+        <PreRendered html={data.rules} />
+    </div>
 </div>
 
 <style>
