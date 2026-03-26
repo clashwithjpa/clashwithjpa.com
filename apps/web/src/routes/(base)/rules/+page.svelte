@@ -14,11 +14,16 @@
     });
 </script>
 
-<Seo title="Rules" description="The rules of JPA FWA Clans" />
+<Seo
+    title="Rules"
+    description="
+            Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming
+            experience."
+/>
 
 <div class="container mx-auto">
     <div class="flex flex-col items-center gap-4 text-center">
-        <H1 class="page-title text-4xl opacity-0 md:text-6xl">JPA Clans</H1>
+        <H1 class="page-title text-4xl opacity-0 md:text-6xl">JPA Rules</H1>
         <p class="page-desc max-w-2xl font-coc text-lg text-stone-200 opacity-0 md:text-xl">
             Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming
             experience.
