@@ -27,10 +27,10 @@
     description="FWA experts in War-Farming, offering diverse clans and simultaneous 50v50 FWA wars and CWL action. Join one of the clans in our family today!"
 />
 
-<video id="bg-video" autoplay muted loop class="absolute inset-0 -z-10 h-full w-full object-cover">
+<video id="bg-video" autoplay muted loop class="absolute inset-0 -z-10 h-full w-full object-cover p-0!">
     <source src="/video/bg.mp4" type="video/mp4" />
 </video>
-<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.8)_100%)]"></div>
+<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.8)_100%)] p-0!"></div>
 
 <div class="flex size-full flex-col items-center justify-between pt-20 sm:pt-0 lg:pt-20">
     <div class="flex flex-col items-center justify-center">
