@@ -69,13 +69,14 @@ This will start the web app on `http://localhost:5173` and the server on `http:/
 The entire application relies primarily on Tailwind CSS's **Stone** color palette (`stone-50` through `stone-950`).
 - **Main Backgrounds:** `bg-stone-950`
 - **Surface/Elevated Backgrounds:** `bg-stone-900`
-- **Primary Text:** `text-stone-50` (*`text-stone-950` for light bg*)
-- **Secondary Text:** `text-stone-200` (*`text-stone-400` for light bg*)
-- **Tertiary Text:** `text-stone-400` (*`text-stone-600` for light bg*)
+- **Primary Text:** `text-stone-50`
+- **Secondary Text:** `text-stone-200`
+- **Tertiary Text:** `text-stone-400`
+- **Quaternary Text:** `text-stone-600`
 - **Borders:** `border-stone-700/50`
 - **Backdrop Blur:** `backdrop-blur-sm`
 
-> **Note:** DO NOT use any text colors other than the 3 defined above. The `CocBtn` component has its own independent theme variations (Green, Orange, Red, Blurple) and is an exception to the strict Stone palette rule.
+> **Note:** DO NOT use any text colors other than the 3 defined above. The `CocBtn` component has its own independent theme variations (Green, Orange, Red, Blurple) and other coc related components are exceptions to the strict Stone palette rule.
 
 ### Borders
 

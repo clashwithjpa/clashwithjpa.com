@@ -17,20 +17,27 @@
 
     let { data, children }: LayoutProps = $props();
 
-    let dashboardLinks: { name: string; icon: Component; href: string }[] = [
+    interface Link {
+        name: string;
+        icon: Component;
+        href: string;
+        requiredPerm?: string;
+    }
+
+    let dashboardLinks: Link[] = [
         { name: "Home ", icon: TablerHome, href: "/dashboard" },
-        { name: "Apply", icon: TablerFileDescription, href: "/dashboard/wars" },
-        { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl" },
+        { name: "Apply", icon: TablerFileDescription, href: "/dashboard/apply", requiredPerm: "apply" },
+        { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", requiredPerm: "cwl" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings" },
     ];
 
-    let adminLinks: { name: string; icon: Component; href: string }[] = [
+    let adminLinks: Link[] = [
         { name: "Home", icon: TablerHome, href: "/admin" },
-        { name: "Users", icon: TablerUser, href: "/admin/users" },
-        { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications" },
-        { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications" },
-        { name: "Rules", icon: TablerBook2, href: "/admin/rules" },
-        { name: "Settings", icon: TablerSettings, href: "/admin/settings" },
+        { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "review" },
+        { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications", requiredPerm: "review" },
+        { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
+        { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
+        { name: "Settings", icon: TablerSettings, href: "/admin/settings", requiredPerm: "sudo" },
     ];
 
     let links = $derived(page.url.pathname.startsWith("/admin") ? adminLinks : dashboardLinks);
@@ -58,11 +65,15 @@
             <div class="relative grid w-full grid-cols-2 items-center">
                 <div class="flex items-center justify-evenly gap-4 pr-8">
                     {#each links.slice(0, links.length / 2) as link (link.href)}
+                        {@const hasPermission = true}
                         <Button
                             variant={null}
                             href={link.href}
-                            class="dash-nav-btn flex flex-col items-center justify-center rounded-lg transition-colors duration-200 hover:text-stone-50
-                                {page.url.pathname == link.href ? 'text-stone-50' : 'text-stone-400'}"
+                            class="dash-nav-btn flex flex-col items-center justify-center rounded-lg transition-colors duration-200
+                                {hasPermission && 'hover:text-stone-50'}
+                                {!hasPermission && 'cursor-not-allowed! text-stone-600!'}
+                                {page.url.pathname == link.href && hasPermission ? 'text-stone-50' : 'text-stone-400'}"
+                            disabled={!hasPermission}
                         >
                             <link.icon class="mb-0.5 size-7" />
                             <p class="truncate text-[10px]">{link.name}</p>
@@ -72,11 +83,15 @@
 
                 <div class="flex items-center justify-evenly gap-4 pl-8">
                     {#each links.slice(links.length / 2) as link (link.href)}
+                        {@const hasPermission = true}
                         <Button
                             variant={null}
                             href={link.href}
-                            class="dash-nav-btn flex flex-col items-center justify-center rounded-lg transition-colors duration-200 hover:text-stone-50
-                                {page.url.pathname == link.href ? 'text-stone-50' : 'text-stone-400'}"
+                            class="dash-nav-btn flex flex-col items-center justify-center rounded-lg transition-colors duration-200
+                                {hasPermission && 'hover:text-stone-50'}
+                                {!hasPermission && 'cursor-not-allowed! text-stone-600!'}
+                                {page.url.pathname == link.href && hasPermission ? 'text-stone-50' : 'text-stone-400'}"
+                            disabled={!hasPermission}
                         >
                             <link.icon class="mb-0.5 size-7" />
                             <p class="truncate text-[10px]">{link.name}</p>
@@ -95,18 +110,26 @@
         {:else}
             <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth}>
                 {#each links as link (link.href)}
+                    {@const hasPermission = true}
                     <Button
                         variant={null}
                         href={link.href}
                         class="dash-nav-btn flex w-full items-center {isSidebarExpanded
                             ? 'flex-row justify-start px-4'
-                            : 'flex-col justify-center'} overflow-hidden rounded-lg transition-colors duration-200 hover:text-stone-50
-                                {page.url.pathname == link.href ? 'text-stone-50' : 'text-stone-400'}"
+                            : 'flex-col justify-center'} overflow-hidden rounded-lg transition-colors duration-200
+                                {hasPermission && 'hover:text-stone-50'}
+                                {!hasPermission && 'cursor-not-allowed! text-stone-600!'}
+                                {page.url.pathname == link.href && hasPermission ? 'text-stone-50' : 'text-stone-400'}"
+                        disabled={!hasPermission}
                     >
                         <link.icon class="size-6 shrink-0 transition-transform duration-200" />
-                        <span class="{isSidebarExpanded ? 'ml-2 text-sm' : 'text-[10px]'} truncate font-medium transition-opacity duration-200"
-                            >{link.name}</span
+                        <span
+                            class="{isSidebarExpanded
+                                ? 'ml-2 text-sm'
+                                : 'text-[10px]'} flex items-center justify-center gap-0.5 truncate font-medium transition-opacity duration-200"
                         >
+                            {link.name}
+                        </span>
                     </Button>
                 {/each}
             </div>
