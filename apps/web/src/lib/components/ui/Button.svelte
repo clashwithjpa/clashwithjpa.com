@@ -93,7 +93,7 @@
         type={href ? undefined : "button"}
         role={href ? "link" : "button"}
         {disabled}
-        {href}
+        href={disabled ? undefined : href}
         {target}
         class={buttonClass}
         onclick={handleClick}

@@ -72,7 +72,6 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 - **Primary Text:** `text-stone-50`
 - **Secondary Text:** `text-stone-200`
 - **Tertiary Text:** `text-stone-400`
-- **Quaternary Text:** `text-stone-600`
 - **Borders:** `border-stone-700/50`
 - **Backdrop Blur:** `backdrop-blur-sm`
 
