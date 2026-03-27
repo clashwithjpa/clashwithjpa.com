@@ -23,7 +23,7 @@ export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     verified: {
         label: "Verified",
         decoration: {
-            gradient: "linear-gradient(135deg, #1e3a8a, #3b82f6)",
+            gradient: "linear-gradient(135deg, #166534, #4ade80)",
             animated: false,
         },
     },
