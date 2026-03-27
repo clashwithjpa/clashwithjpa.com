@@ -33,7 +33,7 @@
             | "right"
             | "right-start"
             | "right-end";
-        variant?: "base" | "ghost";
+        variant?: "base" | "ghost" | null;
         size?: "sm" | "base" | "lg" | "icon" | "";
     } = $props();
 
@@ -78,9 +78,10 @@
 
     const buttonClass = $derived(
         cn(
-            "flex cursor-pointer items-center justify-center rounded-lg border-2 border-stone-700/50 text-stone-200 transition-colors duration-200 outline-none hover:bg-stone-700 hover:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50",
-            variantClasses[variant],
-            sizeClasses[size],
+            variant &&
+                "flex cursor-pointer items-center justify-center rounded-lg border-2 border-stone-700/50 text-stone-200 transition-colors duration-200 outline-none hover:bg-stone-700 hover:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50",
+            variant && variantClasses[variant],
+            variant && sizeClasses[size],
             className,
         ),
     );

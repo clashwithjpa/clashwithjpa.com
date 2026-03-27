@@ -1,8 +1,10 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
     import { spinOnce } from "$lib/utils/animations";
+    import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
     import { onMount } from "svelte";
@@ -201,9 +203,22 @@
             window.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
         }, 10);
     }
+
+    let isMobile = $state(false);
+
+    onMount(() => {
+        const cleanup = createMobileMediaQuery((mobile) => {
+            isMobile = mobile;
+        }, "lg");
+        return cleanup;
+    });
 </script>
 
-<div {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])} class="fixed right-4 bottom-4 z-9999">
+<div
+    {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])}
+    class="fixed right-4 bottom-4 z-9999"
+    class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
+>
     <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-9999" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
             <Button class="size-14 rounded-full" size="" variant="ghost" onclick={(e) => spinOnce(e.currentTarget as Element)}>

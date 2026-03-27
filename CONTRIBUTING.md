@@ -93,6 +93,7 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 
 - **Standard Radius:** `rounded-lg`
     - **Apply to:** Buttons, Tooltips, Popovers, Cards, Menus, Navbars.
+- **Content Radius (*for admin and dashboard*)**: `rounded-2xl` for larger containers like content panels.
 - **Exceptions:**
     - `ControlsPopup.svelte` (The audio/video controls trigger) is the **only** component allowed to use `rounded-full` for its floating trigger button. Inner buttons within the popup should adhere to `rounded-lg`.
     - `CocBtn` may maintain its specific radius (`rounded-[10px]` or `rounded-xl`) as it has an independent theme.
