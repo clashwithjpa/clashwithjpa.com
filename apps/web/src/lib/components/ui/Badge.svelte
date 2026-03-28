@@ -11,10 +11,10 @@
     } = $props();
 
     const colors = {
-        blue: "border-blue-700/50 bg-blue-800/60 text-blue-200",
-        green: "border-green-700/50 bg-green-800/60 text-green-200",
-        red: "border-red-700/50 bg-red-800/60 text-red-200",
-        yellow: "border-yellow-700/50 bg-yellow-800/60 text-yellow-200",
+        blue: "border-blue-700/50 bg-blue-900 text-blue-200",
+        green: "border-green-700/50 bg-green-900 text-green-200",
+        red: "border-red-700/50 bg-red-900 text-red-200",
+        yellow: "border-yellow-700/50 bg-yellow-900 text-yellow-200",
         ghost: "border-stone-700/50 bg-stone-900 text-stone-200",
     };
 </script>

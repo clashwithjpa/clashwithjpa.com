@@ -33,7 +33,7 @@
             | "right"
             | "right-start"
             | "right-end";
-        variant?: "base" | "ghost" | null;
+        variant?: "base" | "ghost" | "success" | "danger" | null;
         size?: "sm" | "base" | "lg" | "icon" | "";
     } = $props();
 
@@ -64,8 +64,10 @@
     }
 
     const variantClasses = {
-        base: "bg-stone-800",
-        ghost: "bg-stone-900",
+        base: "bg-stone-800 border-stone-700/50 text-stone-200 hover:bg-stone-700 hover:text-stone-50",
+        ghost: "bg-stone-900 border-stone-700/50 text-stone-200 hover:bg-stone-700 hover:text-stone-50",
+        success: "bg-green-900 border-green-700/50 text-green-200 hover:bg-green-700 hover:text-green-50",
+        danger: "bg-red-900 border-red-700/50 text-red-200 hover:bg-red-700 hover:text-red-50",
     };
 
     const sizeClasses = {
@@ -79,7 +81,7 @@
     const buttonClass = $derived(
         cn(
             variant &&
-                "flex cursor-pointer items-center justify-center rounded-lg border-2 border-stone-700/50 text-stone-200 transition-colors duration-200 outline-none hover:bg-stone-700 hover:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50",
+                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none  disabled:cursor-not-allowed disabled:opacity-50",
             variant && variantClasses[variant],
             variant && sizeClasses[size],
             className,

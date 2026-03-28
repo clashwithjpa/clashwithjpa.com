@@ -75,12 +75,14 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 - **Borders:** `border-stone-700/50`
 - **Backdrop Blur:** `backdrop-blur-sm`
 
-> **Note:** DO NOT use any text colors other than the 3 defined above. The `CocBtn` component has its own independent theme variations (Green, Orange, Red, Blurple) and other coc related components are exceptions to the strict Stone palette rule.
+> [!NOTE]
+>  DO NOT use any text colors other than the 3 defined above. The `CocBtn` component has its own independent theme variations (Green, Orange, Red, Blurple) and other coc related components are exceptions to the strict Stone palette rule.
 
 ### Borders
 
 - **Border Width:** `border-2` (Provides a stable, pronounced, and uniform outline).
 - **Border Color:** Strictly `border-stone-700/50` EVERYWHERE where a border is used, no other border color is allowed.
+- **Variants:** (*exception*): `border` & `border-<color>-700/50` is used with `bg-<color>-900` for components having different `varaints`, like `<Badge />` and `<Button />` components.
 
 ### Buttons & Contrast
 
