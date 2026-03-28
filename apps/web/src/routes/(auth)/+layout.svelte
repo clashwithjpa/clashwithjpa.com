@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { hasPermission } from "$lib/auth";
+    import { authClient, hasPermission } from "$lib/auth";
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import type { statement } from "$lib/config/permissions";
@@ -18,6 +18,7 @@
     import type { LayoutProps } from "./$types";
 
     let { data, children }: LayoutProps = $props();
+    const session = authClient.useSession();
 
     interface Link {
         name: string;
@@ -62,7 +63,7 @@
 </script>
 
 {#snippet button(link: Link)}
-    {#await hasPermission(data.session.data?.user.id, link.requiredPerm)}
+    {#await hasPermission($session.data?.user.id, link.requiredPerm)}
         <div
             class="flex w-full animate-pulse items-center gap-1 {isSidebarExpanded
                 ? 'flex-row justify-start px-4'
@@ -115,9 +116,9 @@
 
                 <div class="absolute inset-y-0 left-1/2 flex -translate-x-1/2 items-center justify-center">
                     <Avatar
-                        src={data.session.data?.user.image}
-                        name={data.session.data?.user.name || ""}
-                        role={(data.session.data?.user.role as Role) || "unverified"}
+                        src={$session.data?.user.image}
+                        name={$session.data?.user.name || ""}
+                        role={($session.data?.user.role as Role) || "unverified"}
                     />
                 </div>
             </div>
@@ -135,14 +136,14 @@
                     : 'justify-center'} pb-4 transition-all duration-200"
             >
                 <Avatar
-                    src={data.session.data?.user.image}
-                    name={data.session.data?.user.name || ""}
-                    role={(data.session.data?.user.role as Role) || "unverified"}
+                    src={$session.data?.user.image}
+                    name={$session.data?.user.name || ""}
+                    role={($session.data?.user.role as Role) || "unverified"}
                 />
                 {#if isSidebarExpanded}
                     <div class="ml-4 flex flex-col overflow-hidden">
-                        <span class="truncate text-sm font-medium text-stone-200">{data.session.data?.user.name}</span>
-                        <span class="truncate text-xs text-stone-400 capitalize">{(data.session.data?.user.role as Role) || "unverified"}</span>
+                        <span class="truncate text-sm font-medium text-stone-200">{$session.data?.user.name}</span>
+                        <span class="truncate text-xs text-stone-400 capitalize">{($session.data?.user.role as Role) || "unverified"}</span>
                     </div>
                 {/if}
             </div>

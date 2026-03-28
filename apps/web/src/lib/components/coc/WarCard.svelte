@@ -10,6 +10,7 @@
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import Badge from "../ui/Badge.svelte";
     import Icon from "../ui/Icon.svelte";
 
     let {
@@ -218,28 +219,13 @@
                             {/if}
                         </button>
                         {#if clanData?.clanLevel}
-                            <div
-                                class="flex shrink-0 items-center justify-center gap-1 rounded border border-yellow-800/50 bg-yellow-800/60 px-1.5 py-0.5"
-                            >
-                                <Icon name="trophy" class="size-3" />
-                                <span class="font-rubik text-xs font-bold text-[#F8E30A]">Level {clanData.clanLevel}</span>
-                            </div>
+                            <Badge variant="yellow" content={`Level ${clanData.clanLevel}`} icon="trophy" class="font-bold" />
                         {/if}
-                        <div class="min-w-0 flex-1">
-                            <div
-                                class={`inline-flex items-center justify-center gap-1 truncate rounded border px-1.5 py-0.5 ${
-                                    warState === "inWar"
-                                        ? "border-green-700/50 bg-green-700/60"
-                                        : warState === "preparation"
-                                          ? "border-orange-700/50 bg-orange-700/60"
-                                          : "border-stone-700/50 bg-stone-700/60"
-                                }`}
-                            >
-                                <span class="truncate font-rubik text-xs font-bold tracking-wide text-green-50 shadow-none">
-                                    {getWarState(warState)}
-                                </span>
-                            </div>
-                        </div>
+                        <Badge
+                            variant={warState === "inWar" ? "green" : warState === "preparation" ? "yellow" : "ghost"}
+                            class="font-bold"
+                            content={getWarState(warState)}
+                        />
                     </div>
                 </div>
             </div>

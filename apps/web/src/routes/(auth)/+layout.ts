@@ -10,6 +10,4 @@ export const load: LayoutLoad = async () => {
         const target = signInResult.data?.url ?? "/";
         throw redirect(303, target);
     }
-
-    return { session };
 };

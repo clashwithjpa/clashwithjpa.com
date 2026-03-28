@@ -12,14 +12,14 @@
         src?: string | null;
         name: string;
         role?: Role | null;
-        size?: "sm" | "md" | "lg";
+        size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
         class?: string;
     } = $props();
 
-    const sizeClass = { sm: "size-10", md: "size-12", lg: "size-16" } as const;
+    const sizeClass = { sm: "size-10", md: "size-12", lg: "size-16", xl: "size-20", "2xl": "size-24", "3xl": "size-32" } as const;
 
     const config = $derived(role && role in ROLE_CONFIG ? ROLE_CONFIG[role] : null);
-    const imgSrc = $derived(src ?? `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name)}`);
+    const imgSrc = $derived(src ?? `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(name)}`);
 </script>
 
 <div class={cn("relative shrink-0", sizeClass[size], className)}>
@@ -33,7 +33,7 @@
     {/if}
 
     <div class="absolute inset-0.5 overflow-hidden rounded-full bg-stone-950">
-        <img src={imgSrc} alt={name} class="size-full object-cover" loading="lazy" />
+        <div class="size-full bg-cover bg-no-repeat" style="background-image: url({imgSrc});"></div>
     </div>
 </div>
 

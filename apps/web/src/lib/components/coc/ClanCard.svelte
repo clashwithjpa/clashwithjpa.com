@@ -10,6 +10,7 @@
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import Badge from "../ui/Badge.svelte";
     import Icon from "../ui/Icon.svelte";
 
     let {
@@ -143,10 +144,7 @@
                                 <span in:fade={{ duration: 200 }}>{clanData.tag}</span>
                             {/if}
                         </button>
-                        <div class="flex items-center justify-center gap-1 rounded border border-yellow-800/50 bg-yellow-800/60 px-1.5 py-0.5">
-                            <Icon name="trophy" class="size-3" />
-                            <span class="font-rubik text-xs font-bold text-[#F8E30A]">Level {clanData.clanLevel}</span>
-                        </div>
+                        <Badge variant="yellow" content={`Level ${clanData.clanLevel}`} icon="trophy" class="font-bold" />
                     </div>
                 </div>
             </div>
