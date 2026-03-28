@@ -11,12 +11,14 @@
     import TablerCrown from "~icons/tabler/crown";
     import TablerFileText from "~icons/tabler/file-text";
     import TablerQuestionMark from "~icons/tabler/question-mark";
+    import TablerRosetteDiscountCheck from "~icons/tabler/rosette-discount-check";
     import TablerTool from "~icons/tabler/tool";
 
     const session = authClient.useSession();
 
-    const roleIcons: Partial<Record<Role, Component>> = {
+    const roleIcons: Record<Role, Component> = {
         unverified: TablerQuestionMark,
+        verified: TablerRosetteDiscountCheck,
         manager: TablerTool,
         reviewer: TablerFileText,
         admin: TablerCrown,
