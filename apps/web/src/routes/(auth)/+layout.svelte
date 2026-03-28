@@ -87,11 +87,7 @@
                 disabled={!hasPermission}
             >
                 <link.icon class="size-6 shrink-0 transition-transform duration-200" />
-                <span
-                    class="{isSidebarExpanded
-                        ? 'ml-2 text-sm'
-                        : 'text-[10px]'} flex items-center justify-center gap-0.5 truncate font-medium transition-opacity duration-200"
-                >
+                <span class="{isSidebarExpanded ? 'ml-2 text-sm' : 'text-[10px]'} gap-0.5 truncate font-medium transition-opacity duration-200">
                     {link.name}
                 </span>
             </Button>
