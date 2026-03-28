@@ -19,7 +19,7 @@
     const sizeClass = { sm: "size-10", md: "size-12", lg: "size-16", xl: "size-20", "2xl": "size-24", "3xl": "size-32" } as const;
 
     const config = $derived(role && role in ROLE_CONFIG ? ROLE_CONFIG[role] : null);
-    const imgSrc = $derived(src ?? `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(name)}`);
+    const imgSrc = $derived(src ?? `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(name)}`);
 </script>
 
 <div class={cn("relative shrink-0", sizeClass[size], className)}>

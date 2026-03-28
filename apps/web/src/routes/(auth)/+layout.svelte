@@ -9,6 +9,7 @@
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount, type Component } from "svelte";
+    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBook2 from "~icons/tabler/book-2";
     import TablerFileDescription from "~icons/tabler/file-description";
     import TablerHome from "~icons/tabler/home";
@@ -17,7 +18,7 @@
     import TablerUser from "~icons/tabler/user";
     import type { LayoutProps } from "./$types";
 
-    let { data, children }: LayoutProps = $props();
+    let { children }: LayoutProps = $props();
     const session = authClient.useSession();
 
     interface Link {
@@ -115,11 +116,15 @@
                 </div>
 
                 <div class="absolute inset-y-0 left-1/2 flex -translate-x-1/2 items-center justify-center">
-                    <Avatar
-                        src={$session.data?.user.image}
-                        name={$session.data?.user.name || ""}
-                        role={($session.data?.user.role as Role) || "unverified"}
-                    />
+                    {#if $session.data}
+                        <Avatar
+                            src={$session.data?.user.image}
+                            name={$session.data?.user.name || ""}
+                            role={($session.data?.user.role as Role) || "unverified"}
+                        />
+                    {:else}
+                        <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+                    {/if}
                 </div>
             </div>
         {:else}
@@ -135,11 +140,15 @@
                     ? 'justify-start px-6'
                     : 'justify-center'} pb-4 transition-all duration-200"
             >
-                <Avatar
-                    src={$session.data?.user.image}
-                    name={$session.data?.user.name || ""}
-                    role={($session.data?.user.role as Role) || "unverified"}
-                />
+                {#if $session.data}
+                    <Avatar
+                        src={$session.data?.user.image}
+                        name={$session.data?.user.name || ""}
+                        role={($session.data?.user.role as Role) || "unverified"}
+                    />
+                {:else}
+                    <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+                {/if}
                 {#if isSidebarExpanded}
                     <div class="ml-4 flex flex-col overflow-hidden">
                         <span class="truncate text-sm font-medium text-stone-200">{$session.data?.user.name}</span>
@@ -153,7 +162,15 @@
 
 {#snippet ContentPanel()}
     <Splitter.Panel id="content" class="size-full min-w-0 overflow-y-auto rounded-2xl bg-stone-950 p-4">
-        {@render children()}
+        {#if $session.data}
+            <div in:fadeIn class="size-full">
+                {@render children()}
+            </div>
+        {:else}
+            <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
+                <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+            </div>
+        {/if}
     </Splitter.Panel>
 {/snippet}
 

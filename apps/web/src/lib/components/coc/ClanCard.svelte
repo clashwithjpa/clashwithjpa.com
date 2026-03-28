@@ -4,11 +4,10 @@
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import { cn } from "$lib/utils";
-    import { cardSlideIn } from "$lib/utils/animations";
+    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import type { GetCOCClan200, GetJPAClans200 } from "@repo/clashofclans-client";
     import { getCOCClan } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import Badge from "../ui/Badge.svelte";
     import Icon from "../ui/Icon.svelte";
@@ -105,21 +104,21 @@
     contentClass="flex flex-col h-full"
 >
     {#if loading}
-        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fade={{ duration: 200 }}>
+        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fadeIn>
             <div class="flex flex-col items-center gap-4">
                 <SvgSpinnersBlocksScale class="size-12 text-stone-700" />
                 <p class="font-coc text-lg font-bold text-stone-700">Loading clan...</p>
             </div>
         </div>
     {:else if error || !clanData}
-        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fade={{ duration: 200 }}>
+        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fadeIn>
             <div class="flex flex-col items-center gap-4 text-center">
                 <p class="font-coc text-xl font-bold text-red-700">Error Loading Clan</p>
                 <p class="font-coc text-sm text-stone-700">{error || "Clan not found"}</p>
             </div>
         </div>
     {:else}
-        <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fade={{ duration: 200 }} use:cardSlideIn>
+        <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fadeIn use:cardSlideIn>
             <!-- Header with Badge, Name, Tag -->
             <div class="flex items-center gap-4">
                 <div
@@ -139,9 +138,9 @@
                             onclick={copyTagToClipboard}
                         >
                             {#if tagCopied}
-                                <span in:fade={{ duration: 200 }}>Copied!</span>
+                                <span in:fadeIn>Copied!</span>
                             {:else}
-                                <span in:fade={{ duration: 200 }}>{clanData.tag}</span>
+                                <span in:fadeIn>{clanData.tag}</span>
                             {/if}
                         </button>
                         <Badge variant="yellow" content={`Level ${clanData.clanLevel}`} icon="trophy" class="font-bold" />
