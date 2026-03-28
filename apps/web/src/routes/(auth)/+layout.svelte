@@ -16,6 +16,7 @@
     import TablerSettings from "~icons/tabler/settings";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
+    import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
     let { children }: LayoutProps = $props();
@@ -33,6 +34,7 @@
         { name: "Apply", icon: TablerFileDescription, href: "/dashboard/apply", requiredPerm: "apply" },
         { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", requiredPerm: "cwl" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings" },
+        { name: "Exit", icon: TablerX, href: "/" },
     ];
 
     let adminLinks: Link[] = [
@@ -42,6 +44,7 @@
         { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
         { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings", requiredPerm: "sudo" },
+        { name: "Exit", icon: TablerX, href: "/" },
     ];
 
     let links = $derived(page.url.pathname.startsWith("/admin") ? adminLinks : dashboardLinks);
@@ -98,30 +101,10 @@
 {#snippet SidebarPanel()}
     <Splitter.Panel id="sidebar" class="flex items-center {isMobile ? 'min-h-16 w-full justify-center p-2' : 'h-full flex-col justify-between py-4'}">
         {#if isMobile}
-            <div class="relative grid w-full grid-cols-2 items-center">
-                <div class="flex items-center justify-evenly gap-4 pr-8">
-                    {#each links.slice(0, links.length / 2) as link (link.href)}
-                        {@render button(link)}
-                    {/each}
-                </div>
-
-                <div class="flex items-center justify-evenly gap-4 pl-8">
-                    {#each links.slice(links.length / 2) as link (link.href)}
-                        {@render button(link)}
-                    {/each}
-                </div>
-
-                <div class="absolute inset-y-0 left-1/2 flex -translate-x-1/2 items-center justify-center">
-                    {#if $session.data}
-                        <Avatar
-                            src={$session.data?.user.image}
-                            name={$session.data?.user.name || ""}
-                            role={($session.data?.user.role as Role) || "unverified"}
-                        />
-                    {:else}
-                        <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
-                    {/if}
-                </div>
+            <div class="flex w-full items-center justify-evenly gap-4">
+                {#each links as link (link.href)}
+                    {@render button(link)}
+                {/each}
             </div>
         {:else}
             <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth}>
@@ -175,14 +158,14 @@
     class="flex size-full overflow-hidden! bg-stone-900 lg:p-2"
     panels={isMobile
         ? [
-              { id: "content", minSize: 92 },
-              { id: "sidebar", maxSize: 8 },
+              { id: "content", minSize: 94 },
+              { id: "sidebar", maxSize: 6 },
           ]
         : [
               { id: "sidebar", minSize: 6, maxSize: 16 },
               { id: "content", minSize: 84 },
           ]}
-    defaultSize={isMobile ? [92, 8] : [6, 94]}
+    defaultSize={isMobile ? [94, 6] : [6, 94]}
 >
     {#if isMobile}
         {@render ContentPanel()}
