@@ -13,10 +13,10 @@
     import TablerBook2 from "~icons/tabler/book-2";
     import TablerFileDescription from "~icons/tabler/file-description";
     import TablerHome from "~icons/tabler/home";
+    import TablerLogout2 from "~icons/tabler/logout-2";
     import TablerSettings from "~icons/tabler/settings";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
-    import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
     let { children }: LayoutProps = $props();
@@ -34,7 +34,7 @@
         { name: "Apply", icon: TablerFileDescription, href: "/dashboard/apply", requiredPerm: "apply" },
         { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", requiredPerm: "cwl" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings" },
-        { name: "Exit", icon: TablerX, href: "/" },
+        { name: "Leave", icon: TablerLogout2, href: "/" },
     ];
 
     let adminLinks: Link[] = [
@@ -44,7 +44,7 @@
         { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
         { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings", requiredPerm: "sudo" },
-        { name: "Exit", icon: TablerX, href: "/" },
+        { name: "Leave", icon: TablerLogout2, href: "/" },
     ];
 
     let links = $derived(page.url.pathname.startsWith("/admin") ? adminLinks : dashboardLinks);
