@@ -44,7 +44,7 @@
                     icon={roleIcons[($session.data?.user.role as Role) ?? "unverified"]}
                 />
                 <div class="flex flex-wrap gap-1">
-                    <Tooltip title={formatDateTime($session.data?.user.createdAt)} placement="bottom">
+                    <Tooltip title="Joined {formatDateTime($session.data?.user.createdAt)}" placement="bottom">
                         <Badge variant="green" content={formatDate($session.data?.user.createdAt)} icon={TablerCalendarClock} />
                     </Tooltip>
                 </div>
