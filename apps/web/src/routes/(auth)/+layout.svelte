@@ -140,9 +140,9 @@
 {/snippet}
 
 {#snippet ContentPanel()}
-    <Splitter.Panel id="content" class="size-full min-w-0 overflow-y-auto rounded-2xl bg-stone-950 p-4">
+    <Splitter.Panel id="content" class="size-full min-w-0  rounded-2xl bg-stone-950">
         {#if $session.data}
-            <div in:fadeIn class="size-full">
+            <div in:fadeIn class="size-full overflow-y-auto p-4">
                 {@render children()}
             </div>
         {:else}
