@@ -9,7 +9,9 @@
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount, type Component } from "svelte";
+    import { Toaster } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBook2 from "~icons/tabler/book-2";
     import TablerFileDescription from "~icons/tabler/file-description";
     import TablerHome from "~icons/tabler/home";
@@ -65,6 +67,21 @@
         fadeIn(document.querySelectorAll(".dash-nav-btn"));
     });
 </script>
+
+<Toaster
+    richColors
+    theme="dark"
+    closeButton
+    toastOptions={{
+        classes: {
+            toast: "font-rubik!",
+        },
+    }}
+>
+    {#snippet loadingIcon()}
+        <SvgSpinnersRingResize />
+    {/snippet}
+</Toaster>
 
 {#snippet button(link: Link)}
     {#await hasPermission($session.data?.user.id, link.requiredPerm)}

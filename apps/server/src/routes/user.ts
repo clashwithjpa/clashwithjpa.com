@@ -1,22 +1,22 @@
-import { Hono } from "hono";
-import { hasAccessAuthMiddleware } from "@/lib/middlewares";
-import { isVerified, isAuthenticated } from "@/lib/auth/functions";
-import * as Sentry from "@sentry/bun";
-import z4 from "zod/v4";
-import { validator as zValidator, resolver, describeRoute } from "hono-openapi";
-import { SuccessResponseSchema, ErrorResponseSchema, type AppEnv, UserSchema, SessionSchema } from "@/lib/types";
-import { verifyTurnstileToken } from "@/lib/utils/cf";
-import {
-    getUserCocAccounts,
-    getDiscordAccountId,
-    addClanApplication,
-    addCwlApplication,
-    getUserCwlApplications,
-    getCocAccountOwner,
-} from "@/lib/db/functions";
+import { isAuthenticated, isVerified } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { config } from "@/lib/config";
 import { getDbErrorMessage } from "@/lib/db/error";
+import {
+    addClanApplication,
+    addCwlApplication,
+    getCocAccountOwner,
+    getDiscordAccountId,
+    getUserCocAccounts,
+    getUserCwlApplications,
+} from "@/lib/db/functions";
+import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { ErrorResponseSchema, SessionSchema, SuccessResponseSchema, UserSchema, type AppEnv } from "@/lib/types";
+import { verifyTurnstileToken } from "@/lib/utils/cf";
+import * as Sentry from "@sentry/bun";
+import { Hono } from "hono";
+import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
+import z4 from "zod/v4";
 
 // All routes have /user as a prefix
 // Each route has some level of auth middleware

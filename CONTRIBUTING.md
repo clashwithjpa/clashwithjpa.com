@@ -84,8 +84,7 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 - **Border Color:** Strictly `border-stone-700/50` EVERYWHERE where a border is used, no other border color is allowed.
 - **Variants:** (*exception*): `border` & `border-<color>-700/50` is used with `bg-<color>-900` for components having different `varaints`, like `<Badge />` and `<Button />` components.
 
-### Buttons & Contrast
-
+### Buttons
 - **Variants:** Buttons must strictly fall into these variants:
     - **base:** `bg-stone-800`
     - **ghost:** `bg-stone-900`

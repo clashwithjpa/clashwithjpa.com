@@ -1,4 +1,10 @@
 <script lang="ts">
+    import { cn } from "$lib/utils";
+    import { bounceDown, bounceUp } from "$lib/utils/animations";
+    import type { Snippet } from "svelte";
+    import type { HTMLAttributes } from "svelte/elements";
+    import Tooltip from "./Tooltip.svelte";
+
     let {
         children,
         onclick,
@@ -11,6 +17,8 @@
         tooltipPlacement = "left",
         variant = "base",
         size = "base",
+        type = "button",
+        ...restProps
     }: {
         children: Snippet;
         onclick?: (e: MouseEvent) => void;
@@ -35,12 +43,8 @@
             | "right-end";
         variant?: "base" | "ghost" | "success" | "danger" | null;
         size?: "sm" | "base" | "lg" | "icon" | "";
-    } = $props();
-
-    import { cn } from "$lib/utils";
-    import { bounceDown, bounceUp } from "$lib/utils/animations";
-    import type { Snippet } from "svelte";
-    import Tooltip from "./Tooltip.svelte";
+        type?: string;
+    } & HTMLAttributes<HTMLElement> = $props();
 
     let isPressed = false;
 
@@ -64,10 +68,10 @@
     }
 
     const variantClasses = {
-        base: "bg-stone-800 border-stone-700/50 text-stone-200 hover:bg-stone-700 hover:text-stone-50",
-        ghost: "bg-stone-900 border-stone-700/50 text-stone-200 hover:bg-stone-700 hover:text-stone-50",
-        success: "bg-green-900 border-green-700/50 text-green-200 hover:bg-green-700 hover:text-green-50",
-        danger: "bg-red-900 border-red-700/50 text-red-200 hover:bg-red-700 hover:text-red-50",
+        base: "bg-stone-800 border-stone-700/50 text-stone-200 not-disabled:hover:bg-stone-700 not-disabled:hover:text-stone-50",
+        ghost: "bg-stone-900 border-stone-700/50 text-stone-200 not-disabled:hover:bg-stone-700 not-disabled:hover:text-stone-50",
+        success: "bg-green-900 border-green-700/50 text-green-200 not-disabled:hover:bg-green-700 not-disabled:hover:text-green-50",
+        danger: "bg-red-900 border-red-700/50 text-red-200 not-disabled:hover:bg-red-700 not-disabled:hover:text-red-50",
     };
 
     const sizeClasses = {
@@ -81,7 +85,7 @@
     const buttonClass = $derived(
         cn(
             variant &&
-                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none  disabled:cursor-not-allowed disabled:opacity-50",
+                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50",
             variant && variantClasses[variant],
             variant && sizeClasses[size],
             className,
@@ -92,7 +96,7 @@
 {#snippet button()}
     <svelte:element
         this={href ? "a" : "button"}
-        type={href ? undefined : "button"}
+        type={href ? undefined : type}
         role={href ? "link" : "button"}
         {disabled}
         href={disabled ? undefined : href}
@@ -102,6 +106,7 @@
         onpointerdown={handlePointerDown}
         onpointerup={handlePointerUp}
         onpointerleave={handlePointerUp}
+        {...restProps}
     >
         {@render children()}
     </svelte:element>
