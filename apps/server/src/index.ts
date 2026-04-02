@@ -1,11 +1,12 @@
-import "dotenv/config";
-import * as Sentry from "@sentry/bun";
 import { config } from "@/lib/config";
+import { getRules } from "@/lib/db/functions";
 import { betterAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
 import { Scalar } from "@scalar/hono-api-reference";
+import * as Sentry from "@sentry/bun";
+import "dotenv/config";
 import { Hono } from "hono";
 import { describeRoute, openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
@@ -23,7 +24,6 @@ import manage from "./routes/manage";
 import user from "./routes/user";
 
 const client = new RedisClient("redis://default@localhost:7102");
-import { getRules } from "@/lib/db/functions";
 
 const app = new Hono<AppEnv>();
 
@@ -263,7 +263,7 @@ app.get(
         return {
             pageTitle: "ClashWithJPA API Documentation",
             url: "/openapi.json",
-            theme: "saturn",
+            theme: "kepler",
             agent: {
                 disabled: true,
             },
