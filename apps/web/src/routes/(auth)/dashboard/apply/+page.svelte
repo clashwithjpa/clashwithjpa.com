@@ -111,7 +111,7 @@
 
         <form onsubmit={handleSubmit} class="flex flex-col gap-6">
             <Field.Root required invalid={!!fieldErrors.cocAccountTag} class="flex flex-col gap-1">
-                <Field.Label class="text-sm font-medium">Clan Tag</Field.Label>
+                <Field.Label class="text-sm font-medium">Account Tag</Field.Label>
                 <Input
                     bind:value={cocAccountTag}
                     placeholder="#EXAMPLE123"
