@@ -67,7 +67,7 @@
                     apiToken,
                     captchaToken,
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
 
             if (data.success) {
