@@ -88,7 +88,9 @@ The entire application relies primarily on Tailwind CSS's **Stone** color palett
 - **Variants:** Buttons must strictly fall into these variants:
     - **base:** `bg-stone-800`
     - **ghost:** `bg-stone-900`
-- **Hover States:** Both the `base` and `ghost` variants use `hover:bg-stone-700` and `hover:text-stone-50` for their hover states.
+- **Hover States:**
+    - Both the `base` and `ghost` variants use `hover:bg-stone-700` and `hover:text-stone-50` for their hover states.
+    - In `<Select />` component, `hover:bg-stone-700/50` is used for options.
 
 ### Border Radius (Rounded Corners)
 

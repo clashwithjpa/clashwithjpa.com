@@ -24,7 +24,7 @@
 <div class={cn(`flex w-fit shrink-0 items-center justify-center gap-1 rounded border ${colors[props.variant ?? "blue"]} px-1.5 py-0.5`, props.class)}>
     {#if props.icon}
         {#if typeof props.icon === "string"}
-            {#if props.icon.includes("/")}
+            {#if props.icon.includes("http")}
                 <div class="{iconSize} bg-cover bg-center" style="background-image: url({props.icon})"></div>
             {:else}
                 <Icon name={props.icon} class={iconSize} />
