@@ -5,7 +5,7 @@
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import { cn } from "$lib/utils";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
-    import type { GetCOCClan200, GetJPAClans200 } from "@repo/clashofclans-client";
+    import type { GetCOCClan200, GetJPAClanRequirements200 } from "@repo/clashofclans-client";
     import { getCOCClan } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
@@ -13,17 +13,17 @@
     import Icon from "../ui/Icon.svelte";
 
     let {
-        clan,
+        clanTag,
+        requirements,
         class: className = "",
         delay = 0,
     }: {
-        clan: GetJPAClans200["data"]["clans"][0];
+        clanTag: string;
+        requirements: GetJPAClanRequirements200["data"]["clans"][string];
         class?: string;
         delay?: number;
     } = $props();
 
-    const requirements = $derived(clan[Object.keys(clan)[0]]);
-    const clanTag = $derived(Object.keys(clan)[0]);
     const encodedClanTag = $derived(encodeURIComponent(clanTag));
     let clanData: GetCOCClan200["data"]["clan"] | null = $state(null);
     let loading = $state(true);

@@ -1,6 +1,6 @@
 import { isAuthenticated } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
-import { getClansWithRequirements } from "@/lib/db/functions";
+import { getClans, getClansWithRequirements, getCwlClans } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import {
@@ -407,22 +407,20 @@ app.get(
     },
 );
 
-const getJPAClansData = z4.object({
-    clans: z4.array(
-        z4.record(
-            z4.string(),
-            z4.object({
-                requiredAttacks: z4.number().nullable(),
-                requiredClangames: z4.number().nullable(),
-                requiredDonations: z4.number().nullable(),
-            }),
-        ),
+const getJPAClanRequirementsData = z4.object({
+    clans: z4.record(
+        z4.string(),
+        z4.object({
+            requiredAttacks: z4.number().nullable(),
+            requiredClangames: z4.number().nullable(),
+            requiredDonations: z4.number().nullable(),
+        }),
     ),
 });
 app.get(
-    "/jpa/clans",
+    "/jpa/clans/requirements",
     describeRoute({
-        operationId: "getJPAClans",
+        operationId: "getJPAClanRequirements",
         description: "[Public] Fetches all JPA clans and their requirements.",
         tags: ["coc"],
         responses: {
@@ -430,7 +428,7 @@ app.get(
                 description: "Successful response with the JPA clans.",
                 content: {
                     "application/json": {
-                        schema: resolver(SuccessResponseSchema(getJPAClansData)),
+                        schema: resolver(SuccessResponseSchema(getJPAClanRequirementsData)),
                     },
                 },
             },
@@ -454,6 +452,123 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch JPA clans" }, 500);
+        }
+    },
+);
+
+const getJPAClansData = z4.object({
+    clans: z4.record(
+        z4.string(),
+        z4.object({
+            clanTag: z4.string(),
+            clanCode: z4.string(),
+            clanName: z4.string().nullable(),
+            clanLevel: z4.number().nullable(),
+            discord: z4.object({
+                clanRoleId: z4.string(),
+                clanChannelId: z4.string(),
+                memberRoleId: z4.string(),
+                elderRoleId: z4.string(),
+                coleaderRoleId: z4.string(),
+                leaderRoleId: z4.string(),
+                leaderId: z4.string(),
+            }),
+            requirements: z4.object({
+                attacks: z4.number(),
+                donations: z4.number(),
+                clangames: z4.number(),
+            }),
+        }),
+    ),
+});
+app.get(
+    "/jpa/clans",
+    hasAccessAuthMiddleware(isAuthenticated),
+    describeRoute({
+        operationId: "getJPAClans",
+        description: "[Authenticated] Fetches all JPA clans with their details and requirements.",
+        tags: ["coc"],
+        responses: {
+            200: {
+                description: "Successful response with the JPA clans.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getJPAClansData)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when fetching JPA clans fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const clans = await getClans();
+            return c.json({
+                success: true,
+                data: { clans },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch JPA clans" }, 500);
+        }
+    },
+);
+
+const getJPACwlClans = z4.object({
+    clans: z4.record(
+        z4.string(),
+        z4.object({
+            clanTag: z4.string(),
+            clanName: z4.string(),
+            clanLeague: z4.string(),
+            clanLeader: z4.string(),
+            email: z4.string(),
+        }),
+    ),
+});
+app.get(
+    "/jpa/clans/cwl",
+    hasAccessAuthMiddleware(isAuthenticated),
+    describeRoute({
+        operationId: "getJPACwlClans",
+        description: "[Authenticated] Fetches all JPA CWL clans with their details.",
+        tags: ["coc"],
+        responses: {
+            200: {
+                description: "Successful response with the JPA CWL clans.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getJPACwlClans)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when fetching JPA CWL clans fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const clans = await getCwlClans();
+            return c.json({
+                success: true,
+                data: { clans },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch JPA CWL clans" }, 500);
         }
     },
 );

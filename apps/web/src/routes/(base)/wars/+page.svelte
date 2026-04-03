@@ -28,11 +28,11 @@
     <br />
 
     <!-- Wars Grid -->
-    {#if data.clans.success && data.clans.data.clans.length > 0}
+    {#if data.clans.success && Object.keys(data.clans.data.clans).length > 0}
         <div class="war-cards grid grid-cols-1 gap-6 opacity-0 md:grid-cols-2 lg:grid-cols-3">
-            {#each data.clans.data.clans as clan, index}
+            {#each Object.keys(data.clans.data.clans) as clanTag, index}
                 <div class="h-full">
-                    <WarCard clanTag={Object.keys(clan)[0]} delay={index * 200} class="h-full" />
+                    <WarCard {clanTag} delay={index * 200} class="h-full" />
                 </div>
             {/each}
         </div>

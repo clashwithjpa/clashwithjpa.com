@@ -11,14 +11,27 @@ import { z } from "zod/v4";
 export const getJPAClans200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        clans: z.array(
-            z.object({}).catchall(
-                z.object({
-                    requiredAttacks: z.union([z.number(), z.null()]),
-                    requiredClangames: z.union([z.number(), z.null()]),
-                    requiredDonations: z.union([z.number(), z.null()]),
+        clans: z.object({}).catchall(
+            z.object({
+                clanTag: z.string(),
+                clanCode: z.string(),
+                clanName: z.union([z.string(), z.null()]),
+                clanLevel: z.union([z.number(), z.null()]),
+                discord: z.object({
+                    clanRoleId: z.string(),
+                    clanChannelId: z.string(),
+                    memberRoleId: z.string(),
+                    elderRoleId: z.string(),
+                    coleaderRoleId: z.string(),
+                    leaderRoleId: z.string(),
+                    leaderId: z.string(),
                 }),
-            ),
+                requirements: z.object({
+                    attacks: z.number(),
+                    donations: z.number(),
+                    clangames: z.number(),
+                }),
+            }),
         ),
     }),
 });

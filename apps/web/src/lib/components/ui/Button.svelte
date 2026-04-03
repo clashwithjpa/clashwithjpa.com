@@ -85,7 +85,7 @@
     const buttonClass = $derived(
         cn(
             variant &&
-                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50!",
             variant && variantClasses[variant],
             variant && sizeClasses[size],
             className,
@@ -95,9 +95,9 @@
 
 {#snippet button()}
     <svelte:element
-        this={href ? "a" : "button"}
+        this={href && !disabled ? "a" : "button"}
         type={href ? undefined : type}
-        role={href ? "link" : "button"}
+        role={href && !disabled ? "link" : "button"}
         {disabled}
         href={disabled ? undefined : href}
         {target}

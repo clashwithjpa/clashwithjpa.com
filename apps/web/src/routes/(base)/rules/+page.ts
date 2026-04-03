@@ -7,7 +7,7 @@ export const load: PageLoad = async () => {
     const rules = await getRules({
         baseURL: PUBLIC_SERVER_URL,
     });
-    const htmlRules = await carta.render(rules.data.rules as string);
+    const htmlRules = await carta.render((rules.data.rules || "# Enjoy! There are no rules.") as string);
 
     const processedHtml = htmlRules.replace(/<a\s+href=["']([^"']+)["']([^>]*)>/g, (match, href, attrs) => {
         const isExternal = /^https?:\/\//.test(href);

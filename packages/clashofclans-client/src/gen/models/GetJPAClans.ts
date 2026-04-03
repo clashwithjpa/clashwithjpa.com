@@ -16,15 +16,72 @@ export type GetJPAClans200 = {
      */
     data: {
         /**
-         * @type array
+         * @type object
          */
         clans: {
             [key: string]: {
-                requiredAttacks: number | null;
-                requiredClangames: number | null;
-                requiredDonations: number | null;
+                /**
+                 * @type string
+                 */
+                clanTag: string;
+                /**
+                 * @type string
+                 */
+                clanCode: string;
+                clanName: string | null;
+                clanLevel: number | null;
+                /**
+                 * @type object
+                 */
+                discord: {
+                    /**
+                     * @type string
+                     */
+                    clanRoleId: string;
+                    /**
+                     * @type string
+                     */
+                    clanChannelId: string;
+                    /**
+                     * @type string
+                     */
+                    memberRoleId: string;
+                    /**
+                     * @type string
+                     */
+                    elderRoleId: string;
+                    /**
+                     * @type string
+                     */
+                    coleaderRoleId: string;
+                    /**
+                     * @type string
+                     */
+                    leaderRoleId: string;
+                    /**
+                     * @type string
+                     */
+                    leaderId: string;
+                };
+                /**
+                 * @type object
+                 */
+                requirements: {
+                    /**
+                     * @type number
+                     */
+                    attacks: number;
+                    /**
+                     * @type number
+                     */
+                    donations: number;
+                    /**
+                     * @type number
+                     */
+                    clangames: number;
+                };
             };
-        }[];
+        };
     };
 };
 

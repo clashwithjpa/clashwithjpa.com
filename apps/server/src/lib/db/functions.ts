@@ -40,6 +40,35 @@ export async function addClanApplication(discordUserId: string, cocAccountTag: s
     return result[0];
 }
 
+export async function getClans() {
+    const result = await db.select().from(clanInfoTable);
+    return Object.fromEntries(
+        result.map(({ id, ...clan }) => [
+            clan.cocClanTag,
+            {
+                clanTag: clan.cocClanTag,
+                clanCode: clan.cocClanCode,
+                clanName: clan.cocClanName,
+                clanLevel: clan.cocClanLevel,
+                discord: {
+                    clanRoleId: clan.discordClanRoleId,
+                    clanChannelId: clan.discordClanChannelId,
+                    memberRoleId: clan.discordMemberRoleId,
+                    elderRoleId: clan.discordElderRoleId,
+                    coleaderRoleId: clan.discordColeaderRoleId,
+                    leaderRoleId: clan.discordLeaderRoleId,
+                    leaderId: clan.discordLeaderId,
+                },
+                requirements: {
+                    attacks: clan.attacksRequirement,
+                    clangames: clan.clangamesRequirement,
+                    donations: clan.donationsRequirement,
+                },
+            },
+        ]),
+    );
+}
+
 export async function getClansWithRequirements() {
     const result = await db
         .select({
@@ -50,13 +79,16 @@ export async function getClansWithRequirements() {
         })
         .from(clanInfoTable);
 
-    return result.map((clan) => ({
-        [clan.cocClanTag]: {
-            requiredAttacks: clan.requiredAttacks,
-            requiredClangames: clan.requiredClangames,
-            requiredDonations: clan.requiredDonations,
-        },
-    }));
+    return Object.fromEntries(
+        result.map((clan) => [
+            clan.cocClanTag,
+            {
+                requiredAttacks: clan.requiredAttacks,
+                requiredClangames: clan.requiredClangames,
+                requiredDonations: clan.requiredDonations,
+            },
+        ]),
+    );
 }
 
 export async function getRules(): Promise<string | null> {
@@ -115,4 +147,20 @@ export async function getUserCwlApplications(discordUserId: string) {
         .where(and(eq(cwlApplicationTable.discordUserId, discordUserId), eq(cwlApplicationTable.month, month), eq(cwlApplicationTable.year, year)));
 
     return applications;
+}
+
+export async function getCwlClans() {
+    const result = await db.select().from(cwlClanInfoTable);
+    return Object.fromEntries(
+        result.map((clan) => [
+            clan.cocClanTag,
+            {
+                clanTag: clan.cocClanTag,
+                clanName: clan.cocClanName,
+                clanLeague: clan.cocClanLeague,
+                clanLeader: clan.cocClanLeader,
+                email: clan.email,
+            },
+        ]),
+    );
 }

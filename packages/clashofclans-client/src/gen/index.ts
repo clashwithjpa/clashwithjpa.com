@@ -7,7 +7,9 @@ export type { GetCOCClanCurrentWarQueryKey } from "./hooks/createGetCOCClanCurre
 export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.ts";
 export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
+export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
+export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
 export type { GetRootQueryKey } from "./hooks/createGetRoot.ts";
 export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
@@ -103,7 +105,14 @@ export type {
     GetCOCPlayerBattleLogQueryResponse,
     ItemsBattleTypeEnumKey,
 } from "./models/GetCOCPlayerBattleLog.ts";
+export type {
+    GetJPAClanRequirements200,
+    GetJPAClanRequirements500,
+    GetJPAClanRequirementsQuery,
+    GetJPAClanRequirementsQueryResponse,
+} from "./models/GetJPAClanRequirements.ts";
 export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./models/GetJPAClans.ts";
+export type { GetJPACwlClans200, GetJPACwlClans500, GetJPACwlClansQuery, GetJPACwlClansQueryResponse } from "./models/GetJPACwlClans.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./models/GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
@@ -142,7 +151,9 @@ export { getCOCClanCurrentWar } from "./clients/getCOCClanCurrentWar.ts";
 export { getCOCClanMembers } from "./clients/getCOCClanMembers.ts";
 export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
+export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
+export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
 export { getRoot } from "./clients/getRoot.ts";
 export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
@@ -177,9 +188,15 @@ export { getCOCPlayerQueryOptions } from "./hooks/createGetCOCPlayer.ts";
 export { createGetCOCPlayerBattleLog } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBattleLog.ts";
+export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
+export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
+export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
 export { createGetJPAClans } from "./hooks/createGetJPAClans.ts";
 export { getJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export { getJPAClansQueryOptions } from "./hooks/createGetJPAClans.ts";
+export { createGetJPACwlClans } from "./hooks/createGetJPACwlClans.ts";
+export { getJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
+export { getJPACwlClansQueryOptions } from "./hooks/createGetJPACwlClans.ts";
 export { createGetRoot } from "./hooks/createGetRoot.ts";
 export { getRootQueryKey } from "./hooks/createGetRoot.ts";
 export { getRootQueryOptions } from "./hooks/createGetRoot.ts";
@@ -277,7 +294,13 @@ export {
     getCOCPlayerPathParamsSchema,
     getCOCPlayerQueryResponseSchema,
 } from "./zod/getCOCPlayerSchema.ts";
+export {
+    getJPAClanRequirements200Schema,
+    getJPAClanRequirements500Schema,
+    getJPAClanRequirementsQueryResponseSchema,
+} from "./zod/getJPAClanRequirementsSchema.ts";
 export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./zod/getJPAClansSchema.ts";
+export { getJPACwlClans200Schema, getJPACwlClans500Schema, getJPACwlClansQueryResponseSchema } from "./zod/getJPACwlClansSchema.ts";
 export { getRoot200Schema, getRootQueryResponseSchema } from "./zod/getRootSchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
 export {

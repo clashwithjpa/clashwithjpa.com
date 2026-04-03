@@ -1,9 +1,9 @@
 import { PUBLIC_SERVER_URL } from "$env/static/public";
-import { getJPAClans } from "@repo/clashofclans-client";
+import { getJPAClanRequirements } from "@repo/clashofclans-client";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async () => {
-    const clans = await getJPAClans({
+    const clans = await getJPAClanRequirements({
         baseURL: PUBLIC_SERVER_URL,
     });
     return { clans };

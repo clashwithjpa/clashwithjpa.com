@@ -8,7 +8,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { Field } from "@ark-ui/svelte/field";
-    import { applyCwl, getCOCClan, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
+    import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -64,21 +64,10 @@
     }
 
     async function setClanOptions() {
-        const clans = await getJPAClans({ baseURL: PUBLIC_SERVER_URL });
-        const clansInfo = await Promise.all(
-            clans.data.clans.map(async (clan) => {
-                const tag = Object.keys(clan)[0];
-                try {
-                    const clanData = await getCOCClan(encodeURIComponent(tag), {
-                        baseURL: PUBLIC_SERVER_URL,
-                    });
-                    return { tag: tag, name: clanData.data.clan.name, icon: clanData.data.clan.badgeUrls.medium };
-                } catch (e) {
-                    return { tag: tag, name: tag, icon: undefined };
-                }
-            }),
-        );
-        clanOptions = clansInfo.map((clan) => ({ label: clan.name, value: clan.tag, icon: clan.icon }));
+        const clans = await getJPAClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+        Object.values(clans.data.clans).forEach((clan) => {
+            clanOptions.push({ label: `${clan.clanTag} - ${clan.clanName}`, value: clan.clanTag });
+        });
     }
 
     const handleSubmit = async (e: SubmitEvent) => {

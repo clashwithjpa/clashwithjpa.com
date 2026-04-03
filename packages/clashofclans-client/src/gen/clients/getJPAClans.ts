@@ -13,7 +13,7 @@ function getGetJPAClansUrl() {
 }
 
 /**
- * @description [Public] Fetches all JPA clans and their requirements.
+ * @description [Authenticated] Fetches all JPA clans with their details and requirements.
  * {@link /coc/jpa/clans}
  */
 export async function getJPAClans(config: Partial<RequestConfig> & { client?: Client } = {}) {

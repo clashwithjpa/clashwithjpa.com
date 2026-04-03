@@ -84,7 +84,14 @@ export type {
     GetCOCPlayerBattleLogQueryResponse,
     ItemsBattleTypeEnumKey,
 } from "./GetCOCPlayerBattleLog.ts";
+export type {
+    GetJPAClanRequirements200,
+    GetJPAClanRequirements500,
+    GetJPAClanRequirementsQuery,
+    GetJPAClanRequirementsQueryResponse,
+} from "./GetJPAClanRequirements.ts";
 export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./GetJPAClans.ts";
+export type { GetJPACwlClans200, GetJPACwlClans500, GetJPACwlClansQuery, GetJPACwlClansQueryResponse } from "./GetJPACwlClans.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./GetUser.ts";
