@@ -57,7 +57,7 @@
             size="2xl"
         />
         <div class="flex flex-col gap-2">
-            <h1 class="text-4xl font-semibold">{$session.data?.user.name?.split(" ")[0]}</h1>
+            <h1 class="text-4xl font-bold">{$session.data?.user.name?.split(" ")[0]}</h1>
             <div class="flex items-start justify-center gap-2">
                 <Badge
                     variant="ghost"

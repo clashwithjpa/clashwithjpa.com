@@ -35,7 +35,7 @@
         { name: "Home ", icon: TablerHome, href: "/dashboard" },
         { name: "Apply", icon: TablerFileDescription, href: "/dashboard/apply", requiredPerm: "apply" },
         { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", requiredPerm: "cwl" },
-        { name: "Settings", icon: TablerSettings, href: "/admin/settings" },
+        { name: "Settings", icon: TablerSettings, href: "/dashboard/settings" },
         { name: "Leave", icon: TablerLogout2, href: "/" },
     ];
 

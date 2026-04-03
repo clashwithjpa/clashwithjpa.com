@@ -30,6 +30,7 @@
         "@repo/clashofclans-client": "workspace:*",
         "@sentry/sveltekit": "^10.45.0",
         "@tanstack/svelte-query": "^5.0.0",
+        "@types/ua-parser-js": "^0.7.39",
         "@typescript/native-preview": "^7.0.0-dev.20260322.1",
         "animejs": "^4.3.6",
         "better-auth": "^1.5.5",
@@ -37,10 +38,12 @@
         "isomorphic-dompurify": "^3.7.1",
         "runed": "^0.37.1",
         "svelte-sonner": "^1.1.0",
+        "ua-parser-js": "^2.0.9",
         "vaul-svelte": "^0.3.2"
     },
     "devDependencies": {
         "@capacitor/cli": "^8.0.2",
+        "@iconify-json/logos": "^1.2.11",
         "@iconify-json/simple-icons": "^1.2.73",
         "@iconify-json/svg-spinners": "^1.2.4",
         "@iconify-json/tabler": "^1.2.31",
