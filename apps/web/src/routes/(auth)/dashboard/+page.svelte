@@ -30,6 +30,7 @@
     import TablerMapPin from "~icons/tabler/map-pin";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerRosetteDiscountCheck from "~icons/tabler/rosette-discount-check";
+    import TablerRouteAltRight from "~icons/tabler/route-alt-right";
     import TablerScale from "~icons/tabler/scale";
     import TablerTool from "~icons/tabler/tool";
     import TablerX from "~icons/tabler/x";
@@ -190,30 +191,30 @@
                                             </span>
                                         </Tooltip>
                                         {#if application.isAlt}
-                                            <Badge variant="yellow" content="Alt" class="mt-1" />
+                                            <Badge variant="yellow" content="Alt" class="mt-2" icon={TablerRouteAltRight} />
                                         {/if}
                                     </div>
                                 </div>
 
                                 <hr class="border-stone-700/50" />
 
-                                <div class="flex flex-col gap-2 font-medium">
+                                <div class="flex flex-col gap-2">
                                     <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 text-stone-400">
+                                        <span class="flex items-center gap-1 font-medium text-stone-400">
                                             <TablerBuildingCastle class="size-4" />
                                             Clan
                                         </span>
                                         <span class="text-stone-200">{jpaClansResp.data.clans[application.cocAccountClan]?.clanName}</span>
                                     </div>
                                     <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 text-stone-400">
+                                        <span class="flex items-center gap-1 font-medium text-stone-400">
                                             <TablerListNumbers class="size-4" />
                                             Pref. Number
                                         </span>
                                         <span class="font-mono text-stone-200">{application.preferenceNum.toString()}</span>
                                     </div>
                                     <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 text-stone-400">
+                                        <span class="flex items-center gap-1 font-medium text-stone-400">
                                             <TablerScale class="size-4" />
                                             Weight
                                         </span>
@@ -222,7 +223,7 @@
                                 </div>
 
                                 <div class="flex flex-col items-start justify-between gap-2">
-                                    <span class="flex items-center gap-1 text-stone-400">
+                                    <span class="flex items-center gap-1 font-medium text-stone-400">
                                         <TablerMapPin class="size-4" />
                                         Assigned Clan
                                     </span>
