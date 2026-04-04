@@ -233,6 +233,7 @@
                                         )}"
                                         target="_blank"
                                         class="w-full"
+                                        variant={application.assignedTo ? "success" : "base"}
                                         disabled={!application.assignedTo}
                                     >
                                         {#if application.assignedTo}
