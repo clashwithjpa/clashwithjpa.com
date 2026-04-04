@@ -13,6 +13,7 @@
     import TablerClock from "~icons/tabler/clock";
     import TablerDeviceDesktop from "~icons/tabler/device-desktop";
     import TablerDeviceMobile from "~icons/tabler/device-mobile";
+    import TablerPointFilled from "~icons/tabler/point-filled";
     import TablerServer from "~icons/tabler/server";
     import TablerTrash from "~icons/tabler/trash";
     import TablerWorld from "~icons/tabler/world";
@@ -25,6 +26,7 @@
     import LogosOpera from "~icons/logos/opera";
     import LogosSafari from "~icons/logos/safari";
     import LogosVivaldiIcon from "~icons/logos/vivaldi-icon";
+    import TablerBrowser from "~icons/tabler/browser";
 
     let session = authClient.useSession();
     let sessions = authClient.listSessions();
@@ -53,7 +55,7 @@
         if (b.includes("safari")) return LogosSafari;
         if (b.includes("vivaldi")) return LogosVivaldiIcon;
         if (b.includes("internet explorer") || b.includes("ie")) return LogosInternetexplorer;
-        return null;
+        return TablerBrowser;
     }
 </script>
 
@@ -108,7 +110,7 @@
                                 </span>
                             </div>
                             {#if isCurrent}
-                                <Badge variant="green" content="Current" />
+                                <Badge variant="green" content="Current" icon={TablerPointFilled} />
                             {/if}
                         </div>
 

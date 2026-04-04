@@ -30,9 +30,9 @@
     import TablerMapPin from "~icons/tabler/map-pin";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerRosetteDiscountCheck from "~icons/tabler/rosette-discount-check";
-    import TablerRouteAltRight from "~icons/tabler/route-alt-right";
     import TablerScale from "~icons/tabler/scale";
     import TablerTool from "~icons/tabler/tool";
+    import TablerUsersPlus from "~icons/tabler/users-plus";
     import TablerX from "~icons/tabler/x";
 
     const session = authClient.useSession();
@@ -191,7 +191,7 @@
                                             </span>
                                         </Tooltip>
                                         {#if application.isAlt}
-                                            <Badge variant="yellow" content="Alt" class="mt-2" icon={TablerRouteAltRight} />
+                                            <Badge variant="yellow" content="Alt" class="mt-2" icon={TablerUsersPlus} />
                                         {/if}
                                     </div>
                                 </div>
