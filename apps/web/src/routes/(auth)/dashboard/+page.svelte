@@ -24,6 +24,7 @@
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
     import TablerCrown from "~icons/tabler/crown";
+    import TablerExternalLink from "~icons/tabler/external-link";
     import TablerFileText from "~icons/tabler/file-text";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerListNumbers from "~icons/tabler/list-numbers";
@@ -232,12 +233,13 @@
                                             application.assignedTo || '',
                                         )}"
                                         target="_blank"
-                                        class="w-full"
+                                        class="w-full gap-2"
                                         variant={application.assignedTo ? "success" : "base"}
                                         disabled={!application.assignedTo}
                                     >
                                         {#if application.assignedTo}
                                             {jpaCwlClansResp.data.clans[application.assignedTo]?.clanName || "View Assigned Clan"}
+                                            <TablerExternalLink class="size-5" />
                                         {:else}
                                             Clan Not Assigned
                                         {/if}
