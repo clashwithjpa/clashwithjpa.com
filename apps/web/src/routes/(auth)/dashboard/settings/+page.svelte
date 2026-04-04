@@ -17,12 +17,14 @@
     import TablerTrash from "~icons/tabler/trash";
     import TablerWorld from "~icons/tabler/world";
     // Browser Icons
-    import LogosBrave from "~icons/logos/brave";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import LogosChrome from "~icons/logos/chrome";
     import LogosFirefox from "~icons/logos/firefox";
+    import LogosInternetexplorer from "~icons/logos/internetexplorer";
     import LogosEdge from "~icons/logos/microsoft-edge";
     import LogosOpera from "~icons/logos/opera";
     import LogosSafari from "~icons/logos/safari";
+    import LogosVivaldiIcon from "~icons/logos/vivaldi-icon";
 
     let session = authClient.useSession();
     let sessions = authClient.listSessions();
@@ -46,10 +48,11 @@
         const b = browserName.toLowerCase();
         if (b.includes("chrome")) return LogosChrome;
         if (b.includes("firefox")) return LogosFirefox;
-        if (b.includes("safari")) return LogosSafari;
         if (b.includes("edge")) return LogosEdge;
         if (b.includes("opera")) return LogosOpera;
-        if (b.includes("brave")) return LogosBrave;
+        if (b.includes("safari")) return LogosSafari;
+        if (b.includes("vivaldi")) return LogosVivaldiIcon;
+        if (b.includes("internet explorer") || b.includes("ie")) return LogosInternetexplorer;
         return null;
     }
 </script>
@@ -151,10 +154,17 @@
                         </div>
 
                         <div class="mt-auto flex pt-2">
-                            <Button variant="danger" class="w-full gap-2" size="sm" onclick={() => invalidateSession(s.token)} disabled={isCurrent}>
-                                <TablerTrash class="size-4" />
-                                {isCurrent ? "Cannot Remove Current Session" : "Remove Session"}
-                            </Button>
+                            <ConfirmationDialog
+                                title="Revoke Session"
+                                class="w-full"
+                                description="Are you sure you want to revoke this session? This action cannot be undone."
+                                onConfirm={() => invalidateSession(s.token)}
+                            >
+                                <Button variant="danger" class="w-full gap-2" disabled={isCurrent}>
+                                    <TablerTrash class="size-5" />
+                                    {isCurrent ? "Logout to remove" : "Revoke Session"}
+                                </Button>
+                            </ConfirmationDialog>
                         </div>
                     </div>
                 {/each}

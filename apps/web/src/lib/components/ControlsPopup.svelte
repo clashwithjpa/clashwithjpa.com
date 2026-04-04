@@ -233,11 +233,9 @@
                 confirmText="Clear Cache"
                 onConfirm={clearSiteCache}
             >
-                {#snippet trigger()}
-                    <Button tooltip="Clear Website Cache" class="size-12 rounded-full" size="">
-                        <TablerTrash class="size-6" />
-                    </Button>
-                {/snippet}
+                <Button tooltip="Clear Website Cache" class="size-12 rounded-full" size="">
+                    <TablerTrash class="size-6" />
+                </Button>
             </ConfirmationDialog>
 
             <Button tooltip="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
