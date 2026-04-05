@@ -41,6 +41,22 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+@property --sb-color {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+}
+
+* {
+    transition: --sb-color 0.2s ease;
+    --sb-color: transparent;
+}
+
+.show-scrollbar,
+.show-scrollbar * {
+    --sb-color: var(--color-stone-800);
+}
+
 ::-webkit-scrollbar {
     @apply w-0 md:w-2;
 }
@@ -48,11 +64,8 @@ body {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: transparent;
+    background-color: var(--sb-color);
     border-radius: 0;
-}
-::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-stone-800);
 }
 ::-webkit-scrollbar-corner {
     background: transparent;

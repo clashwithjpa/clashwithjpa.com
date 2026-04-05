@@ -8,7 +8,35 @@
     import "./layout.css";
 
     let { children } = $props();
+
+    function handleMouseMove(e: MouseEvent) {
+        let isOverScrollbar = window.innerWidth - e.clientX <= 24;
+        if (!isOverScrollbar) {
+            let el = e.target as HTMLElement | null;
+            while (el && el !== document.body) {
+                if (el.scrollHeight > el.clientHeight) {
+                    const style = window.getComputedStyle(el);
+                    if (style.overflowY === "auto" || style.overflowY === "scroll") {
+                        const rect = el.getBoundingClientRect();
+                        if (rect.right - e.clientX <= 24 && rect.right - e.clientX >= 0) {
+                            isOverScrollbar = true;
+                            break;
+                        }
+                    }
+                }
+                el = el.parentElement;
+            }
+        }
+
+        if (isOverScrollbar) {
+            document.documentElement.classList.add("show-scrollbar");
+        } else {
+            document.documentElement.classList.remove("show-scrollbar");
+        }
+    }
 </script>
+
+<svelte:window onmousemove={handleMouseMove} />
 
 <div class="h-screen w-screen overflow-x-hidden">
     {@render children()}
