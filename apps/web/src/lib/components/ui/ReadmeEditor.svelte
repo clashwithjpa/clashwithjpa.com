@@ -36,9 +36,34 @@
     import Select from "$lib/components/ui/Select.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
-    import { markdown } from "@codemirror/lang-markdown";
+    import { type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
+    import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { Compartment, EditorState } from "@codemirror/state";
     import { keymap, lineNumbers } from "@codemirror/view";
+    import emojilib from "emojilib";
+
+    const emojiCompletions = Object.entries(emojilib).flatMap(([emoji, aliases]) =>
+        aliases.map((alias) => ({
+            label: `:${alias}:`,
+            detail: emoji,
+            apply: emoji,
+            type: "text",
+            boost: alias === aliases[0] ? 2 : 1,
+        })),
+    );
+
+    function emojiCompletionSource(context: CompletionContext): CompletionResult | null {
+        const word = context.matchBefore(/:\w*/);
+        if (!word) return null;
+        if (word.from == word.to && !context.explicit) return null;
+
+        return {
+            from: word.from,
+            options: emojiCompletions,
+            validFor: /^:\w*$/,
+        };
+    }
+
     import { PreRendered } from "carta-md";
     import { EditorView, basicSetup } from "codemirror";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -78,6 +103,7 @@
             extensions: [
                 basicSetup,
                 markdown(),
+                markdownLanguage.data.of({ autocomplete: emojiCompletionSource }),
                 lineNumbers(),
                 keymap.of([
                     {
