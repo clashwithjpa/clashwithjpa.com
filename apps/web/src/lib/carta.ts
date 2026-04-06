@@ -1,7 +1,6 @@
 import { anchor } from "@cartamd/plugin-anchor";
 import { code } from "@cartamd/plugin-code";
 import { emoji } from "@cartamd/plugin-emoji";
-import { slash } from "@cartamd/plugin-slash";
 import { Carta } from "carta-md";
 import DOMPurify from "isomorphic-dompurify";
 import type { BundledTheme, StringLiteralUnion } from "shiki";
@@ -18,7 +17,6 @@ export const carta = new Carta({
         code({
             theme,
         }),
-        slash(),
     ],
     shikiOptions: {
         themes: [theme],
