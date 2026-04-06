@@ -11,4 +11,18 @@ export default defineConfig({
             compiler: "svelte",
         }),
     ],
+    optimizeDeps: {
+        exclude: [
+            "codemirror",
+            "@codemirror/autocomplete",
+            "@codemirror/commands",
+            "@codemirror/language",
+            "@codemirror/lint",
+            "@codemirror/search",
+            "@codemirror/state",
+            "@codemirror/view",
+            "@codemirror/lang-markdown",
+            "@uiw/codemirror-themes-all",
+        ],
+    },
 });

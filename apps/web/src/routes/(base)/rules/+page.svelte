@@ -32,7 +32,7 @@
 
     <br />
 
-    <div class="typography rules max-w-7xl!">
+    <div class="typography rules max-w-none!">
         <PreRendered html={data.rules} />
     </div>
 </div>

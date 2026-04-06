@@ -46,6 +46,7 @@ app.put(
     zValidator("json", setRulesBodySchema),
     async (c) => {
         try {
+            c.header("Cache-Control", "no-cache, no-store, must-revalidate");
             const { rules } = await c.req.json();
             const updatedRules = await setRules(rules);
             return c.json({

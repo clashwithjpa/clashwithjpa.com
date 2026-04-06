@@ -47,7 +47,7 @@
             <Popover.Content
                 class={cn(
                     "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
-                    "flex max-h-[calc(100vh-10rem)] flex-col overflow-x-hidden overflow-y-auto rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 shadow-2xl",
+                    "flex max-h-[calc(var(--available-height)-1rem)] flex-col overflow-x-hidden overflow-y-auto rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 shadow-2xl",
                     "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
                     maxWidth,
                     contentClass,

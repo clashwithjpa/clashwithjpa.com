@@ -157,9 +157,9 @@
 {/snippet}
 
 {#snippet ContentPanel()}
-    <Splitter.Panel id="content" class="size-full min-w-0  rounded-2xl bg-stone-950">
+    <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
         {#if $session.data}
-            <div in:fadeIn class="size-full overflow-y-auto p-4">
+            <div in:fadeIn class="size-full overflow-y-auto" class:p-4={page.url.pathname !== "/admin/rules"}>
                 {@render children()}
             </div>
         {:else}

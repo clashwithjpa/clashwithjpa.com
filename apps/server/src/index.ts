@@ -34,7 +34,7 @@ app.use(
         cors({
             origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
             allowHeaders: ["Content-Type", "Authorization"],
-            allowMethods: ["POST", "GET", "OPTIONS"],
+            allowMethods: ["POST", "GET", "OPTIONS", "PUT"],
             exposeHeaders: ["Content-Length"],
             maxAge: 600,
             credentials: true,
@@ -218,6 +218,7 @@ app.get(
     }),
     async (c) => {
         try {
+            c.header("Cache-Control", "no-cache, no-store, must-revalidate");
             const rules = await getRules();
             return c.json({
                 success: true,

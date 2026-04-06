@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { account, clanApplicationTable, clanInfoTable, cocAccountTable, cwlApplicationTable, cwlClanInfoTable, settingsTable } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -92,7 +92,8 @@ export async function getClansWithRequirements() {
 }
 
 export async function getRules(): Promise<string | null> {
-    const result = await db.select({ rulesContent: settingsTable.rulesContent }).from(settingsTable).limit(1);
+    // Descending order by updatedAt to get the latest rules content
+    const result = await db.select({ rulesContent: settingsTable.rulesContent }).from(settingsTable).orderBy(desc(settingsTable.updatedAt)).limit(1);
 
     return result[0]?.rulesContent ?? null;
 }

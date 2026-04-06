@@ -48,7 +48,6 @@ body {
 }
 
 * {
-    transition: --sb-color 0.2s ease;
     --sb-color: transparent;
 }
 
@@ -58,7 +57,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-    @apply w-0 md:w-2;
+    @apply h-0 w-0 md:h-2 md:w-2;
 }
 ::-webkit-scrollbar-track {
     background: transparent;
@@ -73,6 +72,9 @@ body {
 
 .typography {
     @apply prose prose-stone dark:prose-invert prose-headings:font-black prose-headings:text-amber-500 prose-a:text-yellow-500 prose-a:hover:text-yellow-400 prose-blockquote:rounded-r-lg prose-blockquote:border-l-amber-500 prose-blockquote:bg-stone-800/30 prose-blockquote:px-4 prose-blockquote:py-1 prose-strong:text-amber-400 prose-ol:marker:text-amber-500 prose-ul:marker:text-amber-500;
+}
+.carta-viewer > *:first-child {
+    margin-top: 0 !important;
 }
 
 .typography a {

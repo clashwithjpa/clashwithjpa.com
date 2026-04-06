@@ -115,7 +115,7 @@
             <Popover.Positioner class={cn("absolute", zIndex)}>
                 <Popover.Content
                     class={cn(
-                        "relative flex max-h-[calc(100vh-10rem)] flex-col overflow-hidden rounded-[20px] border border-black outline-none",
+                        "relative flex max-h-[calc(var(--available-height)-10rem)] flex-col overflow-hidden rounded-[20px] border border-black outline-none",
                         "transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
                         "shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_8px_24px_rgba(0,0,0,0.5)]",
                         zIndex,
