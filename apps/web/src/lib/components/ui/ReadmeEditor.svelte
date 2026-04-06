@@ -70,6 +70,8 @@
         }
     });
 
+    let typingTimeout: ReturnType<typeof setTimeout>;
+
     function createEditorState() {
         return EditorState.create({
             doc: value,
@@ -91,6 +93,14 @@
                 EditorView.updateListener.of((update) => {
                     if (update.docChanged) {
                         value = update.state.doc.toString();
+                    }
+
+                    if (update.docChanged || update.selectionSet) {
+                        update.view.dom.classList.add("cursor-typing");
+                        clearTimeout(typingTimeout);
+                        typingTimeout = setTimeout(() => {
+                            update.view.dom.classList.remove("cursor-typing");
+                        }, 500);
                     }
                 }),
             ],
@@ -206,5 +216,32 @@
     :global(.cm-scroller) {
         height: 100% !important;
         overflow: auto;
+    }
+
+    /* Pulse cursor blinking */
+    :global(.cm-cursorLayer) {
+        animation: cm-blink-pulse 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite !important;
+    }
+
+    :global(.cm-editor.cursor-typing .cm-cursorLayer) {
+        animation: none !important;
+    }
+
+    @keyframes -global-cm-blink-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+
+    /* Smooth cursor caret animation */
+    :global(.cm-cursor) {
+        transition:
+            left 80ms ease-out,
+            top 80ms ease-out !important;
+        border-left-width: 2px !important;
     }
 </style>
