@@ -185,7 +185,7 @@
         </Splitter.Root>
     {/if}
 
-    <div class="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl xl:gap-4">
+    <div class="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl xl:gap-4">
         <Select options={themeOptions} bind:value={currentTheme} placeholder="Select theme" class="w-52" />
         <Button variant="success" onclick={handleSave} class="shrink-0" disabled={isSaving}>
             {#if isSaving}
