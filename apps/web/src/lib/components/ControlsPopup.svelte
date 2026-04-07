@@ -216,7 +216,8 @@
 
 <div
     {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd }), bounds(BoundsFrom.viewport())])}
-    class="fixed right-4 bottom-4 z-9999"
+    // No "cursor-grab" class, as it may conflict with the button cursor, we do not want the grab cursor to conflict with the button's cursor when hovering over it
+    class="fixed right-4 bottom-4 z-9999 active:cursor-grabbing"
     class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
 >
     <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-9999" bind:open onOpenChange={handleOpenChange}>
