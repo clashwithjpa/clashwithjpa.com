@@ -13,15 +13,15 @@
         placeholder = "Select an option",
         class: className = "",
         disabled = false,
+        open = $bindable(false),
     }: {
+        open?: boolean;
         value?: string;
         options: Option[];
         placeholder?: string;
         class?: string;
         disabled?: boolean;
     } = $props();
-
-    let open = $state(false);
 
     let selectedOption = $derived(options.find((o) => o.value === value));
     let selectedLabel = $derived(selectedOption?.label || placeholder);

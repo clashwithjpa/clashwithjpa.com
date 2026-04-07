@@ -5,7 +5,7 @@
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
     import { spinOnce } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
-    import { draggable, events } from "@neodrag/svelte";
+    import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
     import { onMount } from "svelte";
     import TablerIcons from "~icons/tabler/icons";
@@ -215,7 +215,7 @@
 </script>
 
 <div
-    {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd })])}
+    {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd }), bounds(BoundsFrom.viewport())])}
     class="fixed right-4 bottom-4 z-9999"
     class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
 >

@@ -40,6 +40,7 @@
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { Compartment, EditorState } from "@codemirror/state";
     import { keymap, lineNumbers } from "@codemirror/view";
+    import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import emojilib from "emojilib";
 
     const emojiCompletions = Object.entries(emojilib).flatMap(([emoji, aliases]) =>
@@ -65,7 +66,7 @@
     }
 
     import { PreRendered } from "carta-md";
-    import { EditorView, basicSetup } from "codemirror";
+    import { basicSetup, EditorView } from "codemirror";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
 
@@ -152,6 +153,8 @@
     }
 
     let isSaving = $state(false);
+    let selectOpen = $state(false);
+
     async function handleSave() {
         isSaving = true;
         try {
@@ -211,17 +214,22 @@
         </Splitter.Root>
     {/if}
 
-    <div class="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl xl:gap-4">
-        <Select options={themeOptions} bind:value={currentTheme} placeholder="Select theme" class="w-52" />
-        <Button variant="success" onclick={handleSave} class="shrink-0" disabled={isSaving}>
-            {#if isSaving}
-                <SvgSpinnersRingResize class="mr-2" />
-                Saving...
-            {:else}
-                <TablerDeviceFloppy class="mr-2" />
-                Save Changes
-            {/if}
-        </Button>
+    <div class="pointer-events-none absolute inset-0 z-10 flex items-end justify-center overflow-hidden pb-6">
+        <div
+            {@attach draggable([bounds(BoundsFrom.parent()), events({ onDragStart: () => (selectOpen = false) })])}
+            class="pointer-events-auto flex cursor-grab items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl active:cursor-grabbing xl:gap-4"
+        >
+            <Select options={themeOptions} bind:value={currentTheme} bind:open={selectOpen} placeholder="Select theme" class="w-52" />
+            <Button variant="success" onclick={handleSave} class="shrink-0" disabled={isSaving}>
+                {#if isSaving}
+                    <SvgSpinnersRingResize class="mr-2" />
+                    Saving...
+                {:else}
+                    <TablerDeviceFloppy class="mr-2" />
+                    Save Changes
+                {/if}
+            </Button>
+        </div>
     </div>
 </div>
 
