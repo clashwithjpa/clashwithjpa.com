@@ -1,4 +1,8 @@
+import * as dotenv from "dotenv";
 import "dotenv/config";
+
+dotenv.config({ path: ".env.server-db" });
+dotenv.config({ path: ".env" });
 
 function required(key: string): string {
     const value = process.env[key];
@@ -30,6 +34,12 @@ export const config = {
 
     // Cloudflare Turnstile
     JPA_TURNSTILE_SECRET_KEY: required("JPA_TURNSTILE_SECRET_KEY"),
+
+    // MinIO / Storage
+    MINIO_ENDPOINT: process.env.MINIO_ENDPOINT,
+    MINIO_ROOT_USER: process.env.MINIO_ROOT_USER,
+    MINIO_ROOT_PASSWORD: process.env.MINIO_ROOT_PASSWORD,
+    MINIO_PUBLIC_URL: process.env.MINIO_PUBLIC_URL,
 
     // Sentry (optional)
     SENTRY_DSN: process.env.SENTRY_DSN,

@@ -28,3 +28,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  jpa-minio:
+    image: minio/minio:latest
+    container_name: jpa-minio
+    restart: unless-stopped
+    env_file: .env.server-db
+    ports:
+      - 7105:9000
+      - 7106:9001
+    volumes:
+      - jpa-minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  jpa-pg-data:
+  jpa-redis-data:
+  jpa-minio-data:

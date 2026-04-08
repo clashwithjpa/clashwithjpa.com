@@ -13,6 +13,7 @@
     },
     "prettier": "@repo/prettier-config",
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.1026.0",
         "@hono/bun-compress": "^0.1.0",
         "@hono/standard-validator": "^0.2.2",
         "@repo/clashofclans-api": "workspace:*",

@@ -16,6 +16,15 @@ services:
       - all
       - services
 
+  jpa-minio:
+    extends:
+      file: ./apps/server/docker-compose.yaml
+      service: jpa-minio
+    profiles:
+      - all
+      - services
+      - media
+
   drizzle-gateway:
     container_name: drizzle-gateway
     image: ghcr.io/drizzle-team/gateway:latest
@@ -58,6 +67,7 @@ services:
 volumes:
   jpa-pg-data:
   jpa-redis-data:
+  jpa-minio-data:
   drizzle-gateway-data:
   redis-insight-data:
 

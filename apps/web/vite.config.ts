@@ -14,6 +14,7 @@ export default defineConfig({
     optimizeDeps: {
         exclude: [
             "codemirror",
+            "prettier",
             "@codemirror/autocomplete",
             "@codemirror/commands",
             "@codemirror/language",

@@ -41,7 +41,7 @@
             | "right"
             | "right-start"
             | "right-end";
-        variant?: "base" | "ghost" | "success" | "danger" | null;
+        variant?: "base" | "ghost" | "success" | "danger" | "waiting" | null;
         size?: "sm" | "base" | "lg" | "icon" | "";
         type?: string;
     } & HTMLAttributes<HTMLElement> = $props();
@@ -72,6 +72,7 @@
         ghost: "bg-stone-900 border-stone-700/50 text-stone-200 not-disabled:hover:bg-stone-700 not-disabled:hover:text-stone-50",
         success: "bg-green-900 border-green-700/50 text-green-200 not-disabled:hover:bg-green-700 not-disabled:hover:text-green-50",
         danger: "bg-red-900 border-red-700/50 text-red-200 not-disabled:hover:bg-red-700 not-disabled:hover:text-red-50",
+        waiting: "bg-yellow-900 border-yellow-700/50 text-yellow-200 not-disabled:hover:bg-yellow-700 not-disabled:hover:text-yellow-50",
     };
 
     const sizeClasses = {

@@ -36,10 +36,12 @@
     import Select from "$lib/components/ui/Select.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
-    import { type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
+    import { type CompletionContext, type CompletionResult, acceptCompletion } from "@codemirror/autocomplete";
+    import { indentLess, indentMore } from "@codemirror/commands";
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
+    import { indentUnit } from "@codemirror/language";
     import { Compartment, EditorState } from "@codemirror/state";
-    import { keymap, lineNumbers } from "@codemirror/view";
+    import { highlightTrailingWhitespace, keymap, lineNumbers } from "@codemirror/view";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import emojilib from "emojilib";
 
@@ -65,12 +67,54 @@
         };
     }
 
+    import { beforeNavigate, goto } from "$app/navigation";
+    import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import { PreRendered } from "carta-md";
     import { basicSetup, EditorView } from "codemirror";
+    import * as prettierPluginMarkdown from "prettier/plugins/markdown";
+    import * as prettier from "prettier/standalone";
+    import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
+    import TablerUpload from "~icons/tabler/upload";
 
     let { value = $bindable(""), isMobile = false, onSave }: { value?: string; isMobile?: boolean; onSave?: () => Promise<void> | void } = $props();
+
+    let hasChanges = $state(false);
+    let pendingNavigation = $state<string | null>(null);
+    let allowNavigation = $state(false);
+    let showConfirmDialog = $state(false);
+
+    beforeNavigate((navigation) => {
+        if (hasChanges && !allowNavigation) {
+            navigation.cancel();
+            pendingNavigation = navigation.to?.url.href || null;
+            if (pendingNavigation) {
+                showConfirmDialog = true;
+            }
+        }
+    });
+
+    onMount(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = "";
+                return "";
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    });
+
+    function proceedNavigation() {
+        if (pendingNavigation) {
+            allowNavigation = true;
+            goto(pendingNavigation);
+        }
+    }
 
     let editorRef: HTMLDivElement;
     let editor: EditorView;
@@ -105,8 +149,23 @@
                 basicSetup,
                 markdown(),
                 markdownLanguage.data.of({ autocomplete: emojiCompletionSource }),
+                indentUnit.of("    "),
+                EditorState.tabSize.of(4),
                 lineNumbers(),
+                highlightTrailingWhitespace(),
                 keymap.of([
+                    {
+                        key: "Tab",
+                        run: (view) => {
+                            if (acceptCompletion(view)) return true;
+                            if (view.state.selection.ranges.some((r) => !r.empty)) {
+                                return indentMore(view);
+                            }
+                            view.dispatch(view.state.replaceSelection("    "));
+                            return true;
+                        },
+                        shift: indentLess,
+                    },
                     {
                         key: "Mod-s",
                         preventDefault: true,
@@ -117,9 +176,49 @@
                     },
                 ]),
                 themeCompartment.of(themesMap[currentTheme] || themesMap["vscodeDark"]),
+                EditorView.domEventHandlers({
+                    drop: (event, view) => {
+                        const files = event.dataTransfer?.files;
+                        if (files && files.length > 0) {
+                            let handled = false;
+                            for (let i = 0; i < files.length; i++) {
+                                if (files[i].type.startsWith("image/")) {
+                                    event.preventDefault();
+                                    let posRaw = view.posAtCoords({ x: event.clientX, y: event.clientY });
+                                    const posToUse = posRaw !== null ? (typeof posRaw === "number" ? posRaw : (posRaw as any).pos) : null;
+                                    const pos = posToUse ?? view.state.selection.main.head;
+                                    handleImageFile(files[i], view, pos);
+                                    handled = true;
+                                }
+                            }
+                            if (handled) return true;
+                        }
+                        return false;
+                    },
+                    paste: (event, view) => {
+                        const items = event.clipboardData?.items;
+                        if (items) {
+                            let handled = false;
+                            for (let i = 0; i < items.length; i++) {
+                                if (items[i].type.startsWith("image/")) {
+                                    const file = items[i].getAsFile();
+                                    if (file) {
+                                        event.preventDefault();
+                                        const pos = view.state.selection.main.head;
+                                        handleImageFile(file, view, pos);
+                                        handled = true;
+                                    }
+                                }
+                            }
+                            if (handled) return true;
+                        }
+                        return false;
+                    },
+                }),
                 EditorView.updateListener.of((update) => {
                     if (update.docChanged) {
                         value = update.state.doc.toString();
+                        hasChanges = true;
                     }
 
                     if (update.docChanged || update.selectionSet) {
@@ -134,7 +233,6 @@
         });
     }
 
-    // Action to handle editor attachment when rendered inside a component that might mount it later
     function attachEditor(node: HTMLDivElement) {
         if (!editorRef) {
             editorRef = node;
@@ -154,16 +252,124 @@
 
     let isSaving = $state(false);
     let selectOpen = $state(false);
+    let fileInputRef: HTMLInputElement;
+
+    function handleManualUploadClick() {
+        fileInputRef?.click();
+    }
+
+    function handleFileInputChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        if (target.files && target.files.length > 0 && editor) {
+            handleImageFile(target.files[0], editor);
+            target.value = "";
+        }
+    }
 
     async function handleSave() {
         isSaving = true;
         try {
+            if (editor) {
+                const docText = editor.state.doc.toString();
+                const currentCursor = editor.state.selection.main.head;
+                try {
+                    const result = await prettier.formatWithCursor(docText, {
+                        parser: "markdown",
+                        plugins: [prettierPluginMarkdown],
+                        tabWidth: 4,
+                        cursorOffset: currentCursor,
+                    });
+
+                    if (result.formatted !== docText) {
+                        editor.dispatch({
+                            changes: { from: 0, to: docText.length, insert: result.formatted },
+                            selection: { anchor: result.cursorOffset },
+                            scrollIntoView: true,
+                        });
+                    }
+                } catch (err) {
+                    toast.error("Failed to format markdown on save. Saving unformatted content.");
+                    console.error("Format on save failed:", err);
+                }
+            }
+
             if (onSave) {
                 await onSave();
             }
+            hasChanges = false;
         } finally {
             isSaving = false;
         }
+    }
+
+    async function uploadImage(file: File): Promise<string> {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(`${PUBLIC_SERVER_URL}/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Upload failed");
+            }
+
+            const data = await response.json();
+            return data.url;
+        } catch (error) {
+            console.error("Image upload failed:", error);
+            throw error;
+        }
+    }
+
+    function handleImageFile(file: File, view: EditorView, insertAt?: number) {
+        if (!file.type.startsWith("image/")) return false;
+
+        const pos = insertAt ?? view.state.selection.main.head;
+        const uploadPlaceholder = `\n![Uploading ${file.name}...]()\n`;
+
+        view.dispatch({
+            changes: { from: pos, insert: uploadPlaceholder },
+            selection: { anchor: pos + uploadPlaceholder.length },
+        });
+
+        uploadImage(file)
+            .then((url) => {
+                // Find where the placeholder is now, since the user might have typed more
+                const docText = view.state.doc.toString();
+                const placeholderIndex = docText.indexOf(uploadPlaceholder);
+
+                if (placeholderIndex !== -1) {
+                    // Replace the placeholder with the actual image markdown
+                    const imageMarkdown = `\n![${file.name}](${url})\n`;
+                    view.dispatch({
+                        changes: {
+                            from: placeholderIndex,
+                            to: placeholderIndex + uploadPlaceholder.length,
+                            insert: imageMarkdown,
+                        },
+                    });
+                }
+            })
+            .catch(() => {
+                const docText = view.state.doc.toString();
+                const placeholderIndex = docText.indexOf(uploadPlaceholder);
+
+                if (placeholderIndex !== -1) {
+                    view.dispatch({
+                        changes: {
+                            from: placeholderIndex,
+                            to: placeholderIndex + uploadPlaceholder.length,
+                            insert: "",
+                        },
+                    });
+                }
+                toast.error(`Failed to upload ${file.name}`);
+            });
+
+        return true;
     }
 </script>
 
@@ -217,20 +423,39 @@
     <div class="pointer-events-none absolute inset-0 z-10 flex items-end justify-center overflow-hidden pb-6">
         <div
             {@attach draggable([bounds(BoundsFrom.parent()), events({ onDragStart: () => (selectOpen = false) })])}
-            class="pointer-events-auto flex cursor-grab items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl active:cursor-grabbing xl:gap-4"
+            class="pointer-events-auto flex cursor-grab items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl active:cursor-grabbing"
         >
-            <Select options={themeOptions} bind:value={currentTheme} bind:open={selectOpen} placeholder="Select theme" class="w-52" />
-            <Button variant="success" onclick={handleSave} class="shrink-0" disabled={isSaving}>
+            <input type="file" accept="image/*" class="hidden" bind:this={fileInputRef} onchange={handleFileInputChange} />
+            <Select
+                options={themeOptions}
+                bind:value={currentTheme}
+                bind:open={selectOpen}
+                placeholder="Select theme"
+                class="h-11 w-52 shrink-0 [&>div]:h-11"
+            />
+            <Button onclick={handleManualUploadClick} class="size-11 shrink-0 px-0" disabled={isSaving}>
+                <TablerUpload class="size-5" />
+            </Button>
+            <Button variant={hasChanges ? "waiting" : "success"} onclick={handleSave} class="size-11 shrink-0 px-0" disabled={isSaving}>
                 {#if isSaving}
-                    <SvgSpinnersRingResize class="mr-2" />
-                    Saving...
+                    <SvgSpinnersRingResize class="size-5" />
                 {:else}
-                    <TablerDeviceFloppy class="mr-2" />
-                    Save Changes
+                    <TablerDeviceFloppy class="size-5" />
                 {/if}
             </Button>
         </div>
     </div>
+
+    <ConfirmationDialog
+        bind:open={showConfirmDialog}
+        title="Unsaved Changes"
+        description="You have unsaved changes. Do you want to leave without saving?"
+        confirmText="Leave"
+        cancelText="Cancel"
+        onConfirm={proceedNavigation}
+    >
+        <span class="hidden"></span>
+    </ConfirmationDialog>
 </div>
 
 <style>
@@ -277,5 +502,13 @@
             left 80ms ease-out,
             top 80ms ease-out !important;
         border-left-width: 2px !important;
+    }
+
+    /* Override the default red background for trailing whitespace with VS Code-style dots */
+    :global(.cm-trailingSpace) {
+        background-color: transparent !important;
+        background-image: radial-gradient(circle at center, #78716c 1.5px, transparent 1.5px) !important;
+        background-size: 1ch 100% !important;
+        background-repeat: repeat-x !important;
     }
 </style>

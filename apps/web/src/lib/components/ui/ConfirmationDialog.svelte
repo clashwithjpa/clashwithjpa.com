@@ -9,6 +9,7 @@
     import TablerX from "~icons/tabler/x";
 
     let {
+        open = $bindable(false),
         children,
         title,
         description,
@@ -17,6 +18,7 @@
         onConfirm,
         class: className = "",
     }: {
+        open?: boolean;
         children: Snippet;
         title: string;
         description: string;
@@ -26,7 +28,6 @@
         class?: string;
     } = $props();
 
-    let open = $state(false);
     let isMobile = $state(false);
 
     onMount(() => {
