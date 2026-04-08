@@ -12,7 +12,11 @@ const theme: ShikiTheme = "ayu-dark";
 export const carta = new Carta({
     sanitizer: DOMPurify.sanitize,
     extensions: [
-        anchor(),
+        anchor({
+            autolink: {
+                behavior: "wrap",
+            },
+        }),
         emoji(),
         code({
             theme,
