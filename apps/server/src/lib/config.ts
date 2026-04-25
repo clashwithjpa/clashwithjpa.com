@@ -44,4 +44,7 @@ export const config = {
     // Sentry (optional)
     SENTRY_DSN: process.env.SENTRY_DSN,
     SENTRY_SPOTLIGHT: process.env.SENTRY_SPOTLIGHT,
+
+    // Better Auth
+    BETTER_AUTH_API_KEY: required("BETTER_AUTH_API_KEY"),
 } as const;

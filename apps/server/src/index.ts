@@ -34,7 +34,7 @@ app.use(
         logger(),
         cors({
             origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
-            allowHeaders: ["Content-Type", "Authorization"],
+            allowHeaders: ["Content-Type", "Authorization", "x-request-id", "x-visitor-id"],
             allowMethods: ["POST", "GET", "OPTIONS", "PUT"],
             exposeHeaders: ["Content-Length"],
             maxAge: 600,

@@ -16,6 +16,7 @@
     },
     "prettier": "./packages/prettier-config",
     "dependencies": {
+        "@better-auth/infra": "^0.2.5",
         "@typescript/native-preview": "^7.0.0-dev.20260322.1"
     },
     "devDependencies": {

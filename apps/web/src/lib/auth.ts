@@ -1,4 +1,5 @@
 import { PUBLIC_SERVER_URL } from "$env/static/public";
+import { dashClient } from "@better-auth/infra/client";
 import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";
 import { ac, admin, manager, reviewer, statement, unverified, verified } from "./config/permissions";
@@ -18,6 +19,7 @@ export const authClient = createAuthClient({
             defaultRole: "unverified",
             adminRoles: ["admin"],
         }),
+        dashClient(),
     ],
 });
 
