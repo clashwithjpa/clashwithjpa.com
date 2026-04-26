@@ -41,7 +41,7 @@
     {#snippet trigger()}
         <div
             class={cn(
-                "flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-base text-stone-50 shadow-xs transition-colors duration-200 ease-in-out outline-none hover:bg-stone-700 focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
+                "flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-base text-stone-50 shadow-xs transition-colors duration-200 ease-in-out outline-none focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
                 !value && "text-stone-400",
                 disabled && "cursor-not-allowed opacity-50!",
             )}
@@ -70,7 +70,7 @@
             <button
                 type="button"
                 class={cn(
-                    "flex w-full cursor-pointer items-center rounded-lg px-2 py-2 text-sm text-stone-200 transition-colors duration-200 ease-in-out outline-none hover:bg-stone-700/50 hover:text-stone-50 focus:bg-stone-700/50 focus:text-stone-50",
+                    "flex w-full cursor-pointer items-center rounded-lg px-2 py-2 text-sm text-stone-200 transition-colors duration-200 ease-in-out outline-none focus:bg-stone-700/50 focus:text-stone-50",
                     value === option.value && "bg-stone-800 text-stone-50",
                 )}
                 onclick={() => selectOption(option.value)}

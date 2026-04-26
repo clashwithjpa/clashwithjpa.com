@@ -3,8 +3,10 @@
     import { authClient, hasPermission } from "$lib/auth";
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
+    import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
     import type { statement } from "$lib/config/permissions";
     import type { Role } from "$lib/config/roles";
+    import { sidebarStore } from "$lib/stores/sidebar.svelte";
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
@@ -55,6 +57,45 @@
     let sidebarWidth = $state(0);
 
     let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
+    const noPaddingPaths: string[] = ["/admin/rules", "/admin/users"];
+
+    let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
+
+    let prevNavWidth = 6;
+    let prevInfoWidth = 30;
+
+    let desktopSize = $state([6, 94, 0]);
+    let mobileSize = $state([94, 6]);
+
+    $effect(() => {
+        if (isMobile) return;
+        if (showInfo) {
+            desktopSize = [prevNavWidth, +(100 - prevNavWidth - prevInfoWidth).toFixed(1), prevInfoWidth];
+        } else {
+            desktopSize = [prevNavWidth, +(100 - prevNavWidth).toFixed(1), 0];
+        }
+    });
+
+    function handleResize(details: { size: number[] }) {
+        if (isMobile) {
+            mobileSize = details.size;
+        }
+        // DO NOT update desktopSize here - let $effect control it
+    }
+
+    function handleDragEnd(details: { size: number[] }) {
+        if (isMobile) return;
+        const s = details.size;
+        if (s.length === 3) {
+            // ONLY explicitly save actual user-dragged boundaries
+            prevNavWidth = s[0];
+            if (showInfo && s[2] > 0) {
+                prevInfoWidth = s[2];
+            }
+            // Update desktopSize after user finishes dragging
+            desktopSize = s;
+        }
+    }
 
     onMount(() => {
         const cleanup = createMobileMediaQuery((m) => {
@@ -63,8 +104,11 @@
         return cleanup;
     });
 
+    let navButtonsRef: HTMLElement | null = $state(null);
     $effect(() => {
-        fadeIn(document.querySelectorAll(".dash-nav-btn"));
+        if (navButtonsRef) {
+            fadeIn(navButtonsRef.querySelectorAll(".dash-nav-btn"));
+        }
     });
 </script>
 
@@ -124,7 +168,7 @@
                 {/each}
             </div>
         {:else}
-            <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth}>
+            <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth} bind:this={navButtonsRef}>
                 {#each links as link (link.href)}
                     <div class="dash-nav-btn">
                         {@render button(link)}
@@ -159,7 +203,7 @@
 {#snippet ContentPanel()}
     <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
         {#if $session.data}
-            <div in:fadeIn class="size-full overflow-y-auto" class:p-4={page.url.pathname !== "/admin/rules"}>
+            <div in:fadeIn class={`size-full overflow-y-auto ${!noPaddingPaths.includes(page.url.pathname) ? "p-4" : ""}`}>
                 {@render children()}
             </div>
         {:else}
@@ -170,9 +214,30 @@
     </Splitter.Panel>
 {/snippet}
 
+{#snippet InfoSidebar()}
+    {#if isMobile}
+        {#if showInfo && sidebarStore.content}
+            <Drawer bind:open={sidebarStore.isOpen} onClose={() => sidebarStore.close()}>
+                {@render sidebarStore.content()}
+            </Drawer>
+        {/if}
+    {:else}
+        <Splitter.Panel id="infosidebar" class="h-full lg:rounded-2xl {!showInfo ? 'hidden' : ''}">
+            {#if showInfo && sidebarStore.content}
+                <div class="size-full overflow-y-auto p-4">
+                    {@render sidebarStore.content()}
+                </div>
+            {/if}
+        </Splitter.Panel>
+    {/if}
+{/snippet}
+
 <Splitter.Root
     orientation={isMobile ? "vertical" : "horizontal"}
     class="flex size-full overflow-hidden! bg-stone-900 lg:p-2"
+    size={isMobile ? mobileSize : desktopSize}
+    onResize={handleResize}
+    onResizeEnd={handleDragEnd}
     panels={isMobile
         ? [
               { id: "content", minSize: 94 },
@@ -180,9 +245,9 @@
           ]
         : [
               { id: "sidebar", minSize: 6, maxSize: 16 },
-              { id: "content", minSize: 84 },
+              { id: "content", minSize: 30 },
+              { id: "infosidebar", minSize: showInfo ? 15 : 0, maxSize: showInfo ? 45 : 0 },
           ]}
-    defaultSize={isMobile ? [94, 6] : [6, 94]}
 >
     {#if isMobile}
         {@render ContentPanel()}
@@ -190,11 +255,22 @@
             <div class="hidden"></div>
         </Splitter.ResizeTrigger>
         {@render SidebarPanel()}
+        {@render InfoSidebar()}
     {:else}
         {@render SidebarPanel()}
         <Splitter.ResizeTrigger id="sidebar:content" class="group relative flex items-center justify-center outline-none">
             <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
         </Splitter.ResizeTrigger>
         {@render ContentPanel()}
+        <Splitter.ResizeTrigger
+            id="content:infosidebar"
+            disabled={!showInfo}
+            class={!showInfo ? "hidden" : "group relative flex items-center justify-center outline-none"}
+        >
+            {#if showInfo}
+                <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
+            {/if}
+        </Splitter.ResizeTrigger>
+        {@render InfoSidebar()}
     {/if}
 </Splitter.Root>

@@ -19,6 +19,7 @@ import { requestId } from "hono/request-id";
 import RedisClient from "ioredis";
 import { RedisStore, type RedisReply } from "rate-limit-redis";
 import z4 from "zod/v4";
+import admin from "./routes/admin";
 import coc from "./routes/coc";
 import manage from "./routes/manage";
 import upload from "./routes/upload";
@@ -234,6 +235,7 @@ app.get(
 
 // Routes here
 app.route("/coc", coc);
+app.route("/admin", admin);
 app.route("/manage", manage);
 app.route("/user", user);
 app.route("/upload", upload);

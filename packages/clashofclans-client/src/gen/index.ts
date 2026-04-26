@@ -7,6 +7,7 @@ export type { GetCOCClanCurrentWarQueryKey } from "./hooks/createGetCOCClanCurre
 export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.ts";
 export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
+export type { GetDiscordIdByUserIdQueryKey } from "./hooks/createGetDiscordIdByUserId.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
@@ -106,6 +107,15 @@ export type {
     ItemsBattleTypeEnumKey,
 } from "./models/GetCOCPlayerBattleLog.ts";
 export type {
+    GetDiscordIdByUserId200,
+    GetDiscordIdByUserId400,
+    GetDiscordIdByUserId404,
+    GetDiscordIdByUserId500,
+    GetDiscordIdByUserIdPathParams,
+    GetDiscordIdByUserIdQuery,
+    GetDiscordIdByUserIdQueryResponse,
+} from "./models/GetDiscordIdByUserId.ts";
+export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
     GetJPAClanRequirementsQuery,
@@ -151,6 +161,7 @@ export { getCOCClanCurrentWar } from "./clients/getCOCClanCurrentWar.ts";
 export { getCOCClanMembers } from "./clients/getCOCClanMembers.ts";
 export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
+export { getDiscordIdByUserId } from "./clients/getDiscordIdByUserId.ts";
 export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
@@ -188,6 +199,9 @@ export { getCOCPlayerQueryOptions } from "./hooks/createGetCOCPlayer.ts";
 export { createGetCOCPlayerBattleLog } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBattleLog.ts";
+export { createGetDiscordIdByUserId } from "./hooks/createGetDiscordIdByUserId.ts";
+export { getDiscordIdByUserIdQueryKey } from "./hooks/createGetDiscordIdByUserId.ts";
+export { getDiscordIdByUserIdQueryOptions } from "./hooks/createGetDiscordIdByUserId.ts";
 export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
@@ -294,6 +308,14 @@ export {
     getCOCPlayerPathParamsSchema,
     getCOCPlayerQueryResponseSchema,
 } from "./zod/getCOCPlayerSchema.ts";
+export {
+    getDiscordIdByUserId200Schema,
+    getDiscordIdByUserId400Schema,
+    getDiscordIdByUserId404Schema,
+    getDiscordIdByUserId500Schema,
+    getDiscordIdByUserIdPathParamsSchema,
+    getDiscordIdByUserIdQueryResponseSchema,
+} from "./zod/getDiscordIdByUserIdSchema.ts";
 export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,

@@ -7,6 +7,7 @@ export { getCOCClanCurrentWar } from "./getCOCClanCurrentWar.ts";
 export { getCOCClanMembers } from "./getCOCClanMembers.ts";
 export { getCOCPlayer } from "./getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./getCOCPlayerBattleLog.ts";
+export { getDiscordIdByUserId } from "./getDiscordIdByUserId.ts";
 export { getJPAClanRequirements } from "./getJPAClanRequirements.ts";
 export { getJPAClans } from "./getJPAClans.ts";
 export { getJPACwlClans } from "./getJPACwlClans.ts";

@@ -7,6 +7,7 @@ export type { GetCOCClanCurrentWarQueryKey } from "./createGetCOCClanCurrentWar.
 export type { GetCOCClanMembersQueryKey } from "./createGetCOCClanMembers.ts";
 export type { GetCOCPlayerQueryKey } from "./createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./createGetCOCPlayerBattleLog.ts";
+export type { GetDiscordIdByUserIdQueryKey } from "./createGetDiscordIdByUserId.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./createGetJPACwlClans.ts";
@@ -44,6 +45,9 @@ export { getCOCPlayerQueryOptions } from "./createGetCOCPlayer.ts";
 export { createGetCOCPlayerBattleLog } from "./createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryKey } from "./createGetCOCPlayerBattleLog.ts";
 export { getCOCPlayerBattleLogQueryOptions } from "./createGetCOCPlayerBattleLog.ts";
+export { createGetDiscordIdByUserId } from "./createGetDiscordIdByUserId.ts";
+export { getDiscordIdByUserIdQueryKey } from "./createGetDiscordIdByUserId.ts";
+export { getDiscordIdByUserIdQueryOptions } from "./createGetDiscordIdByUserId.ts";
 export { createGetJPAClanRequirements } from "./createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryKey } from "./createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryOptions } from "./createGetJPAClanRequirements.ts";

@@ -37,6 +37,7 @@
         "@tanstack/svelte-query": "^5.0.0",
         "@types/ua-parser-js": "^0.7.39",
         "@typescript/native-preview": "^7.0.0-dev.20260322.1",
+        "ag-grid-community": "^35.2.1",
         "animejs": "^4.3.6",
         "better-auth": "^1.5.5",
         "carta-md": "^4.11.1",

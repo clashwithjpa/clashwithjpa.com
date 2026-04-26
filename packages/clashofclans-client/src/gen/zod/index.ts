@@ -44,6 +44,14 @@ export {
 } from "./getCOCPlayerBattleLogSchema.ts";
 export { getCOCPlayer200Schema, getCOCPlayer500Schema, getCOCPlayerPathParamsSchema, getCOCPlayerQueryResponseSchema } from "./getCOCPlayerSchema.ts";
 export {
+    getDiscordIdByUserId200Schema,
+    getDiscordIdByUserId400Schema,
+    getDiscordIdByUserId404Schema,
+    getDiscordIdByUserId500Schema,
+    getDiscordIdByUserIdPathParamsSchema,
+    getDiscordIdByUserIdQueryResponseSchema,
+} from "./getDiscordIdByUserIdSchema.ts";
+export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,
     getJPAClanRequirementsQueryResponseSchema,

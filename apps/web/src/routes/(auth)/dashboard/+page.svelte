@@ -5,6 +5,7 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
 
@@ -19,32 +20,18 @@
         getUserAccounts,
         getUserCwlApplications,
     } from "@repo/clashofclans-client";
-    import type { Component } from "svelte";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
-    import TablerCrown from "~icons/tabler/crown";
     import TablerExternalLink from "~icons/tabler/external-link";
-    import TablerFileText from "~icons/tabler/file-text";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerListNumbers from "~icons/tabler/list-numbers";
     import TablerMapPin from "~icons/tabler/map-pin";
-    import TablerQuestionMark from "~icons/tabler/question-mark";
-    import TablerRosetteDiscountCheck from "~icons/tabler/rosette-discount-check";
     import TablerScale from "~icons/tabler/scale";
-    import TablerTool from "~icons/tabler/tool";
     import TablerUsersPlus from "~icons/tabler/users-plus";
     import TablerX from "~icons/tabler/x";
 
     const session = authClient.useSession();
-
-    const roleIcons: Record<Role, Component> = {
-        unverified: TablerQuestionMark,
-        verified: TablerRosetteDiscountCheck,
-        manager: TablerTool,
-        reviewer: TablerFileText,
-        admin: TablerCrown,
-    };
 </script>
 
 <Seo title="Dashboard" />
@@ -60,11 +47,7 @@
         <div class="flex flex-col gap-2">
             <h1 class="text-4xl font-bold">{$session.data?.user.name?.split(" ")[0]}</h1>
             <div class="flex items-start justify-center gap-2">
-                <Badge
-                    variant="ghost"
-                    content={$session.data?.user.role ?? "unverified"}
-                    icon={roleIcons[($session.data?.user.role as Role) ?? "unverified"]}
-                />
+                <RoleBadge role={$session.data?.user.role ?? "unverified"} />
                 <div class="flex flex-wrap gap-1">
                     <Tooltip title="Joined {formatDateTime($session.data?.user.createdAt)}" placement="bottom">
                         <Badge variant="green" content={formatDate($session.data?.user.createdAt)} icon={TablerCalendarClock} />

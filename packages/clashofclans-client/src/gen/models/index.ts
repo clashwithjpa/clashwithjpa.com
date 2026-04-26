@@ -85,6 +85,15 @@ export type {
     ItemsBattleTypeEnumKey,
 } from "./GetCOCPlayerBattleLog.ts";
 export type {
+    GetDiscordIdByUserId200,
+    GetDiscordIdByUserId400,
+    GetDiscordIdByUserId404,
+    GetDiscordIdByUserId500,
+    GetDiscordIdByUserIdPathParams,
+    GetDiscordIdByUserIdQuery,
+    GetDiscordIdByUserIdQueryResponse,
+} from "./GetDiscordIdByUserId.ts";
+export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
     GetJPAClanRequirementsQuery,
