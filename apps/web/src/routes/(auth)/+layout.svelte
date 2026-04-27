@@ -4,9 +4,9 @@
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
+    import { sidebarStore } from "$lib/components/ui/sidebar";
     import type { statement } from "$lib/config/permissions";
     import type { Role } from "$lib/config/roles";
-    import { sidebarStore } from "$lib/stores/sidebar.svelte";
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
@@ -21,6 +21,7 @@
     import TablerSettings from "~icons/tabler/settings";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
+    import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
     let { children }: LayoutProps = $props();
@@ -225,6 +226,9 @@
         <Splitter.Panel id="infosidebar" class="h-full lg:rounded-2xl {!showInfo ? 'hidden' : ''}">
             {#if showInfo && sidebarStore.content}
                 <div class="size-full overflow-y-auto p-4">
+                    <Button size="icon" variant="ghost" class="fixed top-4 right-4" onclick={() => sidebarStore.close()}>
+                        <TablerX />
+                    </Button>
                     {@render sidebarStore.content()}
                 </div>
             {/if}

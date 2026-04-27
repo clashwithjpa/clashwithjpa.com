@@ -80,7 +80,7 @@
         sm: "text-sm px-3 py-1.5",
         base: "text-base px-4 py-2",
         lg: "text-lg px-6 py-3",
-        icon: "size-10",
+        icon: "size-8 *:size-4",
     };
 
     const buttonClass = $derived(

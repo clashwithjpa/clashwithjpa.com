@@ -41,7 +41,7 @@
                     onclick={() => (open = false)}
                     class="absolute top-0 left-1/2 z-20 grid -translate-x-1/2 -translate-y-16 cursor-pointer rounded-full"
                 >
-                    <TablerX class="size-4" />
+                    <TablerX />
                 </Button>
 
                 {#if title}
@@ -52,7 +52,7 @@
 
                 <div
                     data-vaul-no-drag
-                    class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
                     {@render children()}
                 </div>

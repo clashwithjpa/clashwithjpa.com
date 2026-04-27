@@ -81,8 +81,8 @@
                         <div class="flex items-center justify-between">
                             <Dialog.Title class="text-2xl font-semibold text-stone-50">{title}</Dialog.Title>
                             <Dialog.CloseTrigger>
-                                <Button variant="ghost" size="" class="size-8">
-                                    <TablerX class="size-6" />
+                                <Button variant="ghost" size="icon">
+                                    <TablerX />
                                 </Button>
                             </Dialog.CloseTrigger>
                         </div>

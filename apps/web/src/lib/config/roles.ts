@@ -37,7 +37,7 @@ export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     manager: {
         label: "Manager",
         decoration: {
-            gradient: "linear-gradient(135deg, #7f1d1d, #ef4444)",
+            gradient: "linear-gradient(135deg, #1e40af, #3b82f6)",
             animated: false,
         },
     },

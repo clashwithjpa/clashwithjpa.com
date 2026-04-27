@@ -1,10 +1,7 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
     import type { Role } from "$lib/config/roles";
     import { formatDateTime } from "$lib/utils";
-    import { getDiscordIdByUserId } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
-    import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import TablerBan from "~icons/tabler/ban";
     import TablerCheck from "~icons/tabler/check";
@@ -19,7 +16,7 @@
     import RoleBadge from "./ui/RoleBadge.svelte";
 
     interface Props {
-        user: UserWithRole;
+        user: UserWithRole & { discordId: string };
         onBanToggle: (userId: string, banned: boolean) => void;
         onRemove: (userId: string) => void;
         isCurrentUser?: boolean;
@@ -27,14 +24,6 @@
     }
 
     let { user, onBanToggle, onRemove, isCurrentUser = false, isProcessing = false }: Props = $props();
-    let accId: string | null = $state(null);
-
-    onMount(async () => {
-        if (user) {
-            const { success, data } = await getDiscordIdByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            accId = success ? data?.accountId : null;
-        }
-    });
 
     let activeTab = $state<"overview" | "sessions" | "activity">("overview");
     const tabs: Array<"overview" | "sessions" | "activity"> = ["overview", "sessions", "activity"];
@@ -51,7 +40,7 @@
 
 <div class="flex size-full flex-col overflow-hidden">
     <!-- User Header Card -->
-    <div class="p-4">
+    <div>
         <div class="mb-4 flex items-center gap-4">
             <Avatar src={user.image} name={user.name} role={user.role as Role} size="lg" />
             <div class="flex-1 overflow-hidden">
@@ -86,9 +75,9 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto py-4">
         {#if activeTab === "overview"}
-            <div class="space-y-4 p-4">
+            <div class="space-y-4">
                 <!-- Discord ID -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
@@ -97,21 +86,20 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <code class="flex-1 truncate rounded-lg bg-stone-800 px-3 py-2 font-mono text-xs text-stone-300">
-                            {accId || "N/A"}
+                            {user.discordId || "N/A"}
                         </code>
-                        {#if accId}
+                        {#if user.discordId}
                             <Button
                                 size="icon"
                                 variant={copied.discordId ? "success" : "base"}
-                                class="size-8"
-                                onclick={() => copyToClipboard(accId || "", "discordId")}
+                                onclick={() => copyToClipboard(user.discordId, "discordId")}
                                 tooltip={copied.discordId ? "Copied!" : "Copy"}
                                 tooltipPlacement="bottom"
                             >
                                 {#if copied.discordId}
-                                    <TablerCheck class="size-4" />
+                                    <TablerCheck />
                                 {:else}
-                                    <TablerCopy class="size-4" />
+                                    <TablerCopy />
                                 {/if}
                             </Button>
                         {/if}
@@ -137,9 +125,9 @@
                             tooltipPlacement="bottom"
                         >
                             {#if copied.userId}
-                                <TablerCheck class="size-4" />
+                                <TablerCheck />
                             {:else}
-                                <TablerCopy class="size-4" />
+                                <TablerCopy />
                             {/if}
                         </Button>
                     </div>
@@ -189,7 +177,7 @@
 
     <!-- Action Buttons Footer -->
     {#if !isCurrentUser}
-        <div class="border-t border-stone-700/50 p-4">
+        <div class="border-t border-stone-700/50">
             <div class="space-y-2">
                 <!-- Ban/Unban Button -->
                 <Button
@@ -215,7 +203,7 @@
             </div>
         </div>
     {:else}
-        <div class="border-t border-stone-700/50 p-4">
+        <div class="border-t border-stone-700/50">
             <p class="text-center text-xs text-stone-400">You cannot manage your own account</p>
         </div>
     {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
     import ActionCell from "$lib/components/grid/ActionCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
@@ -8,22 +9,31 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import { fadeIn } from "$lib/utils/animations";
+    import { getDiscordIdByUserId } from "@repo/clashofclans-client";
+    import type { UserWithRole } from "better-auth/plugins";
     import { onMount } from "svelte";
     import { toast } from "svelte-sonner";
 
-    let rowData = $state<any[]>([]);
+    let rowData = $state<(UserWithRole & { discordId: string })[]>([]);
     let isProcessing = $state<string | null>(null);
 
     const session = authClient.useSession();
 
     async function loadUsers() {
-        const { data, error } = await authClient.admin.listUsers({ query: { limit: 100 } });
+        const { data, error } = await authClient.admin.listUsers({ query: { limit: 10 } });
         if (error) {
             toast.error("Failed to load users", { description: error.message });
             return;
         }
 
-        rowData = data?.users.map((user) => ({ ...user })) || [];
+        rowData = await Promise.all(
+            data?.users.map(async (user) => ({
+                ...user,
+                discordId: await getDiscordIdByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }).then((res) =>
+                    res.success && res.data?.accountId ? res.data.accountId : "",
+                ),
+            })) || [],
+        );
     }
 
     onMount(async () => {
@@ -58,15 +68,33 @@
                 const { error } = await authClient.admin.unbanUser({ userId });
                 if (error) toast.error("Failed to unban user", { description: error.message });
                 else {
+                    const { data, error } = await authClient.admin.getUser({ query: { id: userId } });
+                    if (error) {
+                        toast.error("Failed to refresh user data", { description: error.message });
+                    } else if (data) {
+                        const index = rowData.findIndex((u) => u.id === userId);
+                        if (index !== -1) {
+                            Object.assign(rowData[index], data);
+                            rowData = rowData.map((u) => u);
+                        }
+                    }
                     toast.success("User unbanned");
-                    rowData = rowData.map((u) => (u.id === userId ? { ...u, banned: false } : u));
                 }
             } else {
                 const { error } = await authClient.admin.banUser({ userId });
                 if (error) toast.error("Failed to ban user", { description: error.message });
                 else {
+                    const { data, error } = await authClient.admin.getUser({ query: { id: userId } });
+                    if (error) {
+                        toast.error("Failed to refresh user data", { description: error.message });
+                    } else if (data) {
+                        const index = rowData.findIndex((u) => u.id === userId);
+                        if (index !== -1) {
+                            Object.assign(rowData[index], data);
+                            rowData = rowData.map((u) => u);
+                        }
+                    }
                     toast.success("User banned");
-                    rowData = rowData.map((u) => (u.id === userId ? { ...u, banned: true } : u));
                 }
             }
             isProcessing = null;
