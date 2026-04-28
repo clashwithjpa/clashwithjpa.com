@@ -1,5 +1,4 @@
 import { config } from "@/lib/config";
-import { dash } from "@better-auth/infra";
 import { db } from "@lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -51,10 +50,6 @@ export const auth = betterAuth({
         captcha({
             provider: "cloudflare-turnstile",
             secretKey: config.JPA_TURNSTILE_SECRET_KEY,
-        }),
-        dash({
-            apiKey: config.BETTER_AUTH_API_KEY,
-            activityTracking: { enabled: true },
         }),
     ],
     advanced: {
