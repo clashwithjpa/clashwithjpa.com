@@ -37,7 +37,7 @@
     } = $props();
 </script>
 
-<Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
+<Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange} closeOnInteractOutside={false}>
     <Popover.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
         {@render trigger()}
     </Popover.Trigger>

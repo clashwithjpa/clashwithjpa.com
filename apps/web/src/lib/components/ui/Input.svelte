@@ -1,15 +1,28 @@
 <script lang="ts">
-    import { cn, type WithElementRef } from "$lib/utils.js";
+    import { cn, fromArkValue, type WithElementRef } from "$lib/utils";
+    import { DateInput, useDateInput } from "@ark-ui/svelte/date-input";
+    import { DatePicker, parseDate, useDatePicker } from "@ark-ui/svelte/date-picker";
+    import { Portal } from "@ark-ui/svelte/portal";
     import type { HTMLInputAttributes, HTMLInputTypeAttribute } from "svelte/elements";
+    import TablerCalendar from "~icons/tabler/calendar";
     import TablerCheck from "~icons/tabler/check";
     import TablerChevronDown from "~icons/tabler/chevron-down";
+    import TablerChevronLeft from "~icons/tabler/chevron-left";
+    import TablerChevronRight from "~icons/tabler/chevron-right";
     import TablerChevronUp from "~icons/tabler/chevron-up";
     import TablerEye from "~icons/tabler/eye";
     import TablerEyeOff from "~icons/tabler/eye-off";
 
     type InputType = Exclude<HTMLInputTypeAttribute, "file">;
 
-    type Props = WithElementRef<Omit<HTMLInputAttributes, "type"> & ({ type: "file"; files?: FileList } | { type?: InputType; files?: undefined })>;
+    type Props = WithElementRef<
+        Omit<HTMLInputAttributes, "type" | "min" | "max"> & {
+            type?: "file" | InputType;
+            files?: FileList;
+            min?: string | number | Date | null;
+            max?: string | number | Date | null;
+        }
+    >;
 
     let {
         ref = $bindable(null),
@@ -18,6 +31,8 @@
         type,
         files = $bindable(),
         class: className,
+        min,
+        max,
         ...restProps
     }: Props = $props();
 
@@ -37,6 +52,29 @@
             value = Number((ref as HTMLInputElement).value);
         }
     }
+
+    // Ark UI Date Picker Initialization
+    const dateId = $derived(restProps.id || Math.random().toString(36).substring(7));
+    const datePicker = $derived(
+        useDatePicker({
+            id: `${dateId}-picker`,
+            min: min ? parseDate(min as string | Date) : undefined,
+            max: max ? parseDate(max as string | Date) : undefined,
+            onValueChange(details) {
+                value = fromArkValue(details.value);
+            },
+        }),
+    );
+    const dateInput = $derived(
+        useDateInput(() => ({
+            id: dateId,
+            value: datePicker().value,
+            onValueChange(details) {
+                datePicker().setValue(details.value);
+                value = fromArkValue(details.value);
+            },
+        })),
+    );
 </script>
 
 {#if type === "file"}
@@ -141,6 +179,173 @@
             class="pointer-events-none absolute size-3.5 scale-50 text-stone-900 opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100 peer-disabled:opacity-50!"
         />
     </div>
+{:else if type === "date"}
+    <DateInput.RootProvider value={dateInput} class="w-full">
+        <DateInput.Control
+            class={cn(
+                "flex w-full min-w-0 items-center justify-between rounded-lg border-2 border-stone-700/50 bg-stone-900 px-2 py-1 text-base text-stone-50 shadow-xs transition-colors duration-200 ease-in-out outline-none focus-within:border-stone-700 focus-within:ring-4 focus-within:ring-stone-700/50 aria-invalid:border-red-700/50 aria-invalid:ring-red-700/50 md:text-sm dark:aria-invalid:ring-red-700/50",
+                className,
+            )}
+        >
+            <DatePicker.RootProvider value={datePicker} class="w-full ">
+                <DatePicker.Control class="flex w-full items-center justify-between">
+                    <DateInput.SegmentGroup class="flex items-center">
+                        <DateInput.SegmentContext>
+                            {#snippet render(segment)}
+                                <DateInput.Segment
+                                    class="rounded px-1 py-0.5 text-stone-200 transition-colors duration-200 outline-none placeholder:text-stone-400 focus:bg-stone-700/50 focus:text-stone-50 data-[state=invalid]:text-red-400"
+                                    {segment}
+                                />
+                            {/snippet}
+                        </DateInput.SegmentContext>
+                    </DateInput.SegmentGroup>
+                    <DatePicker.Trigger
+                        class="flex items-center justify-center rounded-lg p-1 text-stone-400 transition-colors duration-200 hover:bg-stone-700/50 hover:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50!"
+                    >
+                        <TablerCalendar class="size-5" />
+                    </DatePicker.Trigger>
+                </DatePicker.Control>
+                <Portal>
+                    <DatePicker.Positioner class="z-9999">
+                        <DatePicker.Content
+                            class="z-9999 flex w-[320px] flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 text-stone-50 shadow-2xl backdrop-blur-sm outline-none data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+                        >
+                            <DatePicker.View view="day" class="flex flex-col gap-4">
+                                <DatePicker.Context>
+                                    {#snippet render(datePicker)}
+                                        <DatePicker.ViewControl class="flex items-center justify-between gap-4 *:cursor-pointer">
+                                            <DatePicker.PrevTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronLeft class="size-5" />
+                                            </DatePicker.PrevTrigger>
+                                            <DatePicker.ViewTrigger
+                                                class="text-sm font-medium text-stone-200 transition-colors duration-200 hover:text-stone-50"
+                                            >
+                                                <DatePicker.RangeText />
+                                            </DatePicker.ViewTrigger>
+                                            <DatePicker.NextTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronRight class="size-5" />
+                                            </DatePicker.NextTrigger>
+                                        </DatePicker.ViewControl>
+                                        <DatePicker.Table class="w-full border-collapse">
+                                            <DatePicker.TableHead class="border-b-2 border-stone-700/50">
+                                                <DatePicker.TableRow class="flex w-full justify-between pb-2">
+                                                    {#each datePicker().weekDays as weekDay}
+                                                        <DatePicker.TableHeader class="w-8 text-center text-xs font-medium text-stone-400">
+                                                            {weekDay.short}
+                                                        </DatePicker.TableHeader>
+                                                    {/each}
+                                                </DatePicker.TableRow>
+                                            </DatePicker.TableHead>
+                                            <DatePicker.TableBody class="flex flex-col gap-2 pt-2">
+                                                {#each datePicker().weeks as week}
+                                                    <DatePicker.TableRow class="flex w-full justify-between">
+                                                        {#each week as day}
+                                                            <DatePicker.TableCell class="p-0 text-center" value={day}>
+                                                                <DatePicker.TableCellTrigger
+                                                                    class="flex size-8 cursor-pointer items-center justify-center rounded-lg text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50 data-outside-range:pointer-events-none data-outside-range:text-stone-400/50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950 data-today:border-2 data-today:border-stone-700/50 data-unavailable:pointer-events-none data-unavailable:text-stone-400 data-unavailable:line-through data-unavailable:opacity-50"
+                                                                >
+                                                                    {day.day}
+                                                                </DatePicker.TableCellTrigger>
+                                                            </DatePicker.TableCell>
+                                                        {/each}
+                                                    </DatePicker.TableRow>
+                                                {/each}
+                                            </DatePicker.TableBody>
+                                        </DatePicker.Table>
+                                    {/snippet}
+                                </DatePicker.Context>
+                            </DatePicker.View>
+
+                            <DatePicker.View view="month" class="flex flex-col gap-4">
+                                <DatePicker.Context>
+                                    {#snippet render(datePicker)}
+                                        <DatePicker.ViewControl class="flex items-center justify-between gap-4 *:cursor-pointer">
+                                            <DatePicker.PrevTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronLeft class="size-5" />
+                                            </DatePicker.PrevTrigger>
+                                            <DatePicker.ViewTrigger
+                                                class="text-sm font-medium text-stone-200 transition-colors duration-200 hover:text-stone-50"
+                                            >
+                                                <DatePicker.RangeText />
+                                            </DatePicker.ViewTrigger>
+                                            <DatePicker.NextTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronRight class="size-5" />
+                                            </DatePicker.NextTrigger>
+                                        </DatePicker.ViewControl>
+                                        <DatePicker.Table class="w-full border-collapse">
+                                            <DatePicker.TableBody class="flex flex-col gap-4">
+                                                {#each datePicker().getMonthsGrid({ columns: 4, format: "short" }) as months}
+                                                    <DatePicker.TableRow class="flex w-full justify-between gap-2">
+                                                        {#each months as month}
+                                                            <DatePicker.TableCell class="flex-1 p-0 text-center" value={month.value}>
+                                                                <DatePicker.TableCellTrigger
+                                                                    class="flex w-full cursor-pointer items-center justify-center rounded-lg py-2 text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:line-through data-disabled:opacity-50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950"
+                                                                >
+                                                                    {month.label}
+                                                                </DatePicker.TableCellTrigger>
+                                                            </DatePicker.TableCell>
+                                                        {/each}
+                                                    </DatePicker.TableRow>
+                                                {/each}
+                                            </DatePicker.TableBody>
+                                        </DatePicker.Table>
+                                    {/snippet}
+                                </DatePicker.Context>
+                            </DatePicker.View>
+
+                            <DatePicker.View view="year" class="flex flex-col gap-4">
+                                <DatePicker.Context>
+                                    {#snippet render(datePicker)}
+                                        <DatePicker.ViewControl class="flex items-center justify-between gap-4 *:cursor-pointer">
+                                            <DatePicker.PrevTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronLeft class="size-5" />
+                                            </DatePicker.PrevTrigger>
+                                            <DatePicker.ViewTrigger class="cursor-default! text-sm font-medium text-stone-200">
+                                                <DatePicker.RangeText />
+                                            </DatePicker.ViewTrigger>
+                                            <DatePicker.NextTrigger
+                                                class="flex items-center justify-center rounded-lg bg-stone-900 p-2 text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50"
+                                            >
+                                                <TablerChevronRight class="size-5" />
+                                            </DatePicker.NextTrigger>
+                                        </DatePicker.ViewControl>
+                                        <DatePicker.Table class="w-full border-collapse">
+                                            <DatePicker.TableBody class="flex flex-col gap-4">
+                                                {#each datePicker().getYearsGrid({ columns: 4 }) as years}
+                                                    <DatePicker.TableRow class="flex w-full justify-between gap-2">
+                                                        {#each years as year}
+                                                            <DatePicker.TableCell class="flex-1 p-0 text-center" value={year.value}>
+                                                                <DatePicker.TableCellTrigger
+                                                                    class="flex w-full cursor-pointer items-center justify-center rounded-lg py-2 text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:line-through data-disabled:opacity-50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950"
+                                                                >
+                                                                    {year.label}
+                                                                </DatePicker.TableCellTrigger>
+                                                            </DatePicker.TableCell>
+                                                        {/each}
+                                                    </DatePicker.TableRow>
+                                                {/each}
+                                            </DatePicker.TableBody>
+                                        </DatePicker.Table>
+                                    {/snippet}
+                                </DatePicker.Context>
+                            </DatePicker.View>
+                        </DatePicker.Content>
+                    </DatePicker.Positioner>
+                </Portal>
+            </DatePicker.RootProvider>
+        </DateInput.Control>
+        <DateInput.HiddenInput />
+    </DateInput.RootProvider>
 {:else}
     <input
         bind:this={ref}

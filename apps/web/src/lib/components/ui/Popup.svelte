@@ -53,7 +53,7 @@
     <MobileDrawer bind:open {title} onClose={() => onOpenChange?.({ open: false })}>
         {#snippet trigger()}
             <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
-                {@render trigger()}
+                {@render trigger?.()}
             </div>
         {/snippet}
         <div class={contentClass}>

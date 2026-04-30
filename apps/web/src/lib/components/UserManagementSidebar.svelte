@@ -25,8 +25,8 @@
 
     let { user, onBanToggle, onRemove, isCurrentUser = false, isProcessing = false }: Props = $props();
 
-    let activeTab = $state<"overview" | "sessions" | "activity">("overview");
-    const tabs: Array<"overview" | "sessions" | "activity"> = ["overview", "sessions", "activity"];
+    let activeTab = $state<"overview" | "sessions" | "accounts">("overview");
+    const tabs: Array<"overview" | "sessions" | "accounts"> = ["overview", "sessions", "accounts"];
 
     let copied: Record<string, boolean> = $state({});
     function copyToClipboard(text: string, id: string) {
@@ -64,7 +64,7 @@
             {#each tabs as tab (tab)}
                 <button
                     onclick={() => (activeTab = tab)}
-                    class="flex-1 cursor-pointer border-b-2 px-2 py-2 text-xs font-medium transition-colors duration-200 {activeTab === tab
+                    class="flex-1 cursor-pointer border-b-2 px-2 py-2 text-sm font-medium transition-colors duration-200 {activeTab === tab
                         ? 'border-stone-50 text-stone-50'
                         : 'border-transparent text-stone-400 hover:text-stone-200'}"
                 >
@@ -164,12 +164,6 @@
             <div class="p-4">
                 <div class="rounded-lg bg-stone-800 px-4 py-8 text-center">
                     <p class="text-sm text-stone-400">Sessions data not yet integrated</p>
-                </div>
-            </div>
-        {:else if activeTab === "activity"}
-            <div class="p-4">
-                <div class="rounded-lg bg-stone-800 px-4 py-8 text-center">
-                    <p class="text-sm text-stone-400">Activity logs not yet integrated</p>
                 </div>
             </div>
         {/if}

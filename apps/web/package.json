@@ -18,7 +18,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@ark-ui/svelte": "^5.19.1",
+        "@ark-ui/svelte": "^5.21.2",
         "@capacitor/android": "^8.0.2",
         "@capacitor/core": "^8.0.2",
         "@capacitor/ios": "^8.0.2",

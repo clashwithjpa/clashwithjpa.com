@@ -4,10 +4,13 @@
     import ActionCell from "$lib/components/grid/ActionCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
     import UserCell from "$lib/components/grid/UserCell.svelte";
+    import Dialog from "$lib/components/ui/Dialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
+    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
+    import Input from "$lib/components/ui/Input.svelte";
     import { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
+    import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import { getDiscordIdByUserId } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
@@ -16,6 +19,16 @@
 
     let rowData = $state<(UserWithRole & { discordId: string })[]>([]);
     let isProcessing = $state<string | null>(null);
+    let banUserDialogOpen = $state(false);
+    let selectedUser: {
+        userId: string;
+        reason: string;
+        duration: Date[] | [];
+    } = $state({
+        userId: "",
+        reason: "",
+        duration: [] as Date[] | [],
+    });
 
     const session = authClient.useSession();
 
@@ -39,6 +52,33 @@
     onMount(async () => {
         await loadUsers();
     });
+
+    async function banUser(userId: string, reason: string, duration: Date[] | []) {
+        const { error } = await authClient.admin.banUser({
+            userId,
+            banReason: reason,
+            banExpiresIn: duration.length ? Math.floor((duration[0].getTime() - Date.now()) / 1000) : undefined,
+        });
+
+        if (error) toast.error("Failed to ban user", { description: error.message });
+        else {
+            const { data, error } = await authClient.admin.getUser({ query: { id: userId } });
+            if (error) {
+                toast.error("Failed to refresh user data", { description: error.message });
+            } else if (data) {
+                const index = rowData.findIndex((u) => u.id === userId);
+                if (index !== -1) {
+                    Object.assign(rowData[index], data);
+                    rowData = rowData.map((u) => u);
+                }
+            }
+            selectedUser = { userId: "", reason: "", duration: [] };
+            banUserDialogOpen = false;
+            toast.success(`${data?.name} has been banned ${duration.length ? `until ${formatDate(duration[0])}` : "permanently"}`, {
+                description: reason,
+            });
+        }
+    }
 
     const gridContext = {
         get isProcessing() {
@@ -78,28 +118,18 @@
                             rowData = rowData.map((u) => u);
                         }
                     }
-                    toast.success("User unbanned");
+                    toast.success(`${data?.name} has been unbanned`);
                 }
             } else {
-                const { error } = await authClient.admin.banUser({ userId });
-                if (error) toast.error("Failed to ban user", { description: error.message });
-                else {
-                    const { data, error } = await authClient.admin.getUser({ query: { id: userId } });
-                    if (error) {
-                        toast.error("Failed to refresh user data", { description: error.message });
-                    } else if (data) {
-                        const index = rowData.findIndex((u) => u.id === userId);
-                        if (index !== -1) {
-                            Object.assign(rowData[index], data);
-                            rowData = rowData.map((u) => u);
-                        }
-                    }
-                    toast.success("User banned");
-                }
+                selectedUser = { userId, reason: "", duration: [] };
+                banUserDialogOpen = true;
             }
             isProcessing = null;
         },
     };
+
+    let nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + 1);
 </script>
 
 <Seo
@@ -157,3 +187,27 @@
         ]}
     />
 </div>
+
+<Dialog
+    bind:open={banUserDialogOpen}
+    title="Ban User"
+    description="Are you sure you want to ban this user?"
+    confirmText="Ban"
+    onConfirm={async () => {
+        await banUser(selectedUser.userId, selectedUser.reason, selectedUser.duration);
+    }}
+    onClose={() => {
+        selectedUser = { userId: "", reason: "", duration: [] };
+    }}
+>
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-col items-start justify-center gap-1">
+            <p class="text-sm font-medium">Reason</p>
+            <Input placeholder="Enter reason for ban (optional)" bind:value={selectedUser.reason} />
+        </div>
+        <div class="flex flex-col items-start justify-center gap-1">
+            <p class="text-sm font-medium">Duration</p>
+            <Input type="date" bind:value={selectedUser.duration} min={nextDate} />
+        </div>
+    </div>
+</Dialog>

@@ -35,7 +35,7 @@
 <RawPopup
     bind:open
     class={cn("relative w-full", className)}
-    contentClass="p-2"
+    contentClass="p-2 z-9999"
     maxWidth="w-[var(--reference-width)] sm:w-[var(--reference-width)] min-w-48"
 >
     {#snippet trigger()}
@@ -70,7 +70,7 @@
             <button
                 type="button"
                 class={cn(
-                    "flex w-full cursor-pointer items-center rounded-lg px-2 py-2 text-sm text-stone-200 transition-colors duration-200 ease-in-out outline-none focus:bg-stone-700/50 focus:text-stone-50",
+                    "flex w-full cursor-pointer items-center rounded-lg px-2 py-2 text-sm text-stone-200 transition-colors duration-200 ease-in-out outline-none hover:bg-stone-700/50 hover:text-stone-50",
                     value === option.value && "bg-stone-800 text-stone-50",
                 )}
                 onclick={() => selectOption(option.value)}

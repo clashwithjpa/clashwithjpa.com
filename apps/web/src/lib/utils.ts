@@ -25,7 +25,8 @@ export function formatDate(dateStr?: string | undefined | null | Date) {
     const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
     const day = getOrdinal(date.getDate());
     const month = date.toLocaleString("en-US", { month: "long" }).toWellFormed();
-    return `${day} ${month}`;
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
 }
 
 export function formatDateTime(dateStr?: string | undefined | null | Date) {
@@ -38,4 +39,14 @@ export function formatDateTime(dateStr?: string | undefined | null | Date) {
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const minStr = minutes === 0 ? "" : `:${minutes.toString().padStart(2, "0")}`;
     return `${formatDate(dateStr)} at ${hours}${minStr}${ampm}`;
+}
+
+export function fromArkValue(val: any) {
+    if (!val) return null;
+
+    if (Array.isArray(val)) {
+        return val.map((v) => v.toDate?.() ?? new Date(v));
+    }
+
+    return val.toDate?.() ?? new Date(val);
 }

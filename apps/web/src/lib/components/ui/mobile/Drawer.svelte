@@ -12,6 +12,7 @@
         trigger,
         children,
         class: className = "",
+        zIndex = "z-9999!",
     }: {
         open?: boolean;
         onClose?: () => void;
@@ -19,17 +20,21 @@
         trigger?: Snippet;
         children: Snippet;
         class?: string;
+        zIndex?: string;
     } = $props();
 </script>
 
-<Drawer.Root bind:open {onClose}>
+<Drawer.Root bind:open {onClose} closeOnOutsideClick={false}>
     {#if trigger}
         <Drawer.Trigger>{@render trigger()}</Drawer.Trigger>
     {/if}
     <Drawer.Portal>
-        <Drawer.Overlay class="fixed inset-0 z-9999! bg-stone-950/60 backdrop-blur-sm transition-all duration-200" />
+        <Drawer.Overlay
+            class={cn("fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200", zIndex)}
+            onclick={() => (open = false)}
+        />
         <Drawer.Content
-            class={cn("fixed inset-x-0 bottom-0 z-9999! mt-24 flex max-h-[calc(100vh-6rem)] flex-col outline-none focus:outline-none", className)}
+            class={cn("fixed inset-x-0 bottom-0 mt-24 flex max-h-[calc(100vh-6rem)] flex-col outline-none focus:outline-none", className, zIndex)}
         >
             <div class="pointer-events-none absolute inset-x-0 top-0 bottom-[-100vh] rounded-t-2xl border-t-2 border-stone-700/50 bg-stone-900"></div>
 
