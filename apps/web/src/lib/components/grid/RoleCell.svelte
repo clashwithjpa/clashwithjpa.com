@@ -8,5 +8,7 @@
 </script>
 
 <div class="flex h-full w-full items-center px-1">
-    <RoleBadge {role} />
+    {#if role}
+        <RoleBadge {role} />
+    {/if}
 </div>

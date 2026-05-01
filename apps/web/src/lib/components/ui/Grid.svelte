@@ -10,7 +10,7 @@
     ModuleRegistry.registerModules([AllCommunityModule]);
 
     interface Props {
-        rowData: GridOptions["rowData"];
+        rowData?: GridOptions["rowData"];
         columnDefs: GridOptions["columnDefs"];
         gridOptions?: Omit<GridOptions, "rowData" | "columnDefs">;
         class?: string;

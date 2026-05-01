@@ -173,8 +173,8 @@
     </div>
 
     <!-- Action Buttons Footer -->
-    {#if !isCurrentUser}
-        <div class="border-t border-stone-700/50">
+    <div class="border-t border-stone-700/50 pt-4">
+        {#if !isCurrentUser}
             <div class="space-y-2">
                 <!-- Ban/Unban Button -->
                 <Button
@@ -198,10 +198,8 @@
                     Remove User
                 </Button>
             </div>
-        </div>
-    {:else}
-        <div class="border-t border-stone-700/50">
+        {:else}
             <p class="text-center text-xs text-stone-400">You cannot manage your own account</p>
-        </div>
-    {/if}
+        {/if}
+    </div>
 </div>

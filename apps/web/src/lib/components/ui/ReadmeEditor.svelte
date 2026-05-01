@@ -42,7 +42,6 @@
     import { indentUnit } from "@codemirror/language";
     import { Compartment, EditorState } from "@codemirror/state";
     import { highlightTrailingWhitespace, keymap, lineNumbers } from "@codemirror/view";
-    import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import emojilib from "emojilib";
 
     const emojiCompletions = Object.entries(emojilib).flatMap(([emoji, aliases]) =>
@@ -79,6 +78,7 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
     import TablerUpload from "~icons/tabler/upload";
+    import Toolbar from "../Toolbar.svelte";
 
     let { value = $bindable(""), isMobile = false, onSave }: { value?: string; isMobile?: boolean; onSave?: () => Promise<void> | void } = $props();
 
@@ -420,31 +420,26 @@
         </Splitter.Root>
     {/if}
 
-    <div class="pointer-events-none absolute inset-0 z-10 flex items-end justify-center overflow-hidden pb-6">
-        <div
-            {@attach draggable([bounds(BoundsFrom.parent()), events({ onDragStart: () => (selectOpen = false) })])}
-            class="pointer-events-auto flex cursor-grab items-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl active:cursor-grabbing"
-        >
-            <input type="file" accept="image/*" class="hidden" bind:this={fileInputRef} onchange={handleFileInputChange} />
-            <Select
-                options={themeOptions}
-                bind:value={currentTheme}
-                bind:open={selectOpen}
-                placeholder="Select theme"
-                class="h-11 w-52 shrink-0 [&>div]:h-11"
-            />
-            <Button onclick={handleManualUploadClick} class="size-11 shrink-0 px-0" disabled={isSaving}>
-                <TablerUpload class="size-5" />
-            </Button>
-            <Button variant={hasChanges ? "waiting" : "success"} onclick={handleSave} class="size-11 shrink-0 px-0" disabled={isSaving}>
-                {#if isSaving}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerDeviceFloppy class="size-5" />
-                {/if}
-            </Button>
-        </div>
-    </div>
+    <Toolbar onDragStart={() => (selectOpen = false)}>
+        <input type="file" accept="image/*" class="hidden" bind:this={fileInputRef} onchange={handleFileInputChange} />
+        <Select
+            options={themeOptions}
+            bind:value={currentTheme}
+            bind:open={selectOpen}
+            placeholder="Select theme"
+            class="h-11 w-52 shrink-0 [&>div]:h-11"
+        />
+        <Button onclick={handleManualUploadClick} class="size-11 shrink-0 px-0" disabled={isSaving}>
+            <TablerUpload class="size-5" />
+        </Button>
+        <Button variant={hasChanges ? "waiting" : "success"} onclick={handleSave} class="size-11 shrink-0 px-0" disabled={isSaving}>
+            {#if isSaving}
+                <SvgSpinnersRingResize class="size-5" />
+            {:else}
+                <TablerDeviceFloppy class="size-5" />
+            {/if}
+        </Button>
+    </Toolbar>
 
     <ConfirmationDialog
         bind:open={showConfirmDialog}
