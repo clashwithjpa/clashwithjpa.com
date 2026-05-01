@@ -2,6 +2,8 @@ import { animate, splitText, stagger } from "animejs";
 
 export const DURATION = { FAST: 150, MEDIUM: 200, SMOOTH: 800 };
 
+const animationMap = new WeakMap<Element, ReturnType<typeof animate>>();
+
 export const textGlide = (el: Element, options?: { chars?: { wrap: string } }) => {
     const { chars } = splitText(el as HTMLElement, {
         ...options,
@@ -102,12 +104,23 @@ export const slideDown = (
     });
 };
 
-export const spinOnce = (el: Element) => {
-    return animate(el, {
-        rotate: "+=180",
+export const rotateToggle = (el: Element, isOpen: boolean) => {
+    const existing = animationMap.get(el);
+    if (existing) {
+        existing.pause();
+    }
+
+    const targetRotate = isOpen ? 180 : 0;
+
+    const animation = animate(el, {
+        rotate: targetRotate,
         duration: DURATION.SMOOTH,
         easing: "out(3)",
     });
+
+    animationMap.set(el, animation);
+
+    return animation;
 };
 
 export const cardSlideIn = (el: Element) => {

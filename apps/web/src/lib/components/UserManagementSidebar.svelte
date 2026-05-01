@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { authClient } from "$lib/auth";
     import type { Role } from "$lib/config/roles";
     import { formatDateTime } from "$lib/utils";
     import type { UserWithRole } from "better-auth/plugins";
@@ -162,9 +163,11 @@
             </div>
         {:else if activeTab === "sessions"}
             <div class="p-4">
-                <div class="rounded-lg bg-stone-800 px-4 py-8 text-center">
-                    <p class="text-sm text-stone-400">Sessions data not yet integrated</p>
-                </div>
+                {#await authClient.admin.listUserSessions({ userId: user.id })}
+                    <div class=""></div>
+                {:then sessions}
+                    {JSON.stringify(sessions, null, 2)}
+                {/await}
             </div>
         {/if}
     </div>

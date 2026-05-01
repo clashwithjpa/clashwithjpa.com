@@ -137,6 +137,8 @@
             )}
             {type}
             bind:value
+            min={min as number}
+            max={max as number}
             {...restProps}
         />
         <div class="absolute right-0 flex h-full flex-col overflow-hidden rounded-r-md border-l-2 border-stone-700/50">

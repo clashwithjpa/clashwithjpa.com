@@ -1,10 +1,10 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import { Drawer } from "@ark-ui/svelte/drawer";
     import { Popover } from "@ark-ui/svelte/popover";
     import { Portal } from "@ark-ui/svelte/portal";
     import { onMount, type Snippet } from "svelte";
-    import { Drawer } from "vaul-svelte";
 
     let {
         trigger,
@@ -47,6 +47,11 @@
 
     let isMobile = $state(false);
 
+    function handleDrawerOpenChange(details: { open: boolean }) {
+        open = details.open;
+        onOpenChange?.(details);
+    }
+
     onMount(() => {
         const cleanup = createMobileMediaQuery((mobile) => {
             isMobile = mobile;
@@ -63,47 +68,62 @@
 </script>
 
 {#if isMobile}
-    <Drawer.Root bind:open onClose={() => onOpenChange?.({ open: false })}>
+    <Drawer.Root {open} onOpenChange={handleDrawerOpenChange} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
         <Drawer.Trigger>
             <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
                 {@render trigger()}
             </div>
         </Drawer.Trigger>
-        <Drawer.Portal>
-            <Drawer.Overlay class={cn("fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200", "z-9999")} />
-            <Drawer.Content
-                class={cn("fixed inset-x-0 bottom-0 mt-24 flex max-h-[calc(100vh-6rem)] flex-col outline-none focus:outline-none", "z-9999")}
-            >
-                <div
-                    class="pointer-events-none absolute inset-x-0 top-0 bottom-[-100vh] overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)]"
+
+        <Portal>
+            <Drawer.Backdrop
+                class={cn(
+                    "pointer-events-auto fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200",
+                    "data-[state=closed]:animate-out data-[state=open]:animate-in",
+                    "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+                    "z-9999",
+                )}
+            />
+
+            <Drawer.Positioner class={cn("pointer-events-none fixed inset-0 z-9999 flex items-end justify-center")}>
+                <Drawer.Content
+                    class={cn(
+                        "pointer-events-auto relative w-full max-w-2xl overflow-hidden rounded-t-[20px] border border-black transition-all duration-200 outline-none focus:outline-none",
+                        "data-[state=closed]:animate-out data-[state=open]:animate-in",
+                        "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+                    )}
                 >
-                    <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
-                    <span class={`absolute inset-0.5 rounded-t-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
-                    <span class={`absolute inset-x-1.5 top-1.5 h-[40vh] rounded-t-[14px] rounded-b-xl bg-linear-to-b ${v.gloss} opacity-70`}></span>
-                </div>
-
-                <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col">
-                    {#if title}
-                        <div class="flex shrink-0 items-center justify-center p-3 pt-5 pb-3">
-                            <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
-                                {title}
-                            </h2>
-                        </div>
-                    {:else}
-                        <div class="h-2.5 shrink-0"></div>
-                    {/if}
-
                     <div
-                        data-vaul-no-drag
-                        class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+                        class="pointer-events-none absolute inset-x-0 top-0 bottom-[-100vh] overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)]"
                     >
-                        <div class={cn("w-full p-4 text-stone-900", contentClass)}>
-                            {@render children()}
+                        <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
+                        <span class={`absolute inset-0.5 rounded-t-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
+                        <span class={`absolute inset-x-1.5 top-1.5 h-[40vh] rounded-t-[14px] rounded-b-xl bg-linear-to-b ${v.gloss} opacity-70`}
+                        ></span>
+                    </div>
+
+                    <div class="relative z-10 flex max-h-[calc(100vh-6rem)] min-h-0 w-full flex-1 flex-col overflow-hidden">
+                        {#if title}
+                            <div class="flex shrink-0 items-center justify-center p-3 pt-5 pb-3">
+                                <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
+                                    {title}
+                                </h2>
+                            </div>
+                        {:else}
+                            <div class="h-2.5 shrink-0"></div>
+                        {/if}
+
+                        <div
+                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+                        >
+                            <div class={cn("w-full p-4 text-stone-900", contentClass)}>
+                                {@render children()}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Drawer.Content>
-        </Drawer.Portal>
+                </Drawer.Content>
+            </Drawer.Positioner>
+        </Portal>
     </Drawer.Root>
 {:else}
     <Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
@@ -112,7 +132,7 @@
         </Popover.Trigger>
 
         <Portal>
-            <Popover.Positioner class={cn("absolute", zIndex)}>
+            <Popover.Positioner class={cn("fixed transform-none", zIndex)}>
                 <Popover.Content
                     class={cn(
                         "relative flex max-h-[calc(var(--available-height)-10rem)] flex-col overflow-hidden rounded-[20px] border border-black outline-none",

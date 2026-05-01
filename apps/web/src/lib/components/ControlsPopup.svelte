@@ -3,7 +3,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
-    import { spinOnce } from "$lib/utils/animations";
+    import { rotateToggle } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
@@ -184,6 +184,7 @@
     }
 
     let open = $state(false);
+    let triggerButton = $state<HTMLElement | null>(null);
 
     function handleOpenChange(details: { open: boolean }) {
         open = details.open;
@@ -197,6 +198,13 @@
             }
         }
     }
+
+    // Rotate button based on open/close state
+    $effect(() => {
+        if (triggerButton) {
+            rotateToggle(triggerButton, open);
+        }
+    });
 
     function handleDragEnd() {
         setTimeout(() => {
@@ -217,14 +225,16 @@
 <div
     {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd }), bounds(BoundsFrom.viewport())])}
     // No "cursor-grab" class, as it may conflict with the button cursor, we do not want the grab cursor to conflict with the button's cursor when hovering over it
-    class="fixed right-4 bottom-4 z-9999 active:cursor-grabbing"
+    class="fixed right-4 bottom-4 z-60 active:cursor-grabbing"
     class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
 >
-    <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-9999" bind:open onOpenChange={handleOpenChange}>
+    <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-60" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
-            <Button class="size-14 rounded-full" size="" variant="ghost" onclick={(e) => spinOnce(e.currentTarget as Element)}>
-                <TablerIcons class="pointer-events-none size-6" />
-            </Button>
+            <div bind:this={triggerButton}>
+                <Button class="size-14 rounded-full" size="" variant="ghost">
+                    <TablerIcons class="pointer-events-none size-6" />
+                </Button>
+            </div>
         {/snippet}
 
         {#snippet children()}

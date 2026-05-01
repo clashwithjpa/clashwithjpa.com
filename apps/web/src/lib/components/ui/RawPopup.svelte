@@ -37,7 +37,16 @@
     } = $props();
 </script>
 
-<Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange} closeOnInteractOutside={false}>
+<Popover.Root
+    bind:open
+    {onOpenChange}
+    positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }}
+    closeOnInteractOutside={true}
+    autoFocus={false}
+    immediate={true}
+    unmountOnExit={true}
+    skipAnimationOnMount={true}
+>
     <Popover.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
         {@render trigger()}
     </Popover.Trigger>

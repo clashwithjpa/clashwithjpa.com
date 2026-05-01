@@ -217,11 +217,9 @@
 
 {#snippet InfoSidebar()}
     {#if isMobile}
-        {#if showInfo && sidebarStore.content}
-            <Drawer bind:open={sidebarStore.isOpen} onClose={() => sidebarStore.close()} zIndex="z-0!">
-                {@render sidebarStore.content()}
-            </Drawer>
-        {/if}
+        <Drawer bind:open={sidebarStore.isOpen} onClose={() => sidebarStore.close()} zIndex="z-60!">
+            {@render sidebarStore.content?.()}
+        </Drawer>
     {:else}
         <Splitter.Panel id="infosidebar" class="h-full lg:rounded-2xl {!showInfo ? 'hidden' : ''}">
             {#if showInfo && sidebarStore.content}
