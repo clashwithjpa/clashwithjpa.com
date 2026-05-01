@@ -82,7 +82,7 @@
                     const enrichedUsers = await enrichUsers(data.users);
                     params.successCallback(enrichedUsers, data.total);
                 } catch (error) {
-                    console.error("Failed to load users:", error);
+                    toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
                     params.failCallback();
                 }
             },
