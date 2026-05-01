@@ -47,8 +47,7 @@
         "prettier": "^3.8.1",
         "runed": "^0.37.1",
         "svelte-sonner": "^1.1.0",
-        "ua-parser-js": "^2.0.9",
-        "vaul-svelte": "^0.3.2"
+        "ua-parser-js": "^2.0.9"
     },
     "devDependencies": {
         "@capacitor/cli": "^8.0.2",

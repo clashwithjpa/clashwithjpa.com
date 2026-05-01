@@ -37,7 +37,7 @@
         class?: string;
         contentClass?: string;
         title?: string;
-        onOpenChange?: (details: { open: boolean }) => void;
+        onOpenChange?: (details: Drawer.OpenChangeDetails | Popover.OpenChangeDetails) => void;
         aboveNavbar?: boolean;
         maxWidth?: string;
     } = $props();
@@ -46,11 +46,6 @@
     const zIndex = $derived(aboveNavbar ? "z-9999" : "z-30");
 
     let isMobile = $state(false);
-
-    function handleDrawerOpenChange(details: { open: boolean }) {
-        open = details.open;
-        onOpenChange?.(details);
-    }
 
     onMount(() => {
         const cleanup = createMobileMediaQuery((mobile) => {
@@ -68,7 +63,7 @@
 </script>
 
 {#if isMobile}
-    <Drawer.Root {open} onOpenChange={handleDrawerOpenChange} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
+    <Drawer.Root bind:open {onOpenChange} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
         <Drawer.Trigger>
             <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
                 {@render trigger()}

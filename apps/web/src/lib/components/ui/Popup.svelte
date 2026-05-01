@@ -2,6 +2,8 @@
     import MobileDrawer from "$lib/components/ui/mobile/Drawer.svelte";
     import { cn } from "$lib/utils";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import type { Drawer } from "@ark-ui/svelte/drawer";
+    import type { Popover } from "@ark-ui/svelte/popover";
     import { onMount, type Snippet } from "svelte";
     import RawPopup from "./RawPopup.svelte";
 
@@ -35,7 +37,7 @@
         class?: string;
         contentClass?: string;
         title?: string;
-        onOpenChange?: (details: { open: boolean }) => void;
+        onOpenChange?: (details: Drawer.OpenChangeDetails | Popover.OpenChangeDetails) => void;
         maxWidth?: string;
     } = $props();
 
@@ -50,7 +52,7 @@
 </script>
 
 {#if isMobile}
-    <MobileDrawer bind:open {title} onClose={() => onOpenChange?.({ open: false })}>
+    <MobileDrawer bind:open {title} {onOpenChange}>
         {#snippet trigger()}
             <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
                 {@render trigger?.()}

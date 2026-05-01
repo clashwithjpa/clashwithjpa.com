@@ -8,6 +8,7 @@
 
     interface Props {
         open?: boolean;
+        onOpenChange?: (details: Drawer.OpenChangeDetails) => void;
         onClose?: () => void;
         title?: string;
         trigger?: Snippet;
@@ -16,17 +17,19 @@
         zIndex?: string;
     }
 
-    let { open = $bindable(false), onClose = () => {}, title = "", trigger, children, class: className = "", zIndex = "z-9999!" }: Props = $props();
-
-    function handleOpenChange(details: { open: boolean }) {
-        open = details.open;
-        if (!details.open) {
-            onClose();
-        }
-    }
+    let {
+        open = $bindable(false),
+        onOpenChange,
+        onClose = () => {},
+        title = "",
+        trigger,
+        children,
+        class: className = "",
+        zIndex = "z-9999!",
+    }: Props = $props();
 </script>
 
-<Drawer.Root {open} onOpenChange={handleOpenChange} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
+<Drawer.Root bind:open {onOpenChange} onExitComplete={onClose} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
     {#if trigger}
         <Drawer.Trigger>
             {@render trigger()}

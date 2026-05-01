@@ -77,14 +77,14 @@
         }
     });
 
-    function handleResize(details: { size: number[] }) {
+    function handleResize(details: Splitter.ResizeDetails) {
         if (isMobile) {
             mobileSize = details.size;
         }
         // DO NOT update desktopSize here - let $effect control it
     }
 
-    function handleDragEnd(details: { size: number[] }) {
+    function handleDragEnd(details: Splitter.ResizeEndDetails) {
         if (isMobile) return;
         const s = details.size;
         if (s.length === 3) {

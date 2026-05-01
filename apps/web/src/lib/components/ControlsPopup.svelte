@@ -186,8 +186,7 @@
     let open = $state(false);
     let triggerButton = $state<HTMLElement | null>(null);
 
-    function handleOpenChange(details: { open: boolean }) {
-        open = details.open;
+    function handleOpenChange() {
         if (open) {
             checkVideo();
             if (isMusicPlaying) startBeatDetection();

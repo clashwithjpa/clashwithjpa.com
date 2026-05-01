@@ -33,7 +33,7 @@
         class?: string;
         contentClass?: string;
         maxWidth?: string;
-        onOpenChange?: (details: { open: boolean }) => void;
+        onOpenChange?: (details: Popover.OpenChangeDetails) => void;
     } = $props();
 </script>
 
