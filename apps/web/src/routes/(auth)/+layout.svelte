@@ -217,7 +217,7 @@
 
 {#snippet InfoSidebar()}
     {#if isMobile}
-        <Drawer bind:open={sidebarStore.isOpen} onClose={() => sidebarStore.close()} zIndex="z-60!">
+        <Drawer bind:open={sidebarStore.isOpen} onClose={() => sidebarStore.close()} isParent={true}>
             {@render sidebarStore.content?.()}
         </Drawer>
     {:else}

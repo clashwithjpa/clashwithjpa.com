@@ -14,7 +14,7 @@
         trigger?: Snippet;
         children: Snippet;
         class?: string;
-        zIndex?: string;
+        isParent?: boolean;
     }
 
     let {
@@ -25,11 +25,24 @@
         trigger,
         children,
         class: className = "",
-        zIndex = "z-9999!",
+        isParent = false,
     }: Props = $props();
+
+    function handleOpenChange(details: Drawer.OpenChangeDetails) {
+        open = details.open;
+        onOpenChange?.(details);
+    }
+
+    function handleInteractOutside(event: Event) {
+        // By default, drawers are nested and stop event propagation
+        // Only parent drawers allow events to propagate
+        if (!isParent) {
+            event.stopPropagation();
+        }
+    }
 </script>
 
-<Drawer.Root bind:open {onOpenChange} onExitComplete={onClose} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
+<Drawer.Root bind:open onOpenChange={handleOpenChange} onExitComplete={onClose} onInteractOutside={handleInteractOutside}>
     {#if trigger}
         <Drawer.Trigger>
             {@render trigger()}
@@ -42,11 +55,12 @@
                 "pointer-events-auto fixed inset-0 bg-stone-950/60 backdrop-blur-sm transition-all duration-200",
                 "data-[state=closed]:animate-out data-[state=open]:animate-in",
                 "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                zIndex,
+                "z-9999!",
             )}
+            onpointerdown={handleInteractOutside}
         />
 
-        <Drawer.Positioner class={cn("pointer-events-none fixed inset-0 z-0 flex items-end justify-center", zIndex)}>
+        <Drawer.Positioner class={cn("pointer-events-none fixed inset-0 z-9999! flex items-end justify-center")}>
             <Drawer.Content
                 class={cn(
                     "pointer-events-auto relative w-full max-w-2xl rounded-t-2xl border-t border-stone-700/50 bg-stone-900 transition-all duration-200 outline-none focus:outline-none",
