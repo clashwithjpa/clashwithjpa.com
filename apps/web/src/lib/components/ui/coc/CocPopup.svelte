@@ -63,7 +63,7 @@
 </script>
 
 {#if isMobile}
-    <Drawer.Root bind:open {onOpenChange} modal={true} closeOnEscape={true} closeOnInteractOutside={true} trapFocus={true}>
+    <Drawer.Root bind:open {onOpenChange}>
         <Drawer.Trigger>
             <div class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
                 {@render trigger()}
