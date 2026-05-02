@@ -34,8 +34,6 @@
     }
 
     function handleInteractOutside(event: Event) {
-        // By default, drawers are nested and stop event propagation
-        // Only parent drawers allow events to propagate
         if (!isParent) {
             event.stopPropagation();
         }
@@ -63,27 +61,27 @@
         <Drawer.Positioner class={cn("pointer-events-none fixed inset-0 z-9999! flex items-end justify-center")}>
             <Drawer.Content
                 class={cn(
-                    "pointer-events-auto relative w-full max-w-2xl rounded-t-2xl border-t border-stone-700/50 bg-stone-900 transition-all duration-200 outline-none focus:outline-none",
+                    "pointer-events-auto relative flex max-h-[calc(100vh-6rem)] w-full max-w-2xl flex-col overflow-visible rounded-t-2xl border-t border-stone-700/50 bg-stone-900 transition-all duration-200 outline-none focus:outline-none",
                     "data-[state=closed]:animate-out data-[state=open]:animate-in",
                     "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
                     className,
                 )}
             >
+                <Button
+                    type="button"
+                    size="icon"
+                    aria-label="Close drawer"
+                    onclick={() => (open = false)}
+                    class="pointer-events-auto absolute top-0 left-1/2 z-20 grid -translate-x-1/2 -translate-y-12 cursor-pointer rounded-full"
+                >
+                    <TablerX />
+                </Button>
+
                 <div
                     class="pointer-events-none absolute inset-x-0 top-0 bottom-[-100vh] rounded-t-2xl border-t border-stone-700/50 bg-stone-900"
                 ></div>
 
-                <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col">
-                    <Button
-                        type="button"
-                        size="icon"
-                        aria-label="Close drawer"
-                        onclick={() => (open = false)}
-                        class="absolute top-0 left-1/2 z-20 grid -translate-x-1/2 -translate-y-16 cursor-pointer rounded-full"
-                    >
-                        <TablerX />
-                    </Button>
-
+                <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-t-2xl">
                     {#if title}
                         <div class="flex shrink-0 items-center justify-center px-4 pt-8 pb-4">
                             <h2 class="text-xl font-semibold text-stone-50">{title}</h2>

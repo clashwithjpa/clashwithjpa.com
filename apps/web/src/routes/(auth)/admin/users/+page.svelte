@@ -12,28 +12,35 @@
     import Input from "$lib/components/ui/Input.svelte";
     import { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
     import ToggleGroup from "$lib/components/ui/ToggleGroup.svelte";
+    import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import { getDiscordIdByUserId } from "@repo/clashofclans-client";
-    import type { IDatasource, IGetRowsParams } from "ag-grid-community";
+    import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
+    import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
     import TablerAbc from "~icons/tabler/abc";
     import TablerAt from "~icons/tabler/at";
     import TablerSearch from "~icons/tabler/search";
 
+    type RowUser = UserWithRole & { discordId: string };
+
     let isProcessing = $state<string | null>(null);
     let banUserDialogOpen = $state(false);
-    let gridApi: any = $state(null);
+    let gridApi: GridApi | null = $state(null);
+    let userSidebar: Sidebar | null = $state(null);
+    let selectedSidebarUser: RowUser | null = $state(null);
 
     let selectedUser: {
         userId: string;
         reason: string;
-        duration: Date[] | [];
+        duration: Date[];
     } = $state({
         userId: "",
         reason: "",
-        duration: [] as Date[] | [],
+        duration: [],
     });
 
     const session = authClient.useSession();
@@ -41,7 +48,7 @@
     let isDragging = $state(false);
     let searchType: ["name"] | ["email"] = $state(["name"]);
 
-    async function enrichUsers(users: any[]) {
+    async function enrichUsers(users: any[]): Promise<RowUser[]> {
         return Promise.all(
             users.map(async (user) => ({
                 ...user,
@@ -55,6 +62,52 @@
         );
     }
 
+    async function loadSidebarUser(userId: string): Promise<RowUser | null> {
+        const { data } = await authClient.admin.getUser({ query: { id: userId } });
+
+        if (!data) {
+            return null;
+        }
+
+        const [enrichedUser] = await enrichUsers([data]);
+        return enrichedUser ?? null;
+    }
+
+    function openUserSidebar(user: RowUser) {
+        selectedSidebarUser = user;
+        userSidebar?.open(user.id);
+    }
+
+    function closeUserSidebar() {
+        userSidebar?.close();
+        selectedSidebarUser = null;
+    }
+
+    function updateGridRow(user: RowUser) {
+        gridApi?.forEachNode((node) => {
+            if (node.data?.id === user.id) {
+                node.setData(user);
+            }
+        });
+        gridApi?.refreshCells({ force: true });
+    }
+
+    async function syncUserViews(userId: string) {
+        const refreshedUser = await loadSidebarUser(userId);
+
+        if (!refreshedUser) {
+            return null;
+        }
+
+        updateGridRow(refreshedUser);
+
+        if (selectedSidebarUser?.id === userId) {
+            selectedSidebarUser = refreshedUser;
+        }
+
+        return refreshedUser;
+    }
+
     function createDatasource(): IDatasource {
         return {
             async getRows(params: IGetRowsParams) {
@@ -66,9 +119,7 @@
 
                     // Server-side name search with operator
                     if (searchText) {
-                        let searchValue = searchText;
-
-                        queryParams.searchValue = searchValue;
+                        queryParams.searchValue = searchText;
                         queryParams.searchField = searchType[0];
                     }
 
@@ -99,12 +150,15 @@
         if (error) {
             toast.error("Failed to ban user", { description: error.message });
         } else {
-            const { data } = await authClient.admin.getUser({ query: { id: userId } });
             selectedUser = { userId: "", reason: "", duration: [] };
             banUserDialogOpen = false;
-            toast.success(`${data?.name} has been banned ${duration.length ? `until ${formatDate(duration[0])}` : "permanently"}`, {
-                description: reason,
-            });
+            const refreshedUser = await syncUserViews(userId);
+            toast.success(
+                `${refreshedUser?.name ?? "User"} has been banned ${duration.length ? `until ${formatDate(duration[0])}` : "permanently"}`,
+                {
+                    description: reason,
+                },
+            );
             // Refresh grid data
             gridApi?.refreshInfiniteCache();
         }
@@ -118,6 +172,10 @@
             return $session.data?.user?.id;
         },
 
+        openUserSidebar,
+        closeUserSidebar,
+        isSidebarOpenFor: (userId: string) => sidebarStore.isOpen && selectedSidebarUser?.id === userId,
+
         removeUser: async (userId: string) => {
             isProcessing = userId;
             const { error } = await authClient.admin.removeUser({ userId });
@@ -126,6 +184,9 @@
                 toast.error("Failed to remove user", { description: error.message });
             } else {
                 toast.success("User removed successfully");
+                if (selectedSidebarUser?.id === userId) {
+                    closeUserSidebar();
+                }
                 // Refresh grid data
                 gridApi?.refreshInfiniteCache();
             }
@@ -139,8 +200,8 @@
                 const { error } = await authClient.admin.unbanUser({ userId });
                 if (error) toast.error("Failed to unban user", { description: error.message });
                 else {
-                    const { data } = await authClient.admin.getUser({ query: { id: userId } });
-                    toast.success(`${data?.name} has been unbanned`);
+                    const refreshedUser = await syncUserViews(userId);
+                    toast.success(`${refreshedUser?.name ?? "User"} has been unbanned`);
                     // Refresh grid data
                     gridApi?.refreshInfiniteCache();
                 }
@@ -152,12 +213,8 @@
         },
     };
 
-    function refreshDatasource() {
-        if (gridApi) gridApi.setGridOption("datasource", createDatasource());
-    }
-
     function handleSearchChange() {
-        refreshDatasource();
+        gridApi?.setGridOption("datasource", createDatasource());
     }
 
     function getMinDate(): string {
@@ -167,7 +224,7 @@
     }
 
     $effect(() => {
-        if (searchType) refreshDatasource(); // Refresh datasource when search type changes
+        if (searchType) gridApi?.setGridOption("datasource", createDatasource());
     });
 </script>
 
@@ -176,7 +233,7 @@
     description="Manage users in your server. View user details, edit roles and permissions, and perform administrative actions etc."
 />
 
-<div class="size-full" in:fadeIn>
+<div class="relative flex size-full flex-col overflow-hidden" in:fadeIn>
     <Grid
         gridOptions={{
             context: gridContext,
@@ -202,17 +259,20 @@
                         event.api.refreshCells({ rowNodes: [event.node] });
                     } else {
                         toast.success("Role updated successfully");
+                        await syncUserViews(event.data.id);
                     }
                     isProcessing = null;
                 }
             },
         }}
         columnDefs={[
-            { headerName: "User", field: "name", flex: 2, cellRenderer: svelteRenderer(UserCell) },
+            { headerName: "User", field: "name", sortable: false, filter: false, flex: 2, cellRenderer: svelteRenderer(UserCell) },
             {
                 headerName: "Role",
                 field: "role",
                 editable: (params) => params.data.id !== $session.data?.user?.id,
+                sortable: false,
+                filter: false,
                 cellRenderer: svelteRenderer(RoleCell),
                 cellEditorPopup: true,
                 cellEditor: "uiSelectEditor",
@@ -243,12 +303,24 @@
             contentClass="size-5"
             class="h-11 shrink-0 px-0"
         />
-        <Input placeholder="Search by {searchType}..." bind:value={searchText} onchange={handleSearchChange} class="h-11 w-80" />
+        <Input placeholder="Search by {searchType}..." bind:value={searchText} onchange={handleSearchChange} class="h-11 lg:w-80" />
         <Button variant="success" class="size-11 shrink-0 px-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
             <TablerSearch class="size-5" />
         </Button>
     </Toolbar>
 </div>
+
+<Sidebar bind:this={userSidebar}>
+    {#if selectedSidebarUser}
+        <UserManagementSidebar
+            user={selectedSidebarUser}
+            onBanToggle={(userId, banned) => gridContext.toggleBanUser(userId, banned)}
+            onRemove={(userId) => gridContext.removeUser(userId)}
+            isCurrentUser={selectedSidebarUser.id === $session.data?.user?.id}
+            isProcessing={isProcessing === selectedSidebarUser.id}
+        />
+    {/if}
+</Sidebar>
 
 <Dialog
     bind:open={banUserDialogOpen}
