@@ -7,7 +7,7 @@
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import TablerIcons from "~icons/tabler/icons";
     import TablerMaximize from "~icons/tabler/maximize";
     import TablerMinimize from "~icons/tabler/minimize";
@@ -32,7 +32,6 @@
     onMount(() => {
         audio = new Audio("/music/coc_lofi.ogg");
         audio.loop = true;
-        checkVideo();
         document.addEventListener("fullscreenchange", () => {
             isFullscreen = !!document.fullscreenElement;
         });
@@ -200,6 +199,8 @@
 
     // Rotate button based on open/close state
     $effect(() => {
+        page.url.pathname;
+        void tick().then(checkVideo);
         if (triggerButton) {
             rotateToggle(triggerButton, open);
         }
