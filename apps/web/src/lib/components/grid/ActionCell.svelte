@@ -9,7 +9,7 @@
 
     let { params }: { params: ICellRendererParams } = $props();
 
-    let user: UserWithRole & { discordId: string } = $derived(params.data);
+    let user: UserWithRole = $derived(params.data);
     let isCurrentUser = $derived(user?.id === params.context?.currentUserId);
 
     function handleOpen() {

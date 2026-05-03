@@ -25,13 +25,11 @@
     import TablerAt from "~icons/tabler/at";
     import TablerSearch from "~icons/tabler/search";
 
-    type RowUser = UserWithRole & { discordId: string };
-
     let isProcessing = $state<string | null>(null);
     let banUserDialogOpen = $state(false);
     let gridApi: GridApi | null = $state(null);
     let userSidebar: Sidebar | null = $state(null);
-    let selectedSidebarUser: RowUser | null = $state(null);
+    let selectedSidebarUser: (UserWithRole & { discordId?: string }) | null = $state(null);
 
     let selectedUser: {
         userId: string;
@@ -48,32 +46,27 @@
     let isDragging = $state(false);
     let searchType: ["name"] | ["email"] = $state(["name"]);
 
-    async function enrichUsers(users: any[]): Promise<RowUser[]> {
-        return Promise.all(
-            users.map(async (user) => ({
-                ...user,
-                discordId: await getDiscordIdByUserId(user.id, {
-                    baseURL: PUBLIC_SERVER_URL,
-                    credentials: "include",
-                })
-                    .then((res) => (res.success && res.data?.accountId ? res.data.accountId : ""))
-                    .catch(() => ""),
-            })),
-        );
+    async function enrichUserWithDiscordId(user: UserWithRole): Promise<UserWithRole & { discordId: string }> {
+        const discordId = await getDiscordIdByUserId(user.id, {
+            baseURL: PUBLIC_SERVER_URL,
+            credentials: "include",
+        })
+            .then((res) => (res.success && res.data?.accountId ? res.data.accountId : ""))
+            .catch(() => "");
+        return { ...user, discordId };
     }
 
-    async function loadSidebarUser(userId: string): Promise<RowUser | null> {
+    async function loadSidebarUser(userId: string): Promise<(UserWithRole & { discordId: string }) | null> {
         const { data } = await authClient.admin.getUser({ query: { id: userId } });
 
         if (!data) {
             return null;
         }
 
-        const [enrichedUser] = await enrichUsers([data]);
-        return enrichedUser ?? null;
+        return enrichUserWithDiscordId(data);
     }
 
-    function openUserSidebar(user: RowUser) {
+    function openUserSidebar(user: UserWithRole) {
         selectedSidebarUser = user;
         userSidebar?.open(user.id);
     }
@@ -83,7 +76,7 @@
         selectedSidebarUser = null;
     }
 
-    function updateGridRow(user: RowUser) {
+    function updateGridRow(user: UserWithRole) {
         gridApi?.forEachNode((node) => {
             if (node.data?.id === user.id) {
                 node.setData(user);
@@ -99,7 +92,9 @@
             return null;
         }
 
-        updateGridRow(refreshedUser);
+        // Update grid with user data (without discordId to keep grid lightweight)
+        const { discordId, ...gridUser } = refreshedUser;
+        updateGridRow(gridUser);
 
         if (selectedSidebarUser?.id === userId) {
             selectedSidebarUser = refreshedUser;
@@ -130,8 +125,7 @@
                         return;
                     }
 
-                    const enrichedUsers = await enrichUsers(data.users);
-                    params.successCallback(enrichedUsers, data.total);
+                    params.successCallback(data.users, data.total);
                 } catch (error) {
                     toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
                     params.failCallback();
@@ -225,6 +219,17 @@
 
     $effect(() => {
         if (searchType) gridApi?.setGridOption("datasource", createDatasource());
+    });
+
+    $effect(() => {
+        // Fetch discordId when sidebar opens for a user (non-blocking)
+        if (selectedSidebarUser && !selectedSidebarUser.discordId) {
+            loadSidebarUser(selectedSidebarUser.id).then((enrichedUser) => {
+                if (enrichedUser) {
+                    selectedSidebarUser = enrichedUser;
+                }
+            });
+        }
     });
 </script>
 
