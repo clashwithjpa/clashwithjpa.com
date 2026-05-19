@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
     import * as allThemes from "@uiw/codemirror-themes-all";
 
     // Filter out settings, init functions, styles, and color objects to get only the actual theme extensions
