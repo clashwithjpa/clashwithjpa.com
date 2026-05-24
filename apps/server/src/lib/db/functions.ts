@@ -1,6 +1,16 @@
 import { db } from "@/lib/db";
-import { account, clanApplicationTable, clanInfoTable, cocAccountTable, cwlApplicationTable, cwlClanInfoTable, settingsTable } from "@/lib/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import {
+    account,
+    clanApplicationStatusEnum,
+    clanApplicationTable,
+    clanInfoTable,
+    cocAccountTable,
+    cwlApplicationTable,
+    cwlClanInfoTable,
+    settingsTable,
+    user,
+} from "@/lib/db/schema";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -164,4 +174,173 @@ export async function getCwlClans() {
             },
         ]),
     );
+}
+
+type ClanApplicationStatus = (typeof clanApplicationStatusEnum.enumValues)[number];
+
+export async function getClanApplications(opts: { status?: ClanApplicationStatus; limit?: number; offset?: number } = {}) {
+    const { status, limit = 50, offset = 0 } = opts;
+
+    const whereClause = status ? eq(clanApplicationTable.status, status) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+        db.select().from(clanApplicationTable).where(whereClause).orderBy(desc(clanApplicationTable.createdAt)).limit(limit).offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(clanApplicationTable)
+            .where(whereClause),
+    ]);
+
+    return { applications: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function updateClanApplicationStatus(id: number, status: ClanApplicationStatus) {
+    return db.transaction(async (tx) => {
+        const [existing] = await tx.select().from(clanApplicationTable).where(eq(clanApplicationTable.id, id));
+        if (!existing) return null;
+
+        const [updated] = await tx.update(clanApplicationTable).set({ status }).where(eq(clanApplicationTable.id, id)).returning();
+
+        if (status === "accepted" && existing.status !== "accepted") {
+            await tx
+                .insert(cocAccountTable)
+                .values({ discordUserId: existing.discordUserId, cocAccountTag: existing.cocAccountTag })
+                .onConflictDoNothing({ target: cocAccountTable.cocAccountTag });
+
+            const [acct] = await tx
+                .select({ userId: account.userId })
+                .from(account)
+                .where(and(eq(account.accountId, existing.discordUserId), eq(account.providerId, "discord")))
+                .limit(1);
+            if (acct) {
+                await tx
+                    .update(user)
+                    .set({ role: "verified" })
+                    .where(and(eq(user.id, acct.userId), eq(user.role, "unverified")));
+            }
+        } else if (existing.status === "accepted" && status !== "accepted") {
+            await tx.delete(cocAccountTable).where(eq(cocAccountTable.cocAccountTag, existing.cocAccountTag));
+
+            const [{ count } = { count: 0 }] = await tx
+                .select({ count: sql<number>`count(*)::int` })
+                .from(cocAccountTable)
+                .where(eq(cocAccountTable.discordUserId, existing.discordUserId));
+
+            if (count === 0) {
+                const [acct] = await tx
+                    .select({ userId: account.userId })
+                    .from(account)
+                    .where(and(eq(account.accountId, existing.discordUserId), eq(account.providerId, "discord")))
+                    .limit(1);
+                if (acct) {
+                    await tx
+                        .update(user)
+                        .set({ role: "unverified" })
+                        .where(and(eq(user.id, acct.userId), eq(user.role, "verified")));
+                }
+            }
+        }
+
+        return updated ?? null;
+    });
+}
+
+export async function getAllCwlApplications(
+    opts: { month?: string; year?: number; assignedTo?: string | null; limit?: number; offset?: number } = {},
+) {
+    const { month, year, assignedTo, limit = 50, offset = 0 } = opts;
+
+    const conditions = [];
+    if (month) conditions.push(eq(cwlApplicationTable.month, month));
+    if (year !== undefined) conditions.push(eq(cwlApplicationTable.year, year));
+    if (assignedTo === null) conditions.push(sql`${cwlApplicationTable.assignedTo} IS NULL`);
+    else if (assignedTo) conditions.push(eq(cwlApplicationTable.assignedTo, assignedTo));
+
+    const whereClause = conditions.length ? and(...conditions) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+        db.select().from(cwlApplicationTable).where(whereClause).orderBy(desc(cwlApplicationTable.appliedAt)).limit(limit).offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(cwlApplicationTable)
+            .where(whereClause),
+    ]);
+
+    return { applications: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function assignCwlApplication(id: number, clanTag: string | null) {
+    const result = await db.update(cwlApplicationTable).set({ assignedTo: clanTag }).where(eq(cwlApplicationTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+export async function getSettings() {
+    const result = await db.select().from(settingsTable).orderBy(desc(settingsTable.updatedAt)).limit(1);
+    return result[0] ?? null;
+}
+
+export async function updateSettings(values: {
+    applicationsEnabled?: boolean;
+    cwlEnabled?: boolean;
+    siteMaintenanceMode?: boolean;
+    guildId?: string | null;
+}) {
+    const existing = await db.select({ id: settingsTable.id }).from(settingsTable).limit(1);
+    if (existing[0]) {
+        const result = await db
+            .update(settingsTable)
+            .set({ ...values, updatedAt: new Date() })
+            .where(eq(settingsTable.id, existing[0].id))
+            .returning();
+        return result[0]!;
+    }
+    const result = await db
+        .insert(settingsTable)
+        .values({ ...values, updatedAt: new Date() })
+        .returning();
+    return result[0]!;
+}
+
+export async function getAllClans() {
+    return db.select().from(clanInfoTable).orderBy(clanInfoTable.cocClanCode);
+}
+
+export async function createClan(values: typeof clanInfoTable.$inferInsert) {
+    const result = await db.insert(clanInfoTable).values(values).returning();
+    return result[0]!;
+}
+
+export async function updateClan(id: number, values: Partial<typeof clanInfoTable.$inferInsert>) {
+    const result = await db.update(clanInfoTable).set(values).where(eq(clanInfoTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+export async function deleteClan(id: number) {
+    const result = await db.delete(clanInfoTable).where(eq(clanInfoTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+export async function getAllCwlClans() {
+    return db.select().from(cwlClanInfoTable).orderBy(cwlClanInfoTable.cocClanTag);
+}
+
+export async function createCwlClan(values: typeof cwlClanInfoTable.$inferInsert) {
+    const result = await db.insert(cwlClanInfoTable).values(values).returning();
+    return result[0]!;
+}
+
+export async function updateCwlClan(clanTag: string, values: Partial<typeof cwlClanInfoTable.$inferInsert>) {
+    const result = await db.update(cwlClanInfoTable).set(values).where(eq(cwlClanInfoTable.cocClanTag, clanTag)).returning();
+    return result[0] ?? null;
+}
+
+export async function deleteCwlClan(clanTag: string) {
+    const result = await db.delete(cwlClanInfoTable).where(eq(cwlClanInfoTable.cocClanTag, clanTag)).returning();
+    return result[0] ?? null;
+}
+
+export async function getCocAccountsForUser(userId: string) {
+    const discordId = await getDiscordAccountId(userId);
+    if (!discordId) return [];
+    return db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordId));
 }

@@ -38,6 +38,7 @@ export const reviewer = ac.newRole({
 
 export const manager = ac.newRole({
     jpa: ["apply", "cwl", "review", "manage"],
+    ...adminAc.statements,
 });
 
 export const admin = ac.newRole({

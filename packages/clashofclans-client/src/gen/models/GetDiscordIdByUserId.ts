@@ -31,7 +31,7 @@ export type GetDiscordIdByUserId200 = {
 };
 
 /**
- * @description Bad request when userid path param is missing or invalid.
+ * @description Bad request.
  */
 export type GetDiscordIdByUserId400 = {
     /**
@@ -46,7 +46,7 @@ export type GetDiscordIdByUserId400 = {
 };
 
 /**
- * @description No Discord account found for the given userId.
+ * @description Not found.
  */
 export type GetDiscordIdByUserId404 = {
     /**
@@ -61,7 +61,7 @@ export type GetDiscordIdByUserId404 = {
 };
 
 /**
- * @description Server error response when fetching Discord accountId fails.
+ * @description Server error.
  */
 export type GetDiscordIdByUserId500 = {
     /**

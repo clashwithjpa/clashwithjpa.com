@@ -1,4 +1,5 @@
 {
     // TypeScript (Native Preview) > Use Tsgo
-    "js/ts.experimental.useTsgo": true
+    // "js/ts.experimental.useTsgo": true,
+    // "typescript.native-preview.tsdk": "/home/mini/projects/clashwithjpa.com/node_modules/@typescript/native-preview"
 }

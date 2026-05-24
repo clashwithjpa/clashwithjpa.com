@@ -19,6 +19,68 @@ export type {
     ApplyUserAccountMutationResponse,
 } from "./ApplyUserAccount.ts";
 export type {
+    AssignCwlApplication200,
+    AssignCwlApplication400,
+    AssignCwlApplication401,
+    AssignCwlApplication404,
+    AssignCwlApplication500,
+    AssignCwlApplicationMutation,
+    AssignCwlApplicationMutationRequest,
+    AssignCwlApplicationMutationResponse,
+    AssignCwlApplicationPathParams,
+} from "./AssignCwlApplication.ts";
+export type {
+    CreateAdminClan200,
+    CreateAdminClan401,
+    CreateAdminClan409,
+    CreateAdminClan500,
+    CreateAdminClanMutation,
+    CreateAdminClanMutationRequest,
+    CreateAdminClanMutationResponse,
+} from "./CreateAdminClan.ts";
+export type {
+    CreateAdminCwlClan200,
+    CreateAdminCwlClan401,
+    CreateAdminCwlClan409,
+    CreateAdminCwlClan500,
+    CreateAdminCwlClanMutation,
+    CreateAdminCwlClanMutationRequest,
+    CreateAdminCwlClanMutationResponse,
+} from "./CreateAdminCwlClan.ts";
+export type {
+    DeleteAdminClan200,
+    DeleteAdminClan401,
+    DeleteAdminClan404,
+    DeleteAdminClan500,
+    DeleteAdminClanMutation,
+    DeleteAdminClanMutationResponse,
+    DeleteAdminClanPathParams,
+} from "./DeleteAdminClan.ts";
+export type {
+    DeleteAdminCwlClan200,
+    DeleteAdminCwlClan401,
+    DeleteAdminCwlClan404,
+    DeleteAdminCwlClan500,
+    DeleteAdminCwlClanMutation,
+    DeleteAdminCwlClanMutationResponse,
+    DeleteAdminCwlClanPathParams,
+} from "./DeleteAdminCwlClan.ts";
+export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./GetAdminClans.ts";
+export type {
+    GetAdminCwlClans200,
+    GetAdminCwlClans401,
+    GetAdminCwlClans500,
+    GetAdminCwlClansQuery,
+    GetAdminCwlClansQueryResponse,
+} from "./GetAdminCwlClans.ts";
+export type {
+    GetAdminSettings200,
+    GetAdminSettings401,
+    GetAdminSettings500,
+    GetAdminSettingsQuery,
+    GetAdminSettingsQueryResponse,
+} from "./GetAdminSettings.ts";
+export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
     GetCOCCWLWarPathParams,
@@ -85,6 +147,14 @@ export type {
     ItemsBattleTypeEnumKey,
 } from "./GetCOCPlayerBattleLog.ts";
 export type {
+    GetCwlApplications200,
+    GetCwlApplications401,
+    GetCwlApplications500,
+    GetCwlApplicationsQuery,
+    GetCwlApplicationsQueryParams,
+    GetCwlApplicationsQueryResponse,
+} from "./GetCwlApplications.ts";
+export type {
     GetDiscordIdByUserId200,
     GetDiscordIdByUserId400,
     GetDiscordIdByUserId404,
@@ -101,6 +171,16 @@ export type {
 } from "./GetJPAClanRequirements.ts";
 export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./GetJPAClans.ts";
 export type { GetJPACwlClans200, GetJPACwlClans500, GetJPACwlClansQuery, GetJPACwlClansQueryResponse } from "./GetJPACwlClans.ts";
+export type {
+    ApplicationsStatusEnumKey,
+    GetJoinApplications200,
+    GetJoinApplications401,
+    GetJoinApplications500,
+    GetJoinApplicationsQuery,
+    GetJoinApplicationsQueryParams,
+    GetJoinApplicationsQueryParamsStatusEnumKey,
+    GetJoinApplicationsQueryResponse,
+} from "./GetJoinApplications.ts";
 export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./GetUser.ts";
@@ -111,6 +191,14 @@ export type {
     GetUserAccountsQuery,
     GetUserAccountsQueryResponse,
 } from "./GetUserAccounts.ts";
+export type {
+    GetUserCocAccountsByUserId200,
+    GetUserCocAccountsByUserId401,
+    GetUserCocAccountsByUserId500,
+    GetUserCocAccountsByUserIdPathParams,
+    GetUserCocAccountsByUserIdQuery,
+    GetUserCocAccountsByUserIdQueryResponse,
+} from "./GetUserCocAccountsByUserId.ts";
 export type {
     GetUserCwlApplications200,
     GetUserCwlApplications401,
@@ -130,6 +218,46 @@ export type {
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
+export type {
+    UpdateAdminClan200,
+    UpdateAdminClan401,
+    UpdateAdminClan404,
+    UpdateAdminClan500,
+    UpdateAdminClanMutation,
+    UpdateAdminClanMutationRequest,
+    UpdateAdminClanMutationResponse,
+    UpdateAdminClanPathParams,
+} from "./UpdateAdminClan.ts";
+export type {
+    UpdateAdminCwlClan200,
+    UpdateAdminCwlClan401,
+    UpdateAdminCwlClan404,
+    UpdateAdminCwlClan500,
+    UpdateAdminCwlClanMutation,
+    UpdateAdminCwlClanMutationRequest,
+    UpdateAdminCwlClanMutationResponse,
+    UpdateAdminCwlClanPathParams,
+} from "./UpdateAdminCwlClan.ts";
+export type {
+    UpdateAdminSettings200,
+    UpdateAdminSettings401,
+    UpdateAdminSettings500,
+    UpdateAdminSettingsMutation,
+    UpdateAdminSettingsMutationRequest,
+    UpdateAdminSettingsMutationResponse,
+} from "./UpdateAdminSettings.ts";
+export type {
+    ApplicationStatusEnumKey,
+    UpdateJoinApplicationStatus200,
+    UpdateJoinApplicationStatus401,
+    UpdateJoinApplicationStatus404,
+    UpdateJoinApplicationStatus500,
+    UpdateJoinApplicationStatusMutation,
+    UpdateJoinApplicationStatusMutationRequest,
+    UpdateJoinApplicationStatusMutationRequestStatusEnumKey,
+    UpdateJoinApplicationStatusMutationResponse,
+    UpdateJoinApplicationStatusPathParams,
+} from "./UpdateJoinApplicationStatus.ts";
 export { warBattleModifierEnum } from "./GetCOCCWLWar.ts";
 export { warStateEnum } from "./GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./GetCOCClan.ts";
@@ -147,4 +275,8 @@ export { playerWarPreferenceEnum } from "./GetCOCPlayer.ts";
 export { spellsVillageEnum } from "./GetCOCPlayer.ts";
 export { troopsVillageEnum } from "./GetCOCPlayer.ts";
 export { itemsBattleTypeEnum } from "./GetCOCPlayerBattleLog.ts";
+export { applicationsStatusEnum } from "./GetJoinApplications.ts";
+export { getJoinApplicationsQueryParamsStatusEnum } from "./GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./PostCOCPlayerVerify.ts";
+export { applicationStatusEnum } from "./UpdateJoinApplicationStatus.ts";
+export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./UpdateJoinApplicationStatus.ts";

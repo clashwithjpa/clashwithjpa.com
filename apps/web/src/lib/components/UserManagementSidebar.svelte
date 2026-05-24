@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
     import type { Role } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
+    import { getUserCocAccountsByUserId } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
@@ -221,12 +223,48 @@
                 {/await}
             {/key}
         {:else if activeTab === "accounts"}
-            <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
-                <div class="flex items-center gap-2 text-stone-400">
-                    <TablerWorldX class="size-6" />
-                    <span>Not implemented yet</span>
+            {#await getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
+                <div class="py-8">
+                    <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
                 </div>
-            </div>
+            {:then response}
+                {#if !response.success || response.data.accounts.length === 0}
+                    <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
+                        <div class="flex items-center gap-2 text-stone-400">
+                            <TablerWorldX class="size-6" />
+                            <span>No linked CoC accounts</span>
+                        </div>
+                    </div>
+                {:else}
+                    <div class="space-y-2">
+                        {#each response.data.accounts as account (account.id)}
+                            <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-800 px-3 py-2">
+                                <code class="truncate font-mono text-sm text-stone-200">{account.cocAccountTag}</code>
+                                <Button
+                                    size="icon"
+                                    variant="base"
+                                    onclick={() =>
+                                        window.open(
+                                            `https://link.clashofclans.com/en/?action=OpenPlayerProfile&tag=${encodeURIComponent(account.cocAccountTag)}`,
+                                            "_blank",
+                                        )}
+                                    tooltip="Open in game"
+                                    tooltipPlacement="left"
+                                >
+                                    <TablerCopy />
+                                </Button>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            {:catch}
+                <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
+                    <div class="flex items-center gap-2 text-stone-400">
+                        <TablerWorldX class="size-6" />
+                        <span>Failed to load accounts</span>
+                    </div>
+                </div>
+            {/await}
         {/if}
     </div>
 

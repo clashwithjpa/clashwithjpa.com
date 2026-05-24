@@ -14,6 +14,7 @@
         class: className = "",
         disabled = false,
         open = $bindable(false),
+        onValueChange,
     }: {
         open?: boolean;
         value?: string;
@@ -21,6 +22,7 @@
         placeholder?: string;
         class?: string;
         disabled?: boolean;
+        onValueChange?: (value: string) => void;
     } = $props();
 
     let selectedOption = $derived(options.find((o) => o.value === value));
@@ -29,6 +31,7 @@
     function selectOption(val: string) {
         value = val;
         open = false;
+        onValueChange?.(val);
     }
 </script>
 

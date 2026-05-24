@@ -20,7 +20,7 @@ export const getDiscordIdByUserId200Schema = z.object({
 });
 
 /**
- * @description Bad request when userid path param is missing or invalid.
+ * @description Bad request.
  */
 export const getDiscordIdByUserId400Schema = z.object({
     success: z.literal(false),
@@ -28,7 +28,7 @@ export const getDiscordIdByUserId400Schema = z.object({
 });
 
 /**
- * @description No Discord account found for the given userId.
+ * @description Not found.
  */
 export const getDiscordIdByUserId404Schema = z.object({
     success: z.literal(false),
@@ -36,7 +36,7 @@ export const getDiscordIdByUserId404Schema = z.object({
 });
 
 /**
- * @description Server error response when fetching Discord accountId fails.
+ * @description Server error.
  */
 export const getDiscordIdByUserId500Schema = z.object({
     success: z.literal(false),

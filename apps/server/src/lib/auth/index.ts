@@ -64,7 +64,7 @@ export const auth = betterAuth({
     session: {
         cookieCache: {
             enabled: true,
-            maxAge: 1 * 30, // Cache duration in seconds
+            maxAge: 15, // Cache duration in seconds
         },
     },
     trustedOrigins: ["http://localhost:5173", config.JPA_APP_URL],

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { authClient } from "$lib/auth";
+    import { authClient, hasPermission } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
     import { fadeUp, wavyBounce } from "$lib/utils/animations";
@@ -75,9 +75,11 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <CocBtn variant="orange" size="sm" href="/dashboard">Dashboard</CocBtn>
-                        {#if !["unverified", "verified"].includes(role ?? "")}
-                            <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
-                        {/if}
+                        {#await hasPermission(user.id, "review") then canAdmin}
+                            {#if canAdmin}
+                                <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
+                            {/if}
+                        {/await}
                         <CocBtn variant="red" size="sm" onclick={() => authClient.signOut()}>Logout</CocBtn>
                     </div>
                 </div>

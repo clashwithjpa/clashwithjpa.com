@@ -4,7 +4,7 @@ import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async () => {
     const session = await authClient.getSession();
-    const hasPerms = await hasPermission(session.data?.user?.id, "sudo");
+    const hasPerms = await hasPermission(session.data?.user?.id, "manage");
 
     if (!session.data?.user || !hasPerms) {
         throw error(401, "Unauthorized");
