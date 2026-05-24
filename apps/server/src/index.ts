@@ -25,7 +25,7 @@ import manage from "./routes/manage";
 import upload from "./routes/upload";
 import user from "./routes/user";
 
-const client = new RedisClient("redis://default@localhost:7102");
+const client = new RedisClient(config.JPA_REDIS_URL);
 
 const app = new Hono<AppEnv>();
 

@@ -19,6 +19,7 @@ import {
     updateSettings,
 } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
@@ -86,6 +87,7 @@ const getUserCocAccountsData = z4.object({
             id: z4.number(),
             discordUserId: z4.string(),
             cocAccountTag: z4.string(),
+            warWeight: z4.number(),
         }),
     ),
 });
@@ -211,7 +213,7 @@ app.put(
 );
 
 // ============================================================
-// CWL applications - reviewer perm
+// CWL applications - manager perm
 // ============================================================
 
 const cwlApplicationSchema = z4.object({
@@ -244,10 +246,10 @@ const getCwlApplicationsData = z4.object({
 });
 app.get(
     "/cwl-applications",
-    hasAccessAuthMiddleware(isReviewer),
+    hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getCwlApplications",
-        description: "[Reviewer] Lists CWL applications. Filter by month/year/assignedTo or unassigned=true.",
+        description: "[Manager] Lists CWL applications. Filter by month/year/assignedTo or unassigned=true.",
         tags: ["admin"],
         responses: {
             200: {
@@ -288,10 +290,10 @@ const assignCwlApplicationData = z4.object({
 });
 app.put(
     "/cwl-applications/:id/assign",
-    hasAccessAuthMiddleware(isReviewer),
+    hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "assignCwlApplication",
-        description: "[Reviewer] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.",
+        description: "[Manager] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.",
         tags: ["admin"],
         responses: {
             200: {
@@ -396,6 +398,7 @@ app.put(
     async (c) => {
         try {
             const settings = await updateSettings(c.req.valid("json"));
+            await invalidateSettingsCache();
             return c.json({ success: true, data: { settings } });
         } catch (error) {
             Sentry.captureException(error);

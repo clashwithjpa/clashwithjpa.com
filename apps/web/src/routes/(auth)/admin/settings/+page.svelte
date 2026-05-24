@@ -54,6 +54,10 @@
             );
             if (resp.success) {
                 settings = resp.data.settings;
+                applicationsEnabled = settings?.applicationsEnabled ?? false;
+                cwlEnabled = settings?.cwlEnabled ?? false;
+                siteMaintenanceMode = settings?.siteMaintenanceMode ?? false;
+                guildId = settings?.guildId ?? "";
                 toast.success("Settings updated");
             } else {
                 toast.error("Failed to update settings");

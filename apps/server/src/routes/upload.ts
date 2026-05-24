@@ -1,10 +1,16 @@
+import { isManager } from "@/lib/auth/functions";
 import { config } from "@/lib/config";
+import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { type AppEnv } from "@/lib/types";
 import { CreateBucketCommand, HeadBucketCommand, PutBucketPolicyCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
 
 const upload = new Hono<AppEnv>();
+
+const ALLOWED_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
+const ALLOWED_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp"]);
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const s3 = new S3Client({
     endpoint: config.MINIO_ENDPOINT,
@@ -55,7 +61,7 @@ async function ensureBucket() {
 // Call once on startup
 ensureBucket().catch(Sentry.captureException);
 
-upload.post("/", async (c) => {
+upload.post("/", hasAccessAuthMiddleware(isManager), async (c) => {
     try {
         const body = await c.req.parseBody();
         const file = body["file"];
@@ -64,7 +70,19 @@ upload.post("/", async (c) => {
             return c.json({ error: "No file uploaded" }, 400);
         }
 
-        const ext = file.name.split(".").pop() || "png";
+        if (file.size > MAX_UPLOAD_BYTES) {
+            return c.json({ error: "File exceeds maximum size of 5 MB" }, 413);
+        }
+
+        if (!ALLOWED_MIME_TYPES.has(file.type)) {
+            return c.json({ error: "Unsupported file type" }, 415);
+        }
+
+        const ext = (file.name.split(".").pop() || "").toLowerCase();
+        if (!ALLOWED_EXTENSIONS.has(ext)) {
+            return c.json({ error: "Unsupported file extension" }, 415);
+        }
+
         const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${ext}`;
 
         const arrayBuffer = await file.arrayBuffer();

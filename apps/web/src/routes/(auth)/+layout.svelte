@@ -44,7 +44,7 @@
 
     let adminLinks: Link[] = [
         { name: "Home", icon: TablerHome, href: "/admin" },
-        { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "review" },
+        { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "manage" },
         { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications", requiredPerm: "review" },
         { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
         { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
@@ -57,15 +57,15 @@
     let isMobile = $state(false);
     let sidebarWidth = $state(0);
 
-    let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
+    let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 140);
     const noPaddingPaths: string[] = ["/admin/rules", "/admin/users"];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 
-    let prevNavWidth = 6;
+    let prevNavWidth = 10;
     let prevInfoWidth = 30;
 
-    let desktopSize = $state([6, 94, 0]);
+    let desktopSize = $state([10, 90, 0]);
     let mobileSize = $state([94, 6]);
 
     $effect(() => {
@@ -243,7 +243,7 @@
     panels={isMobile
         ? [
               { id: "content", minSize: 94 },
-              { id: "sidebar", maxSize: 6 },
+              { id: "sidebar", maxSize: 10 },
           ]
         : [
               { id: "sidebar", minSize: 6, maxSize: 16 },

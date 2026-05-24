@@ -1,0 +1,1 @@
+ALTER TABLE "coc_account_table" ADD COLUMN "war_weight" integer DEFAULT 0 NOT NULL;

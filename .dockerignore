@@ -1,11 +1,36 @@
-node_modules
-dist
-build
-.svelte-kit
-pnpm-lock.yaml
-package-lock.json
-yarn.lock
-bun.lock
-bun.lockb
-*.md
-logs
+**/node_modules
+**/.turbo
+**/dist
+**/build
+**/.svelte-kit
+**/coverage
+**/.cache
+**/.eslintcache
+**/*.tsbuildinfo
+
+# env / secrets
+**/.env
+**/.env.*
+!**/.env*.example
+
+# git / editor / OS
+.git
+.gitignore
+.idea
+.vscode
+.DS_Store
+
+# project meta
+**/README.md
+**/CHANGELOG.md
+**/LICENSE
+.claude
+.commandcode
+.husky
+
+# logs
+**/logs
+**/*.log
+
+# dataset migrations (large, not needed at runtime)
+apps/server/scripts/migrations/datasets

@@ -10,6 +10,7 @@ import {
     getUserCocAccounts,
     getUserCwlApplications,
 } from "@/lib/db/functions";
+import { getCachedSettings } from "@/lib/settings-cache";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SessionSchema, SuccessResponseSchema, UserSchema, type AppEnv } from "@/lib/types";
 import { verifyTurnstileToken } from "@/lib/utils/cf";
@@ -76,6 +77,7 @@ const getUserAccounts = z4.object({
             id: z4.number(),
             discordUserId: z4.string(),
             cocAccountTag: z4.string(),
+            warWeight: z4.number(),
         }),
     ),
 });
@@ -214,6 +216,11 @@ app.post(
         const session = c.get("session");
         if (!user || !session) {
             return c.json({ success: false, error: "Unauthorized" }, 401);
+        }
+
+        const settings = await getCachedSettings();
+        if (!settings?.applicationsEnabled) {
+            return c.json({ success: false, error: "Applications are currently closed." }, 403);
         }
 
         const { cocAccountTag, apiToken, captchaToken } = await c.req.json();
@@ -355,7 +362,7 @@ const postCwlApplyBody = z4.object({
     preferenceNum: z4.int().min(1).max(99),
     tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
     accountClan: z4.string().min(1, "Account clan is required").max(50),
-    accountWeight: z4.int().min(1, "Account weight is required").max(9999999),
+    accountWeight: z4.int().min(1, "Account weight is required").max(9999999).optional(),
 });
 const postCwlApplyData = z4.object({
     application: z4.object({
@@ -428,6 +435,11 @@ app.post(
             return c.json({ success: false, error: "Unauthorized" }, 401);
         }
 
+        const settings = await getCachedSettings();
+        if (!settings?.cwlEnabled) {
+            return c.json({ success: false, error: "CWL applications are currently closed." }, 403);
+        }
+
         const { isAlt, preferenceNum, tag, accountClan, accountWeight } = await c.req.json();
 
         const discordId = await getDiscordAccountId(user.id);
@@ -435,17 +447,24 @@ app.post(
             return c.json({ success: false, error: "No linked Discord account found." }, 500);
         }
 
+        let resolvedWeight: number;
+
         if (!isAlt) {
             const userAccounts = await getUserCocAccounts(discordId);
-            const accountExists = userAccounts.some((acc) => acc.cocAccountTag === tag);
-            if (!accountExists) {
+            const matchedAccount = userAccounts.find((acc) => acc.cocAccountTag === tag);
+            if (!matchedAccount) {
                 return c.json({ success: false, error: "This account is not linked to your profile. Link it first or mark it as an alt." }, 400);
             }
+            resolvedWeight = matchedAccount.warWeight;
         } else {
             const existingOwner = await getCocAccountOwner(tag);
             if (existingOwner) {
                 return c.json({ success: false, error: "This account is already linked to another user. It cannot be used as an alt." }, 400);
             }
+            if (!accountWeight) {
+                return c.json({ success: false, error: "Account weight is required for alt accounts." }, 400);
+            }
+            resolvedWeight = accountWeight;
         }
 
         let playerData;
@@ -463,7 +482,7 @@ app.post(
                 cocAccountName: playerData.name,
                 cocAccountTag: tag,
                 cocAccountClan: accountClan,
-                cocAccountWeight: accountWeight,
+                cocAccountWeight: resolvedWeight,
                 isAlt,
                 preferenceNum,
             });

@@ -29,6 +29,13 @@
             "when": 1774538749023,
             "tag": "0003_silky_imperial_guard",
             "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "7",
+            "when": 1779644316845,
+            "tag": "0004_striped_grandmaster",
+            "breakpoints": true
         }
     ]
 }

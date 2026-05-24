@@ -18,6 +18,9 @@ export const config = {
     // Database
     JPA_DATABASE_URL: required("JPA_DATABASE_URL"),
 
+    // Redis
+    JPA_REDIS_URL: required("JPA_REDIS_URL"),
+
     // Auth
     JPA_AUTH_SECRET: required("JPA_AUTH_SECRET"),
     JPA_AUTH_URL: required("JPA_AUTH_URL"),

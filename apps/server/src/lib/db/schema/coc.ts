@@ -45,6 +45,7 @@ export const cocAccountTable = pgTable(
             .notNull()
             .references(() => account.accountId, { onDelete: "cascade" }),
         cocAccountTag: text("coc_account_tag").notNull().unique(),
+        warWeight: integer("war_weight").notNull().default(0),
     },
     (t) => [index("coc_account_discord_user_id_idx").on(t.discordUserId)],
 );

@@ -7,6 +7,7 @@ services:
       - all
       - services
       - db
+      - prod
 
   jpa-redis:
     extends:
@@ -15,6 +16,7 @@ services:
     profiles:
       - all
       - services
+      - prod
 
   jpa-minio:
     extends:
@@ -24,6 +26,27 @@ services:
       - all
       - services
       - media
+      - prod
+
+  jpa-server:
+    container_name: jpa-server
+    build:
+      context: .
+      dockerfile: ./apps/server/Dockerfile
+    image: clashwithjpa/server:latest
+    restart: unless-stopped
+    env_file: ./apps/server/.env
+    ports:
+      - 7100:3000
+    depends_on:
+      jpa-db:
+        condition: service_healthy
+      jpa-redis:
+        condition: service_healthy
+      jpa-minio:
+        condition: service_healthy
+    profiles:
+      - prod
 
   drizzle-gateway:
     container_name: drizzle-gateway

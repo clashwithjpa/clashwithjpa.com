@@ -74,7 +74,6 @@ export async function isAdmin(userId: string | null | undefined) {
     return await auth.api.userHasPermission({
         body: {
             userId: userId,
-            role: "admin",
             permissions: {
                 jpa: ["sudo"],
             },

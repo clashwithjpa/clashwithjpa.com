@@ -36,7 +36,7 @@
             title: "CWL Applications",
             description: "Manage CWL applications and assignments",
             icon: TablerSwords,
-            requiredPerm: "review",
+            requiredPerm: "manage",
         },
         { href: "/admin/users", title: "Users", description: "Manage users, roles and sessions", icon: TablerUser, requiredPerm: "manage" },
         { href: "/admin/rules", title: "Rules", description: "Edit alliance rules", icon: TablerBook2, requiredPerm: "manage" },

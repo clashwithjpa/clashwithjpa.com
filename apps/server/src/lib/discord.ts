@@ -1,6 +1,7 @@
 import type { APIGuildMember } from "discord-api-types/v10";
 import type { RESTGetAPIGuildMemberResult } from "discord-api-types/v10";
 import { config } from "@/lib/config";
+import { getCachedSettings } from "@/lib/settings-cache";
 
 interface CheckUserInGuildResult {
     exists: boolean;
@@ -97,10 +98,13 @@ export async function checkJPAMember(userId: string): Promise<{
     matchingRoles: string[];
     error?: string;
 }> {
-    const GUILD_ID = "1029993902503108678";
+    const DEFAULT_GUILD_ID = "1029993902503108678";
     const REQUIRED_ROLE_IDS = ["1252896435913883760", "1367750139527168020", "1030004174148087878"];
 
-    const result = await checkUserRoles(GUILD_ID, userId, REQUIRED_ROLE_IDS);
+    const settings = await getCachedSettings();
+    const guildId = settings?.guildId ?? DEFAULT_GUILD_ID;
+
+    const result = await checkUserRoles(guildId, userId, REQUIRED_ROLE_IDS);
 
     return {
         isAuthorized: result.hasAnyRole,

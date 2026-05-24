@@ -14,7 +14,7 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
     let session = authClient.useSession();
-    let options: Option[] = $state([]);
+    let options: (Option & { warWeight: number })[] = $state([]);
     let clanOptions: Option[] = $state([]);
 
     // Form fields
@@ -23,6 +23,8 @@
     let preferenceNum = $state<number>(1);
     let accountClan = $state("");
     let accountWeight = $state<number | "">("");
+
+    let selectedAccountWeight = $derived(!isAlt && tag ? (options.find((o) => o.value === tag)?.warWeight ?? 0) : null);
 
     let isLoading = $state(false);
     let fieldErrors = $state<Record<string, string>>({});
@@ -54,13 +56,18 @@
                         baseURL: PUBLIC_SERVER_URL,
                         credentials: "include",
                     });
-                    return { tag: acc.cocAccountTag, name: playerData.data.player.name, icon: `th/${playerData.data.player.townHallLevel}` };
+                    return {
+                        tag: acc.cocAccountTag,
+                        name: playerData.data.player.name,
+                        icon: `th/${playerData.data.player.townHallLevel}`,
+                        warWeight: acc.warWeight,
+                    };
                 } catch (e) {
-                    return { tag: acc.cocAccountTag, name: acc.cocAccountTag, icon: undefined };
+                    return { tag: acc.cocAccountTag, name: acc.cocAccountTag, icon: undefined, warWeight: acc.warWeight };
                 }
             }),
         );
-        options = accsInfo.map((acc) => ({ label: `${acc.tag} - ${acc.name}`, value: acc.tag, icon: acc.icon }));
+        options = accsInfo.map((acc) => ({ label: `${acc.tag} - ${acc.name}`, value: acc.tag, icon: acc.icon, warWeight: acc.warWeight }));
     }
 
     async function setClanOptions() {
@@ -82,8 +89,12 @@
             toast.error("Account clan is required");
             return;
         }
-        if (accountWeight === "" || isNaN(Number(accountWeight))) {
+        if (isAlt && (accountWeight === "" || isNaN(Number(accountWeight)) || Number(accountWeight) === 0)) {
             toast.error("Account weight is required");
+            return;
+        }
+        if (!isAlt && selectedAccountWeight === 0) {
+            toast.error("War weight is 0. Please contact an admin to update your war weight.");
             return;
         }
 
@@ -95,7 +106,7 @@
                     isAlt,
                     preferenceNum,
                     accountClan,
-                    accountWeight: Number(accountWeight),
+                    ...(isAlt ? { accountWeight: Number(accountWeight) } : {}),
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
@@ -176,23 +187,33 @@
                     {/if}
                 </Field.Root>
 
-                <Field.Root required invalid={!!fieldErrors.accountWeight} class="flex flex-col gap-1">
-                    <Field.Label class="text-sm font-medium">Account Weight</Field.Label>
-                    <Input
-                        bind:value={accountWeight}
-                        type="number"
-                        placeholder="E.g. 100000"
-                        min={1}
-                        max={9999999}
-                        disabled={isLoading}
-                        aria-invalid={!!fieldErrors.accountWeight}
-                    />
-                    {#if fieldErrors.accountWeight}
-                        <Field.ErrorText class="text-xs text-red-400">{fieldErrors.accountWeight}</Field.ErrorText>
-                    {:else}
-                        <Field.HelperText class="text-xs text-stone-400">War weight of your base</Field.HelperText>
-                    {/if}
-                </Field.Root>
+                {#if isAlt}
+                    <Field.Root required invalid={!!fieldErrors.accountWeight} class="flex flex-col gap-1">
+                        <Field.Label class="text-sm font-medium">Account Weight</Field.Label>
+                        <Input
+                            bind:value={accountWeight}
+                            type="number"
+                            placeholder="E.g. 100000"
+                            min={1}
+                            max={9999999}
+                            disabled={isLoading}
+                            aria-invalid={!!fieldErrors.accountWeight}
+                        />
+                        {#if fieldErrors.accountWeight}
+                            <Field.ErrorText class="text-xs text-red-400">{fieldErrors.accountWeight}</Field.ErrorText>
+                        {:else}
+                            <Field.HelperText class="text-xs text-stone-400">War weight of your base</Field.HelperText>
+                        {/if}
+                    </Field.Root>
+                {:else if selectedAccountWeight !== null}
+                    <div class="flex flex-col gap-1">
+                        <span class="text-sm font-medium">Account Weight</span>
+                        <span class="rounded-lg border-2 border-stone-700/50 bg-stone-900/50 px-4 py-2 text-base text-stone-300"
+                            >{selectedAccountWeight.toLocaleString()}</span
+                        >
+                        <span class="text-xs text-stone-400">Using saved war weight from your account</span>
+                    </div>
+                {/if}
 
                 <Field.Root required invalid={!!fieldErrors.preferenceNum} class="flex flex-col gap-1">
                     <Field.Label class="text-sm font-medium">Preference Number</Field.Label>
@@ -217,7 +238,14 @@
                     <span class="text-sm font-medium">Is this an alternate account?</span>
                 </label>
 
-                <Button type="submit" disabled={isLoading || !tag || !accountClan || !accountWeight}>
+                <Button
+                    type="submit"
+                    disabled={isLoading ||
+                        !tag ||
+                        !accountClan ||
+                        (isAlt && (!accountWeight || Number(accountWeight) === 0)) ||
+                        (!isAlt && selectedAccountWeight === 0)}
+                >
                     {#if isLoading}
                         <span class="flex items-center justify-center gap-2">
                             <SvgSpinnersRingResize class="size-4" /> Submitting...

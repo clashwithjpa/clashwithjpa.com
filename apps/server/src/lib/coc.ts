@@ -8,7 +8,7 @@ import { config } from "@/lib/config";
 export const cocClient = new ClashOfClansAPI({
     baseUrl: config.PUBLIC_COC_API_BASE_URI,
     apiToken: config.JPA_COC_API_TOKEN,
-    redisUrl: "redis://default@localhost:7102",
+    redisUrl: config.JPA_REDIS_URL,
     cacheTTL: 120,
     rateLimit: {
         maxTokens: 30,
