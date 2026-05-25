@@ -3,6 +3,7 @@
     "compilerOptions": {
         "ignoreDeprecations": "6.0",
         "baseUrl": ".",
+        "types": ["bun"],
         "paths": {
             "@/*": ["./src/*"],
             "@lib/*": ["./src/lib/*"]

@@ -20,9 +20,12 @@
         getUserAccounts,
         getUserCwlApplications,
     } from "@repo/clashofclans-client";
+    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
+    import TablerDownload from "~icons/tabler/download";
     import TablerExternalLink from "~icons/tabler/external-link";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerListNumbers from "~icons/tabler/list-numbers";
@@ -32,6 +35,46 @@
     import TablerX from "~icons/tabler/x";
 
     const session = authClient.useSession();
+
+    let importDismissed = $state(false);
+    let isImporting = $state(false);
+
+    async function importAccounts() {
+        isImporting = true;
+        try {
+            const res = await fetch(`${PUBLIC_SERVER_URL}/user/accounts/import`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+            const body = (await res.json()) as
+                | { success: true; data: { imported: { cocAccountTag: string }[]; available: number } }
+                | { success: false; error: string };
+
+            if (!body.success) {
+                toast.error(body.error || "Failed to import accounts");
+                return;
+            }
+
+            const { imported, available } = body.data;
+            if (available === 0) {
+                toast.info("No pre-existing accounts found for your Discord ID. Please apply manually.");
+                importDismissed = true;
+            } else if (imported.length === 0) {
+                toast.info("All your accounts are already linked.");
+                importDismissed = true;
+            } else {
+                toast.success(`Imported ${imported.length} account${imported.length === 1 ? "" : "s"}.`);
+                // Refresh to pick up new role + linked accounts.
+                location.reload();
+            }
+        } catch (err) {
+            console.error("Import error:", err);
+            toast.error("Failed to import accounts");
+        } finally {
+            isImporting = false;
+        }
+    }
 </script>
 
 <Seo title="Dashboard" />
@@ -60,6 +103,41 @@
 
 <hr class="my-6 border-stone-700/50" />
 
+{#snippet importBanner()}
+    {#if !importDismissed}
+        <div
+            in:fadeIn
+            class="mb-6 flex flex-col items-start justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 md:flex-row md:items-center"
+        >
+            <div class="flex items-start gap-3">
+                <TablerDownload class="mt-0.5 size-5 shrink-0 text-stone-300" />
+                <div class="flex flex-col gap-1">
+                    <span class="font-semibold text-stone-100">Import your existing accounts</span>
+                    <span class="text-sm text-stone-400">
+                        If you were previously a JPA member, we can link your Clash accounts automatically using your Discord ID.
+                    </span>
+                </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2 self-end md:self-center">
+                <Button variant="ghost" size="sm" disabled={isImporting} onclick={() => (importDismissed = true)}>Dismiss</Button>
+                <Button size="sm" disabled={isImporting} onclick={importAccounts}>
+                    {#if isImporting}
+                        <span class="flex items-center justify-center gap-2">
+                            <SvgSpinnersRingResize class="size-4" /> Importing...
+                        </span>
+                    {:else}
+                        Import accounts
+                    {/if}
+                </Button>
+            </div>
+        </div>
+    {/if}
+{/snippet}
+
+{#if $session.data?.user.role === "unverified"}
+    {@render importBanner()}
+{/if}
+
 {#if $session.data?.user.role !== "unverified"}
     {#await getUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
         <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
@@ -67,6 +145,9 @@
             <span>Linked Accounts</span>
         </div>
     {:then resp}
+        {#if resp.data.accounts.length === 0}
+            {@render importBanner()}
+        {/if}
         <div in:fadeIn>
             <h1 class="text-2xl font-bold">Linked Accounts</h1>
             <br />

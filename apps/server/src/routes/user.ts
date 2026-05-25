@@ -9,7 +9,9 @@ import {
     getDiscordAccountId,
     getUserCocAccounts,
     getUserCwlApplications,
+    importCocAccountsForUser,
 } from "@/lib/db/functions";
+import { getImportableAccounts } from "@/lib/import-lookup";
 import { getCachedSettings } from "@/lib/settings-cache";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SessionSchema, SuccessResponseSchema, UserSchema, type AppEnv } from "@/lib/types";
@@ -142,6 +144,86 @@ app.get(
             success: true,
             data: { accounts },
         });
+    },
+);
+
+const postImportAccountsData = z4.object({
+    imported: z4.array(
+        z4.object({
+            cocAccountTag: z4.string(),
+            warWeight: z4.number(),
+        }),
+    ),
+    available: z4.number(),
+});
+app.post(
+    "/accounts/import",
+    hasAccessAuthMiddleware(isAuthenticated),
+    describeRoute({
+        operationId: "importUserAccounts",
+        description:
+            "[Authenticated] Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.",
+        tags: ["user"],
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(postImportAccountsData)),
+                    },
+                },
+                description: "Accounts imported (or nothing to import).",
+            },
+            401: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Unauthorized.",
+            },
+            500: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Internal server error.",
+            },
+        },
+    }),
+    async (c) => {
+        const user = c.get("user");
+        const session = c.get("session");
+        if (!user || !session) {
+            return c.json({ success: false, error: "Unauthorized" }, 401);
+        }
+
+        const discordId = await getDiscordAccountId(user.id);
+        if (!discordId) {
+            return c.json({ success: false, error: "No linked Discord account found." }, 500);
+        }
+
+        const candidates = await getImportableAccounts(discordId);
+        if (candidates.length === 0) {
+            return c.json({
+                success: true,
+                data: { imported: [], available: 0 },
+            });
+        }
+
+        try {
+            const inserted = await importCocAccountsForUser(user.id, discordId, candidates);
+            return c.json({
+                success: true,
+                data: {
+                    imported: inserted.map((row) => ({ cocAccountTag: row.cocAccountTag, warWeight: row.warWeight })),
+                    available: candidates.length,
+                },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to import accounts." }, 500);
+        }
     },
 );
 

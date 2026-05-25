@@ -353,3 +353,28 @@ export async function getCocAccountsForUser(userId: string) {
     if (!discordId) return [];
     return db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordId));
 }
+
+export async function importCocAccountsForUser(userId: string, discordUserId: string, accounts: { tag: string; weight: number }[]) {
+    return db.transaction(async (tx) => {
+        const inserted = await tx
+            .insert(cocAccountTable)
+            .values(
+                accounts.map((a) => ({
+                    discordUserId,
+                    cocAccountTag: a.tag,
+                    warWeight: a.weight,
+                })),
+            )
+            .onConflictDoNothing({ target: cocAccountTable.cocAccountTag })
+            .returning();
+
+        if (inserted.length > 0) {
+            await tx
+                .update(user)
+                .set({ role: "verified" })
+                .where(and(eq(user.id, userId), eq(user.role, "unverified")));
+        }
+
+        return inserted;
+    });
+}

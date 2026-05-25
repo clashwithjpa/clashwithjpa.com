@@ -2,6 +2,7 @@
     "name": "server",
     "scripts": {
         "ba:generate": "bunx auth@latest generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schema/ba-auth.ts --yes && bun run scripts/fix-ba-schema.ts",
+        "dataset:build-import-lookup": "bun run scripts/migrations/build-import-lookup.ts",
         "dataset:convert-coc": "bun run scripts/migrations/convert-coc-to-json.ts",
         "dataset:migrate": "bun run scripts/migrations/migrate.ts",
         "db:generate": "drizzle-kit generate",
