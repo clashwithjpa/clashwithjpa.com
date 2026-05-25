@@ -48,6 +48,15 @@ services:
     profiles:
       - prod
 
+  jpa-web:
+    extends:
+      file: ./apps/web/docker-compose.yaml
+      service: jpa-web
+    depends_on:
+      - jpa-server
+    profiles:
+      - prod
+
   drizzle-gateway:
     container_name: drizzle-gateway
     image: ghcr.io/drizzle-team/gateway:latest

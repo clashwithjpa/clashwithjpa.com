@@ -1,0 +1,15 @@
+services:
+    jpa-web:
+        container_name: jpa-web
+        build:
+            context: ../..
+            dockerfile: ./apps/web/Dockerfile
+            args:
+                PUBLIC_SERVER_URL: ${PUBLIC_SERVER_URL}
+                PUBLIC_SENTRY_DSN: ${PUBLIC_SENTRY_DSN}
+                PUBLIC_SENTRY_SPOTLIGHT: ${PUBLIC_SENTRY_SPOTLIGHT}
+                PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY}
+        image: clashwithjpa/web:latest
+        restart: unless-stopped
+        ports:
+            - 7110:80
