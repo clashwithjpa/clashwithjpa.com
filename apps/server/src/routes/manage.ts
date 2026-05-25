@@ -1,6 +1,7 @@
 import { isManager } from "@/lib/auth/functions";
 import { setRules } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
@@ -12,7 +13,7 @@ import z4 from "zod/v4";
 const app = new Hono<AppEnv>();
 
 const setRulesBodySchema = z4.object({
-    rules: z4.string().min(1, "Rules content is required"),
+    rules: z4.string().min(1, "Rules content is required").max(100_000, "Rules content too large"),
 });
 const setRulesData = z4.object({
     rules: z4.string(),
@@ -46,9 +47,9 @@ app.put(
     zValidator("json", setRulesBodySchema),
     async (c) => {
         try {
-            c.header("Cache-Control", "no-cache, no-store, must-revalidate");
-            const { rules } = await c.req.json();
+            const { rules } = c.req.valid("json");
             const updatedRules = await setRules(rules);
+            await invalidateSettingsCache();
             return c.json({
                 success: true,
                 data: { rules: updatedRules },

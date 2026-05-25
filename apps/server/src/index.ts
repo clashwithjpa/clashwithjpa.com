@@ -1,6 +1,7 @@
+import { isAdmin } from "@/lib/auth/functions";
 import { config } from "@/lib/config";
-import { getRules } from "@/lib/db/functions";
-import { betterAuthMiddleware } from "@/lib/middlewares";
+import { getCachedSettings } from "@/lib/settings-cache";
+import { betterAuthMiddleware, hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
@@ -36,7 +37,7 @@ app.use(
         cors({
             origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
             allowHeaders: ["Content-Type", "Authorization", "x-request-id", "x-visitor-id"],
-            allowMethods: ["POST", "GET", "OPTIONS", "PUT"],
+            allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
             exposeHeaders: ["Content-Length"],
             maxAge: 600,
             credentials: true,
@@ -53,10 +54,24 @@ app.use(
 
         rateLimiter({
             windowMs: 1 * 60 * 1000, // 1 minute
-            limit: 60, // Limit each client to 60 requests per window
-            skip: (c) => config.NODE_ENV === "development" && c.req.header("origin") === config.JPA_APP_URL, // Skip rate limiting in development for requests from the frontend
-            // TODO: https://honohub.dev/docs/rate-limiter/troubleshooting#solution-2
-            keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "",
+            limit: 120, // Limit each client to 120 requests per window
+            skip: (c) => {
+                // Better Auth applies its own per-path rate limits to /api/auth/*,
+                // so let it own that namespace instead of double-limiting here.
+                if (c.req.path.startsWith("/api/auth/")) return true;
+                // Skip rate limiting in development for requests from the frontend.
+                return config.NODE_ENV === "development" && c.req.header("origin") === config.JPA_APP_URL;
+            },
+            keyGenerator: (c) => {
+                // Behind Cloudflare in prod; cf-connecting-ip is the authoritative client IP.
+                // Fall back to leftmost x-forwarded-for hop, then x-real-ip. Last resort is a shared
+                // "unknown" bucket so a missing-header attacker can't escape the limiter.
+                const cf = c.req.header("cf-connecting-ip");
+                if (cf) return cf;
+                const xff = c.req.header("x-forwarded-for");
+                if (xff) return xff.split(",")[0]!.trim();
+                return c.req.header("x-real-ip") ?? "unknown";
+            },
             store: new RedisStore({
                 sendCommand: (command: string, ...args: string[]) => client.call(command, ...args) as Promise<RedisReply>,
             }) as unknown as Store, // Type assertion to fix typescript error (https://honohub.dev/docs/rate-limiter/troubleshooting#solution)
@@ -75,6 +90,10 @@ app.onError((err, c) => {
 });
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
+    // Don't expose the better-auth OpenAPI reference in production.
+    if (config.NODE_ENV === "production" && c.req.path.endsWith("/reference")) {
+        return c.notFound();
+    }
     return auth.handler(c.req.raw);
 });
 
@@ -220,11 +239,10 @@ app.get(
     }),
     async (c) => {
         try {
-            c.header("Cache-Control", "no-cache, no-store, must-revalidate");
-            const rules = await getRules();
+            const settings = await getCachedSettings();
             return c.json({
                 success: true,
-                data: { rules },
+                data: { rules: settings?.rulesContent ?? null },
             });
         } catch (error) {
             Sentry.captureException(error);
@@ -240,8 +258,11 @@ app.route("/manage", manage);
 app.route("/user", user);
 app.route("/upload", upload);
 
+const docsGuard = config.NODE_ENV === "production" ? [hasAccessAuthMiddleware(isAdmin)] : [];
+
 app.get(
     "/openapi.json",
+    ...docsGuard,
     openAPIRouteHandler(app, {
         documentation: {
             info: {
@@ -264,6 +285,7 @@ app.get(
 
 app.get(
     "/scalar",
+    ...docsGuard,
     Scalar((c) => {
         return {
             pageTitle: "ClashWithJPA API Documentation",

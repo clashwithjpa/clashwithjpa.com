@@ -108,7 +108,7 @@ app.post(
     zValidator("json", postCOCPlayerVerifyBodySchema),
     async (c) => {
         const tag = c.req.param("tag");
-        const { apiToken } = await c.req.json();
+        const { apiToken } = c.req.valid("json");
         try {
             const verifyToken = await cocClient.verifyPlayerToken(tag, apiToken);
             return c.json({
@@ -529,7 +529,7 @@ const getJPACwlClans = z4.object({
             clanName: z4.string(),
             clanLeague: z4.string(),
             clanLeader: z4.string(),
-            email: z4.string(),
+            email: z4.email(),
         }),
     ),
 });

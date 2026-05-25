@@ -40,12 +40,12 @@
         fieldErrors = {};
 
         if (!cocAccountTag.trim()) {
-            toast.error("Clan tag is required");
+            toast.error("Account tag is required");
             return;
         }
 
         if (!cocAccountTag.startsWith("#")) {
-            toast.error("Clan tag must start with #");
+            toast.error("Account tag must start with #");
             return;
         }
 

@@ -310,14 +310,14 @@
             const response = await fetch(`${PUBLIC_SERVER_URL}/upload`, {
                 method: "POST",
                 body: formData,
+                credentials: "include",
             });
 
-            if (!response.ok) {
-                throw new Error("Upload failed");
-            }
-
             const data = await response.json();
-            return data.url;
+            if (!response.ok || !data?.success) {
+                throw new Error(data?.error ?? "Upload failed");
+            }
+            return data.data.url;
         } catch (error) {
             console.error("Image upload failed:", error);
             throw error;

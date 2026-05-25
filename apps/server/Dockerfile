@@ -44,8 +44,10 @@ COPY --from=pruner /app/out/full/ ./
 
 WORKDIR /app/apps/server
 
+RUN chmod +x docker-entrypoint.sh
+
 USER bun
 
 EXPOSE 3000
 
-CMD ["bun", "run", "src/index.ts"]
+CMD ["./docker-entrypoint.sh"]

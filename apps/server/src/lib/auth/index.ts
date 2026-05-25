@@ -57,6 +57,13 @@ export const auth = betterAuth({
         crossSubDomainCookies: {
             enabled: true,
         },
+        // BA's built-in rate limiter needs to know the client IP. In prod we're
+        // behind Cloudflare so cf-connecting-ip is authoritative; XFF/x-real-ip
+        // are fallbacks. Without this BA skips its own limits (see warning:
+        // "Rate limiting skipped: could not determine client IP address").
+        ipAddress: {
+            ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for", "x-real-ip"],
+        },
     },
     telemetry: {
         enabled: false,
@@ -67,6 +74,6 @@ export const auth = betterAuth({
             maxAge: 15, // Cache duration in seconds
         },
     },
-    trustedOrigins: ["http://localhost:5173", config.JPA_APP_URL],
+    trustedOrigins: config.NODE_ENV === "production" ? [config.JPA_APP_URL] : ["http://localhost:5173", config.JPA_APP_URL],
     experimental: { joins: true },
 });

@@ -176,6 +176,13 @@ export async function getCwlClans() {
     );
 }
 
+export class MissingDiscordAccountError extends Error {
+    constructor(discordUserId: string) {
+        super(`Discord account ${discordUserId} is no longer linked`);
+        this.name = "MissingDiscordAccountError";
+    }
+}
+
 type ClanApplicationStatus = (typeof clanApplicationStatusEnum.enumValues)[number];
 
 export async function getClanApplications(opts: { status?: ClanApplicationStatus; limit?: number; offset?: number } = {}) {
@@ -199,25 +206,26 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
         const [existing] = await tx.select().from(clanApplicationTable).where(eq(clanApplicationTable.id, id));
         if (!existing) return null;
 
-        const [updated] = await tx.update(clanApplicationTable).set({ status }).where(eq(clanApplicationTable.id, id)).returning();
-
         if (status === "accepted" && existing.status !== "accepted") {
-            await tx
-                .insert(cocAccountTable)
-                .values({ discordUserId: existing.discordUserId, cocAccountTag: existing.cocAccountTag })
-                .onConflictDoNothing({ target: cocAccountTable.cocAccountTag });
-
             const [acct] = await tx
                 .select({ userId: account.userId })
                 .from(account)
                 .where(and(eq(account.accountId, existing.discordUserId), eq(account.providerId, "discord")))
                 .limit(1);
-            if (acct) {
-                await tx
-                    .update(user)
-                    .set({ role: "verified" })
-                    .where(and(eq(user.id, acct.userId), eq(user.role, "unverified")));
+
+            if (!acct) {
+                throw new MissingDiscordAccountError(existing.discordUserId);
             }
+
+            await tx
+                .insert(cocAccountTable)
+                .values({ discordUserId: existing.discordUserId, cocAccountTag: existing.cocAccountTag })
+                .onConflictDoNothing({ target: cocAccountTable.cocAccountTag });
+
+            await tx
+                .update(user)
+                .set({ role: "verified" })
+                .where(and(eq(user.id, acct.userId), eq(user.role, "unverified")));
         } else if (existing.status === "accepted" && status !== "accepted") {
             await tx.delete(cocAccountTable).where(eq(cocAccountTable.cocAccountTag, existing.cocAccountTag));
 
@@ -241,6 +249,7 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
             }
         }
 
+        const [updated] = await tx.update(clanApplicationTable).set({ status }).where(eq(clanApplicationTable.id, id)).returning();
         return updated ?? null;
     });
 }

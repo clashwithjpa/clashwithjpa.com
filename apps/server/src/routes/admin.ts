@@ -13,6 +13,7 @@ import {
     getCocAccountsForUser,
     getDiscordAccountId,
     getSettings,
+    MissingDiscordAccountError,
     updateClan,
     updateClanApplicationStatus,
     updateCwlClan,
@@ -206,6 +207,9 @@ app.put(
             if (!application) return c.json({ success: false, error: "Application not found" }, 404);
             return c.json({ success: true, data: { application } });
         } catch (error) {
+            if (error instanceof MissingDiscordAccountError) {
+                return c.json({ success: false, error: "Applicant's Discord account is no longer linked. They must re-link before approval." }, 400);
+            }
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update application" }, 500);
         }
@@ -570,7 +574,7 @@ const cwlClanSchema = z4.object({
     cocClanName: z4.string(),
     cocClanLeague: z4.string(),
     cocClanLeader: z4.string(),
-    email: z4.string(),
+    email: z4.email(),
 });
 
 const getAdminCwlClansData = z4.object({
@@ -663,7 +667,7 @@ app.put(
     zValidator("json", cwlClanInputSchema.partial()),
     async (c) => {
         try {
-            const tag = decodeURIComponent(c.req.param("tag"));
+            const { tag } = c.req.valid("param");
             const clan = await updateCwlClan(tag, c.req.valid("json"));
             if (!clan) return c.json({ success: false, error: "CWL clan not found" }, 404);
             return c.json({ success: true, data: { clan } });
@@ -694,7 +698,7 @@ app.delete(
     zValidator("param", cwlClanPathSchema),
     async (c) => {
         try {
-            const tag = decodeURIComponent(c.req.param("tag"));
+            const { tag } = c.req.valid("param");
             const clan = await deleteCwlClan(tag);
             if (!clan) return c.json({ success: false, error: "CWL clan not found" }, 404);
             return c.json({ success: true, data: { clan } });

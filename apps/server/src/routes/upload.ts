@@ -5,19 +5,25 @@ import { type AppEnv } from "@/lib/types";
 import { CreateBucketCommand, HeadBucketCommand, PutBucketPolicyCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 
 const upload = new Hono<AppEnv>();
 
 const ALLOWED_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
-const ALLOWED_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp"]);
+const MIME_TO_EXT: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/gif": "gif",
+    "image/webp": "webp",
+};
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const s3 = new S3Client({
     endpoint: config.MINIO_ENDPOINT,
     region: "us-east-1",
     credentials: {
-        accessKeyId: config.MINIO_ROOT_USER!,
-        secretAccessKey: config.MINIO_ROOT_PASSWORD!,
+        accessKeyId: config.MINIO_ROOT_USER,
+        secretAccessKey: config.MINIO_ROOT_PASSWORD,
     },
     forcePathStyle: true,
 });
@@ -34,13 +40,12 @@ async function ensureBucket() {
     }
 
     try {
-        // Always try to set the public read policy to ensure it's applied even if the bucket already existed
         const policy = {
             Version: "2012-10-17",
             Statement: [
                 {
                     Effect: "Allow",
-                    Principal: { AWS: ["*"] },
+                    Principal: "*",
                     Action: ["s3:GetObject"],
                     Resource: [`arn:aws:s3:::${BUCKET_NAME}/*`],
                 },
@@ -61,50 +66,49 @@ async function ensureBucket() {
 // Call once on startup
 ensureBucket().catch(Sentry.captureException);
 
-upload.post("/", hasAccessAuthMiddleware(isManager), async (c) => {
-    try {
-        const body = await c.req.parseBody();
-        const file = body["file"];
+upload.post(
+    "/",
+    hasAccessAuthMiddleware(isManager),
+    bodyLimit({
+        maxSize: MAX_UPLOAD_BYTES,
+        onError: (c) => c.json({ success: false, error: "File exceeds maximum size of 5 MB" }, 413),
+    }),
+    async (c) => {
+        try {
+            const body = await c.req.parseBody();
+            const file = body["file"];
 
-        if (!file || !(file instanceof File)) {
-            return c.json({ error: "No file uploaded" }, 400);
+            if (!file || !(file instanceof File)) {
+                return c.json({ success: false, error: "No file uploaded" }, 400);
+            }
+
+            if (!ALLOWED_MIME_TYPES.has(file.type)) {
+                return c.json({ success: false, error: "Unsupported file type" }, 415);
+            }
+
+            // Derive extension from validated MIME instead of trusting the client filename.
+            const ext = MIME_TO_EXT[file.type];
+            const uniqueFilename = `${crypto.randomUUID()}.${ext}`;
+
+            const arrayBuffer = await file.arrayBuffer();
+
+            await s3.send(
+                new PutObjectCommand({
+                    Bucket: BUCKET_NAME,
+                    Key: uniqueFilename,
+                    Body: Buffer.from(arrayBuffer),
+                    ContentType: file.type,
+                }),
+            );
+
+            const fileUrl = `${config.MINIO_PUBLIC_URL}/${BUCKET_NAME}/${uniqueFilename}`;
+
+            return c.json({ success: true, data: { url: fileUrl } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to upload file" }, 500);
         }
-
-        if (file.size > MAX_UPLOAD_BYTES) {
-            return c.json({ error: "File exceeds maximum size of 5 MB" }, 413);
-        }
-
-        if (!ALLOWED_MIME_TYPES.has(file.type)) {
-            return c.json({ error: "Unsupported file type" }, 415);
-        }
-
-        const ext = (file.name.split(".").pop() || "").toLowerCase();
-        if (!ALLOWED_EXTENSIONS.has(ext)) {
-            return c.json({ error: "Unsupported file extension" }, 415);
-        }
-
-        const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${ext}`;
-
-        const arrayBuffer = await file.arrayBuffer();
-
-        await ensureBucket();
-
-        await s3.send(
-            new PutObjectCommand({
-                Bucket: BUCKET_NAME,
-                Key: uniqueFilename,
-                Body: Buffer.from(arrayBuffer),
-                ContentType: file.type,
-            }),
-        );
-
-        const fileUrl = `${config.MINIO_PUBLIC_URL}/${BUCKET_NAME}/${uniqueFilename}`;
-
-        return c.json({ url: fileUrl });
-    } catch (error) {
-        Sentry.captureException(error);
-        return c.json({ error: "Failed to upload file" }, 500);
-    }
-});
+    },
+);
 
 export default upload;

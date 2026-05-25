@@ -223,7 +223,7 @@ app.post(
             return c.json({ success: false, error: "Applications are currently closed." }, 403);
         }
 
-        const { cocAccountTag, apiToken, captchaToken } = await c.req.json();
+        const { cocAccountTag, apiToken, captchaToken } = c.req.valid("json");
 
         if (config.NODE_ENV !== "development") {
             const isCaptchaValid = await verifyTurnstileToken(captchaToken);
@@ -440,7 +440,7 @@ app.post(
             return c.json({ success: false, error: "CWL applications are currently closed." }, 403);
         }
 
-        const { isAlt, preferenceNum, tag, accountClan, accountWeight } = await c.req.json();
+        const { isAlt, preferenceNum, tag, accountClan, accountWeight } = c.req.valid("json");
 
         const discordId = await getDiscordAccountId(user.id);
         if (!discordId) {

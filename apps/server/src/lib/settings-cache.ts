@@ -19,6 +19,14 @@ type CachedSettings = {
 let cachedSettings: CachedSettings = null;
 let cacheTimestamp = 0;
 
+function reviveSettings(raw: string): CachedSettings {
+    const parsed = JSON.parse(raw) as CachedSettings;
+    if (parsed?.updatedAt) {
+        parsed.updatedAt = new Date(parsed.updatedAt as unknown as string);
+    }
+    return parsed;
+}
+
 export async function getCachedSettings(): Promise<CachedSettings> {
     const now = Date.now();
     if (cachedSettings && now - cacheTimestamp < TTL_SECONDS * 1000) {
@@ -28,7 +36,7 @@ export async function getCachedSettings(): Promise<CachedSettings> {
     try {
         const cached = await redis.get(CACHE_KEY);
         if (cached) {
-            cachedSettings = JSON.parse(cached);
+            cachedSettings = reviveSettings(cached);
             cacheTimestamp = now;
             return cachedSettings;
         }
