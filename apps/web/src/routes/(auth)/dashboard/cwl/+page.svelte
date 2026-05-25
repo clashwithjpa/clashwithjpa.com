@@ -14,7 +14,7 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
     let session = authClient.useSession();
-    let options: (Option & { warWeight: number })[] = $state([]);
+    let options: (Option & { warWeight: number; clanTag?: string })[] = $state([]);
     let clanOptions: Option[] = $state([]);
 
     // Form fields
@@ -25,6 +25,14 @@
     let accountWeight = $state<number | "">("");
 
     let selectedAccountWeight = $derived(!isAlt && tag ? (options.find((o) => o.value === tag)?.warWeight ?? 0) : null);
+
+    $effect(() => {
+        if (isAlt || !tag) return;
+        const selected = options.find((o) => o.value === tag);
+        if (!selected?.clanTag) return;
+        const match = clanOptions.find((c) => c.value === selected.clanTag);
+        if (match) accountClan = match.value;
+    });
 
     let isLoading = $state(false);
     let fieldErrors = $state<Record<string, string>>({});
@@ -61,13 +69,26 @@
                         name: playerData.data.player.name,
                         icon: `th/${playerData.data.player.townHallLevel}`,
                         warWeight: acc.warWeight,
+                        clanTag: playerData.data.player.clan?.tag,
                     };
                 } catch (e) {
-                    return { tag: acc.cocAccountTag, name: acc.cocAccountTag, icon: undefined, warWeight: acc.warWeight };
+                    return {
+                        tag: acc.cocAccountTag,
+                        name: acc.cocAccountTag,
+                        icon: undefined,
+                        warWeight: acc.warWeight,
+                        clanTag: undefined,
+                    };
                 }
             }),
         );
-        options = accsInfo.map((acc) => ({ label: `${acc.tag} - ${acc.name}`, value: acc.tag, icon: acc.icon, warWeight: acc.warWeight }));
+        options = accsInfo.map((acc) => ({
+            label: `${acc.tag} - ${acc.name}`,
+            value: acc.tag,
+            icon: acc.icon,
+            warWeight: acc.warWeight,
+            clanTag: acc.clanTag,
+        }));
     }
 
     async function setClanOptions() {
