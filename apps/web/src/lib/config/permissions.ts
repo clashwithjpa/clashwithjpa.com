@@ -50,7 +50,7 @@ export const manager = ac.newRole({
 
 export const admin = ac.newRole({
     jpa: ["apply", "cwl", "review", "manage", "sudo"],
-    user: ["create", "list", "get", "set-role", "ban", "impersonate", "delete"],
+    user: ["create", "list", "get", "set-role", "ban", "delete"],
 });
 
 export const superadmin = ac.newRole({

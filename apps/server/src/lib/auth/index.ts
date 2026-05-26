@@ -68,7 +68,7 @@ export const auth = betterAuth({
                 superadmin,
             },
             defaultRole: "unverified",
-            adminRoles: ["admin", "superadmin"],
+            adminRoles: ["superadmin"],
         }),
         openAPI(),
         captcha({

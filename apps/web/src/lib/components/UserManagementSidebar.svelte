@@ -51,11 +51,8 @@
     // Server blocks ban/remove on users at or above the caller's level
     // (see `before` hook in apps/server/src/lib/auth/index.ts). Mirror in UI.
     let canActOnTarget = $derived(roleLevel(user.role) < roleLevel($currentSession.data?.user?.role));
-    // Impersonate requires the `user:impersonate` perm (admin+ in our config).
-    // better-auth additionally blocks impersonating users in adminRoles unless
-    // the caller has `impersonate-admins` (superadmin only). The strict
-    // hierarchy already covers this since admin+target>=admin is also blocked.
-    let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Impersonate requires the `user:impersonate` perm — superadmin only.
+    let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.superadmin);
     let canImpersonate = $derived(canImpersonateRole && canActOnTarget);
     let impersonating = $state(false);
 

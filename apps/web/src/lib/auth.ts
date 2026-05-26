@@ -17,7 +17,7 @@ export const authClient = createAuthClient({
                 superadmin,
             },
             defaultRole: "unverified",
-            adminRoles: ["admin", "superadmin"],
+            adminRoles: ["superadmin"],
         }),
     ],
 });

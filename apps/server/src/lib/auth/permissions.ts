@@ -51,17 +51,16 @@ export const manager = ac.newRole({
 
 export const admin = ac.newRole({
     jpa: ["apply", "cwl", "review", "manage", "sudo"],
-    // Like manager + impersonate/delete. Notably withheld:
+    // Like manager + delete. Notably withheld:
     //   - `update`: `/admin/update-user` accepts arbitrary columns (banned,
     //     email, role, ...) so granting it would re-open every other guarded
     //     endpoint. Kept superadmin-only since the UI never calls it.
     //   - `set-password`: would let an admin reset the superadmin's password.
     //     Email/password auth is disabled (see ./index.ts) but we keep the
     //     perm narrow as defense-in-depth.
-    //   - `impersonate-admins`: reserved for superadmin so an admin can't
-    //     impersonate the owner.
+    //   - `impersonate` / `impersonate-admins`: reserved for superadmin.
     // No session perms.
-    user: ["create", "list", "get", "set-role", "ban", "impersonate", "delete"],
+    user: ["create", "list", "get", "set-role", "ban", "delete"],
 });
 
 export const superadmin = ac.newRole({
