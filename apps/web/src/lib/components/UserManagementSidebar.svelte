@@ -1,10 +1,13 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
     import type { Role } from "$lib/config/roles";
+    import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
     import { getUserCocAccountsByUserId } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
+    import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBan from "~icons/tabler/ban";
@@ -15,6 +18,7 @@
     import TablerIdBadge from "~icons/tabler/id-badge";
     import TablerLogin2 from "~icons/tabler/login-2";
     import TablerQuestionMark from "~icons/tabler/question-mark";
+    import TablerSpy from "~icons/tabler/spy";
     import TablerTrash from "~icons/tabler/trash";
     import TablerUserX from "~icons/tabler/user-x";
     import TablerWorldX from "~icons/tabler/world-x";
@@ -34,8 +38,43 @@
 
     let { user, onBanToggle, onRemove, isCurrentUser = false, isProcessing = false }: Props = $props();
 
+    const currentSession = authClient.useSession();
+    // Session-management endpoints (listUserSessions, revokeUserSession) are
+    // gated on the `session:list` / `session:revoke` permissions, which only
+    // superadmin currently has. Hide the tab from anyone who can't use it.
+    let canManageSessions = $derived(
+        ($currentSession.data?.user?.role ?? "")
+            .split(",")
+            .map((r) => r.trim())
+            .includes("superadmin"),
+    );
+    // Server blocks ban/remove on users at or above the caller's level
+    // (see `before` hook in apps/server/src/lib/auth/index.ts). Mirror in UI.
+    let canActOnTarget = $derived(roleLevel(user.role) < roleLevel($currentSession.data?.user?.role));
+    // Impersonate requires the `user:impersonate` perm (admin+ in our config).
+    // better-auth additionally blocks impersonating users in adminRoles unless
+    // the caller has `impersonate-admins` (superadmin only). The strict
+    // hierarchy already covers this since admin+target>=admin is also blocked.
+    let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    let canImpersonate = $derived(canImpersonateRole && canActOnTarget);
+    let impersonating = $state(false);
+
+    async function handleImpersonate() {
+        impersonating = true;
+        const { error } = await authClient.admin.impersonateUser({ userId: user.id });
+        if (error) {
+            toast.error("Failed to impersonate user", { description: error.message });
+            impersonating = false;
+        } else {
+            toast.success(`Now impersonating ${user.name}`);
+            await goto("/dashboard", { invalidateAll: true });
+        }
+    }
+
     let activeTab = $state<"overview" | "sessions" | "accounts">("overview");
-    const tabs: Array<"overview" | "sessions" | "accounts"> = ["overview", "sessions", "accounts"];
+    let tabs = $derived<Array<"overview" | "sessions" | "accounts">>(
+        canManageSessions ? ["overview", "sessions", "accounts"] : ["overview", "accounts"],
+    );
 
     let copied: Record<string, boolean> = $state({});
     let sessionsRefreshKey = $state(0);
@@ -270,8 +309,15 @@
 
     <!-- Action Buttons Footer -->
     <div class="border-t border-stone-700/50 pt-4">
-        {#if !isCurrentUser}
+        {#if !isCurrentUser && canActOnTarget}
             <div class="space-y-2">
+                {#if canImpersonate}
+                    <Button class="w-full gap-2" variant="base" disabled={isProcessing || impersonating} onclick={handleImpersonate}>
+                        <TablerSpy class="size-5" />
+                        {impersonating ? "Switching..." : "Impersonate User"}
+                    </Button>
+                {/if}
+
                 <!-- Ban/Unban Button -->
                 <Button
                     class="w-full gap-2"
@@ -294,6 +340,8 @@
                     Remove User
                 </Button>
             </div>
+        {:else if !isCurrentUser}
+            <p class="text-center text-xs text-stone-400">You cannot manage a user at or above your role level</p>
         {:else}
             <p class="text-center text-xs text-stone-400">You cannot manage your own account</p>
         {/if}

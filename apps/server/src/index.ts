@@ -1,4 +1,4 @@
-import { isAdmin } from "@/lib/auth/functions";
+import { isSuperadmin } from "@/lib/auth/functions";
 import { config } from "@/lib/config";
 import { getCachedSettings } from "@/lib/settings-cache";
 import { betterAuthMiddleware, hasAccessAuthMiddleware } from "@/lib/middlewares";
@@ -258,7 +258,10 @@ app.route("/manage", manage);
 app.route("/user", user);
 app.route("/upload", upload);
 
-const docsGuard = config.NODE_ENV === "production" ? [hasAccessAuthMiddleware(isAdmin)] : [];
+// API docs (OpenAPI JSON + Scalar UI) are superadmin-only across all envs.
+// They reveal every endpoint shape including admin-only operations; even in
+// dev we'd rather not leak that surface to a logged-in non-owner.
+const docsGuard = [hasAccessAuthMiddleware(isSuperadmin)];
 
 app.get(
     "/openapi.json",

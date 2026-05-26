@@ -81,6 +81,22 @@ export async function isAdmin(userId: string | null | undefined) {
     });
 }
 
+export async function isSuperadmin(userId: string | null | undefined) {
+    if (!userId)
+        return {
+            error: null,
+            success: false,
+        };
+    return await auth.api.userHasPermission({
+        body: {
+            userId: userId,
+            permissions: {
+                jpa: ["root"],
+            },
+        },
+    });
+}
+
 export async function hasPermission(
     userId: string | null | undefined,
     permission: (typeof statement.jpa)[number] | Array<(typeof statement.jpa)[number]>,

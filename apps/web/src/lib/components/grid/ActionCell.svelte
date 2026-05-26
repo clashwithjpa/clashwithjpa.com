@@ -1,5 +1,6 @@
 <script lang="ts">
     import Button from "$lib/components/ui/Button.svelte";
+    import { roleLevel } from "$lib/config/roles";
     import type { ICellRendererParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import TablerBan from "~icons/tabler/ban";
@@ -11,6 +12,11 @@
 
     let user: UserWithRole = $derived(params.data);
     let isCurrentUser = $derived(user?.id === params.context?.currentUserId);
+    // Disable destructive buttons when the target is at or above the caller's
+    // level. Server enforces the same rule via the `before` hook in
+    // apps/server/src/lib/auth/index.ts.
+    let isAboveOrEqual = $derived(roleLevel(user?.role) >= (params.context?.currentUserLevel ?? 0));
+    let canAct = $derived(!isCurrentUser && !isAboveOrEqual);
 
     function handleOpen() {
         if (user) {
@@ -19,7 +25,7 @@
     }
 
     async function handleRemove() {
-        if (params.context?.removeUser && !isCurrentUser && user) {
+        if (params.context?.removeUser && canAct && user) {
             if (params.context?.isSidebarOpenFor?.(user.id)) {
                 params.context.closeUserSidebar?.();
             }
@@ -28,7 +34,7 @@
     }
 
     async function handleBanToggle() {
-        if (params.context?.toggleBanUser && !isCurrentUser && user) {
+        if (params.context?.toggleBanUser && canAct && user) {
             await params.context.toggleBanUser(user.id, user.banned);
         }
     }
@@ -46,7 +52,7 @@
             tooltipPlacement="bottom"
             tooltip={user.banned ? "Unban User" : "Ban User"}
             onclick={handleBanToggle}
-            disabled={params.context?.isProcessing === user.id || isCurrentUser}
+            disabled={params.context?.isProcessing === user.id || !canAct}
         >
             {#if user.banned}
                 <TablerCheck />
@@ -60,7 +66,7 @@
             tooltipPlacement="bottom"
             tooltip="Remove User"
             onclick={handleRemove}
-            disabled={params.context?.isProcessing === user.id || isCurrentUser}
+            disabled={params.context?.isProcessing === user.id || !canAct}
         >
             <TablerTrash />
         </Button>

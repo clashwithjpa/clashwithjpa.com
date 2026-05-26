@@ -1,5 +1,6 @@
 <script lang="ts" module>
     import TablerCrown from "~icons/tabler/crown";
+    import TablerCrownFilled from "~icons/tabler/crown-filled";
     import TablerFileText from "~icons/tabler/file-text";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerRosetteDiscountCheck from "~icons/tabler/rosette-discount-check";
@@ -11,6 +12,7 @@
         reviewer: { label: "Reviewer", variant: "yellow", icon: TablerFileText },
         manager: { label: "Manager", variant: "blue", icon: TablerTool },
         admin: { label: "Admin", variant: "red", icon: TablerCrown },
+        superadmin: { label: "Superadmin", variant: "red", icon: TablerCrownFilled },
     } as const;
 
     export const roleOptions = Object.entries(ROLE_DETAILS).map(([value, details]) => ({

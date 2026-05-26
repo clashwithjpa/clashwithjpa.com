@@ -36,3 +36,4 @@
 # Keep the generated import_lookup.json — it's read at runtime by the account-import endpoint.
 apps/server/scripts/migrations/datasets
 !apps/server/scripts/migrations/datasets/import_lookup.json
+.backups

@@ -15,6 +15,7 @@
     import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
     import ToggleGroup from "$lib/components/ui/ToggleGroup.svelte";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
+    import { roleLevel } from "$lib/config/roles";
     import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import { getDiscordIdByUserId } from "@repo/clashofclans-client";
@@ -165,6 +166,9 @@
         get currentUserId() {
             return $session.data?.user?.id;
         },
+        get currentUserLevel() {
+            return roleLevel($session.data?.user?.role);
+        },
 
         openUserSidebar,
         closeUserSidebar,
@@ -275,14 +279,19 @@
             {
                 headerName: "Role",
                 field: "role",
-                editable: (params) => params.data.id !== $session.data?.user?.id,
+                editable: (params) => {
+                    const me = $session.data?.user;
+                    if (!me || params.data.id === me.id) return false;
+                    return roleLevel(params.data.role) < roleLevel(me.role);
+                },
                 sortable: false,
                 filter: false,
                 cellRenderer: svelteRenderer(RoleCell),
                 cellEditorPopup: true,
                 cellEditor: "uiSelectEditor",
-                cellEditorParams: {
-                    options: roleOptions,
+                cellEditorParams: () => {
+                    const myLevel = roleLevel($session.data?.user?.role);
+                    return { options: roleOptions.filter((opt) => roleLevel(opt.value) < myLevel) };
                 },
             },
             {
