@@ -17,6 +17,10 @@ endef
 ENV_FILES := $(wildcard ./apps/*/.env)
 ENV_FLAGS := $(foreach f,$(ENV_FILES),--env-file $(f))
 
+# When the `prod` profile is active, layer docker-compose.prod.yaml on top of
+# the base file (adds pangolin network attachments for the reverse proxy).
+COMPOSE_FILES := $(if $(filter prod,$(PROFILES)),-f docker-compose.yaml -f docker-compose.prod.yaml,)
+
 .PHONY: help
 help:
 	@echo ""
@@ -43,12 +47,12 @@ ifeq ($(PROFILES),)
 	$(error No profiles given. Usage: make run -- <profile1> [profile2 ...] [--flag ...])
 endif
 	$(eval PROFILE_FLAGS := $(call build_profiles,$(PROFILES)))
-	@echo "→ Stopping:  docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) down"
-	docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) down
-	@echo "→ Starting:  docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) up -d $(UP_FLAGS)"
-	docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) up -d $(UP_FLAGS)
+	@echo "→ Stopping:  docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) down"
+	docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) down
+	@echo "→ Starting:  docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) up -d $(UP_FLAGS)"
+	docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) up -d $(UP_FLAGS)
 	@echo "→ Service URLs:"
-	@CONTAINERS=$$(docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) ps -q); \
+	@CONTAINERS=$$(docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) ps -q); \
 	if [ -n "$$CONTAINERS" ]; then \
 		docker inspect -f '{{.Name}} |{{range $$p, $$conf := .NetworkSettings.Ports}}{{if $$conf}}  http://localhost:{{(index $$conf 0).HostPort}}{{end}}{{end}}' $$CONTAINERS \
 			| sed 's/^\///' \
@@ -62,8 +66,8 @@ ifeq ($(PROFILES),)
 	$(error No profiles given. Usage: make stop -- <profile1> [profile2 ...])
 endif
 	$(eval PROFILE_FLAGS := $(call build_profiles,$(PROFILES)))
-	@echo "→ Stopping:  docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) down"
-	docker compose $(ENV_FLAGS) $(PROFILE_FLAGS) down
+	@echo "→ Stopping:  docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) down"
+	docker compose $(COMPOSE_FILES) $(ENV_FLAGS) $(PROFILE_FLAGS) down
 
 .PHONY: show
 show: ## Show running container URLs

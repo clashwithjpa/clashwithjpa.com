@@ -1,0 +1,20 @@
+services:
+  jpa-minio:
+    networks:
+      - default
+      - pangolin
+
+  jpa-server:
+    networks:
+      - default
+      - pangolin
+
+  jpa-web:
+    networks:
+      - default
+      - pangolin
+
+networks:
+  pangolin:
+    name: pangolin
+    external: true
