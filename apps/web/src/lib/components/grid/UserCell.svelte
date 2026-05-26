@@ -10,10 +10,9 @@
 
 {#if user}
     <div class="flex h-full w-full items-center gap-3 px-2">
-        <Avatar src={user.image || null} name={user.name || user.email || "Unknown"} role={(user.role as Role) || "unverified"} size="sm" />
+        <Avatar src={user.image || null} name={user.name || "Unknown"} role={(user.role as Role) || "unverified"} size="sm" />
         <div class="flex min-w-0 flex-col justify-center">
             <span class="truncate text-sm font-medium text-stone-200">{user.name || "Unknown"}</span>
-            <span class="truncate text-xs text-stone-400">{user.email}</span>
         </div>
     </div>
 {/if}

@@ -14,7 +14,6 @@
     import TablerDeviceMobile from "~icons/tabler/device-mobile";
     import TablerPointFilled from "~icons/tabler/point-filled";
     import TablerTrash from "~icons/tabler/trash";
-    import TablerWorld from "~icons/tabler/world";
 
     import LogosChrome from "~icons/logos/chrome";
     import LogosFirefox from "~icons/logos/firefox";
@@ -90,13 +89,6 @@
     <hr class="border-stone-700/50" />
 
     <div class="flex flex-col gap-2">
-        <div class="flex items-center justify-between gap-2 text-sm text-stone-200">
-            <span class="flex items-center gap-1 font-medium text-stone-400">
-                <TablerWorld class="size-4" /> IP Address
-            </span>
-            <span>{sessionData.ipAddress || "Unknown"}</span>
-        </div>
-
         <div class="flex items-center justify-between gap-2 text-sm text-stone-200">
             <span class="flex items-center gap-1 font-medium text-stone-400">
                 <TablerCalendarClock class="size-4" /> Created

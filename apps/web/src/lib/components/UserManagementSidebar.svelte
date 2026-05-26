@@ -95,7 +95,6 @@
             <Avatar src={user.image} name={user.name} role={user.role as Role} size="lg" />
             <div class="flex-1 overflow-hidden">
                 <h3 class="truncate text-sm font-medium text-stone-50">{user.name}</h3>
-                <p class="truncate text-xs text-stone-400">{user.email}</p>
             </div>
         </div>
 
