@@ -1,6 +1,6 @@
 <script lang="ts">
     import Button from "$lib/components/ui/Button.svelte";
-    import { roleLevel } from "$lib/config/roles";
+    import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
     import type { ICellRendererParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import TablerBan from "~icons/tabler/ban";
@@ -17,6 +17,8 @@
     // apps/server/src/lib/auth/index.ts.
     let isAboveOrEqual = $derived(roleLevel(user?.role) >= (params.context?.currentUserLevel ?? 0));
     let canAct = $derived(!isCurrentUser && !isAboveOrEqual);
+    // Remove requires `user:delete` — admin+ only (managers can't delete).
+    let canRemoveRole = $derived((params.context?.currentUserLevel ?? 0) >= ROLE_LEVELS.admin);
 
     function handleOpen() {
         if (user) {
@@ -60,15 +62,17 @@
                 <TablerBan />
             {/if}
         </Button>
-        <Button
-            size="icon"
-            variant="danger"
-            tooltipPlacement="bottom"
-            tooltip="Remove User"
-            onclick={handleRemove}
-            disabled={params.context?.isProcessing === user.id || !canAct}
-        >
-            <TablerTrash />
-        </Button>
+        {#if canRemoveRole}
+            <Button
+                size="icon"
+                variant="danger"
+                tooltipPlacement="bottom"
+                tooltip="Remove User"
+                onclick={handleRemove}
+                disabled={params.context?.isProcessing === user.id || !canAct}
+            >
+                <TablerTrash />
+            </Button>
+        {/if}
     {/if}
 </div>

@@ -1,23 +1,6 @@
-export const ROLES = ["unverified", "verified", "reviewer", "manager", "admin", "superadmin"] as const;
+import type { Role } from "@repo/auth-shared";
 
-export type Role = (typeof ROLES)[number];
-
-// Strict hierarchy: a user can only change another user's role when their own
-// level is strictly greater than both the target's current level and the role
-// being assigned. Must stay in sync with apps/server/src/lib/auth/permissions.ts.
-export const ROLE_LEVELS: Record<Role, number> = {
-    unverified: 0,
-    verified: 1,
-    reviewer: 2,
-    manager: 3,
-    admin: 4,
-    superadmin: 5,
-};
-
-export function roleLevel(role: string | null | undefined): number {
-    if (!role) return ROLE_LEVELS.unverified;
-    return role.split(",").reduce((max, r) => Math.max(max, ROLE_LEVELS[r.trim() as Role] ?? -1), -1);
-}
+export { ROLE_LEVELS, ROLES, roleLevel, type Role } from "@repo/auth-shared";
 
 export interface RoleDecoration {
     gradient: string;

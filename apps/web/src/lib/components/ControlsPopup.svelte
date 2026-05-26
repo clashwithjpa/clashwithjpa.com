@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { page } from "$app/state";
+    import { authClient } from "$lib/auth";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
@@ -8,6 +10,7 @@
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { animate } from "animejs";
     import { onMount, tick } from "svelte";
+    import { toast } from "svelte-sonner";
     import TablerIcons from "~icons/tabler/icons";
     import TablerMaximize from "~icons/tabler/maximize";
     import TablerMinimize from "~icons/tabler/minimize";
@@ -15,7 +18,25 @@
     import TablerMusicOff from "~icons/tabler/music-off";
     import TablerPlayerPause from "~icons/tabler/player-pause";
     import TablerPlayerPlay from "~icons/tabler/player-play";
+    import TablerSpyOff from "~icons/tabler/spy-off";
     import TablerTrash from "~icons/tabler/trash";
+
+    const session = authClient.useSession();
+    let isImpersonating = $derived(!!$session.data?.session?.impersonatedBy);
+    let stoppingImpersonation = $state(false);
+
+    async function stopImpersonating() {
+        stoppingImpersonation = true;
+        const { error } = await authClient.admin.stopImpersonating();
+        if (error) {
+            toast.error("Failed to stop impersonating", { description: error.message });
+            stoppingImpersonation = false;
+        } else {
+            toast.success("Stopped impersonating");
+            await goto("/admin/users", { invalidateAll: true });
+            stoppingImpersonation = false;
+        }
+    }
 
     let isMusicPlaying = $state(false);
     let isVideoPlaying = $state(true);
@@ -230,14 +251,29 @@
 >
     <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-60" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
-            <div bind:this={triggerButton}>
+            <div bind:this={triggerButton} class="relative">
                 <Button class="size-14 rounded-full" size="" variant="ghost">
                     <TablerIcons class="pointer-events-none size-6" />
                 </Button>
+                {#if isImpersonating}
+                    <span class="absolute top-1 right-1 size-3 animate-pulse rounded-full border-2 border-stone-900 bg-amber-500"></span>
+                {/if}
             </div>
         {/snippet}
 
         {#snippet children()}
+            {#if isImpersonating}
+                <Button
+                    tooltip={`Stop impersonating ${$session.data?.user.name ?? "user"}`}
+                    class="size-12 rounded-full bg-amber-700/80 hover:bg-amber-600"
+                    size=""
+                    disabled={stoppingImpersonation}
+                    onclick={stopImpersonating}
+                >
+                    <TablerSpyOff class="size-6" />
+                </Button>
+            {/if}
+
             <ConfirmationDialog
                 title="Clear Site Cache"
                 description="Are you sure you want to clear the website cache and reload? You may need to log back in."

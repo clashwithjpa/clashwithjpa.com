@@ -17,6 +17,7 @@
         "@aws-sdk/client-s3": "^3.1026.0",
         "@hono/bun-compress": "^0.1.0",
         "@hono/standard-validator": "^0.2.2",
+        "@repo/auth-shared": "workspace:*",
         "@repo/clashofclans-api": "workspace:*",
         "@scalar/hono-api-reference": "^0.10.3",
         "@sentry/bun": "^10.43.0",

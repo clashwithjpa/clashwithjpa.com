@@ -4,7 +4,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
-import { ac, admin, manager, reviewer, roleLevel, superadmin, unverified, verified } from "./permissions";
+import { ac, admin, manager, reviewer, roleLevel, superadmin, unverified, verified } from "@repo/auth-shared";
 
 const ROLE_MUTATING_PATHS = new Set(["/admin/set-role", "/admin/update-user", "/admin/create-user"]);
 const TARGETED_USER_PATHS = new Set(["/admin/ban-user", "/admin/unban-user", "/admin/remove-user", "/admin/impersonate-user"]);

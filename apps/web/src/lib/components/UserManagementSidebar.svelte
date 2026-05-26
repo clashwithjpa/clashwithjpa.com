@@ -54,6 +54,8 @@
     // Impersonate requires the `user:impersonate` perm — superadmin only.
     let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.superadmin);
     let canImpersonate = $derived(canImpersonateRole && canActOnTarget);
+    // Remove requires the `user:delete` perm — admin+ only (managers can't delete).
+    let canRemoveRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
     let impersonating = $state(false);
 
     async function handleImpersonate() {
@@ -331,10 +333,12 @@
                 </Button>
 
                 <!-- Remove Button -->
-                <Button class="w-full gap-2" variant="danger" disabled={isProcessing} onclick={() => onRemove(user.id)}>
-                    <TablerTrash class="size-5" />
-                    Remove User
-                </Button>
+                {#if canRemoveRole}
+                    <Button class="w-full gap-2" variant="danger" disabled={isProcessing} onclick={() => onRemove(user.id)}>
+                        <TablerTrash class="size-5" />
+                        Remove User
+                    </Button>
+                {/if}
             </div>
         {:else if !isCurrentUser}
             <p class="text-center text-xs text-stone-400">You cannot manage a user at or above your role level</p>

@@ -45,7 +45,7 @@ export const manager = ac.newRole({
     jpa: ["apply", "cwl", "review", "manage"],
     // Read + moderate. No update/impersonate/delete/set-password and no session
     // perms. set-role and ban are further constrained by the strict-hierarchy
-    // `before` hook in ./index.ts.
+    // `before` hook in apps/server/src/lib/auth/index.ts.
     user: ["create", "list", "get", "set-role", "ban"],
 });
 
@@ -56,8 +56,8 @@ export const admin = ac.newRole({
     //     email, role, ...) so granting it would re-open every other guarded
     //     endpoint. Kept superadmin-only since the UI never calls it.
     //   - `set-password`: would let an admin reset the superadmin's password.
-    //     Email/password auth is disabled (see ./index.ts) but we keep the
-    //     perm narrow as defense-in-depth.
+    //     Email/password auth is disabled but we keep the perm narrow as
+    //     defense-in-depth.
     //   - `impersonate` / `impersonate-admins`: reserved for superadmin.
     // No session perms.
     user: ["create", "list", "get", "set-role", "ban", "delete"],
@@ -69,10 +69,14 @@ export const superadmin = ac.newRole({
     session: ["list", "revoke", "delete"],
 });
 
-// Strict hierarchy used by the `before` hook in ./index.ts to gate role
-// mutations and destructive actions (ban / unban / remove). A user can only
-// act on another user when their own level is strictly greater than the
-// target's, and can only assign roles strictly below their own level.
+export const ROLES = ["unverified", "verified", "reviewer", "manager", "admin", "superadmin"] as const;
+export type Role = (typeof ROLES)[number];
+
+// Strict hierarchy used by the `before` hook in apps/server/src/lib/auth/index.ts
+// to gate role mutations and destructive actions (ban / unban / remove /
+// impersonate). A user can only act on another user when their own level is
+// strictly greater than the target's, and can only assign roles strictly below
+// their own level.
 export const ROLE_LEVELS = {
     unverified: 0,
     verified: 1,
@@ -80,9 +84,9 @@ export const ROLE_LEVELS = {
     manager: 3,
     admin: 4,
     superadmin: 5,
-} as const satisfies Record<string, number>;
+} as const satisfies Record<Role, number>;
 
 export function roleLevel(roleStr: string | null | undefined): number {
     if (!roleStr) return ROLE_LEVELS.unverified;
-    return roleStr.split(",").reduce((max, r) => Math.max(max, ROLE_LEVELS[r.trim() as keyof typeof ROLE_LEVELS] ?? -1), -1);
+    return roleStr.split(",").reduce((max, r) => Math.max(max, ROLE_LEVELS[r.trim() as Role] ?? -1), -1);
 }

@@ -1,5 +1,5 @@
 import { auth } from "@lib/auth";
-import { statement } from "@lib/auth/permissions";
+import { statement } from "@repo/auth-shared";
 
 export async function isAuthenticated(userId: string | null | undefined) {
     if (!userId)

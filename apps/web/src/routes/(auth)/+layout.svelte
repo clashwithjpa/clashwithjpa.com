@@ -1,18 +1,17 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { authClient, hasPermission } from "$lib/auth";
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
     import { sidebarStore } from "$lib/components/ui/sidebar";
-    import type { statement } from "$lib/config/permissions";
     import type { Role } from "$lib/config/roles";
+    import type { statement } from "@repo/auth-shared";
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount, type Component } from "svelte";
-    import { toast, Toaster } from "svelte-sonner";
+    import { Toaster } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBook2 from "~icons/tabler/book-2";
@@ -20,7 +19,6 @@
     import TablerHome from "~icons/tabler/home";
     import TablerLogout2 from "~icons/tabler/logout-2";
     import TablerSettings from "~icons/tabler/settings";
-    import TablerSpyOff from "~icons/tabler/spy-off";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
     import TablerX from "~icons/tabler/x";
@@ -28,22 +26,6 @@
 
     let { children }: LayoutProps = $props();
     const session = authClient.useSession();
-
-    let isImpersonating = $derived(!!$session.data?.session?.impersonatedBy);
-    let stoppingImpersonation = $state(false);
-
-    async function stopImpersonating() {
-        stoppingImpersonation = true;
-        const { error } = await authClient.admin.stopImpersonating();
-        if (error) {
-            toast.error("Failed to stop impersonating", { description: error.message });
-            stoppingImpersonation = false;
-        } else {
-            toast.success("Stopped impersonating");
-            await goto("/admin/users", { invalidateAll: true });
-            stoppingImpersonation = false;
-        }
-    }
 
     interface Link {
         name: string;
@@ -253,20 +235,6 @@
 {/snippet}
 
 <div class="flex h-full flex-col">
-    {#if isImpersonating}
-        <div class="flex shrink-0 items-center justify-between gap-3 border-b border-amber-700/40 bg-amber-950/80 px-4 py-2 text-sm text-amber-100">
-            <div class="flex min-w-0 items-center gap-2">
-                <TablerSpyOff class="size-5 shrink-0" />
-                <span class="truncate">
-                    Impersonating <span class="font-semibold">{$session.data?.user.name}</span>
-                </span>
-            </div>
-            <Button size="sm" variant="base" disabled={stoppingImpersonation} onclick={stopImpersonating} class="shrink-0 gap-2">
-                <TablerSpyOff class="size-4" />
-                {stoppingImpersonation ? "Stopping..." : "Stop impersonating"}
-            </Button>
-        </div>
-    {/if}
     <Splitter.Root
         orientation={isMobile ? "vertical" : "horizontal"}
         class="flex min-h-0 flex-1 overflow-hidden! bg-stone-900 lg:p-2"
