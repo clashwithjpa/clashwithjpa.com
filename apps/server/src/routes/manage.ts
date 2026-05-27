@@ -1,4 +1,5 @@
 import { isManager } from "@/lib/auth/functions";
+import { logAction } from "@/lib/audit";
 import { setRules } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
@@ -50,6 +51,7 @@ app.put(
             const { rules } = c.req.valid("json");
             const updatedRules = await setRules(rules);
             await invalidateSettingsCache();
+            logAction(c, { action: "rules.update", targetType: "rules" });
             return c.json({
                 success: true,
                 data: { rules: updatedRules },

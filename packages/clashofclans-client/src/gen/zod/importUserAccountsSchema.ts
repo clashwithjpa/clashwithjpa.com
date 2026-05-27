@@ -6,26 +6,25 @@
 import { z } from "zod/v4";
 
 /**
- * @description User accounts fetched successfully.
+ * @description Accounts imported (or nothing to import).
  */
-export const getUserAccounts200Schema = z.object({
+export const importUserAccounts200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        accounts: z.array(
+        imported: z.array(
             z.object({
-                id: z.number(),
-                discordUserId: z.string(),
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
             }),
         ),
+        available: z.number(),
     }),
 });
 
 /**
  * @description Unauthorized.
  */
-export const getUserAccounts401Schema = z.object({
+export const importUserAccounts401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -33,9 +32,9 @@ export const getUserAccounts401Schema = z.object({
 /**
  * @description Internal server error.
  */
-export const getUserAccounts500Schema = z.object({
+export const importUserAccounts500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const getUserAccountsQueryResponseSchema = z.lazy(() => getUserAccounts200Schema);
+export const importUserAccountsMutationResponseSchema = z.lazy(() => importUserAccounts200Schema);

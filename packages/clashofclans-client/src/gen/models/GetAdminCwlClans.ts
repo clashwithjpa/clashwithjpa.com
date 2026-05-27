@@ -36,7 +36,7 @@ export type GetAdminCwlClans200 = {
              */
             cocClanLeader: string;
             /**
-             * @type string
+             * @type string, email
              */
             email: string;
         }[];

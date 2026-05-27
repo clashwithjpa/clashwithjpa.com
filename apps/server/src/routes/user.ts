@@ -1,4 +1,5 @@
 import { isAuthenticated, isVerified } from "@/lib/auth/functions";
+import { logAction } from "@/lib/audit";
 import { cocClient } from "@/lib/coc";
 import { config } from "@/lib/config";
 import { getDbErrorMessage } from "@/lib/db/error";
@@ -213,6 +214,13 @@ app.post(
 
         try {
             const inserted = await importCocAccountsForUser(user.id, discordId, candidates);
+            if (inserted.length > 0) {
+                logAction(c, {
+                    action: "coc_account.import",
+                    targetType: "coc_account",
+                    metadata: { count: inserted.length },
+                });
+            }
             return c.json({
                 success: true,
                 data: {
@@ -345,6 +353,12 @@ app.post(
 
         try {
             const application = await addClanApplication(discordId, cocAccountTag, playerData);
+            logAction(c, {
+                action: "clan_application.create",
+                targetType: "clan_application",
+                targetId: application.id,
+                metadata: { cocAccountTag },
+            });
             return c.json({
                 success: true,
                 data: { application },
@@ -567,6 +581,18 @@ app.post(
                 cocAccountWeight: resolvedWeight,
                 isAlt,
                 preferenceNum,
+            });
+            logAction(c, {
+                action: "cwl_application.create",
+                targetType: "cwl_application",
+                targetId: application.id,
+                metadata: {
+                    cocAccountTag: tag,
+                    month: application.month,
+                    year: application.year,
+                    preferenceNum,
+                    isAlt,
+                },
             });
             return c.json({
                 success: true,

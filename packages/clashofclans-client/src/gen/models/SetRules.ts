@@ -40,6 +40,7 @@ export type SetRules500 = {
 export type SetRulesMutationRequest = {
     /**
      * @minLength 1
+     * @maxLength 100000
      * @type string
      */
     rules: string;

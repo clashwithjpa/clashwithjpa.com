@@ -1,4 +1,5 @@
 import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
+import { logAction } from "@/lib/audit";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
     assignCwlApplication,
@@ -9,6 +10,7 @@ import {
     getAllClans,
     getAllCwlApplications,
     getAllCwlClans,
+    getAuditLog,
     getClanApplications,
     getCocAccountsForUser,
     getDiscordAccountId,
@@ -205,6 +207,12 @@ app.put(
             const { status } = c.req.valid("json");
             const application = await updateClanApplicationStatus(id, status);
             if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            logAction(c, {
+                action: `clan_application.${status}` as const,
+                targetType: "clan_application",
+                targetId: application.id,
+                metadata: { cocAccountTag: application.cocAccountTag },
+            });
             return c.json({ success: true, data: { application } });
         } catch (error) {
             if (error instanceof MissingDiscordAccountError) {
@@ -318,6 +326,14 @@ app.put(
             const { clanTag } = c.req.valid("json");
             const application = await assignCwlApplication(id, clanTag);
             if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            logAction(c, {
+                action: clanTag ? "cwl_application.assign" : "cwl_application.unassign",
+                targetType: "cwl_application",
+                targetId: application.id,
+                metadata: clanTag
+                    ? { cocAccountTag: application.cocAccountTag, assignedClanTag: clanTag }
+                    : { cocAccountTag: application.cocAccountTag },
+            });
             return c.json({ success: true, data: { application } });
         } catch (error: any) {
             const { code } = getDbErrorMessage(error);
@@ -401,8 +417,27 @@ app.put(
     zValidator("json", updateSettingsBodySchema),
     async (c) => {
         try {
-            const settings = await updateSettings(c.req.valid("json"));
+            const body = c.req.valid("json");
+            const settings = await updateSettings(body);
             await invalidateSettingsCache();
+
+            const booleans: Record<string, boolean> = {};
+            const fields: string[] = [];
+            for (const [key, value] of Object.entries(body)) {
+                if (value === undefined) continue;
+                if (typeof value === "boolean") booleans[key] = value;
+                else fields.push(key);
+            }
+            const metadata: Record<string, unknown> = {};
+            if (Object.keys(booleans).length) metadata.booleans = booleans;
+            if (fields.length) metadata.fields = fields;
+            logAction(c, {
+                action: "settings.update",
+                targetType: "settings",
+                targetId: settings.id,
+                metadata: Object.keys(metadata).length ? metadata : undefined,
+            });
+
             return c.json({ success: true, data: { settings } });
         } catch (error) {
             Sentry.captureException(error);
@@ -497,6 +532,12 @@ app.post(
     async (c) => {
         try {
             const clan = await createClan(c.req.valid("json"));
+            logAction(c, {
+                action: "clan.create",
+                targetType: "clan",
+                targetId: clan.id,
+                metadata: { cocClanCode: clan.cocClanCode, cocClanTag: clan.cocClanTag },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error: any) {
             const { code } = getDbErrorMessage(error);
@@ -527,8 +568,16 @@ app.put(
     async (c) => {
         try {
             const { id } = c.req.valid("param");
-            const clan = await updateClan(id, c.req.valid("json"));
+            const body = c.req.valid("json");
+            const clan = await updateClan(id, body);
             if (!clan) return c.json({ success: false, error: "Clan not found" }, 404);
+            const fields = Object.keys(body).filter((k) => (body as Record<string, unknown>)[k] !== undefined);
+            logAction(c, {
+                action: "clan.update",
+                targetType: "clan",
+                targetId: clan.id,
+                metadata: { cocClanCode: clan.cocClanCode, ...(fields.length ? { fields } : {}) },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
             Sentry.captureException(error);
@@ -557,6 +606,12 @@ app.delete(
             const { id } = c.req.valid("param");
             const clan = await deleteClan(id);
             if (!clan) return c.json({ success: false, error: "Clan not found" }, 404);
+            logAction(c, {
+                action: "clan.delete",
+                targetType: "clan",
+                targetId: clan.id,
+                metadata: { cocClanCode: clan.cocClanCode, cocClanTag: clan.cocClanTag },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
             Sentry.captureException(error);
@@ -635,6 +690,12 @@ app.post(
     async (c) => {
         try {
             const clan = await createCwlClan(c.req.valid("json"));
+            logAction(c, {
+                action: "cwl_clan.create",
+                targetType: "cwl_clan",
+                targetId: clan.cocClanTag,
+                metadata: { cocClanTag: clan.cocClanTag, cocClanName: clan.cocClanName },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error: any) {
             const { code } = getDbErrorMessage(error);
@@ -668,8 +729,16 @@ app.put(
     async (c) => {
         try {
             const { tag } = c.req.valid("param");
-            const clan = await updateCwlClan(tag, c.req.valid("json"));
+            const body = c.req.valid("json");
+            const clan = await updateCwlClan(tag, body);
             if (!clan) return c.json({ success: false, error: "CWL clan not found" }, 404);
+            const fields = Object.keys(body).filter((k) => (body as Record<string, unknown>)[k] !== undefined);
+            logAction(c, {
+                action: "cwl_clan.update",
+                targetType: "cwl_clan",
+                targetId: clan.cocClanTag,
+                metadata: { cocClanTag: clan.cocClanTag, ...(fields.length ? { fields } : {}) },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
             Sentry.captureException(error);
@@ -701,10 +770,74 @@ app.delete(
             const { tag } = c.req.valid("param");
             const clan = await deleteCwlClan(tag);
             if (!clan) return c.json({ success: false, error: "CWL clan not found" }, 404);
+            logAction(c, {
+                action: "cwl_clan.delete",
+                targetType: "cwl_clan",
+                targetId: clan.cocClanTag,
+                metadata: { cocClanTag: clan.cocClanTag, cocClanName: clan.cocClanName },
+            });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete CWL clan" }, 500);
+        }
+    },
+);
+
+// ============================================================
+// Audit log - manager+
+// ============================================================
+
+const auditLogEntrySchema = z4.object({
+    id: z4.number(),
+    actorId: z4.string().nullable(),
+    actorName: z4.string().nullable(),
+    actorCurrentName: z4.string().nullable(),
+    action: z4.string(),
+    targetType: z4.string().nullable(),
+    targetId: z4.string().nullable(),
+    metadata: z4.unknown().nullable(),
+    createdAt: z4.date(),
+});
+
+const getAuditLogQuerySchema = z4.object({
+    actorId: z4.string().optional(),
+    action: z4.string().optional(),
+    targetType: z4.string().optional(),
+    targetId: z4.string().optional(),
+    before: z4.coerce.date().optional(),
+    after: z4.coerce.date().optional(),
+    limit: z4.coerce.number().int().min(1).max(200).default(50),
+    offset: z4.coerce.number().int().min(0).default(0),
+});
+const getAuditLogData = z4.object({
+    entries: z4.array(auditLogEntrySchema),
+    total: z4.number(),
+});
+app.get(
+    "/audit-log",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getAuditLog",
+        description: "[Manager] Lists audit log entries with optional filters (actorId, action, targetType, targetId, date range) and pagination.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Audit log entries.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getAuditLogData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("query", getAuditLogQuerySchema),
+    async (c) => {
+        try {
+            const result = await getAuditLog(c.req.valid("query"));
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch audit log" }, 500);
         }
     },
 );

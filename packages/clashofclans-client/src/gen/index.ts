@@ -8,6 +8,7 @@ export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwl
 export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
 export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
+export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
 export type { GetCOCClanCWLGroupQueryKey } from "./hooks/createGetCOCClanCWLGroup.ts";
@@ -27,8 +28,7 @@ export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
 export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCocAccountsByUserId.ts";
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
-export type { LoginQueryKey } from "./hooks/createLogin.ts";
-export type { LogoutMutationKey } from "./hooks/createLogout.ts";
+export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
@@ -117,6 +117,14 @@ export type {
     GetAdminSettingsQuery,
     GetAdminSettingsQueryResponse,
 } from "./models/GetAdminSettings.ts";
+export type {
+    GetAuditLog200,
+    GetAuditLog401,
+    GetAuditLog500,
+    GetAuditLogQuery,
+    GetAuditLogQueryParams,
+    GetAuditLogQueryResponse,
+} from "./models/GetAuditLog.ts";
 export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
@@ -243,8 +251,13 @@ export type {
     GetUserCwlApplicationsQuery,
     GetUserCwlApplicationsQueryResponse,
 } from "./models/GetUserCwlApplications.ts";
-export type { Login200, LoginQuery, LoginQueryResponse } from "./models/Login.ts";
-export type { Logout200, Logout500, LogoutMutation, LogoutMutationResponse } from "./models/Logout.ts";
+export type {
+    ImportUserAccounts200,
+    ImportUserAccounts401,
+    ImportUserAccounts500,
+    ImportUserAccountsMutation,
+    ImportUserAccountsMutationResponse,
+} from "./models/ImportUserAccounts.ts";
 export type {
     PostCOCPlayerVerify200,
     PostCOCPlayerVerify500,
@@ -305,6 +318,7 @@ export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
 export { getAdminClans } from "./clients/getAdminClans.ts";
 export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
 export { getAdminSettings } from "./clients/getAdminSettings.ts";
+export { getAuditLog } from "./clients/getAuditLog.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
 export { getCOCClanCWLGroup } from "./clients/getCOCClanCWLGroup.ts";
@@ -324,8 +338,7 @@ export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
 export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId.ts";
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
-export { login } from "./clients/login.ts";
-export { logout } from "./clients/logout.ts";
+export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { setRules } from "./clients/setRules.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
@@ -355,6 +368,9 @@ export { getAdminCwlClansQueryOptions } from "./hooks/createGetAdminCwlClans.ts"
 export { createGetAdminSettings } from "./hooks/createGetAdminSettings.ts";
 export { getAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
 export { getAdminSettingsQueryOptions } from "./hooks/createGetAdminSettings.ts";
+export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
+export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
+export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
 export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryOptions } from "./hooks/createGetCOCCWLWar.ts";
@@ -412,11 +428,8 @@ export { getUserCocAccountsByUserIdQueryOptions } from "./hooks/createGetUserCoc
 export { createGetUserCwlApplications } from "./hooks/createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryOptions } from "./hooks/createGetUserCwlApplications.ts";
-export { createLogin } from "./hooks/createLogin.ts";
-export { loginQueryKey } from "./hooks/createLogin.ts";
-export { loginQueryOptions } from "./hooks/createLogin.ts";
-export { createLogout } from "./hooks/createLogout.ts";
-export { logoutMutationKey } from "./hooks/createLogout.ts";
+export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
+export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
@@ -530,6 +543,13 @@ export {
     getAdminSettingsQueryResponseSchema,
 } from "./zod/getAdminSettingsSchema.ts";
 export {
+    getAuditLog200Schema,
+    getAuditLog401Schema,
+    getAuditLog500Schema,
+    getAuditLogQueryParamsSchema,
+    getAuditLogQueryResponseSchema,
+} from "./zod/getAuditLogSchema.ts";
+export {
     getCOCCWLWar200Schema,
     getCOCCWLWar500Schema,
     getCOCCWLWarPathParamsSchema,
@@ -617,8 +637,12 @@ export {
     getUserCwlApplicationsQueryResponseSchema,
 } from "./zod/getUserCwlApplicationsSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./zod/getUserSchema.ts";
-export { login200Schema, loginQueryResponseSchema } from "./zod/loginSchema.ts";
-export { logout200Schema, logout500Schema, logoutMutationResponseSchema } from "./zod/logoutSchema.ts";
+export {
+    importUserAccounts200Schema,
+    importUserAccounts401Schema,
+    importUserAccounts500Schema,
+    importUserAccountsMutationResponseSchema,
+} from "./zod/importUserAccountsSchema.ts";
 export {
     postCOCPlayerVerify200Schema,
     postCOCPlayerVerify500Schema,

@@ -22,7 +22,7 @@ export const assignCwlApplicationMutationKey = () => [{ url: "/admin/cwl-applica
 export type AssignCwlApplicationMutationKey = ReturnType<typeof assignCwlApplicationMutationKey>;
 
 /**
- * @description [Reviewer] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.
+ * @description [Manager] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.
  * {@link /admin/cwl-applications/:id/assign}
  */
 export function createAssignCwlApplication<TContext>(

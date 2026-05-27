@@ -70,7 +70,7 @@ export const auth = betterAuth({
             defaultRole: "unverified",
             adminRoles: ["superadmin"],
         }),
-        openAPI(),
+        ...(config.NODE_ENV !== "production" ? [openAPI()] : []),
         captcha({
             provider: "cloudflare-turnstile",
             secretKey: config.JPA_TURNSTILE_SECRET_KEY,

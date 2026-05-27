@@ -4,9 +4,9 @@
  */
 
 /**
- * @description User accounts fetched successfully.
+ * @description Accounts imported (or nothing to import).
  */
-export type GetUserAccounts200 = {
+export type ImportUserAccounts200 = {
     /**
      * @type boolean
      */
@@ -18,15 +18,7 @@ export type GetUserAccounts200 = {
         /**
          * @type array
          */
-        accounts: {
-            /**
-             * @type number
-             */
-            id: number;
-            /**
-             * @type string
-             */
-            discordUserId: string;
+        imported: {
             /**
              * @type string
              */
@@ -36,13 +28,17 @@ export type GetUserAccounts200 = {
              */
             warWeight: number;
         }[];
+        /**
+         * @type number
+         */
+        available: number;
     };
 };
 
 /**
  * @description Unauthorized.
  */
-export type GetUserAccounts401 = {
+export type ImportUserAccounts401 = {
     /**
      * @type boolean
      */
@@ -57,7 +53,7 @@ export type GetUserAccounts401 = {
 /**
  * @description Internal server error.
  */
-export type GetUserAccounts500 = {
+export type ImportUserAccounts500 = {
     /**
      * @type boolean
      */
@@ -69,9 +65,9 @@ export type GetUserAccounts500 = {
           };
 };
 
-export type GetUserAccountsQueryResponse = GetUserAccounts200;
+export type ImportUserAccountsMutationResponse = ImportUserAccounts200;
 
-export type GetUserAccountsQuery = {
-    Response: GetUserAccounts200;
-    Errors: GetUserAccounts401 | GetUserAccounts500;
+export type ImportUserAccountsMutation = {
+    Response: ImportUserAccounts200;
+    Errors: ImportUserAccounts401 | ImportUserAccounts500;
 };

@@ -1,7 +1,6 @@
-import { isSuperadmin } from "@/lib/auth/functions";
 import { config } from "@/lib/config";
 import { getCachedSettings } from "@/lib/settings-cache";
-import { betterAuthMiddleware, hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { betterAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
@@ -90,10 +89,6 @@ app.onError((err, c) => {
 });
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
-    // Don't expose the better-auth OpenAPI reference in production.
-    if (config.NODE_ENV === "production" && c.req.path.endsWith("/reference")) {
-        return c.notFound();
-    }
     return auth.handler(c.req.raw);
 });
 
@@ -124,88 +119,6 @@ app.get(
                 message: "Welcome to the ClashWithJPA API! Visit /scalar for API documentation.",
             },
         });
-    },
-);
-
-const getLoginData = z4.object({
-    url: z4.url(),
-    redirect: z4.literal(true),
-});
-app.get(
-    "/login",
-    describeRoute({
-        operationId: "login",
-        description: "[Public] Use this only for backend/scalar usage. For frontend, authClient should be used.",
-        tags: ["root"],
-        responses: {
-            200: {
-                description: "Successful response with a login URL.",
-                content: {
-                    "application/json": {
-                        schema: resolver(SuccessResponseSchema(getLoginData)),
-                    },
-                },
-            },
-        },
-    }),
-    async (c) => {
-        const socialLogin = await auth.api.signInSocial({
-            body: {
-                provider: "discord",
-            },
-            asResponse: true,
-        });
-
-        return socialLogin;
-    },
-);
-
-const postLogoutData = z4.object({
-    message: z4.string(),
-});
-app.post(
-    "/logout",
-    describeRoute({
-        operationId: "logout",
-        description: "[Public] Use this only for backend/scalar usage. For frontend, authClient should be used.",
-        tags: ["root"],
-        responses: {
-            200: {
-                description: "Successful response with a logout message.",
-                content: {
-                    "application/json": {
-                        schema: resolver(SuccessResponseSchema(postLogoutData)),
-                    },
-                },
-            },
-            500: {
-                description: "Server error response when logging out fails.",
-                content: {
-                    "application/json": {
-                        schema: resolver(ErrorResponseSchema),
-                    },
-                },
-            },
-        },
-    }),
-    async (c) => {
-        try {
-            const logout = await auth.api.signOut({
-                headers: c.req.raw.headers,
-            });
-            if (logout.success) {
-                return c.json({
-                    success: true,
-                    data: {
-                        message: "Logged out successfully",
-                    },
-                });
-            }
-            return c.json({ success: false, error: "Failed to log out" }, 500);
-        } catch (error) {
-            Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to log out" }, 500);
-        }
     },
 );
 
@@ -258,14 +171,8 @@ app.route("/manage", manage);
 app.route("/user", user);
 app.route("/upload", upload);
 
-// API docs (OpenAPI JSON + Scalar UI) are superadmin-only across all envs.
-// They reveal every endpoint shape including admin-only operations; even in
-// dev we'd rather not leak that surface to a logged-in non-owner.
-const docsGuard = [hasAccessAuthMiddleware(isSuperadmin)];
-
 app.get(
     "/openapi.json",
-    ...docsGuard,
     openAPIRouteHandler(app, {
         documentation: {
             info: {
@@ -288,7 +195,6 @@ app.get(
 
 app.get(
     "/scalar",
-    ...docsGuard,
     Scalar((c) => {
         return {
             pageTitle: "ClashWithJPA API Documentation",

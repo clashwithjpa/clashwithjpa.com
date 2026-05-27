@@ -20,6 +20,7 @@ export const getUserCocAccountsByUserId200Schema = z.object({
                 id: z.number(),
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
+                warWeight: z.number(),
             }),
         ),
     }),

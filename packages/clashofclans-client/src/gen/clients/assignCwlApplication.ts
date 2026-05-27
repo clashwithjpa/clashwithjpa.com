@@ -21,7 +21,7 @@ function getAssignCwlApplicationUrl(id: AssignCwlApplicationPathParams["id"]) {
 }
 
 /**
- * @description [Reviewer] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.
+ * @description [Manager] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.
  * {@link /admin/cwl-applications/:id/assign}
  */
 export async function assignCwlApplication(

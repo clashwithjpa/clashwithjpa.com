@@ -146,9 +146,9 @@ export type ApplyCwlMutationRequest = {
     /**
      * @minLength 1
      * @maxLength 9999999
-     * @type integer
+     * @type integer | undefined
      */
-    accountWeight: number;
+    accountWeight?: number;
 };
 
 export type ApplyCwlMutationResponse = ApplyCwl200;

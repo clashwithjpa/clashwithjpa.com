@@ -149,3 +149,25 @@ export const guidesRelations = relations(guidesTable, ({ one }) => ({
         references: [user.id],
     }),
 }));
+
+// No FK on actorId so deletes don't cascade (audit must survive user removal).
+// actorName is a snapshot taken at log time as a display fallback.
+export const auditLogTable = pgTable(
+    "audit_log_table",
+    {
+        id: serial("id").primaryKey(),
+        actorId: text("actor_id"),
+        actorName: text("actor_name"),
+        action: text("action").notNull(),
+        targetType: text("target_type"),
+        targetId: text("target_id"),
+        metadata: jsonb("metadata"),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+    },
+    (t) => [
+        index("audit_log_created_at_idx").on(t.createdAt.desc()),
+        index("audit_log_actor_id_idx").on(t.actorId, t.createdAt.desc()),
+        index("audit_log_target_idx").on(t.targetType, t.targetId, t.createdAt.desc()),
+        index("audit_log_action_idx").on(t.action, t.createdAt.desc()),
+    ],
+);

@@ -40,7 +40,7 @@ export function getDiscordIdByUserIdQueryOptions(
 }
 
 /**
- * @description [Admin] Fetches the Discord accountId from Better Auth account table using a userid path param.
+ * @description [Manager] Fetches the Discord accountId from Better Auth account table using a userid path param.
  * {@link /admin/discord-id/:userid}
  */
 export function createGetDiscordIdByUserId<

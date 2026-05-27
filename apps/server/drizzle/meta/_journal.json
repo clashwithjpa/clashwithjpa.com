@@ -36,6 +36,13 @@
             "when": 1779644316845,
             "tag": "0004_striped_grandmaster",
             "breakpoints": true
+        },
+        {
+            "idx": 5,
+            "version": "7",
+            "when": 1779877986239,
+            "tag": "0005_equal_oracle",
+            "breakpoints": true
         }
     ]
 }

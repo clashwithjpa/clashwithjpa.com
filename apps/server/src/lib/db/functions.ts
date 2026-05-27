@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import {
     account,
+    auditLogTable,
     clanApplicationStatusEnum,
     clanApplicationTable,
     clanInfoTable,
@@ -10,7 +11,7 @@ import {
     settingsTable,
     user,
 } from "@/lib/db/schema";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -47,7 +48,7 @@ export async function addCocAccount(discordUserId: string, cocAccountTag: string
 export async function addClanApplication(discordUserId: string, cocAccountTag: string, cocAccountData: unknown) {
     const result = await db.insert(clanApplicationTable).values({ discordUserId, cocAccountTag, cocAccountData }).returning();
 
-    return result[0];
+    return result[0]!;
 }
 
 export async function getClans() {
@@ -144,7 +145,7 @@ export async function addCwlApplication(data: {
         })
         .returning();
 
-    return result[0];
+    return result[0]!;
 }
 
 export async function getUserCwlApplications(discordUserId: string) {
@@ -352,6 +353,58 @@ export async function getCocAccountsForUser(userId: string) {
     const discordId = await getDiscordAccountId(userId);
     if (!discordId) return [];
     return db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordId));
+}
+
+export async function getAuditLog(
+    opts: {
+        actorId?: string;
+        action?: string;
+        targetType?: string;
+        targetId?: string;
+        before?: Date;
+        after?: Date;
+        limit?: number;
+        offset?: number;
+    } = {},
+) {
+    const { actorId, action, targetType, targetId, before, after, limit = 50, offset = 0 } = opts;
+
+    const conditions = [];
+    if (actorId) conditions.push(eq(auditLogTable.actorId, actorId));
+    if (action) conditions.push(eq(auditLogTable.action, action));
+    if (targetType) conditions.push(eq(auditLogTable.targetType, targetType));
+    if (targetId) conditions.push(eq(auditLogTable.targetId, targetId));
+    if (after) conditions.push(gte(auditLogTable.createdAt, after));
+    if (before) conditions.push(lte(auditLogTable.createdAt, before));
+    const whereClause = conditions.length ? and(...conditions) : undefined;
+
+    // Left join user to pull the live display name; fall back to the snapshot stored in the row.
+    const [rows, countResult] = await Promise.all([
+        db
+            .select({
+                id: auditLogTable.id,
+                actorId: auditLogTable.actorId,
+                actorName: auditLogTable.actorName,
+                actorCurrentName: user.name,
+                action: auditLogTable.action,
+                targetType: auditLogTable.targetType,
+                targetId: auditLogTable.targetId,
+                metadata: auditLogTable.metadata,
+                createdAt: auditLogTable.createdAt,
+            })
+            .from(auditLogTable)
+            .leftJoin(user, eq(auditLogTable.actorId, user.id))
+            .where(whereClause)
+            .orderBy(desc(auditLogTable.createdAt))
+            .limit(limit)
+            .offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(auditLogTable)
+            .where(whereClause),
+    ]);
+
+    return { entries: rows, total: countResult[0]?.count ?? 0 };
 }
 
 export async function importCocAccountsForUser(userId: string, discordUserId: string, accounts: { tag: string; weight: number }[]) {

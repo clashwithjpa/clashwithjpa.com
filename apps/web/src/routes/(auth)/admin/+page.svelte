@@ -9,6 +9,7 @@
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBook2 from "~icons/tabler/book-2";
     import TablerFileDescription from "~icons/tabler/file-description";
+    import TablerHistory from "~icons/tabler/history";
     import TablerSettings from "~icons/tabler/settings";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
@@ -40,6 +41,7 @@
         },
         { href: "/admin/users", title: "Users", description: "Manage users, roles and sessions", icon: TablerUser, requiredPerm: "manage" },
         { href: "/admin/rules", title: "Rules", description: "Edit alliance rules", icon: TablerBook2, requiredPerm: "manage" },
+        { href: "/admin/audit-log", title: "Audit Log", description: "View server actions history", icon: TablerHistory, requiredPerm: "manage" },
         {
             href: "/admin/settings",
             title: "Settings",

@@ -39,6 +39,10 @@ export type GetUserCocAccountsByUserId200 = {
              * @type string
              */
             cocAccountTag: string;
+            /**
+             * @type number
+             */
+            warWeight: number;
         }[];
     };
 };

@@ -62,7 +62,7 @@ export const applyCwlMutationRequestSchema = z.object({
     preferenceNum: z.int().min(1).max(99),
     tag: z.string().min(1).max(20).regex(/^#.*/),
     accountClan: z.string().min(1).max(50),
-    accountWeight: z.int().min(1).max(9999999),
+    accountWeight: z.optional(z.int().min(1).max(9999999)),
 });
 
 export const applyCwlMutationResponseSchema = z.lazy(() => applyCwl200Schema);

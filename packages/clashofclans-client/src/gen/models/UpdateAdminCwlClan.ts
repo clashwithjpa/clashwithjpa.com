@@ -44,7 +44,7 @@ export type UpdateAdminCwlClan200 = {
              */
             cocClanLeader: string;
             /**
-             * @type string
+             * @type string, email
              */
             email: string;
         };

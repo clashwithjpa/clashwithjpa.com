@@ -24,7 +24,7 @@ export const setRules500Schema = z.object({
 });
 
 export const setRulesMutationRequestSchema = z.object({
-    rules: z.string().min(1),
+    rules: z.string().min(1).max(100000),
 });
 
 export const setRulesMutationResponseSchema = z.lazy(() => setRules200Schema);
