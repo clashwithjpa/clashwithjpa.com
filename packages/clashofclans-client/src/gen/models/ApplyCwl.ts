@@ -27,10 +27,7 @@ export type ApplyCwl200 = {
              * @type string
              */
             cocAccountTag: string;
-            /**
-             * @type string
-             */
-            cocAccountClan: string;
+            cocAccountClan: string | null;
             /**
              * @type number
              */
@@ -137,12 +134,7 @@ export type ApplyCwlMutationRequest = {
      * @type string
      */
     tag: string;
-    /**
-     * @minLength 1
-     * @maxLength 50
-     * @type string
-     */
-    accountClan: string;
+    accountClan?: string | null;
     /**
      * @minLength 1
      * @maxLength 9999999

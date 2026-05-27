@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" ALTER COLUMN "coc_account_clan" DROP NOT NULL;

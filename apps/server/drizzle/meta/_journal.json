@@ -43,6 +43,13 @@
             "when": 1779877986239,
             "tag": "0005_equal_oracle",
             "breakpoints": true
+        },
+        {
+            "idx": 6,
+            "version": "7",
+            "when": 1779909460034,
+            "tag": "0006_marvelous_silver_surfer",
+            "breakpoints": true
         }
     ]
 }

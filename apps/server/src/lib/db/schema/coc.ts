@@ -106,7 +106,7 @@ export const cwlApplicationTable = pgTable(
         discordUsername: text("discord_username").notNull(),
         cocAccountName: text("coc_account_name").notNull(),
         cocAccountTag: text("coc_account_tag").notNull(),
-        cocAccountClan: text("coc_account_clan").notNull(),
+        cocAccountClan: text("coc_account_clan"),
         cocAccountWeight: integer("coc_account_weight").notNull(),
         isAlt: boolean("is_alt").notNull().default(false),
         month: text("month").notNull(),

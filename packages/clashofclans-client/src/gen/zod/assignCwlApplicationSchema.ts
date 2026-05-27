@@ -21,7 +21,7 @@ export const assignCwlApplication200Schema = z.object({
             discordUsername: z.string(),
             cocAccountName: z.string(),
             cocAccountTag: z.string(),
-            cocAccountClan: z.string(),
+            cocAccountClan: z.union([z.string(), z.null()]),
             cocAccountWeight: z.number(),
             isAlt: z.boolean(),
             month: z.string(),

@@ -264,13 +264,15 @@
                                 <hr class="border-stone-700/50" />
 
                                 <div class="flex flex-col gap-2">
-                                    <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 font-medium text-stone-400">
-                                            <TablerBuildingCastle class="size-4" />
-                                            Clan
-                                        </span>
-                                        <span class="text-stone-200">{jpaClansResp.data.clans[application.cocAccountClan]?.clanName}</span>
-                                    </div>
+                                    {#if application.cocAccountClan}
+                                        <div class="flex items-center justify-between gap-2 text-sm">
+                                            <span class="flex items-center gap-1 font-medium text-stone-400">
+                                                <TablerBuildingCastle class="size-4" />
+                                                Clan
+                                            </span>
+                                            <span class="text-stone-200">{jpaClansResp.data.clans[application.cocAccountClan]?.clanName}</span>
+                                        </div>
+                                    {/if}
                                     <div class="flex items-center justify-between gap-2 text-sm">
                                         <span class="flex items-center gap-1 font-medium text-stone-400">
                                             <TablerListNumbers class="size-4" />

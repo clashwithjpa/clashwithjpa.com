@@ -127,7 +127,7 @@ export async function addCwlApplication(data: {
     discordUsername: string;
     cocAccountName: string;
     cocAccountTag: string;
-    cocAccountClan: string;
+    cocAccountClan: string | null;
     cocAccountWeight: number;
     isAlt: boolean;
     preferenceNum: number;

@@ -14,7 +14,7 @@ export const applyCwl200Schema = z.object({
         application: z.object({
             id: z.number(),
             cocAccountTag: z.string(),
-            cocAccountClan: z.string(),
+            cocAccountClan: z.union([z.string(), z.null()]),
             cocAccountWeight: z.number(),
             isAlt: z.boolean(),
             preferenceNum: z.number(),
@@ -61,7 +61,7 @@ export const applyCwlMutationRequestSchema = z.object({
     isAlt: z.boolean(),
     preferenceNum: z.int().min(1).max(99),
     tag: z.string().min(1).max(20).regex(/^#.*/),
-    accountClan: z.string().min(1).max(50),
+    accountClan: z.optional(z.union([z.string(), z.null()])),
     accountWeight: z.optional(z.int().min(1).max(9999999)),
 });
 

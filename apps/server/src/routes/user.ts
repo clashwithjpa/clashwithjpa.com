@@ -316,7 +316,7 @@ app.post(
         const { cocAccountTag, apiToken, captchaToken } = c.req.valid("json");
 
         if (config.NODE_ENV !== "development") {
-            const isCaptchaValid = await verifyTurnstileToken(captchaToken);
+            const isCaptchaValid = await verifyTurnstileToken(captchaToken!);
             if (!isCaptchaValid) {
                 return c.json({ success: false, error: "Captcha verification failed." }, 400);
             }
@@ -383,7 +383,7 @@ const getCwlApplicationsData = z4.object({
             discordUsername: z4.string(),
             cocAccountName: z4.string(),
             cocAccountTag: z4.string(),
-            cocAccountClan: z4.string(),
+            cocAccountClan: z4.string().nullable(),
             cocAccountWeight: z4.number(),
             isAlt: z4.boolean(),
             month: z4.string(),
@@ -453,18 +453,23 @@ app.get(
     },
 );
 
-const postCwlApplyBody = z4.object({
-    isAlt: z4.boolean(),
-    preferenceNum: z4.int().min(1).max(99),
-    tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
-    accountClan: z4.string().min(1, "Account clan is required").max(50),
-    accountWeight: z4.int().min(1, "Account weight is required").max(9999999).optional(),
-});
+const postCwlApplyBody = z4
+    .object({
+        isAlt: z4.boolean(),
+        preferenceNum: z4.int().min(1).max(99),
+        tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
+        accountClan: z4.string().max(50).nullable().optional(),
+        accountWeight: z4.int().min(1, "Account weight is required").max(9999999).optional(),
+    })
+    .refine((d) => d.isAlt || (typeof d.accountClan === "string" && d.accountClan.trim().length > 0), {
+        message: "Account clan is required",
+        path: ["accountClan"],
+    });
 const postCwlApplyData = z4.object({
     application: z4.object({
         id: z4.number(),
         cocAccountTag: z4.string(),
-        cocAccountClan: z4.string(),
+        cocAccountClan: z4.string().nullable(),
         cocAccountWeight: z4.number(),
         isAlt: z4.boolean(),
         preferenceNum: z4.number(),
@@ -554,13 +559,18 @@ app.post(
             resolvedWeight = matchedAccount.warWeight;
         } else {
             const existingOwner = await getCocAccountOwner(tag);
-            if (existingOwner) {
+            if (existingOwner && existingOwner !== discordId) {
                 return c.json({ success: false, error: "This account is already linked to another user. It cannot be used as an alt." }, 400);
             }
-            if (!accountWeight) {
-                return c.json({ success: false, error: "Account weight is required for alt accounts." }, 400);
+            const linkedAccount = existingOwner ? (await getUserCocAccounts(discordId)).find((acc) => acc.cocAccountTag === tag) : undefined;
+            if (linkedAccount) {
+                resolvedWeight = linkedAccount.warWeight;
+            } else {
+                if (!accountWeight) {
+                    return c.json({ success: false, error: "Account weight is required for alt accounts." }, 400);
+                }
+                resolvedWeight = accountWeight;
             }
-            resolvedWeight = accountWeight;
         }
 
         let playerData;
@@ -577,7 +587,7 @@ app.post(
                 discordUsername: user.name,
                 cocAccountName: playerData.name,
                 cocAccountTag: tag,
-                cocAccountClan: accountClan,
+                cocAccountClan: isAlt ? null : (accountClan ?? null),
                 cocAccountWeight: resolvedWeight,
                 isAlt,
                 preferenceNum,

@@ -145,7 +145,9 @@
                         </div>
 
                         <div class="flex flex-wrap gap-1">
-                            <Badge variant="ghost" content={app.cocAccountClan} />
+                            {#if app.cocAccountClan}
+                                <Badge variant="ghost" content={app.cocAccountClan} />
+                            {/if}
                             <Badge variant="ghost" content="Pref. {app.preferenceNum}" icon={TablerListNumbers} />
                             <Badge variant="ghost" content={app.cocAccountWeight.toLocaleString()} icon={TablerScale} />
                         </div>

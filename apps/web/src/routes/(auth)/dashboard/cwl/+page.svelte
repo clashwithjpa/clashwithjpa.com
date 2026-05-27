@@ -24,7 +24,10 @@
     let accountClan = $state("");
     let accountWeight = $state<number | "">("");
 
-    let selectedAccountWeight = $derived(!isAlt && tag ? (options.find((o) => o.value === tag)?.warWeight ?? 0) : null);
+    let linkedAltAccount = $derived(isAlt && tag ? options.find((o) => o.value === tag) : undefined);
+    let selectedAccountWeight = $derived(
+        !isAlt && tag ? (options.find((o) => o.value === tag)?.warWeight ?? 0) : (linkedAltAccount?.warWeight ?? null),
+    );
 
     $effect(() => {
         if (isAlt || !tag) return;
@@ -106,15 +109,15 @@
             toast.error("Please select an account tag");
             return;
         }
-        if (!accountClan.trim()) {
+        if (!isAlt && !accountClan.trim()) {
             toast.error("Account clan is required");
             return;
         }
-        if (isAlt && (accountWeight === "" || isNaN(Number(accountWeight)) || Number(accountWeight) === 0)) {
+        if (isAlt && !linkedAltAccount && (accountWeight === "" || isNaN(Number(accountWeight)) || Number(accountWeight) === 0)) {
             toast.error("Account weight is required");
             return;
         }
-        if (!isAlt && selectedAccountWeight === 0) {
+        if (selectedAccountWeight === 0) {
             toast.error("War weight is 0. Please contact an admin to update your war weight.");
             return;
         }
@@ -126,8 +129,8 @@
                     tag,
                     isAlt,
                     preferenceNum,
-                    accountClan,
-                    ...(isAlt ? { accountWeight: Number(accountWeight) } : {}),
+                    accountClan: isAlt ? null : accountClan,
+                    ...(isAlt && !linkedAltAccount ? { accountWeight: Number(accountWeight) } : {}),
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
@@ -195,20 +198,22 @@
                     {/if}
                 </Field.Root>
 
-                <Field.Root required invalid={!!fieldErrors.accountClan} class="flex flex-col gap-1">
-                    <Field.Label class="text-sm font-medium">Account Clan</Field.Label>
-                    <Select
-                        bind:value={accountClan}
-                        options={clanOptions}
-                        placeholder="Select the clan you want to participate with"
-                        disabled={isLoading}
-                    />
-                    {#if fieldErrors.accountClan}
-                        <Field.ErrorText class="text-xs text-red-400">{fieldErrors.accountClan}</Field.ErrorText>
-                    {/if}
-                </Field.Root>
+                {#if !isAlt}
+                    <Field.Root required invalid={!!fieldErrors.accountClan} class="flex flex-col gap-1">
+                        <Field.Label class="text-sm font-medium">Account Clan</Field.Label>
+                        <Select
+                            bind:value={accountClan}
+                            options={clanOptions}
+                            placeholder="Select the clan you want to participate with"
+                            disabled={isLoading}
+                        />
+                        {#if fieldErrors.accountClan}
+                            <Field.ErrorText class="text-xs text-red-400">{fieldErrors.accountClan}</Field.ErrorText>
+                        {/if}
+                    </Field.Root>
+                {/if}
 
-                {#if isAlt}
+                {#if isAlt && !linkedAltAccount}
                     <Field.Root required invalid={!!fieldErrors.accountWeight} class="flex flex-col gap-1">
                         <Field.Label class="text-sm font-medium">Account Weight</Field.Label>
                         <Input
@@ -263,9 +268,9 @@
                     type="submit"
                     disabled={isLoading ||
                         !tag ||
-                        !accountClan ||
-                        (isAlt && (!accountWeight || Number(accountWeight) === 0)) ||
-                        (!isAlt && selectedAccountWeight === 0)}
+                        (!isAlt && !accountClan) ||
+                        (isAlt && !linkedAltAccount && (!accountWeight || Number(accountWeight) === 0)) ||
+                        selectedAccountWeight === 0}
                 >
                     {#if isLoading}
                         <span class="flex items-center justify-center gap-2">

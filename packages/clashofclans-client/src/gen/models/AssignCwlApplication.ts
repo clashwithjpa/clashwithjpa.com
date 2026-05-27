@@ -48,10 +48,7 @@ export type AssignCwlApplication200 = {
              * @type string
              */
             cocAccountTag: string;
-            /**
-             * @type string
-             */
-            cocAccountClan: string;
+            cocAccountClan: string | null;
             /**
              * @type number
              */
