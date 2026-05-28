@@ -1,16 +1,20 @@
-import { boolean, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique, index } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { boolean, check, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique, index } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
 import { account, user } from "./ba-auth";
 
-export const settingsTable = pgTable("settings_table", {
-    id: serial("id").primaryKey(), // Only one row expected
-    applicationsEnabled: boolean("applications_enabled").notNull().default(false),
-    cwlEnabled: boolean("cwl_enabled").notNull().default(false),
-    siteMaintenanceMode: boolean("site_maintenance_mode").notNull().default(false),
-    rulesContent: text("rules_content"),
-    guildId: text("guild_id"),
-    updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const settingsTable = pgTable(
+    "settings_table",
+    {
+        id: integer("id").primaryKey().default(1),
+        applicationsEnabled: boolean("applications_enabled").notNull().default(false),
+        cwlEnabled: boolean("cwl_enabled").notNull().default(false),
+        siteMaintenanceMode: boolean("site_maintenance_mode").notNull().default(false),
+        rulesContent: text("rules_content"),
+        guildId: text("guild_id"),
+        updatedAt: timestamp("updated_at").defaultNow(),
+    },
+    (t) => [check("settings_table_single_row", sql`${t.id} = 1`)],
+);
 
 export const guidesTable = pgTable(
     "guides_table",

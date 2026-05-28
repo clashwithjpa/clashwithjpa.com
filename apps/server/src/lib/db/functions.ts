@@ -295,18 +295,13 @@ export async function updateSettings(values: {
     siteMaintenanceMode?: boolean;
     guildId?: string | null;
 }) {
-    const existing = await db.select({ id: settingsTable.id }).from(settingsTable).limit(1);
-    if (existing[0]) {
-        const result = await db
-            .update(settingsTable)
-            .set({ ...values, updatedAt: new Date() })
-            .where(eq(settingsTable.id, existing[0].id))
-            .returning();
-        return result[0]!;
-    }
     const result = await db
         .insert(settingsTable)
         .values({ ...values, updatedAt: new Date() })
+        .onConflictDoUpdate({
+            target: settingsTable.id,
+            set: { ...values, updatedAt: new Date() },
+        })
         .returning();
     return result[0]!;
 }
