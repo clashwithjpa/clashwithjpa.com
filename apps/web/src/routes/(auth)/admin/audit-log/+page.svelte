@@ -45,6 +45,15 @@
         { label: "CWL clan — updated", value: "cwl_clan.update" },
         { label: "CWL clan — deleted", value: "cwl_clan.delete" },
         { label: "COC account — imported", value: "coc_account.import" },
+        { label: "User — role set", value: "user.role_set" },
+        { label: "User — created", value: "user.create" },
+        { label: "User — updated", value: "user.update" },
+        { label: "User — banned", value: "user.ban" },
+        { label: "User — unbanned", value: "user.unban" },
+        { label: "User — removed", value: "user.remove" },
+        { label: "User — password set", value: "user.password_set" },
+        { label: "User — session revoked", value: "user.session_revoked" },
+        { label: "User — sessions revoked", value: "user.sessions_revoked" },
     ];
 
     const targetTypeOptions: Option[] = [
@@ -56,6 +65,7 @@
         { label: "Clans", value: "clan" },
         { label: "CWL clans", value: "cwl_clan" },
         { label: "COC accounts", value: "coc_account" },
+        { label: "Users", value: "user" },
     ];
 
     async function load() {
@@ -145,9 +155,43 @@
                 return `${actor} deleted CWL clan ${m.cocClanName ?? ""} (${m.cocClanTag ?? "?"})`;
             case "coc_account.import":
                 return `${actor} imported ${m.count ?? "?"} COC account${m.count === 1 ? "" : "s"}`;
+            case "user.role_set":
+                return `${actor} set role of ${userTargetLabel(e, m)} to ${roleLabel(m.role)}`;
+            case "user.create":
+                return `${actor} created user ${userTargetLabel(e, m)}${m.role ? ` with role ${roleLabel(m.role)}` : ""}`;
+            case "user.update":
+                return `${actor} updated user ${userTargetLabel(e, m)}${Array.isArray(m.changedFields) && m.changedFields.length ? ` (${m.changedFields.join(", ")})` : ""}`;
+            case "user.ban":
+                return `${actor} banned ${userTargetLabel(e, m)}${m.banReason ? ` — ${m.banReason}` : ""}`;
+            case "user.unban":
+                return `${actor} unbanned ${userTargetLabel(e, m)}`;
+            case "user.remove":
+                return `${actor} removed ${userTargetLabel(e, m)}`;
+            case "user.password_set":
+                return `${actor} set password for ${userTargetLabel(e, m)}`;
+            case "user.session_revoked":
+                return `${actor} revoked a session${e.targetId ? ` for ${userTargetLabel(e, m)}` : ""}`;
+            case "user.sessions_revoked":
+                return `${actor} revoked all sessions for ${userTargetLabel(e, m)}`;
             default:
                 return `${actor} ${e.action}${e.targetType ? ` on ${e.targetType}` : ""}${e.targetId ? ` #${e.targetId}` : ""}`;
         }
+    }
+
+    function userTargetLabel(e: AuditEntry, m: Record<string, any>): string {
+        const name = typeof m.targetName === "string" ? m.targetName : null;
+        const discordId = typeof m.targetDiscordId === "string" ? m.targetDiscordId : null;
+        const idHint = e.targetId ? `#${e.targetId.slice(0, 8)}` : "";
+        if (name && discordId) return `${name} (discord:${discordId})`;
+        if (name) return `${name} ${idHint}`.trim();
+        if (discordId) return `discord:${discordId} ${idHint}`.trim();
+        return e.targetId ? `user #${e.targetId}` : "user";
+    }
+
+    function roleLabel(role: unknown): string {
+        if (Array.isArray(role)) return role.join(", ") || "?";
+        if (typeof role === "string") return role;
+        return "?";
     }
 
     function resetFilters() {

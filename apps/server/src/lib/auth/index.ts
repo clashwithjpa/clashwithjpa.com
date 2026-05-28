@@ -1,13 +1,132 @@
 import { config } from "@/lib/config";
+import { logActionForActor, type AuditActor, type LogActionInput } from "@/lib/audit";
 import { db } from "@lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
 import { ac, admin, manager, reviewer, roleLevel, superadmin, unverified, verified } from "@repo/auth-shared";
 
 const ROLE_MUTATING_PATHS = new Set(["/admin/set-role", "/admin/update-user", "/admin/create-user"]);
 const TARGETED_USER_PATHS = new Set(["/admin/ban-user", "/admin/unban-user", "/admin/remove-user", "/admin/impersonate-user"]);
+
+function normalizeRole(role: unknown): string | string[] | undefined {
+    if (typeof role === "string") return role;
+    if (Array.isArray(role)) return role.filter((r): r is string => typeof r === "string");
+    return undefined;
+}
+
+function buildAuditFromAdminCall(path: string, body: unknown, returned: unknown): LogActionInput | null {
+    const b = (body && typeof body === "object" ? (body as Record<string, unknown>) : {}) as Record<string, unknown>;
+    const userId = typeof b.userId === "string" ? b.userId : undefined;
+
+    switch (path) {
+        case "/admin/set-role": {
+            if (!userId) return null;
+            return { action: "user.role_set", targetType: "user", targetId: userId, metadata: { role: normalizeRole(b.role) } };
+        }
+        case "/admin/update-user": {
+            if (!userId) return null;
+            const data = (b.data && typeof b.data === "object" ? (b.data as Record<string, unknown>) : {}) as Record<string, unknown>;
+            const changedFields = Object.keys(data);
+            if (Object.prototype.hasOwnProperty.call(data, "role")) {
+                return { action: "user.role_set", targetType: "user", targetId: userId, metadata: { role: normalizeRole(data.role), changedFields } };
+            }
+            return { action: "user.update", targetType: "user", targetId: userId, metadata: { changedFields } };
+        }
+        case "/admin/create-user": {
+            const created = (returned && typeof returned === "object" ? (returned as { user?: { id?: unknown } }).user : undefined) ?? undefined;
+            const newUserId = created && typeof created.id === "string" ? created.id : undefined;
+            return {
+                action: "user.create",
+                targetType: "user",
+                targetId: newUserId ?? null,
+                metadata: { role: normalizeRole(b.role) },
+            };
+        }
+        case "/admin/ban-user": {
+            if (!userId) return null;
+            return {
+                action: "user.ban",
+                targetType: "user",
+                targetId: userId,
+                metadata: {
+                    banReason: typeof b.banReason === "string" ? b.banReason : undefined,
+                    banExpiresIn: typeof b.banExpiresIn === "number" ? b.banExpiresIn : undefined,
+                },
+            };
+        }
+        case "/admin/unban-user": {
+            if (!userId) return null;
+            return { action: "user.unban", targetType: "user", targetId: userId };
+        }
+        case "/admin/remove-user": {
+            if (!userId) return null;
+            return { action: "user.remove", targetType: "user", targetId: userId };
+        }
+        case "/admin/set-user-password": {
+            if (!userId) return null;
+            return { action: "user.password_set", targetType: "user", targetId: userId };
+        }
+        case "/admin/revoke-user-session": {
+            // Session token is a live credential — never store it. Without
+            // pre-resolution in a before hook, we have no userId either, so
+            // this entry only records the action + actor + timestamp.
+            return { action: "user.session_revoked", targetType: "user", targetId: null };
+        }
+        case "/admin/revoke-user-sessions": {
+            if (!userId) return null;
+            return { action: "user.sessions_revoked", targetType: "user", targetId: userId };
+        }
+        default:
+            return null;
+    }
+}
+
+type AuthCtxForLookup = {
+    context: {
+        internalAdapter: {
+            findUserById: (id: string) => Promise<unknown>;
+            findAccountByUserId: (id: string) => Promise<unknown[]>;
+        };
+    };
+};
+
+async function resolveTargetIdentity(
+    ctx: AuthCtxForLookup,
+    targetId: string | number | null | undefined,
+    returned: unknown,
+): Promise<{ targetName?: string; targetDiscordId?: string }> {
+    let userId: string | undefined;
+    let nameFromResponse: string | undefined;
+
+    if (returned && typeof returned === "object") {
+        const u = (returned as { user?: { id?: unknown; name?: unknown } }).user;
+        if (u && typeof u.id === "string") {
+            userId = u.id;
+            if (typeof u.name === "string") nameFromResponse = u.name;
+        }
+    }
+    if (!userId && typeof targetId === "string") userId = targetId;
+    if (!userId) return {};
+
+    try {
+        const [userRow, accounts] = await Promise.all([
+            nameFromResponse ? Promise.resolve(null) : ctx.context.internalAdapter.findUserById(userId),
+            ctx.context.internalAdapter.findAccountByUserId(userId),
+        ]);
+        const name = nameFromResponse ?? (userRow as { name?: string } | null)?.name;
+        const discord = accounts.find((a): a is { providerId: string; accountId: string } => {
+            return !!a && typeof a === "object" && (a as { providerId?: unknown }).providerId === "discord";
+        });
+        const out: { targetName?: string; targetDiscordId?: string } = {};
+        if (name) out.targetName = name;
+        if (discord?.accountId) out.targetDiscordId = discord.accountId;
+        return out;
+    } catch {
+        return {};
+    }
+}
 
 function extractRoleChange(path: string, body: unknown): { targetUserId?: string; newRole?: string | string[] } | null {
     if (!body || typeof body !== "object") return null;
@@ -143,6 +262,25 @@ export const auth = betterAuth({
                     message: "You cannot perform this action on a user at or above your own level.",
                 });
             }
+        }),
+        // Audit successful admin endpoint calls. Runs after the handler with
+        // ctx.context.returned set to the response (or APIError on failure).
+        after: createAuthMiddleware(async (ctx) => {
+            const returned = ctx.context.returned;
+            if (isAPIError(returned)) return;
+
+            const input = buildAuditFromAdminCall(ctx.path, ctx.body, returned);
+            if (!input) return;
+
+            const identity = await resolveTargetIdentity(ctx, input.targetId, returned);
+            const enriched: LogActionInput = {
+                ...input,
+                metadata: { ...identity, ...(input.metadata ?? {}) },
+            };
+
+            const session = await getSessionFromCtx(ctx);
+            const actor: AuditActor = session?.user ? { id: session.user.id, name: session.user.name } : null;
+            logActionForActor(actor, enriched);
         }),
     },
     advanced: {

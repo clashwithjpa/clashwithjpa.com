@@ -26,9 +26,19 @@ export type AuditAction =
     | "cwl_clan.update"
     | "cwl_clan.delete"
     // COC account links
-    | "coc_account.import";
+    | "coc_account.import"
+    // Better-auth admin endpoints
+    | "user.role_set"
+    | "user.create"
+    | "user.update"
+    | "user.ban"
+    | "user.unban"
+    | "user.remove"
+    | "user.password_set"
+    | "user.session_revoked"
+    | "user.sessions_revoked";
 
-export type AuditTargetType = "clan_application" | "cwl_application" | "settings" | "rules" | "clan" | "cwl_clan" | "coc_account";
+export type AuditTargetType = "clan_application" | "cwl_application" | "settings" | "rules" | "clan" | "cwl_clan" | "coc_account" | "user";
 
 export type LogActionInput = {
     action: AuditAction;
@@ -39,17 +49,13 @@ export type LogActionInput = {
     metadata?: Record<string, unknown>;
 };
 
-// Fire-and-forget audit insert. Failures are reported to Sentry but never thrown,
-// so a failing audit insert can't break the user-facing request.
-export function logAction(c: Context<AppEnv>, input: LogActionInput): void {
-    const user = c.get("user");
-    const actorId = user?.id ?? null;
-    const actorName = user?.name ?? null;
+export type AuditActor = { id?: string | null; name?: string | null } | null | undefined;
 
+function insertAuditLog(actor: AuditActor, input: LogActionInput): void {
     db.insert(auditLogTable)
         .values({
-            actorId,
-            actorName,
+            actorId: actor?.id ?? null,
+            actorName: actor?.name ?? null,
             action: input.action,
             targetType: input.targetType ?? null,
             targetId: input.targetId != null ? String(input.targetId) : null,
@@ -58,4 +64,15 @@ export function logAction(c: Context<AppEnv>, input: LogActionInput): void {
         .catch((err) => {
             Sentry.captureException(err, { tags: { audit_action: input.action } });
         });
+}
+
+// Fire-and-forget audit insert. Failures are reported to Sentry but never thrown,
+// so a failing audit insert can't break the user-facing request.
+export function logAction(c: Context<AppEnv>, input: LogActionInput): void {
+    insertAuditLog(c.get("user"), input);
+}
+
+// For callers without a Hono context (e.g. better-auth hooks).
+export function logActionForActor(actor: AuditActor, input: LogActionInput): void {
+    insertAuditLog(actor, input);
 }
