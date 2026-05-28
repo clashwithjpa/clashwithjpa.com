@@ -6,10 +6,10 @@
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
     import { sidebarStore } from "$lib/components/ui/sidebar";
     import type { Role } from "$lib/config/roles";
-    import type { statement } from "@repo/auth-shared";
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
+    import type { statement } from "@repo/auth-shared";
     import { onMount, type Component } from "svelte";
     import { Toaster } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
@@ -59,44 +59,75 @@
     let isMobile = $state(false);
     let sidebarWidth = $state(0);
 
-    let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 140);
+    let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
     const noPaddingPaths: string[] = ["/admin/rules", "/admin/users"];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 
-    let prevNavWidth = 10;
-    let prevInfoWidth = 30;
+    /*
+    Layout Config - All values in percentages (%) of viewport width
+    ╭─────────────┬─────┬─────┬─────────╮
+    │ Panel       │ Min │ Max │ Default │
+    ├─────────────┼─────┼─────┼─────────┤
+    │ sidebar     │ 6%  │ 16% │ 6%      │
+    │ content     │ 30% │ 85% │ 30%     │
+    │ infoSidebar │ 15% │ 45% │ 30%     │
+    ╰─────────────┴─────┴─────┴─────────╯
+    To adjust: Change any value below. Desktop total must not exceed 100%.
+    Mobile: Independently configured for smaller screens.
+    */
+    const LAYOUT_CONFIG = {
+        sidebar: { min: 6, max: 16, default: 6 },
+        content: { min: 30, max: 85, default: 30 },
+        infoSidebar: { min: 15, max: 45, default: 30 },
+        mobile: {
+            content: { min: 94, max: 99, default: 94 },
+            sidebar: { min: 6, max: 10, default: 6 },
+        },
+    };
 
-    let desktopSize = $state([10, 90, 0]);
-    let mobileSize = $state([94, 6]);
+    let userSidebarWidth = $state(LAYOUT_CONFIG.sidebar.default);
+    let userInfoWidth = $state(LAYOUT_CONFIG.infoSidebar.default);
+    let mobileSize = $state([LAYOUT_CONFIG.mobile.content.default, LAYOUT_CONFIG.mobile.sidebar.default]);
 
-    $effect(() => {
-        if (isMobile) return;
+    let desktopSize = $derived.by(() => {
+        if (isMobile) return [0, 0, 0];
         if (showInfo) {
-            desktopSize = [prevNavWidth, +(100 - prevNavWidth - prevInfoWidth).toFixed(1), prevInfoWidth];
-        } else {
-            desktopSize = [prevNavWidth, +(100 - prevNavWidth).toFixed(1), 0];
+            const contentWidth = 100 - userSidebarWidth - userInfoWidth;
+            return [userSidebarWidth, contentWidth, userInfoWidth];
         }
+        return [userSidebarWidth, 100 - userSidebarWidth, 0];
     });
+
+    const desktopPanels = $derived.by(() => [
+        { id: "sidebar", minSize: LAYOUT_CONFIG.sidebar.min, maxSize: LAYOUT_CONFIG.sidebar.max },
+        { id: "content", minSize: LAYOUT_CONFIG.content.min },
+        {
+            id: "infosidebar",
+            minSize: showInfo ? LAYOUT_CONFIG.infoSidebar.min : 0,
+            maxSize: showInfo ? LAYOUT_CONFIG.infoSidebar.max : 0,
+        },
+    ]);
+
+    const mobilePanels = $derived.by(() => [
+        { id: "content", minSize: LAYOUT_CONFIG.mobile.content.min },
+        { id: "sidebar", maxSize: LAYOUT_CONFIG.mobile.sidebar.max },
+    ]);
 
     function handleResize(details: Splitter.ResizeDetails) {
         if (isMobile) {
             mobileSize = details.size;
         }
-        // DO NOT update desktopSize here - let $effect control it
     }
 
     function handleDragEnd(details: Splitter.ResizeEndDetails) {
         if (isMobile) return;
         const s = details.size;
         if (s.length === 3) {
-            // ONLY explicitly save actual user-dragged boundaries
-            prevNavWidth = s[0];
+            userSidebarWidth = s[0];
             if (showInfo && s[2] > 0) {
-                prevInfoWidth = s[2];
+                userInfoWidth = s[2];
             }
-            // Update desktopSize after user finishes dragging
-            desktopSize = s;
         }
     }
 
@@ -236,47 +267,36 @@
     {/if}
 {/snippet}
 
-<div class="flex h-full flex-col">
-    <Splitter.Root
-        orientation={isMobile ? "vertical" : "horizontal"}
-        class="flex min-h-0 flex-1 overflow-hidden! bg-stone-900 lg:p-2"
-        size={isMobile ? mobileSize : desktopSize}
-        onResize={handleResize}
-        onResizeEnd={handleDragEnd}
-        panels={isMobile
-            ? [
-                  { id: "content", minSize: 94 },
-                  { id: "sidebar", maxSize: 10 },
-              ]
-            : [
-                  { id: "sidebar", minSize: 6, maxSize: 16 },
-                  { id: "content", minSize: 30 },
-                  { id: "infosidebar", minSize: showInfo ? 15 : 0, maxSize: showInfo ? 45 : 0 },
-              ]}
-    >
-        {#if isMobile}
-            {@render ContentPanel()}
-            <Splitter.ResizeTrigger id="content:sidebar" disabled class="hidden">
-                <div class="hidden"></div>
-            </Splitter.ResizeTrigger>
-            {@render SidebarPanel()}
-            {@render InfoSidebar()}
-        {:else}
-            {@render SidebarPanel()}
-            <Splitter.ResizeTrigger id="sidebar:content" class="group relative flex items-center justify-center outline-none">
+<Splitter.Root
+    orientation={isMobile ? "vertical" : "horizontal"}
+    class="flex size-full overflow-hidden! bg-stone-900 lg:p-2"
+    size={isMobile ? mobileSize : desktopSize}
+    onResize={handleResize}
+    onResizeEnd={handleDragEnd}
+    panels={isMobile ? mobilePanels : desktopPanels}
+>
+    {#if isMobile}
+        {@render ContentPanel()}
+        <Splitter.ResizeTrigger id="content:sidebar" disabled class="hidden">
+            <div class="hidden"></div>
+        </Splitter.ResizeTrigger>
+        {@render SidebarPanel()}
+        {@render InfoSidebar()}
+    {:else}
+        {@render SidebarPanel()}
+        <Splitter.ResizeTrigger id="sidebar:content" class="group relative flex items-center justify-center outline-none">
+            <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
+        </Splitter.ResizeTrigger>
+        {@render ContentPanel()}
+        <Splitter.ResizeTrigger
+            id="content:infosidebar"
+            disabled={!showInfo}
+            class={!showInfo ? "hidden" : "group relative flex items-center justify-center outline-none"}
+        >
+            {#if showInfo}
                 <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
-            </Splitter.ResizeTrigger>
-            {@render ContentPanel()}
-            <Splitter.ResizeTrigger
-                id="content:infosidebar"
-                disabled={!showInfo}
-                class={!showInfo ? "hidden" : "group relative flex items-center justify-center outline-none"}
-            >
-                {#if showInfo}
-                    <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
-                {/if}
-            </Splitter.ResizeTrigger>
-            {@render InfoSidebar()}
-        {/if}
-    </Splitter.Root>
-</div>
+            {/if}
+        </Splitter.ResizeTrigger>
+        {@render InfoSidebar()}
+    {/if}
+</Splitter.Root>
