@@ -6,6 +6,7 @@ export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwl
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
 export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
+export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
 export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
 export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
@@ -34,6 +35,7 @@ export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export type { UpdateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
+export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type {
     ApplyCwl200,
@@ -103,6 +105,14 @@ export type {
     DeleteAdminCwlClanPathParams,
 } from "./models/DeleteAdminCwlClan.ts";
 export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./models/GetAdminClans.ts";
+export type {
+    GetAdminCocAccounts200,
+    GetAdminCocAccounts401,
+    GetAdminCocAccounts500,
+    GetAdminCocAccountsQuery,
+    GetAdminCocAccountsQueryParams,
+    GetAdminCocAccountsQueryResponse,
+} from "./models/GetAdminCocAccounts.ts";
 export type {
     GetAdminCwlClans200,
     GetAdminCwlClans401,
@@ -297,6 +307,16 @@ export type {
     UpdateAdminSettingsMutationResponse,
 } from "./models/UpdateAdminSettings.ts";
 export type {
+    UpdateCocAccountWarWeight200,
+    UpdateCocAccountWarWeight401,
+    UpdateCocAccountWarWeight404,
+    UpdateCocAccountWarWeight500,
+    UpdateCocAccountWarWeightMutation,
+    UpdateCocAccountWarWeightMutationRequest,
+    UpdateCocAccountWarWeightMutationResponse,
+    UpdateCocAccountWarWeightPathParams,
+} from "./models/UpdateCocAccountWarWeight.ts";
+export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,
     UpdateJoinApplicationStatus401,
@@ -316,6 +336,7 @@ export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
 export { getAdminClans } from "./clients/getAdminClans.ts";
+export { getAdminCocAccounts } from "./clients/getAdminCocAccounts.ts";
 export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
 export { getAdminSettings } from "./clients/getAdminSettings.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
@@ -344,6 +365,7 @@ export { setRules } from "./clients/setRules.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
 export { updateAdminCwlClan } from "./clients/updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
+export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
 export { createApplyCwl } from "./hooks/createApplyCwl.ts";
@@ -362,6 +384,9 @@ export { deleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.
 export { createGetAdminClans } from "./hooks/createGetAdminClans.ts";
 export { getAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export { getAdminClansQueryOptions } from "./hooks/createGetAdminClans.ts";
+export { createGetAdminCocAccounts } from "./hooks/createGetAdminCocAccounts.ts";
+export { getAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
+export { getAdminCocAccountsQueryOptions } from "./hooks/createGetAdminCocAccounts.ts";
 export { createGetAdminCwlClans } from "./hooks/createGetAdminCwlClans.ts";
 export { getAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
 export { getAdminCwlClansQueryOptions } from "./hooks/createGetAdminCwlClans.ts";
@@ -440,6 +465,8 @@ export { createUpdateAdminCwlClan } from "./hooks/createUpdateAdminCwlClan.ts";
 export { updateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts";
 export { updateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
+export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
+export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
@@ -530,6 +557,13 @@ export {
     getAdminClans500Schema,
     getAdminClansQueryResponseSchema,
 } from "./zod/getAdminClansSchema.ts";
+export {
+    getAdminCocAccounts200Schema,
+    getAdminCocAccounts401Schema,
+    getAdminCocAccounts500Schema,
+    getAdminCocAccountsQueryParamsSchema,
+    getAdminCocAccountsQueryResponseSchema,
+} from "./zod/getAdminCocAccountsSchema.ts";
 export {
     getAdminCwlClans200Schema,
     getAdminCwlClans401Schema,
@@ -676,6 +710,15 @@ export {
     updateAdminSettingsMutationRequestSchema,
     updateAdminSettingsMutationResponseSchema,
 } from "./zod/updateAdminSettingsSchema.ts";
+export {
+    updateCocAccountWarWeight200Schema,
+    updateCocAccountWarWeight401Schema,
+    updateCocAccountWarWeight404Schema,
+    updateCocAccountWarWeight500Schema,
+    updateCocAccountWarWeightMutationRequestSchema,
+    updateCocAccountWarWeightMutationResponseSchema,
+    updateCocAccountWarWeightPathParamsSchema,
+} from "./zod/updateCocAccountWarWeightSchema.ts";
 export {
     updateJoinApplicationStatus200Schema,
     updateJoinApplicationStatus401Schema,

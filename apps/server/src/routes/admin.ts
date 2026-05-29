@@ -8,6 +8,7 @@ import {
     deleteClan,
     deleteCwlClan,
     getAllClans,
+    getAllCocAccounts,
     getAllCwlApplications,
     getAllCwlClans,
     getAuditLog,
@@ -18,6 +19,7 @@ import {
     MissingDiscordAccountError,
     updateClan,
     updateClanApplicationStatus,
+    updateCocAccountWarWeight,
     updateCwlClan,
     updateSettings,
 } from "@/lib/db/functions";
@@ -838,6 +840,102 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch audit log" }, 500);
+        }
+    },
+);
+
+// ============================================================
+// COC accounts war weight - manager+
+// ============================================================
+
+const cocAccountSchema = z4.object({
+    id: z4.number(),
+    discordUserId: z4.string(),
+    cocAccountTag: z4.string(),
+    warWeight: z4.number(),
+    ownerUserId: z4.string().nullable(),
+    ownerName: z4.string().nullable(),
+});
+
+const getCocAccountsQuerySchema = z4.object({
+    search: z4.string().optional(),
+    limit: z4.coerce.number().int().min(1).max(200).default(50),
+    offset: z4.coerce.number().int().min(0).default(0),
+});
+const getCocAccountsData = z4.object({
+    accounts: z4.array(cocAccountSchema),
+    total: z4.number(),
+});
+app.get(
+    "/coc-accounts",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getAdminCocAccounts",
+        description: "[Manager] Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "COC accounts.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getCocAccountsData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("query", getCocAccountsQuerySchema),
+    async (c) => {
+        try {
+            const result = await getAllCocAccounts(c.req.valid("query"));
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch COC accounts" }, 500);
+        }
+    },
+);
+
+const cocAccountIdPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
+const updateCocAccountWeightBodySchema = z4.object({
+    warWeight: z4.number().int().min(0),
+});
+const updateCocAccountWeightData = z4.object({
+    account: cocAccountSchema,
+});
+app.put(
+    "/coc-accounts/:id/weight",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "updateCocAccountWarWeight",
+        description: "[Manager] Updates the war weight of a linked Clash of Clans account.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated COC account.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCocAccountWeightData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", cocAccountIdPathSchema),
+    zValidator("json", updateCocAccountWeightBodySchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const { warWeight } = c.req.valid("json");
+            const account = await updateCocAccountWarWeight(id, warWeight);
+            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            logAction(c, {
+                action: "coc_account.weight_update",
+                targetType: "coc_account",
+                targetId: account.id,
+                metadata: { cocAccountTag: account.cocAccountTag, warWeight: account.warWeight },
+            });
+            return c.json({ success: true, data: { account } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update war weight" }, 500);
         }
     },
 );

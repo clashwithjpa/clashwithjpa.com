@@ -67,6 +67,14 @@ export type {
 } from "./DeleteAdminCwlClan.ts";
 export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./GetAdminClans.ts";
 export type {
+    GetAdminCocAccounts200,
+    GetAdminCocAccounts401,
+    GetAdminCocAccounts500,
+    GetAdminCocAccountsQuery,
+    GetAdminCocAccountsQueryParams,
+    GetAdminCocAccountsQueryResponse,
+} from "./GetAdminCocAccounts.ts";
+export type {
     GetAdminCwlClans200,
     GetAdminCwlClans401,
     GetAdminCwlClans500,
@@ -259,6 +267,16 @@ export type {
     UpdateAdminSettingsMutationRequest,
     UpdateAdminSettingsMutationResponse,
 } from "./UpdateAdminSettings.ts";
+export type {
+    UpdateCocAccountWarWeight200,
+    UpdateCocAccountWarWeight401,
+    UpdateCocAccountWarWeight404,
+    UpdateCocAccountWarWeight500,
+    UpdateCocAccountWarWeightMutation,
+    UpdateCocAccountWarWeightMutationRequest,
+    UpdateCocAccountWarWeightMutationResponse,
+    UpdateCocAccountWarWeightPathParams,
+} from "./UpdateCocAccountWarWeight.ts";
 export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,

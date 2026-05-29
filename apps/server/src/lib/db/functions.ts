@@ -11,7 +11,7 @@ import {
     settingsTable,
     user,
 } from "@/lib/db/schema";
-import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -348,6 +348,53 @@ export async function getCocAccountsForUser(userId: string) {
     const discordId = await getDiscordAccountId(userId);
     if (!discordId) return [];
     return db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordId));
+}
+
+export async function getAllCocAccounts(opts: { search?: string; limit?: number; offset?: number } = {}) {
+    const { search, limit = 50, offset = 0 } = opts;
+
+    // cocAccountTable.discordUserId stores the Discord accountId; join the
+    // better-auth account table to resolve the owning user, then the user table
+    // for their display name (sourced from Discord at sign-in).
+    const whereClause = search
+        ? or(
+              ilike(cocAccountTable.cocAccountTag, `%${search}%`),
+              ilike(cocAccountTable.discordUserId, `%${search}%`),
+              ilike(user.name, `%${search}%`),
+          )
+        : undefined;
+
+    const [rows, countResult] = await Promise.all([
+        db
+            .select({
+                id: cocAccountTable.id,
+                discordUserId: cocAccountTable.discordUserId,
+                cocAccountTag: cocAccountTable.cocAccountTag,
+                warWeight: cocAccountTable.warWeight,
+                ownerUserId: account.userId,
+                ownerName: user.name,
+            })
+            .from(cocAccountTable)
+            .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
+            .leftJoin(user, eq(user.id, account.userId))
+            .where(whereClause)
+            .orderBy(desc(cocAccountTable.warWeight))
+            .limit(limit)
+            .offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(cocAccountTable)
+            .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
+            .leftJoin(user, eq(user.id, account.userId))
+            .where(whereClause),
+    ]);
+
+    return { accounts: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function updateCocAccountWarWeight(id: number, warWeight: number) {
+    const result = await db.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, id)).returning();
+    return result[0] ?? null;
 }
 
 export async function getAuditLog(

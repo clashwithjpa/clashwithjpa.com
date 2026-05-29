@@ -60,6 +60,13 @@ export {
 } from "./deleteAdminCwlClanSchema.ts";
 export { getAdminClans200Schema, getAdminClans401Schema, getAdminClans500Schema, getAdminClansQueryResponseSchema } from "./getAdminClansSchema.ts";
 export {
+    getAdminCocAccounts200Schema,
+    getAdminCocAccounts401Schema,
+    getAdminCocAccounts500Schema,
+    getAdminCocAccountsQueryParamsSchema,
+    getAdminCocAccountsQueryResponseSchema,
+} from "./getAdminCocAccountsSchema.ts";
+export {
     getAdminCwlClans200Schema,
     getAdminCwlClans401Schema,
     getAdminCwlClans500Schema,
@@ -195,6 +202,15 @@ export {
     updateAdminSettingsMutationRequestSchema,
     updateAdminSettingsMutationResponseSchema,
 } from "./updateAdminSettingsSchema.ts";
+export {
+    updateCocAccountWarWeight200Schema,
+    updateCocAccountWarWeight401Schema,
+    updateCocAccountWarWeight404Schema,
+    updateCocAccountWarWeight500Schema,
+    updateCocAccountWarWeightMutationRequestSchema,
+    updateCocAccountWarWeightMutationResponseSchema,
+    updateCocAccountWarWeightPathParamsSchema,
+} from "./updateCocAccountWarWeightSchema.ts";
 export {
     updateJoinApplicationStatus200Schema,
     updateJoinApplicationStatus401Schema,

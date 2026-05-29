@@ -27,6 +27,7 @@ export type AuditAction =
     | "cwl_clan.delete"
     // COC account links
     | "coc_account.import"
+    | "coc_account.weight_update"
     // Better-auth admin endpoints
     | "user.role_set"
     | "user.create"

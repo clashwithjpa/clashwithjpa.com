@@ -19,6 +19,7 @@
     import TablerHistory from "~icons/tabler/history";
     import TablerHome from "~icons/tabler/home";
     import TablerLogout2 from "~icons/tabler/logout-2";
+    import TablerScale from "~icons/tabler/scale";
     import TablerSettings from "~icons/tabler/settings";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
@@ -48,6 +49,7 @@
         { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "manage" },
         { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications", requiredPerm: "review" },
         { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
+        { name: "Weights", icon: TablerScale, href: "/admin/coc-accounts", requiredPerm: "manage" },
         { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
         { name: "Audit Log", icon: TablerHistory, href: "/admin/audit-log", requiredPerm: "manage" },
         { name: "Settings", icon: TablerSettings, href: "/admin/settings", requiredPerm: "sudo" },
@@ -60,7 +62,7 @@
     let sidebarWidth = $state(0);
 
     let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
-    const noPaddingPaths: string[] = ["/admin/rules", "/admin/users"];
+    const noPaddingPaths: string[] = ["/admin/rules", "/admin/users", "/admin/coc-accounts"];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 

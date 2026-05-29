@@ -37,3 +37,5 @@
 apps/server/scripts/migrations/datasets
 !apps/server/scripts/migrations/datasets/import_lookup.json
 .backups
+.claude
+.github/skills
