@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { authClient, hasPermission } from "$lib/auth";
+    import { authClient } from "$lib/auth";
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
@@ -25,7 +25,7 @@
     import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
-    let { children }: LayoutProps = $props();
+    let { children, data }: LayoutProps = $props();
     const session = authClient.useSession();
 
     interface Link {
@@ -139,6 +139,9 @@
     });
 
     let navButtonsRef: HTMLElement | null = $state(null);
+
+    let permittedLinks = $derived(links.filter((link) => !link.requiredPerm || data.permissions[link.requiredPerm]));
+
     $effect(() => {
         if (navButtonsRef) {
             fadeIn(navButtonsRef.querySelectorAll(".dash-nav-btn"));
@@ -162,48 +165,41 @@
 </Toaster>
 
 {#snippet button(link: Link)}
-    {#await hasPermission($session.data?.user.id, link.requiredPerm)}
-        <div
-            class="flex w-full animate-pulse items-center gap-1 {isSidebarExpanded
-                ? 'flex-row justify-start px-4'
-                : 'flex-col justify-center'} overflow-hidden"
+    <div in:fadeIn>
+        <Button
+            variant={null}
+            href={link.href}
+            class="flex w-full items-center
+            {isSidebarExpanded ? 'flex-row justify-start px-4' : 'flex-col justify-center'}
+            overflow-hidden transition-colors duration-200 hover:text-stone-50
+            {page.url.pathname == link.href ? 'text-stone-50' : 'text-stone-400'}"
         >
-            <div class="size-6 shrink-0 rounded-lg bg-stone-700"></div>
-            <div class="{isSidebarExpanded ? 'ml-2 h-4 w-full' : 'h-3 w-8'} rounded-lg bg-stone-700"></div>
-        </div>
-    {:then hasPermission}
-        <div in:fadeIn>
-            <Button
-                variant={null}
-                href={link.href}
-                class="flex w-full items-center {isSidebarExpanded
-                    ? 'flex-row justify-start px-4'
-                    : 'flex-col justify-center'} overflow-hidden transition-colors duration-200
-                    {hasPermission && 'hover:text-stone-50'}
-                    {!hasPermission && 'cursor-not-allowed! opacity-50!'}
-                    {page.url.pathname == link.href && hasPermission ? 'text-stone-50' : 'text-stone-400'}"
-                disabled={!hasPermission}
-            >
-                <link.icon class="size-6 shrink-0 transition-transform duration-200" />
-                <span class="{isSidebarExpanded ? 'ml-2 text-sm' : 'text-[10px]'} gap-0.5 truncate font-medium transition-opacity duration-200">
-                    {link.name}
-                </span>
-            </Button>
-        </div>
-    {/await}
+            <link.icon class="size-6 shrink-0 transition-transform duration-200" />
+            <span class="{isSidebarExpanded ? 'ml-2 text-sm' : 'text-[10px]'} gap-0.5 truncate font-medium transition-opacity duration-200">
+                {link.name}
+            </span>
+        </Button>
+    </div>
 {/snippet}
 
 {#snippet SidebarPanel()}
-    <Splitter.Panel id="sidebar" class="flex items-center {isMobile ? 'min-h-16 w-full justify-center p-2' : 'h-full flex-col justify-between py-4'}">
+    <Splitter.Panel
+        id="sidebar"
+        class="flex items-center {isMobile ? 'min-h-16 w-full justify-center py-2' : 'h-full flex-col justify-between py-4'}"
+    >
         {#if isMobile}
-            <div class="flex w-full items-center justify-evenly gap-4">
-                {#each links as link (link.href)}
-                    {@render button(link)}
-                {/each}
+            <div class="w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div class="flex w-max min-w-full items-center justify-evenly gap-8 px-4" bind:this={navButtonsRef}>
+                    {#each permittedLinks as link (link.href)}
+                        <div class="dash-nav-btn shrink-0">
+                            {@render button(link)}
+                        </div>
+                    {/each}
+                </div>
             </div>
         {:else}
             <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth} bind:this={navButtonsRef}>
-                {#each links as link (link.href)}
+                {#each permittedLinks as link (link.href)}
                     <div class="dash-nav-btn">
                         {@render button(link)}
                     </div>
