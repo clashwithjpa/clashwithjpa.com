@@ -8,6 +8,7 @@ import type {
     ApplyUserAccountMutationResponse,
     ApplyUserAccount400,
     ApplyUserAccount401,
+    ApplyUserAccount403,
     ApplyUserAccount409,
     ApplyUserAccount500,
 } from "../models/ApplyUserAccount.ts";
@@ -28,7 +29,7 @@ export function createApplyUserAccount<TContext>(
     options: {
         mutation?: CreateMutationOptions<
             ApplyUserAccountMutationResponse,
-            ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500>,
+            ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500>,
             { data: ApplyUserAccountMutationRequest },
             TContext
         > & { client?: QueryClient };
@@ -41,7 +42,7 @@ export function createApplyUserAccount<TContext>(
 
     return createMutation<
         ApplyUserAccountMutationResponse,
-        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500>,
+        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500>,
         { data: ApplyUserAccountMutationRequest },
         TContext
     >(

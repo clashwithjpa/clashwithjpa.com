@@ -16,7 +16,6 @@ export const applyCwl200Schema = z.object({
             cocAccountTag: z.string(),
             cocAccountClan: z.union([z.string(), z.null()]),
             cocAccountWeight: z.number(),
-            isAlt: z.boolean(),
             preferenceNum: z.number(),
             month: z.string(),
             year: z.number(),
@@ -58,11 +57,9 @@ export const applyCwl500Schema = z.object({
 });
 
 export const applyCwlMutationRequestSchema = z.object({
-    isAlt: z.boolean(),
     preferenceNum: z.int().min(1).max(99),
     tag: z.string().min(1).max(20).regex(/^#.*/),
     accountClan: z.optional(z.union([z.string(), z.null()])),
-    accountWeight: z.optional(z.int().min(1).max(9999999)),
 });
 
 export const applyCwlMutationResponseSchema = z.lazy(() => applyCwl200Schema);

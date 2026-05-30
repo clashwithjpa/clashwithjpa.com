@@ -33,10 +33,6 @@ export type ApplyCwl200 = {
              */
             cocAccountWeight: number;
             /**
-             * @type boolean
-             */
-            isAlt: boolean;
-            /**
              * @type number
              */
             preferenceNum: number;
@@ -118,10 +114,6 @@ export type ApplyCwl500 = {
 
 export type ApplyCwlMutationRequest = {
     /**
-     * @type boolean
-     */
-    isAlt: boolean;
-    /**
      * @minLength 1
      * @maxLength 99
      * @type integer
@@ -135,12 +127,6 @@ export type ApplyCwlMutationRequest = {
      */
     tag: string;
     accountClan?: string | null;
-    /**
-     * @minLength 1
-     * @maxLength 9999999
-     * @type integer | undefined
-     */
-    accountWeight?: number;
 };
 
 export type ApplyCwlMutationResponse = ApplyCwl200;

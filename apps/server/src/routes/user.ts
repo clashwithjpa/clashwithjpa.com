@@ -5,8 +5,8 @@ import { config } from "@/lib/config";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
     addClanApplication,
+    addCocAccount,
     addCwlApplication,
-    getCocAccountOwner,
     getDiscordAccountId,
     getUserCocAccounts,
     getUserCwlApplications,
@@ -81,6 +81,7 @@ const getUserAccounts = z4.object({
             discordUserId: z4.string(),
             cocAccountTag: z4.string(),
             warWeight: z4.number(),
+            isExternal: z4.boolean(),
         }),
     ),
 });
@@ -235,20 +236,37 @@ app.post(
     },
 );
 
-const postApplyAccountBody = z4.object({
-    cocAccountTag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
-    apiToken: z4.string().min(1, "API token is required").max(500),
-    captchaToken: z4.string().max(2048).nullish(),
-});
+const postApplyAccountBody = z4
+    .object({
+        cocAccountTag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
+        apiToken: z4.string().min(1, "API token is required").max(500),
+        captchaToken: z4.string().max(2048).nullish(),
+        isExternal: z4.boolean().optional().default(false),
+        warWeight: z4.int().min(1, "War weight is required").max(9999999).optional(),
+    })
+    .refine((d) => !d.isExternal || typeof d.warWeight === "number", {
+        message: "War weight is required for external accounts",
+        path: ["warWeight"],
+    });
 const postApplyAccountData = z4.object({
-    application: z4.object({
-        id: z4.number(),
-        cocAccountTag: z4.string(),
-        cocAccountData: z4.unknown(),
-        discordUserId: z4.string(),
-        status: z4.string(),
-        createdAt: z4.date(),
-    }),
+    application: z4
+        .object({
+            id: z4.number(),
+            cocAccountTag: z4.string(),
+            cocAccountData: z4.unknown(),
+            discordUserId: z4.string(),
+            status: z4.string(),
+            createdAt: z4.date(),
+        })
+        .optional(),
+    account: z4
+        .object({
+            id: z4.number(),
+            cocAccountTag: z4.string(),
+            warWeight: z4.number(),
+            isExternal: z4.boolean(),
+        })
+        .optional(),
 });
 app.post(
     "/accounts/apply",
@@ -282,6 +300,14 @@ app.post(
                 },
                 description: "Unauthorized.",
             },
+            403: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Applications closed, or external account add requires a verified member.",
+            },
             409: {
                 content: {
                     "application/json": {
@@ -313,7 +339,7 @@ app.post(
             return c.json({ success: false, error: "Applications are currently closed." }, 403);
         }
 
-        const { cocAccountTag, apiToken, captchaToken } = c.req.valid("json");
+        const { cocAccountTag, apiToken, captchaToken, isExternal, warWeight } = c.req.valid("json");
 
         if (config.NODE_ENV !== "development") {
             const isCaptchaValid = await verifyTurnstileToken(captchaToken!);
@@ -351,6 +377,37 @@ app.post(
             return c.json({ success: false, error: "No linked Discord account found." }, 500);
         }
 
+        // External accounts (e.g. accounts a member only brings for CWL) skip the
+        // admin approval flow and are linked directly with a self-reported war weight.
+        // Restricted to verified+ members.
+        if (isExternal) {
+            const verified = await isVerified(user.id);
+            if (!verified.success) {
+                return c.json({ success: false, error: "Only verified members can add external accounts." }, 403);
+            }
+            try {
+                const account = await addCocAccount(discordId, cocAccountTag, { warWeight, isExternal: true });
+                logAction(c, {
+                    action: "coc_account.create",
+                    targetType: "coc_account",
+                    targetId: account!.id,
+                    metadata: { cocAccountTag, warWeight, isExternal: true },
+                });
+                return c.json({
+                    success: true,
+                    data: { account },
+                });
+            } catch (error: any) {
+                const { message, constraint, code } = getDbErrorMessage(error);
+                if (code === "23505") {
+                    return c.json({ success: false, error: "This account is already linked." }, 409);
+                }
+
+                Sentry.captureException(error, { extra: { message, constraint, code } });
+                return c.json({ success: false, error: "Failed to add account." }, 500);
+            }
+        }
+
         try {
             const application = await addClanApplication(discordId, cocAccountTag, playerData);
             logAction(c, {
@@ -385,7 +442,7 @@ const getCwlApplicationsData = z4.object({
             cocAccountTag: z4.string(),
             cocAccountClan: z4.string().nullable(),
             cocAccountWeight: z4.number(),
-            isAlt: z4.boolean(),
+            isExternal: z4.boolean(),
             month: z4.string(),
             year: z4.number(),
             preferenceNum: z4.number(),
@@ -453,25 +510,17 @@ app.get(
     },
 );
 
-const postCwlApplyBody = z4
-    .object({
-        isAlt: z4.boolean(),
-        preferenceNum: z4.int().min(1).max(99),
-        tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
-        accountClan: z4.string().max(50).nullable().optional(),
-        accountWeight: z4.int().min(1, "Account weight is required").max(9999999).optional(),
-    })
-    .refine((d) => d.isAlt || (typeof d.accountClan === "string" && d.accountClan.trim().length > 0), {
-        message: "Account clan is required",
-        path: ["accountClan"],
-    });
+const postCwlApplyBody = z4.object({
+    preferenceNum: z4.int().min(1).max(99),
+    tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
+    accountClan: z4.string().max(50).nullable().optional(),
+});
 const postCwlApplyData = z4.object({
     application: z4.object({
         id: z4.number(),
         cocAccountTag: z4.string(),
         cocAccountClan: z4.string().nullable(),
         cocAccountWeight: z4.number(),
-        isAlt: z4.boolean(),
         preferenceNum: z4.number(),
         month: z4.string(),
         year: z4.number(),
@@ -541,36 +590,25 @@ app.post(
             return c.json({ success: false, error: "CWL applications are currently closed." }, 403);
         }
 
-        const { isAlt, preferenceNum, tag, accountClan, accountWeight } = c.req.valid("json");
+        const { preferenceNum, tag, accountClan } = c.req.valid("json");
 
         const discordId = await getDiscordAccountId(user.id);
         if (!discordId) {
             return c.json({ success: false, error: "No linked Discord account found." }, 500);
         }
 
-        let resolvedWeight: number;
+        const userAccounts = await getUserCocAccounts(discordId);
+        const matchedAccount = userAccounts.find((acc) => acc.cocAccountTag === tag);
+        if (!matchedAccount) {
+            return c.json({ success: false, error: "This account is not linked to your profile. Link it first to apply." }, 400);
+        }
+        const resolvedWeight = matchedAccount.warWeight;
 
-        if (!isAlt) {
-            const userAccounts = await getUserCocAccounts(discordId);
-            const matchedAccount = userAccounts.find((acc) => acc.cocAccountTag === tag);
-            if (!matchedAccount) {
-                return c.json({ success: false, error: "This account is not linked to your profile. Link it first or mark it as an alt." }, 400);
-            }
-            resolvedWeight = matchedAccount.warWeight;
-        } else {
-            const existingOwner = await getCocAccountOwner(tag);
-            if (existingOwner && existingOwner !== discordId) {
-                return c.json({ success: false, error: "This account is already linked to another user. It cannot be used as an alt." }, 400);
-            }
-            const linkedAccount = existingOwner ? (await getUserCocAccounts(discordId)).find((acc) => acc.cocAccountTag === tag) : undefined;
-            if (linkedAccount) {
-                resolvedWeight = linkedAccount.warWeight;
-            } else {
-                if (!accountWeight) {
-                    return c.json({ success: false, error: "Account weight is required for alt accounts." }, 400);
-                }
-                resolvedWeight = accountWeight;
-            }
+        // Alt/external status comes from the linked account; only non-external
+        // (main) accounts pick a clan to participate with.
+        const isExternal = matchedAccount.isExternal;
+        if (!isExternal && (typeof accountClan !== "string" || accountClan.trim().length === 0)) {
+            return c.json({ success: false, error: "Account clan is required.", path: ["accountClan"] }, 400);
         }
 
         let playerData;
@@ -587,9 +625,8 @@ app.post(
                 discordUsername: user.name,
                 cocAccountName: playerData.name,
                 cocAccountTag: tag,
-                cocAccountClan: isAlt ? null : (accountClan ?? null),
+                cocAccountClan: isExternal ? null : (accountClan ?? null),
                 cocAccountWeight: resolvedWeight,
-                isAlt,
                 preferenceNum,
             });
             logAction(c, {
@@ -601,7 +638,7 @@ app.post(
                     month: application.month,
                     year: application.year,
                     preferenceNum,
-                    isAlt,
+                    isExternal,
                 },
             });
             return c.json({
@@ -611,13 +648,11 @@ app.post(
         } catch (error: any) {
             const { message, constraint, code } = getDbErrorMessage(error);
             if (code === "23505") {
-                return c.json(
-                    {
-                        success: false,
-                        error: "This preference number is already in use. Each preference number can only be used once per account and per user.",
-                    },
-                    409,
-                );
+                const errorMessage =
+                    constraint === "cwl_table_accountTag_month_year_unique"
+                        ? "You've already applied with this account this season."
+                        : "This preference number is already in use. Each preference number can only be used once per account and per user.";
+                return c.json({ success: false, error: errorMessage }, 409);
             }
 
             Sentry.captureException(error, { extra: { message, constraint, code } });

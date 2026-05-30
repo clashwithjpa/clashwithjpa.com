@@ -119,7 +119,7 @@
             case "clan_application.pending":
                 return `${actor} marked clan application from ${m.cocAccountTag ?? "?"} as pending`;
             case "cwl_application.create":
-                return `${actor} submitted a CWL application with ${m.cocAccountTag ?? "?"} (pref #${m.preferenceNum ?? "?"}${m.isAlt ? ", alt" : ""})`;
+                return `${actor} submitted a CWL application with ${m.cocAccountTag ?? "?"} (pref #${m.preferenceNum ?? "?"}${m.isExternal ? ", external" : ""})`;
             case "cwl_application.assign":
                 return `${actor} assigned ${m.cocAccountTag ?? "?"} to CWL clan ${m.assignedClanTag ?? "?"}`;
             case "cwl_application.unassign":

@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" ADD CONSTRAINT "cwl_application_table_discord_user_id_account_account_id_fk" FOREIGN KEY ("discord_user_id") REFERENCES "public"."account"("account_id") ON DELETE cascade ON UPDATE no action;

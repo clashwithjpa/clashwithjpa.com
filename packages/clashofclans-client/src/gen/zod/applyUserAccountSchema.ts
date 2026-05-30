@@ -11,14 +11,24 @@ import { z } from "zod/v4";
 export const applyUserAccount200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        application: z.object({
-            id: z.number(),
-            cocAccountTag: z.string(),
-            cocAccountData: z.any(),
-            discordUserId: z.string(),
-            status: z.string(),
-            createdAt: z.iso.datetime(),
-        }),
+        application: z.optional(
+            z.object({
+                id: z.number(),
+                cocAccountTag: z.string(),
+                cocAccountData: z.any(),
+                discordUserId: z.string(),
+                status: z.string(),
+                createdAt: z.iso.datetime(),
+            }),
+        ),
+        account: z.optional(
+            z.object({
+                id: z.number(),
+                cocAccountTag: z.string(),
+                warWeight: z.number(),
+                isExternal: z.boolean(),
+            }),
+        ),
     }),
 });
 
@@ -34,6 +44,14 @@ export const applyUserAccount400Schema = z.object({
  * @description Unauthorized.
  */
 export const applyUserAccount401Schema = z.object({
+    success: z.literal(false),
+    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+});
+
+/**
+ * @description Applications closed, or external account add requires a verified member.
+ */
+export const applyUserAccount403Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -58,6 +76,8 @@ export const applyUserAccountMutationRequestSchema = z.object({
     cocAccountTag: z.string().min(1).max(20).regex(/^#.*/),
     apiToken: z.string().min(1).max(500),
     captchaToken: z.optional(z.union([z.string(), z.null()])),
+    isExternal: z.optional(z.boolean().default(false)),
+    warWeight: z.optional(z.int().min(1).max(9999999)),
 });
 
 export const applyUserAccountMutationResponseSchema = z.lazy(() => applyUserAccount200Schema);

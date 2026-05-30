@@ -39,8 +39,11 @@ export async function getDiscordAccountId(userId: string): Promise<string | null
     return result[0]?.accountId ?? null;
 }
 
-export async function addCocAccount(discordUserId: string, cocAccountTag: string) {
-    const result = await db.insert(cocAccountTable).values({ discordUserId, cocAccountTag }).returning();
+export async function addCocAccount(discordUserId: string, cocAccountTag: string, opts: { warWeight?: number; isExternal?: boolean } = {}) {
+    const result = await db
+        .insert(cocAccountTable)
+        .values({ discordUserId, cocAccountTag, warWeight: opts.warWeight, isExternal: opts.isExternal })
+        .returning();
 
     return result[0];
 }
@@ -129,7 +132,6 @@ export async function addCwlApplication(data: {
     cocAccountTag: string;
     cocAccountClan: string | null;
     cocAccountWeight: number;
-    isAlt: boolean;
     preferenceNum: number;
 }) {
     const now = new Date();
@@ -148,14 +150,34 @@ export async function addCwlApplication(data: {
     return result[0]!;
 }
 
+// Shared CWL application projection. isExternal is derived from the linked CoC
+// account via the cwl_application_table.cocAccountTag -> coc_account_table FK,
+// replacing the old per-application isAlt flag.
+const cwlApplicationColumns = {
+    id: cwlApplicationTable.id,
+    discordUserId: cwlApplicationTable.discordUserId,
+    discordUsername: cwlApplicationTable.discordUsername,
+    cocAccountName: cwlApplicationTable.cocAccountName,
+    cocAccountTag: cwlApplicationTable.cocAccountTag,
+    cocAccountClan: cwlApplicationTable.cocAccountClan,
+    cocAccountWeight: cwlApplicationTable.cocAccountWeight,
+    isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
+    month: cwlApplicationTable.month,
+    year: cwlApplicationTable.year,
+    preferenceNum: cwlApplicationTable.preferenceNum,
+    appliedAt: cwlApplicationTable.appliedAt,
+    assignedTo: cwlApplicationTable.assignedTo,
+};
+
 export async function getUserCwlApplications(discordUserId: string) {
     const now = new Date();
     const month = now.toLocaleString("en-US", { month: "long" });
     const year = now.getFullYear();
 
     const applications = await db
-        .select()
+        .select(cwlApplicationColumns)
         .from(cwlApplicationTable)
+        .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
         .where(and(eq(cwlApplicationTable.discordUserId, discordUserId), eq(cwlApplicationTable.month, month), eq(cwlApplicationTable.year, year)));
 
     return applications;
@@ -269,7 +291,14 @@ export async function getAllCwlApplications(
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
     const [rows, countResult] = await Promise.all([
-        db.select().from(cwlApplicationTable).where(whereClause).orderBy(desc(cwlApplicationTable.appliedAt)).limit(limit).offset(offset),
+        db
+            .select(cwlApplicationColumns)
+            .from(cwlApplicationTable)
+            .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+            .where(whereClause)
+            .orderBy(desc(cwlApplicationTable.appliedAt))
+            .limit(limit)
+            .offset(offset),
         db
             .select({ count: sql<number>`count(*)::int` })
             .from(cwlApplicationTable)
@@ -281,7 +310,14 @@ export async function getAllCwlApplications(
 
 export async function assignCwlApplication(id: number, clanTag: string | null) {
     const result = await db.update(cwlApplicationTable).set({ assignedTo: clanTag }).where(eq(cwlApplicationTable.id, id)).returning();
-    return result[0] ?? null;
+    const row = result[0];
+    if (!row) return null;
+    const [acc] = await db
+        .select({ isExternal: cocAccountTable.isExternal })
+        .from(cocAccountTable)
+        .where(eq(cocAccountTable.cocAccountTag, row.cocAccountTag))
+        .limit(1);
+    return { ...row, isExternal: acc?.isExternal ?? false };
 }
 
 export async function getSettings() {

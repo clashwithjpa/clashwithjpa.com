@@ -57,6 +57,41 @@
             "when": 1779944309705,
             "tag": "0007_thick_the_executioner",
             "breakpoints": true
+        },
+        {
+            "idx": 8,
+            "version": "7",
+            "when": 1780080037505,
+            "tag": "0008_high_namora",
+            "breakpoints": true
+        },
+        {
+            "idx": 9,
+            "version": "7",
+            "when": 1780080880154,
+            "tag": "0009_reflective_scourge",
+            "breakpoints": true
+        },
+        {
+            "idx": 10,
+            "version": "7",
+            "when": 1780083061684,
+            "tag": "0010_amusing_zarek",
+            "breakpoints": true
+        },
+        {
+            "idx": 11,
+            "version": "7",
+            "when": 1780084118421,
+            "tag": "0011_previous_prowler",
+            "breakpoints": true
+        },
+        {
+            "idx": 12,
+            "version": "7",
+            "when": 1780115294872,
+            "tag": "0012_sloppy_mother_askani",
+            "breakpoints": true
         }
     ]
 }

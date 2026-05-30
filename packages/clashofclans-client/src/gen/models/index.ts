@@ -12,6 +12,7 @@ export type {
     ApplyUserAccount200,
     ApplyUserAccount400,
     ApplyUserAccount401,
+    ApplyUserAccount403,
     ApplyUserAccount409,
     ApplyUserAccount500,
     ApplyUserAccountMutation,

@@ -10,9 +10,13 @@
     import { Turnstile } from "svelte-turnstile";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
+    let { data } = $props();
+
     let cocAccountTag = $state("");
     let apiToken = $state("");
     let captchaToken = $state<string | null>(null);
+    let isExternal = $state(false);
+    let warWeight = $state<number | "">("");
     let reset = $state<() => void>();
     let isLoading = $state(false);
     let fieldErrors = $state<Record<string, string>>({});
@@ -59,6 +63,11 @@
             return;
         }
 
+        if (isExternal && (warWeight === "" || isNaN(Number(warWeight)) || Number(warWeight) <= 0)) {
+            toast.error("War weight is required for external accounts");
+            return;
+        }
+
         isLoading = true;
         try {
             const data = await applyUserAccount(
@@ -66,14 +75,18 @@
                     cocAccountTag,
                     apiToken,
                     captchaToken,
+                    isExternal,
+                    ...(isExternal ? { warWeight: Number(warWeight) } : {}),
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
 
             if (data.success) {
-                toast.success("Application submitted successfully!");
+                toast.success(isExternal ? "External account added successfully!" : "Application submitted successfully!");
                 cocAccountTag = "";
                 apiToken = "";
+                isExternal = false;
+                warWeight = "";
                 fieldErrors = {};
             } else {
                 console.log(data);
@@ -147,6 +160,36 @@
                 {/if}
             </Field.Root>
 
+            {#if data.canAddExternal}
+                <label class="flex cursor-pointer items-start gap-2">
+                    <Input type="checkbox" bind:checked={isExternal} disabled={isLoading} class="mt-1" />
+                    <span class="flex flex-col">
+                        <span class="text-sm font-medium">External account (CWL only)</span>
+                        <span class="text-xs text-stone-400">An account you only bring for CWL. Added directly without admin approval.</span>
+                    </span>
+                </label>
+
+                {#if isExternal}
+                    <Field.Root required invalid={!!fieldErrors.warWeight} class="flex flex-col gap-1">
+                        <Field.Label class="text-sm font-medium">War Weight</Field.Label>
+                        <Input
+                            bind:value={warWeight}
+                            type="number"
+                            placeholder="E.g. 100000"
+                            min={1}
+                            max={9999999}
+                            disabled={isLoading}
+                            aria-invalid={!!fieldErrors.warWeight}
+                        />
+                        {#if fieldErrors.warWeight}
+                            <Field.ErrorText class="text-xs text-red-400">{fieldErrors.warWeight}</Field.ErrorText>
+                        {:else}
+                            <Field.HelperText class="text-xs text-stone-400">War weight of your base</Field.HelperText>
+                        {/if}
+                    </Field.Root>
+                {/if}
+            {/if}
+
             <div class="flex justify-center">
                 <Turnstile
                     on:callback={(e) => {
@@ -158,13 +201,16 @@
                 />
             </div>
 
-            <Button type="submit" disabled={isLoading || !cocAccountTag || !apiToken || !captchaToken}>
+            <Button
+                type="submit"
+                disabled={isLoading || !cocAccountTag || !apiToken || !captchaToken || (isExternal && (warWeight === "" || Number(warWeight) <= 0))}
+            >
                 {#if isLoading}
                     <span class="flex items-center justify-center gap-2">
                         <SvgSpinnersRingResize class="size-4" /> Submitting...
                     </span>
                 {:else}
-                    <span> Submit Application </span>
+                    <span> {isExternal ? "Add External Account" : "Submit Application"} </span>
                 {/if}
             </Button>
         </form>

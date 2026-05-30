@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" ADD CONSTRAINT "cwl_table_accountTag_month_year_unique" UNIQUE("coc_account_tag","month","year");

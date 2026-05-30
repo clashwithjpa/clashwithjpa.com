@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" ADD CONSTRAINT "cwl_application_table_coc_account_tag_coc_account_table_coc_account_tag_fk" FOREIGN KEY ("coc_account_tag") REFERENCES "public"."coc_account_table"("coc_account_tag") ON DELETE cascade ON UPDATE no action;

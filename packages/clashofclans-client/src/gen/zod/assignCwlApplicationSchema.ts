@@ -23,7 +23,7 @@ export const assignCwlApplication200Schema = z.object({
             cocAccountTag: z.string(),
             cocAccountClan: z.union([z.string(), z.null()]),
             cocAccountWeight: z.number(),
-            isAlt: z.boolean(),
+            isExternal: z.boolean(),
             month: z.string(),
             year: z.number(),
             preferenceNum: z.number(),

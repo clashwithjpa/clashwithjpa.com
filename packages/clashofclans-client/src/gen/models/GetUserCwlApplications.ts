@@ -47,7 +47,7 @@ export type GetUserCwlApplications200 = {
             /**
              * @type boolean
              */
-            isAlt: boolean;
+            isExternal: boolean;
             /**
              * @type string
              */

@@ -11,6 +11,7 @@ export {
     applyUserAccount200Schema,
     applyUserAccount400Schema,
     applyUserAccount401Schema,
+    applyUserAccount403Schema,
     applyUserAccount409Schema,
     applyUserAccount500Schema,
     applyUserAccountMutationRequestSchema,

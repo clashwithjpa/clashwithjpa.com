@@ -10,9 +10,9 @@
     import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import TablerExternalLink from "~icons/tabler/external-link";
     import TablerListNumbers from "~icons/tabler/list-numbers";
     import TablerScale from "~icons/tabler/scale";
-    import TablerUsersPlus from "~icons/tabler/users-plus";
     import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
@@ -139,8 +139,8 @@
                                 <span class="block truncate text-lg font-bold text-stone-50">{app.cocAccountName}</span>
                                 <span class="block truncate font-mono text-xs text-stone-400">{app.cocAccountTag}</span>
                             </div>
-                            {#if app.isAlt}
-                                <Badge variant="yellow" content="Alt" icon={TablerUsersPlus} />
+                            {#if app.isExternal}
+                                <Badge variant="red" content="External" icon={TablerExternalLink} />
                             {/if}
                         </div>
 

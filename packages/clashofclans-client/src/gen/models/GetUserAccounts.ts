@@ -35,6 +35,10 @@ export type GetUserAccounts200 = {
              * @type number
              */
             warWeight: number;
+            /**
+             * @type boolean
+             */
+            isExternal: boolean;
         }[];
     };
 };

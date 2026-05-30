@@ -1,0 +1,1 @@
+ALTER TABLE "coc_account_table" ADD COLUMN "is_external" boolean DEFAULT false NOT NULL;

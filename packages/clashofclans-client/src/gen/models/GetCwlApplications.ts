@@ -82,7 +82,7 @@ export type GetCwlApplications200 = {
             /**
              * @type boolean
              */
-            isAlt: boolean;
+            isExternal: boolean;
             /**
              * @type string
              */

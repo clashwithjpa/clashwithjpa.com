@@ -238,7 +238,7 @@ const cwlApplicationSchema = z4.object({
     cocAccountTag: z4.string(),
     cocAccountClan: z4.string().nullable(),
     cocAccountWeight: z4.number(),
-    isAlt: z4.boolean(),
+    isExternal: z4.boolean(),
     month: z4.string(),
     year: z4.number(),
     preferenceNum: z4.number(),

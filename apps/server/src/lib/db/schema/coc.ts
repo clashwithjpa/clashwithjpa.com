@@ -50,6 +50,7 @@ export const cocAccountTable = pgTable(
             .references(() => account.accountId, { onDelete: "cascade" }),
         cocAccountTag: text("coc_account_tag").notNull().unique(),
         warWeight: integer("war_weight").notNull().default(0),
+        isExternal: boolean("is_external").notNull().default(false),
     },
     (t) => [index("coc_account_discord_user_id_idx").on(t.discordUserId)],
 );
@@ -106,13 +107,16 @@ export const cwlApplicationTable = pgTable(
     "cwl_application_table",
     {
         id: serial("id").primaryKey(),
-        discordUserId: text("discord_user_id").notNull(),
+        discordUserId: text("discord_user_id")
+            .notNull()
+            .references(() => account.accountId, { onDelete: "cascade" }),
         discordUsername: text("discord_username").notNull(),
         cocAccountName: text("coc_account_name").notNull(),
-        cocAccountTag: text("coc_account_tag").notNull(),
+        cocAccountTag: text("coc_account_tag")
+            .notNull()
+            .references(() => cocAccountTable.cocAccountTag, { onDelete: "cascade" }),
         cocAccountClan: text("coc_account_clan"),
         cocAccountWeight: integer("coc_account_weight").notNull(),
-        isAlt: boolean("is_alt").notNull().default(false),
         month: text("month").notNull(),
         year: integer("year").notNull(),
         preferenceNum: integer("preference_num").notNull(),
@@ -124,6 +128,8 @@ export const cwlApplicationTable = pgTable(
     (t) => [
         unique("cwl_table_accountTag_preferenceNum_month_year_unique").on(t.cocAccountTag, t.preferenceNum, t.month, t.year),
         unique("cwl_table_userId_preferenceNum_month_year_unique").on(t.discordUserId, t.preferenceNum, t.month, t.year),
+        // One CWL application per account per season, regardless of preference slot.
+        unique("cwl_table_accountTag_month_year_unique").on(t.cocAccountTag, t.month, t.year),
         index("cwl_application_discord_user_id_idx").on(t.discordUserId),
         index("cwl_application_assigned_to_idx").on(t.assignedTo),
     ],
@@ -134,17 +140,22 @@ export const cwlRelations = relations(cwlApplicationTable, ({ one }) => ({
         fields: [cwlApplicationTable.assignedTo],
         references: [cwlClanInfoTable.cocClanTag],
     }),
+    cocAccount: one(cocAccountTable, {
+        fields: [cwlApplicationTable.cocAccountTag],
+        references: [cocAccountTable.cocAccountTag],
+    }),
 }));
 
 export const accountCocRelations = relations(account, ({ many }) => ({
     cocAccounts: many(cocAccountTable),
 }));
 
-export const cocAccountRelations = relations(cocAccountTable, ({ one }) => ({
+export const cocAccountRelations = relations(cocAccountTable, ({ one, many }) => ({
     user: one(account, {
         fields: [cocAccountTable.discordUserId],
         references: [account.accountId],
     }),
+    cwlApplications: many(cwlApplicationTable),
 }));
 
 export const guidesRelations = relations(guidesTable, ({ one }) => ({

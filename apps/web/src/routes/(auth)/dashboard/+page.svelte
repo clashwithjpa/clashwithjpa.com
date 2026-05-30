@@ -31,7 +31,6 @@
     import TablerListNumbers from "~icons/tabler/list-numbers";
     import TablerMapPin from "~icons/tabler/map-pin";
     import TablerScale from "~icons/tabler/scale";
-    import TablerUsersPlus from "~icons/tabler/users-plus";
     import TablerX from "~icons/tabler/x";
 
     const session = authClient.useSession();
@@ -191,6 +190,9 @@
                                             </div>
                                         </div>
                                         <div class="flex shrink-0 flex-wrap gap-1">
+                                            {#if account.isExternal}
+                                                <Badge variant="red" content="External" icon={TablerExternalLink} />
+                                            {/if}
                                             {#if acc.data.player.clan}
                                                 <Badge
                                                     variant="blue"
@@ -255,8 +257,8 @@
                                                 {formatDate(application.appliedAt)}
                                             </span>
                                         </Tooltip>
-                                        {#if application.isAlt}
-                                            <Badge variant="yellow" content="Alt" class="mt-2" icon={TablerUsersPlus} />
+                                        {#if application.isExternal}
+                                            <Badge variant="red" content="External" class="mt-2" icon={TablerExternalLink} />
                                         {/if}
                                     </div>
                                 </div>

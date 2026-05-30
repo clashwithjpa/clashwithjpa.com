@@ -14,23 +14,20 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
     let session = authClient.useSession();
-    let options: (Option & { warWeight: number; clanTag?: string })[] = $state([]);
+    let options: (Option & { warWeight: number; clanTag?: string; isExternal: boolean })[] = $state([]);
     let clanOptions: Option[] = $state([]);
 
     // Form fields
     let tag = $state("");
-    let isAlt = $state(false);
     let preferenceNum = $state<number>(1);
     let accountClan = $state("");
-    let accountWeight = $state<number | "">("");
 
-    let linkedAltAccount = $derived(isAlt && tag ? options.find((o) => o.value === tag) : undefined);
-    let selectedAccountWeight = $derived(
-        !isAlt && tag ? (options.find((o) => o.value === tag)?.warWeight ?? 0) : (linkedAltAccount?.warWeight ?? null),
-    );
+    let selectedAccountWeight = $derived(tag ? (options.find((o) => o.value === tag)?.warWeight ?? null) : null);
+    // Alt/external status comes from the account itself, not a manual checkbox.
+    let selectedIsExternal = $derived(tag ? (options.find((o) => o.value === tag)?.isExternal ?? false) : false);
 
     $effect(() => {
-        if (isAlt || !tag) return;
+        if (selectedIsExternal || !tag) return;
         const selected = options.find((o) => o.value === tag);
         if (!selected?.clanTag) return;
         const match = clanOptions.find((c) => c.value === selected.clanTag);
@@ -73,6 +70,7 @@
                         icon: `th/${playerData.data.player.townHallLevel}`,
                         warWeight: acc.warWeight,
                         clanTag: playerData.data.player.clan?.tag,
+                        isExternal: acc.isExternal,
                     };
                 } catch (e) {
                     return {
@@ -81,16 +79,18 @@
                         icon: undefined,
                         warWeight: acc.warWeight,
                         clanTag: undefined,
+                        isExternal: acc.isExternal,
                     };
                 }
             }),
         );
         options = accsInfo.map((acc) => ({
-            label: `${acc.tag} - ${acc.name}`,
+            label: `${acc.tag} - ${acc.name}${acc.isExternal ? " (External)" : ""}`,
             value: acc.tag,
             icon: acc.icon,
             warWeight: acc.warWeight,
             clanTag: acc.clanTag,
+            isExternal: acc.isExternal,
         }));
     }
 
@@ -109,12 +109,8 @@
             toast.error("Please select an account tag");
             return;
         }
-        if (!isAlt && !accountClan.trim()) {
+        if (!selectedIsExternal && !accountClan.trim()) {
             toast.error("Account clan is required");
-            return;
-        }
-        if (isAlt && !linkedAltAccount && (accountWeight === "" || isNaN(Number(accountWeight)) || Number(accountWeight) === 0)) {
-            toast.error("Account weight is required");
             return;
         }
         if (selectedAccountWeight === 0) {
@@ -127,10 +123,8 @@
             const data = await applyCwl(
                 {
                     tag,
-                    isAlt,
                     preferenceNum,
-                    accountClan: isAlt ? null : accountClan,
-                    ...(isAlt && !linkedAltAccount ? { accountWeight: Number(accountWeight) } : {}),
+                    accountClan: selectedIsExternal ? null : accountClan,
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
@@ -139,10 +133,8 @@
                 const selectedOption = options.find((o) => o.value === tag);
                 toast.success(`CWL Application for ${selectedOption?.label || tag} submitted successfully!`);
                 tag = "";
-                isAlt = false;
                 preferenceNum = 1;
                 accountClan = "";
-                accountWeight = "";
                 fieldErrors = {};
             } else {
                 console.log(data);
@@ -183,22 +175,13 @@
             <form onsubmit={handleSubmit} class="flex flex-col gap-6">
                 <Field.Root required invalid={!!fieldErrors.tag} class="flex flex-col gap-1">
                     <Field.Label class="text-sm font-medium">Select Account</Field.Label>
-                    {#if isAlt}
-                        <Input
-                            bind:value={tag}
-                            placeholder="Enter the tag of the alternate account (e.g. #ABCDEFG)"
-                            disabled={isLoading}
-                            aria-invalid={!!fieldErrors.tag}
-                        />
-                    {:else}
-                        <Select bind:value={tag} {options} placeholder="Select an account" disabled={isLoading} />
-                    {/if}
+                    <Select bind:value={tag} {options} placeholder="Select a linked account" disabled={isLoading} />
                     {#if fieldErrors.tag}
                         <Field.ErrorText class="text-xs text-red-400">{fieldErrors.tag}</Field.ErrorText>
                     {/if}
                 </Field.Root>
 
-                {#if !isAlt}
+                {#if !selectedIsExternal}
                     <Field.Root required invalid={!!fieldErrors.accountClan} class="flex flex-col gap-1">
                         <Field.Label class="text-sm font-medium">Account Clan</Field.Label>
                         <Select
@@ -213,25 +196,7 @@
                     </Field.Root>
                 {/if}
 
-                {#if isAlt && !linkedAltAccount}
-                    <Field.Root required invalid={!!fieldErrors.accountWeight} class="flex flex-col gap-1">
-                        <Field.Label class="text-sm font-medium">Account Weight</Field.Label>
-                        <Input
-                            bind:value={accountWeight}
-                            type="number"
-                            placeholder="E.g. 100000"
-                            min={1}
-                            max={9999999}
-                            disabled={isLoading}
-                            aria-invalid={!!fieldErrors.accountWeight}
-                        />
-                        {#if fieldErrors.accountWeight}
-                            <Field.ErrorText class="text-xs text-red-400">{fieldErrors.accountWeight}</Field.ErrorText>
-                        {:else}
-                            <Field.HelperText class="text-xs text-stone-400">War weight of your base</Field.HelperText>
-                        {/if}
-                    </Field.Root>
-                {:else if selectedAccountWeight !== null}
+                {#if selectedAccountWeight !== null}
                     <div class="flex flex-col gap-1">
                         <span class="text-sm font-medium">Account Weight</span>
                         <span class="rounded-lg border-2 border-stone-700/50 bg-stone-900/50 px-4 py-2 text-base text-stone-300"
@@ -248,7 +213,7 @@
                         type="number"
                         placeholder="1"
                         min={1}
-                        max={isAlt ? options.length + 1 : options.length}
+                        max={options.length}
                         disabled={isLoading}
                         aria-invalid={!!fieldErrors.preferenceNum}
                     />
@@ -259,19 +224,7 @@
                     {/if}
                 </Field.Root>
 
-                <label class="flex cursor-pointer items-center gap-2">
-                    <Input type="checkbox" bind:checked={isAlt} disabled={isLoading} />
-                    <span class="text-sm font-medium">Is this an alternate account?</span>
-                </label>
-
-                <Button
-                    type="submit"
-                    disabled={isLoading ||
-                        !tag ||
-                        (!isAlt && !accountClan) ||
-                        (isAlt && !linkedAltAccount && (!accountWeight || Number(accountWeight) === 0)) ||
-                        selectedAccountWeight === 0}
-                >
+                <Button type="submit" disabled={isLoading || !tag || (!selectedIsExternal && !accountClan) || selectedAccountWeight === 0}>
                     {#if isLoading}
                         <span class="flex items-center justify-center gap-2">
                             <SvgSpinnersRingResize class="size-4" /> Submitting...

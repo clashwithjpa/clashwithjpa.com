@@ -9,6 +9,7 @@ import type {
     ApplyUserAccountMutationResponse,
     ApplyUserAccount400,
     ApplyUserAccount401,
+    ApplyUserAccount403,
     ApplyUserAccount409,
     ApplyUserAccount500,
 } from "../models/ApplyUserAccount.ts";
@@ -33,7 +34,7 @@ export async function applyUserAccount(
 
     const res = await request<
         ApplyUserAccountMutationResponse,
-        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500>,
+        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500>,
         ApplyUserAccountMutationRequest
     >({ method: "POST", url: getApplyUserAccountUrl().url.toString(), data: requestData, ...requestConfig });
     return res.data;

@@ -16,9 +16,9 @@ export type ApplyUserAccount200 = {
      */
     data: {
         /**
-         * @type object
+         * @type object | undefined
          */
-        application: {
+        application?: {
             /**
              * @type number
              */
@@ -40,6 +40,27 @@ export type ApplyUserAccount200 = {
              * @type string, date-time
              */
             createdAt: string;
+        };
+        /**
+         * @type object | undefined
+         */
+        account?: {
+            /**
+             * @type number
+             */
+            id: number;
+            /**
+             * @type string
+             */
+            cocAccountTag: string;
+            /**
+             * @type number
+             */
+            warWeight: number;
+            /**
+             * @type boolean
+             */
+            isExternal: boolean;
         };
     };
 };
@@ -63,6 +84,21 @@ export type ApplyUserAccount400 = {
  * @description Unauthorized.
  */
 export type ApplyUserAccount401 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
+ * @description Applications closed, or external account add requires a verified member.
+ */
+export type ApplyUserAccount403 = {
     /**
      * @type boolean
      */
@@ -119,6 +155,17 @@ export type ApplyUserAccountMutationRequest = {
      */
     apiToken: string;
     captchaToken?: string | null;
+    /**
+     * @default false
+     * @type boolean | undefined
+     */
+    isExternal?: boolean;
+    /**
+     * @minLength 1
+     * @maxLength 9999999
+     * @type integer | undefined
+     */
+    warWeight?: number;
 };
 
 export type ApplyUserAccountMutationResponse = ApplyUserAccount200;
@@ -126,5 +173,5 @@ export type ApplyUserAccountMutationResponse = ApplyUserAccount200;
 export type ApplyUserAccountMutation = {
     Response: ApplyUserAccount200;
     Request: ApplyUserAccountMutationRequest;
-    Errors: ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount409 | ApplyUserAccount500;
+    Errors: ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500;
 };
