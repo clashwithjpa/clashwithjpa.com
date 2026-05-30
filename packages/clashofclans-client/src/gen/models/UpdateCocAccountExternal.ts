@@ -3,31 +3,19 @@
  * Do not edit manually.
  */
 
-export type GetAdminCocAccountsQueryParams = {
-    /**
-     * @type string | undefined
-     */
-    search?: string;
+export type UpdateCocAccountExternalPathParams = {
     /**
      * @minLength 1
-     * @maxLength 200
-     * @default 50
-     * @type integer | undefined
-     */
-    limit?: number;
-    /**
-     * @minLength 0
      * @maxLength 9007199254740991
-     * @default 0
-     * @type integer | undefined
+     * @type integer
      */
-    offset?: number;
+    id: number;
 };
 
 /**
- * @description COC accounts.
+ * @description Updated COC account.
  */
-export type GetAdminCocAccounts200 = {
+export type UpdateCocAccountExternal200 = {
     /**
      * @type boolean
      */
@@ -37,9 +25,9 @@ export type GetAdminCocAccounts200 = {
      */
     data: {
         /**
-         * @type array
+         * @type object
          */
-        accounts: {
+        account: {
             /**
              * @type number
              */
@@ -62,18 +50,29 @@ export type GetAdminCocAccounts200 = {
             isExternal: boolean;
             ownerUserId: string | null;
             ownerName: string | null;
-        }[];
-        /**
-         * @type number
-         */
-        total: number;
+        };
     };
 };
 
 /**
  * @description Unauthorized.
  */
-export type GetAdminCocAccounts401 = {
+export type UpdateCocAccountExternal401 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
+ * @description Not found.
+ */
+export type UpdateCocAccountExternal404 = {
     /**
      * @type boolean
      */
@@ -88,7 +87,7 @@ export type GetAdminCocAccounts401 = {
 /**
  * @description Server error.
  */
-export type GetAdminCocAccounts500 = {
+export type UpdateCocAccountExternal500 = {
     /**
      * @type boolean
      */
@@ -100,10 +99,18 @@ export type GetAdminCocAccounts500 = {
           };
 };
 
-export type GetAdminCocAccountsQueryResponse = GetAdminCocAccounts200;
+export type UpdateCocAccountExternalMutationRequest = {
+    /**
+     * @type boolean
+     */
+    isExternal: boolean;
+};
 
-export type GetAdminCocAccountsQuery = {
-    Response: GetAdminCocAccounts200;
-    QueryParams: GetAdminCocAccountsQueryParams;
-    Errors: GetAdminCocAccounts401 | GetAdminCocAccounts500;
+export type UpdateCocAccountExternalMutationResponse = UpdateCocAccountExternal200;
+
+export type UpdateCocAccountExternalMutation = {
+    Response: UpdateCocAccountExternal200;
+    Request: UpdateCocAccountExternalMutationRequest;
+    PathParams: UpdateCocAccountExternalPathParams;
+    Errors: UpdateCocAccountExternal401 | UpdateCocAccountExternal404 | UpdateCocAccountExternal500;
 };

@@ -23,6 +23,7 @@ export const getAdminCocAccounts200Schema = z.object({
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
+                isExternal: z.boolean(),
                 ownerUserId: z.union([z.string(), z.null()]),
                 ownerName: z.union([z.string(), z.null()]),
             }),

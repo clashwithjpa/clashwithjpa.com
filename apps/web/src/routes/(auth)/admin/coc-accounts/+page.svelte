@@ -6,7 +6,7 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { fadeIn } from "$lib/utils/animations";
-    import { getAdminCocAccounts, updateCocAccountWarWeight } from "@repo/clashofclans-client";
+    import { getAdminCocAccounts, updateCocAccountExternal, updateCocAccountWarWeight } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import { toast } from "svelte-sonner";
     import TablerSearch from "~icons/tabler/search";
@@ -59,33 +59,59 @@
                 gridApi.setGridOption("datasource", createDatasource());
             },
             onCellValueChanged: async (event) => {
-                if (event.colDef.field !== "warWeight" || event.oldValue === event.newValue) return;
+                if (event.oldValue === event.newValue) return;
 
-                const warWeight = Number(event.newValue);
-                if (!Number.isInteger(warWeight) || warWeight < 0) {
-                    toast.error("War weight must be a non-negative whole number");
-                    event.data.warWeight = event.oldValue;
-                    event.api.refreshCells({ rowNodes: [event.node], force: true });
+                if (event.colDef.field === "warWeight") {
+                    const warWeight = Number(event.newValue);
+                    if (!Number.isInteger(warWeight) || warWeight < 0) {
+                        toast.error("War weight must be a non-negative whole number");
+                        event.data.warWeight = event.oldValue;
+                        event.api.refreshCells({ rowNodes: [event.node], force: true });
+                        return;
+                    }
+
+                    try {
+                        const resp = await updateCocAccountWarWeight(
+                            event.data.id,
+                            { warWeight },
+                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                        );
+                        if (resp.success) {
+                            event.data.warWeight = resp.data.account.warWeight;
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                            toast.success(`War weight updated for ${event.data.cocAccountTag}`);
+                        } else {
+                            throw new Error();
+                        }
+                    } catch (error) {
+                        toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
+                        event.data.warWeight = event.oldValue;
+                        event.api.refreshCells({ rowNodes: [event.node], force: true });
+                    }
                     return;
                 }
 
-                try {
-                    const resp = await updateCocAccountWarWeight(
-                        event.data.id,
-                        { warWeight },
-                        { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                    );
-                    if (resp.success) {
-                        event.data.warWeight = resp.data.account.warWeight;
+                if (event.colDef.field === "isExternal") {
+                    const isExternal = Boolean(event.newValue);
+                    try {
+                        const resp = await updateCocAccountExternal(
+                            event.data.id,
+                            { isExternal },
+                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                        );
+                        if (resp.success) {
+                            event.data.isExternal = resp.data.account.isExternal;
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                            toast.success(`${event.data.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
+                        } else {
+                            throw new Error();
+                        }
+                    } catch (error) {
+                        toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
+                        event.data.isExternal = event.oldValue;
                         event.api.refreshCells({ rowNodes: [event.node], force: true });
-                        toast.success(`War weight updated for ${event.data.cocAccountTag}`);
-                    } else {
-                        throw new Error();
                     }
-                } catch (error) {
-                    toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
-                    event.data.warWeight = event.oldValue;
-                    event.api.refreshCells({ rowNodes: [event.node], force: true });
+                    return;
                 }
             },
         }}
@@ -111,6 +137,17 @@
                 cellEditorParams: { type: "number" },
                 valueParser: (p) => Number(p.newValue),
                 valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
+            },
+            {
+                headerName: "External",
+                field: "isExternal",
+                sortable: false,
+                filter: false,
+                flex: 1,
+                editable: true,
+                cellRenderer: "agCheckboxCellRenderer",
+                cellEditor: "agCheckboxCellEditor",
+                valueGetter: (p) => Boolean(p.data?.isExternal),
             },
         ]}
     />

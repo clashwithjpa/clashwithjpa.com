@@ -19,6 +19,7 @@ import {
     MissingDiscordAccountError,
     updateClan,
     updateClanApplicationStatus,
+    updateCocAccountExternal,
     updateCocAccountWarWeight,
     updateCwlClan,
     updateSettings,
@@ -853,6 +854,7 @@ const cocAccountSchema = z4.object({
     discordUserId: z4.string(),
     cocAccountTag: z4.string(),
     warWeight: z4.number(),
+    isExternal: z4.boolean(),
     ownerUserId: z4.string().nullable(),
     ownerName: z4.string().nullable(),
 });
@@ -936,6 +938,52 @@ app.put(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update war weight" }, 500);
+        }
+    },
+);
+
+const updateCocAccountExternalBodySchema = z4.object({
+    isExternal: z4.boolean(),
+});
+const updateCocAccountExternalData = z4.object({
+    account: cocAccountSchema,
+});
+app.put(
+    "/coc-accounts/:id/external",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "updateCocAccountExternal",
+        description:
+            "[Manager] Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated COC account.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCocAccountExternalData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", cocAccountIdPathSchema),
+    zValidator("json", updateCocAccountExternalBodySchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const { isExternal } = c.req.valid("json");
+            const account = await updateCocAccountExternal(id, isExternal);
+            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            logAction(c, {
+                action: "coc_account.external_update",
+                targetType: "coc_account",
+                targetId: account.id,
+                metadata: { cocAccountTag: account.cocAccountTag, isExternal: account.isExternal },
+            });
+            return c.json({ success: true, data: { account } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update external status" }, 500);
         }
     },
 );

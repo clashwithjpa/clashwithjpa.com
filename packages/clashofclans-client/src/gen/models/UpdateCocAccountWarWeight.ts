@@ -44,6 +44,10 @@ export type UpdateCocAccountWarWeight200 = {
              * @type number
              */
             warWeight: number;
+            /**
+             * @type boolean
+             */
+            isExternal: boolean;
             ownerUserId: string | null;
             ownerName: string | null;
         };

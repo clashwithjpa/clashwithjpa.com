@@ -46,6 +46,8 @@
         { label: "CWL clan — deleted", value: "cwl_clan.delete" },
         { label: "COC account — imported", value: "coc_account.import" },
         { label: "COC account — war weight updated", value: "coc_account.weight_update" },
+        { label: "COC account — marked external", value: "coc_account.mark_external" },
+        { label: "COC account — external status changed", value: "coc_account.external_update" },
         { label: "User — role set", value: "user.role_set" },
         { label: "User — created", value: "user.create" },
         { label: "User — updated", value: "user.update" },
@@ -158,6 +160,10 @@
                 return `${actor} imported ${m.count ?? "?"} COC account${m.count === 1 ? "" : "s"}`;
             case "coc_account.weight_update":
                 return `${actor} set war weight of ${m.cocAccountTag ?? "?"} to ${m.warWeight ?? "?"}`;
+            case "coc_account.mark_external":
+                return `${actor} marked ${m.cocAccountTag ?? "?"} as external`;
+            case "coc_account.external_update":
+                return `${actor} set ${m.cocAccountTag ?? "?"} to ${m.isExternal ? "external" : "main"}`;
             case "user.role_set":
                 return `${actor} set role of ${userTargetLabel(e, m)} to ${roleLabel(m.role)}`;
             case "user.create":

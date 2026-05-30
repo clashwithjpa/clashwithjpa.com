@@ -29,6 +29,8 @@ export type AuditAction =
     | "coc_account.create"
     | "coc_account.import"
     | "coc_account.weight_update"
+    | "coc_account.external_update"
+    | "coc_account.mark_external"
     // Better-auth admin endpoints
     | "user.role_set"
     | "user.create"

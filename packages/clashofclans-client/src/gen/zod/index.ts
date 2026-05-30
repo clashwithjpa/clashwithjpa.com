@@ -179,6 +179,14 @@ export {
 } from "./postCOCPlayerVerifySchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
+    setUserAccountExternal200Schema,
+    setUserAccountExternal401Schema,
+    setUserAccountExternal404Schema,
+    setUserAccountExternal500Schema,
+    setUserAccountExternalMutationResponseSchema,
+    setUserAccountExternalPathParamsSchema,
+} from "./setUserAccountExternalSchema.ts";
+export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,
@@ -203,6 +211,15 @@ export {
     updateAdminSettingsMutationRequestSchema,
     updateAdminSettingsMutationResponseSchema,
 } from "./updateAdminSettingsSchema.ts";
+export {
+    updateCocAccountExternal200Schema,
+    updateCocAccountExternal401Schema,
+    updateCocAccountExternal404Schema,
+    updateCocAccountExternal500Schema,
+    updateCocAccountExternalMutationRequestSchema,
+    updateCocAccountExternalMutationResponseSchema,
+    updateCocAccountExternalPathParamsSchema,
+} from "./updateCocAccountExternalSchema.ts";
 export {
     updateCocAccountWarWeight200Schema,
     updateCocAccountWarWeight401Schema,

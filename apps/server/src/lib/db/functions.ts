@@ -407,6 +407,7 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
                 discordUserId: cocAccountTable.discordUserId,
                 cocAccountTag: cocAccountTable.cocAccountTag,
                 warWeight: cocAccountTable.warWeight,
+                isExternal: cocAccountTable.isExternal,
                 ownerUserId: account.userId,
                 ownerName: user.name,
             })
@@ -430,6 +431,26 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
 
 export async function updateCocAccountWarWeight(id: number, warWeight: number) {
     const result = await db.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+// Admin-only toggle of the external flag. Used to revert a member-marked
+// external account back to a main account (members can only set it one-way).
+export async function updateCocAccountExternal(id: number, isExternal: boolean) {
+    const result = await db.update(cocAccountTable).set({ isExternal }).where(eq(cocAccountTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+// Member self-service: convert one of their OWN accounts to external (one-way).
+// Scoped to discordUserId so a member can only touch their own accounts, and only
+// ever sets isExternal to true — reverting to a main account is staff-only (see
+// updateCocAccountExternal). War weight is left untouched; members never edit it.
+export async function setUserCocAccountExternal(id: number, discordUserId: string) {
+    const result = await db
+        .update(cocAccountTable)
+        .set({ isExternal: true })
+        .where(and(eq(cocAccountTable.id, id), eq(cocAccountTable.discordUserId, discordUserId)))
+        .returning();
     return result[0] ?? null;
 }
 

@@ -4,6 +4,7 @@
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -19,6 +20,8 @@
         getJPACwlClans,
         getUserAccounts,
         getUserCwlApplications,
+        setUserAccountExternal,
+        type SetUserAccountExternal500,
     } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
@@ -37,6 +40,63 @@
 
     let importDismissed = $state(false);
     let isImporting = $state(false);
+
+    type LinkedAccount = {
+        id: number;
+        discordUserId: string;
+        cocAccountTag: string;
+        warWeight: number;
+        isExternal: boolean;
+    };
+
+    // Verified members and up can manage their accounts; unverified users only see
+    // the import banner (handled separately below).
+    const canManageAccounts = $derived(!!$session.data && $session.data.user.role !== "unverified");
+
+    // Accounts are held in state (rather than rendered straight from the fetch) so
+    // marking one external can update its card in place without a full reload.
+    let accounts = $state<LinkedAccount[] | null>(null);
+    let markingId = $state<number | null>(null);
+
+    async function loadAccounts() {
+        try {
+            const resp = await getUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            accounts = resp.success ? resp.data.accounts : [];
+        } catch (err) {
+            console.error("Failed to load accounts:", err);
+            accounts = [];
+        }
+    }
+
+    $effect(() => {
+        if (canManageAccounts && accounts === null) {
+            loadAccounts();
+        }
+    });
+
+    async function markExternal(account: LinkedAccount) {
+        markingId = account.id;
+        try {
+            const resp = await setUserAccountExternal(account.id, {
+                baseURL: PUBLIC_SERVER_URL,
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (resp.success) {
+                account.isExternal = resp.data.account.isExternal;
+                toast.success(`${account.cocAccountTag} marked as external`);
+            } else {
+                const error = (resp as unknown as SetUserAccountExternal500).error;
+                toast.error(typeof error === "string" ? error : "Failed to convert account to external");
+            }
+        } catch (err) {
+            console.error("Mark external error:", err);
+            toast.error("Failed to convert account to external");
+        } finally {
+            markingId = null;
+        }
+    }
 
     async function importAccounts() {
         isImporting = true;
@@ -137,81 +197,101 @@
     {@render importBanner()}
 {/if}
 
-{#if $session.data?.user.role !== "unverified"}
-    {#await getUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
+{#if canManageAccounts}
+    {#if accounts === null}
         <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
             <SvgSpinnersBlocksScale />
             <span>Linked Accounts</span>
         </div>
-    {:then resp}
-        {#if resp.data.accounts.length === 0}
+    {:else}
+        {#if accounts.length === 0}
             {@render importBanner()}
         {/if}
         <div in:fadeIn>
             <h1 class="text-2xl font-bold">Linked Accounts</h1>
             <br />
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {#if resp.data.accounts.length === 0}
+                {#if accounts.length === 0}
                     <div class="flex items-center justify-start gap-1 text-stone-400">
                         <TablerX />
                         <span>No linked accounts found</span>
                     </div>
                 {:else}
-                    {#each resp.data.accounts as account}
+                    {#each accounts as account (account.id)}
                         <div
-                            class="flex min-h-20 w-full items-center justify-center overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
+                            class="flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
                         >
-                            {#await getCOCPlayer(encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
-                                <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
-                            {:then acc}
-                                {#if !acc.success}
-                                    <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
-                                        <TablerX class="size-16 text-stone-400" />
-                                        <div class="flex flex-col items-start justify-center gap-1">
-                                            <span class="text-lg font-semibold">Error fetching player</span>
-                                            <span class="font-mono text-sm text-stone-400">{(acc as unknown as GetCOCPlayer500).error}</span>
-                                        </div>
-                                    </div>
-                                {:else}
-                                    <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
-                                        <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
-                                            <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
-                                                <Icon name="th/{acc.data.player.townHallLevel}" class="size-16 shrink-0" />
-                                            </Tooltip>
-                                            <div class="w-full min-w-0">
-                                                <Tooltip title={acc.data.player.name} placement="top" class="w-full text-left">
-                                                    <span class="block w-full truncate text-lg font-semibold">
-                                                        {acc.data.player.name}
-                                                    </span>
-                                                </Tooltip>
-                                                <span class="block w-full truncate font-mono text-sm text-stone-400">
-                                                    {acc.data.player.tag}
-                                                </span>
+                            <div class="flex w-full grow items-center justify-center">
+                                {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )}
+                                    <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+                                {:then acc}
+                                    {#if !acc.success}
+                                        <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                            <TablerX class="size-16 text-stone-400" />
+                                            <div class="flex flex-col items-start justify-center gap-1">
+                                                <span class="text-lg font-semibold">Error fetching player</span>
+                                                <span class="font-mono text-sm text-stone-400">{(acc as unknown as GetCOCPlayer500).error}</span>
                                             </div>
                                         </div>
-                                        <div class="flex shrink-0 flex-wrap gap-1">
-                                            {#if account.isExternal}
-                                                <Badge variant="red" content="External" icon={TablerExternalLink} />
-                                            {/if}
-                                            {#if acc.data.player.clan}
-                                                <Badge
-                                                    variant="blue"
-                                                    content={acc.data.player.clan?.name}
-                                                    icon={acc.data.player.clan?.badgeUrls.small}
-                                                    iconSize="size-4"
-                                                />
-                                            {/if}
-                                            <Badge variant="yellow" content="BH {acc.data.player.builderHallLevel}" icon={TablerHammer} />
+                                    {:else}
+                                        <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                            <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
+                                                <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
+                                                    <Icon name="th/{acc.data.player.townHallLevel}" class="size-16 shrink-0" />
+                                                </Tooltip>
+                                                <div class="w-full min-w-0">
+                                                    <Tooltip title={acc.data.player.name} placement="top" class="w-full text-left">
+                                                        <span class="block w-full truncate text-lg font-semibold">
+                                                            {acc.data.player.name}
+                                                        </span>
+                                                    </Tooltip>
+                                                    <span class="block w-full truncate font-mono text-sm text-stone-400">
+                                                        {acc.data.player.tag}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex shrink-0 flex-wrap gap-1">
+                                                {#if account.isExternal}
+                                                    <Badge variant="red" content="External" icon={TablerExternalLink} />
+                                                {/if}
+                                                {#if acc.data.player.clan}
+                                                    <Badge
+                                                        variant="blue"
+                                                        content={acc.data.player.clan?.name}
+                                                        icon={acc.data.player.clan?.badgeUrls.small}
+                                                        iconSize="size-4"
+                                                    />
+                                                {/if}
+                                                <Badge variant="yellow" content="BH {acc.data.player.builderHallLevel}" icon={TablerHammer} />
+                                            </div>
                                         </div>
-                                    </div>
-                                {/if}
-                            {/await}
+                                    {/if}
+                                {/await}
+                            </div>
+                            {#if !account.isExternal}
+                                <ConfirmationDialog
+                                    title="Mark as external?"
+                                    class="w-full"
+                                    description="Convert {account.cocAccountTag} to an external account (e.g. one you only bring for CWL). This is one-way — only staff can change it back to a main account."
+                                    confirmText="Mark as external"
+                                    onConfirm={() => markExternal(account)}
+                                >
+                                    <Button variant="ghost" size="sm" class="w-full gap-1 text-xs" disabled={markingId === account.id}>
+                                        {#if markingId === account.id}
+                                            <SvgSpinnersRingResize class="size-3.5" />
+                                        {:else}
+                                            <TablerExternalLink class="size-3.5" />
+                                        {/if}
+                                        Mark as external
+                                    </Button>
+                                </ConfirmationDialog>
+                            {/if}
                         </div>
                     {/each}
                 {/if}
             </div>
         </div>
-    {/await}
+    {/if}
 {/if}
 
 <br />

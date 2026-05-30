@@ -5,14 +5,14 @@
 
 import { z } from "zod/v4";
 
-export const updateCocAccountWarWeightPathParamsSchema = z.object({
+export const updateCocAccountExternalPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
 });
 
 /**
  * @description Updated COC account.
  */
-export const updateCocAccountWarWeight200Schema = z.object({
+export const updateCocAccountExternal200Schema = z.object({
     success: z.literal(true),
     data: z.object({
         account: z.object({
@@ -30,7 +30,7 @@ export const updateCocAccountWarWeight200Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const updateCocAccountWarWeight401Schema = z.object({
+export const updateCocAccountExternal401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -38,7 +38,7 @@ export const updateCocAccountWarWeight401Schema = z.object({
 /**
  * @description Not found.
  */
-export const updateCocAccountWarWeight404Schema = z.object({
+export const updateCocAccountExternal404Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -46,13 +46,13 @@ export const updateCocAccountWarWeight404Schema = z.object({
 /**
  * @description Server error.
  */
-export const updateCocAccountWarWeight500Schema = z.object({
+export const updateCocAccountExternal500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const updateCocAccountWarWeightMutationRequestSchema = z.object({
-    warWeight: z.int().min(0).max(9007199254740991),
+export const updateCocAccountExternalMutationRequestSchema = z.object({
+    isExternal: z.boolean(),
 });
 
-export const updateCocAccountWarWeightMutationResponseSchema = z.lazy(() => updateCocAccountWarWeight200Schema);
+export const updateCocAccountExternalMutationResponseSchema = z.lazy(() => updateCocAccountExternal200Schema);

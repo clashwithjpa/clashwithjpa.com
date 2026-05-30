@@ -5,14 +5,14 @@
 
 import { z } from "zod/v4";
 
-export const updateCocAccountWarWeightPathParamsSchema = z.object({
+export const setUserAccountExternalPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
 });
 
 /**
- * @description Updated COC account.
+ * @description Account converted to external successfully.
  */
-export const updateCocAccountWarWeight200Schema = z.object({
+export const setUserAccountExternal200Schema = z.object({
     success: z.literal(true),
     data: z.object({
         account: z.object({
@@ -21,8 +21,6 @@ export const updateCocAccountWarWeight200Schema = z.object({
             cocAccountTag: z.string(),
             warWeight: z.number(),
             isExternal: z.boolean(),
-            ownerUserId: z.union([z.string(), z.null()]),
-            ownerName: z.union([z.string(), z.null()]),
         }),
     }),
 });
@@ -30,29 +28,25 @@ export const updateCocAccountWarWeight200Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const updateCocAccountWarWeight401Schema = z.object({
+export const setUserAccountExternal401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
 /**
- * @description Not found.
+ * @description Account not found or not linked to the current user.
  */
-export const updateCocAccountWarWeight404Schema = z.object({
+export const setUserAccountExternal404Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
 /**
- * @description Server error.
+ * @description Internal server error.
  */
-export const updateCocAccountWarWeight500Schema = z.object({
+export const setUserAccountExternal500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const updateCocAccountWarWeightMutationRequestSchema = z.object({
-    warWeight: z.int().min(0).max(9007199254740991),
-});
-
-export const updateCocAccountWarWeightMutationResponseSchema = z.lazy(() => updateCocAccountWarWeight200Schema);
+export const setUserAccountExternalMutationResponseSchema = z.lazy(() => setUserAccountExternal200Schema);

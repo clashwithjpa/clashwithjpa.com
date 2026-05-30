@@ -11,6 +11,7 @@ import {
     getUserCocAccounts,
     getUserCwlApplications,
     importCocAccountsForUser,
+    setUserCocAccountExternal,
 } from "@/lib/db/functions";
 import { getImportableAccounts } from "@/lib/import-lookup";
 import { getCachedSettings } from "@/lib/settings-cache";
@@ -428,6 +429,98 @@ app.post(
 
             Sentry.captureException(error, { extra: { message, constraint, code } });
             return c.json({ success: false, error: "Failed to submit application." }, 500);
+        }
+    },
+);
+
+const putAccountExternalPathSchema = z4.object({
+    id: z4.coerce.number().int().min(1),
+});
+const putAccountExternalData = z4.object({
+    account: z4.object({
+        id: z4.number(),
+        discordUserId: z4.string(),
+        cocAccountTag: z4.string(),
+        warWeight: z4.number(),
+        isExternal: z4.boolean(),
+    }),
+});
+app.put(
+    "/accounts/:id/external",
+    hasAccessAuthMiddleware(isVerified),
+    describeRoute({
+        operationId: "setUserAccountExternal",
+        description:
+            "[Verified] Converts one of the current user's own Clash of Clans accounts to external. One-way: members can only mark an account external, not revert it (reverting to a main account is staff-only). War weight is left unchanged.",
+        tags: ["user"],
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(putAccountExternalData)),
+                    },
+                },
+                description: "Account converted to external successfully.",
+            },
+            401: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Unauthorized.",
+            },
+            404: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Account not found or not linked to the current user.",
+            },
+            500: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Internal server error.",
+            },
+        },
+    }),
+    zValidator("param", putAccountExternalPathSchema),
+    async (c) => {
+        const user = c.get("user");
+        const session = c.get("session");
+        if (!user || !session) {
+            return c.json({ success: false, error: "Unauthorized" }, 401);
+        }
+
+        const { id } = c.req.valid("param");
+
+        const discordId = await getDiscordAccountId(user.id);
+        if (!discordId) {
+            return c.json({ success: false, error: "No linked Discord account found." }, 500);
+        }
+
+        try {
+            const account = await setUserCocAccountExternal(id, discordId);
+            if (!account) {
+                return c.json({ success: false, error: "Account not found or not linked to your profile." }, 404);
+            }
+            logAction(c, {
+                action: "coc_account.mark_external",
+                targetType: "coc_account",
+                targetId: account.id,
+                metadata: { cocAccountTag: account.cocAccountTag, isExternal: true },
+            });
+            return c.json({
+                success: true,
+                data: { account },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update account." }, 500);
         }
     },
 );

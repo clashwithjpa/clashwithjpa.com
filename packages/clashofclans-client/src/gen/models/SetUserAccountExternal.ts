@@ -3,31 +3,19 @@
  * Do not edit manually.
  */
 
-export type GetAdminCocAccountsQueryParams = {
-    /**
-     * @type string | undefined
-     */
-    search?: string;
+export type SetUserAccountExternalPathParams = {
     /**
      * @minLength 1
-     * @maxLength 200
-     * @default 50
-     * @type integer | undefined
-     */
-    limit?: number;
-    /**
-     * @minLength 0
      * @maxLength 9007199254740991
-     * @default 0
-     * @type integer | undefined
+     * @type integer
      */
-    offset?: number;
+    id: number;
 };
 
 /**
- * @description COC accounts.
+ * @description Account converted to external successfully.
  */
-export type GetAdminCocAccounts200 = {
+export type SetUserAccountExternal200 = {
     /**
      * @type boolean
      */
@@ -37,9 +25,9 @@ export type GetAdminCocAccounts200 = {
      */
     data: {
         /**
-         * @type array
+         * @type object
          */
-        accounts: {
+        account: {
             /**
              * @type number
              */
@@ -60,20 +48,14 @@ export type GetAdminCocAccounts200 = {
              * @type boolean
              */
             isExternal: boolean;
-            ownerUserId: string | null;
-            ownerName: string | null;
-        }[];
-        /**
-         * @type number
-         */
-        total: number;
+        };
     };
 };
 
 /**
  * @description Unauthorized.
  */
-export type GetAdminCocAccounts401 = {
+export type SetUserAccountExternal401 = {
     /**
      * @type boolean
      */
@@ -86,9 +68,9 @@ export type GetAdminCocAccounts401 = {
 };
 
 /**
- * @description Server error.
+ * @description Account not found or not linked to the current user.
  */
-export type GetAdminCocAccounts500 = {
+export type SetUserAccountExternal404 = {
     /**
      * @type boolean
      */
@@ -100,10 +82,25 @@ export type GetAdminCocAccounts500 = {
           };
 };
 
-export type GetAdminCocAccountsQueryResponse = GetAdminCocAccounts200;
+/**
+ * @description Internal server error.
+ */
+export type SetUserAccountExternal500 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
 
-export type GetAdminCocAccountsQuery = {
-    Response: GetAdminCocAccounts200;
-    QueryParams: GetAdminCocAccountsQueryParams;
-    Errors: GetAdminCocAccounts401 | GetAdminCocAccounts500;
+export type SetUserAccountExternalMutationResponse = SetUserAccountExternal200;
+
+export type SetUserAccountExternalMutation = {
+    Response: SetUserAccountExternal200;
+    PathParams: SetUserAccountExternalPathParams;
+    Errors: SetUserAccountExternal401 | SetUserAccountExternal404 | SetUserAccountExternal500;
 };

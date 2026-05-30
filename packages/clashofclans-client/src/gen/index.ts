@@ -32,9 +32,11 @@ export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApp
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
+export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export type { UpdateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
+export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type {
@@ -280,6 +282,15 @@ export type {
 } from "./models/PostCOCPlayerVerify.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
+    SetUserAccountExternal200,
+    SetUserAccountExternal401,
+    SetUserAccountExternal404,
+    SetUserAccountExternal500,
+    SetUserAccountExternalMutation,
+    SetUserAccountExternalMutationResponse,
+    SetUserAccountExternalPathParams,
+} from "./models/SetUserAccountExternal.ts";
+export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,
@@ -307,6 +318,16 @@ export type {
     UpdateAdminSettingsMutationRequest,
     UpdateAdminSettingsMutationResponse,
 } from "./models/UpdateAdminSettings.ts";
+export type {
+    UpdateCocAccountExternal200,
+    UpdateCocAccountExternal401,
+    UpdateCocAccountExternal404,
+    UpdateCocAccountExternal500,
+    UpdateCocAccountExternalMutation,
+    UpdateCocAccountExternalMutationRequest,
+    UpdateCocAccountExternalMutationResponse,
+    UpdateCocAccountExternalPathParams,
+} from "./models/UpdateCocAccountExternal.ts";
 export type {
     UpdateCocAccountWarWeight200,
     UpdateCocAccountWarWeight401,
@@ -363,9 +384,11 @@ export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { setRules } from "./clients/setRules.ts";
+export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
 export { updateAdminCwlClan } from "./clients/updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
+export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
@@ -460,12 +483,16 @@ export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts"
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
+export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
+export { setUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export { createUpdateAdminClan } from "./hooks/createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export { createUpdateAdminCwlClan } from "./hooks/createUpdateAdminCwlClan.ts";
 export { updateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts";
 export { updateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
+export { createUpdateCocAccountExternal } from "./hooks/createUpdateCocAccountExternal.ts";
+export { updateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
@@ -688,6 +715,14 @@ export {
 } from "./zod/postCOCPlayerVerifySchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
+    setUserAccountExternal200Schema,
+    setUserAccountExternal401Schema,
+    setUserAccountExternal404Schema,
+    setUserAccountExternal500Schema,
+    setUserAccountExternalMutationResponseSchema,
+    setUserAccountExternalPathParamsSchema,
+} from "./zod/setUserAccountExternalSchema.ts";
+export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,
@@ -712,6 +747,15 @@ export {
     updateAdminSettingsMutationRequestSchema,
     updateAdminSettingsMutationResponseSchema,
 } from "./zod/updateAdminSettingsSchema.ts";
+export {
+    updateCocAccountExternal200Schema,
+    updateCocAccountExternal401Schema,
+    updateCocAccountExternal404Schema,
+    updateCocAccountExternal500Schema,
+    updateCocAccountExternalMutationRequestSchema,
+    updateCocAccountExternalMutationResponseSchema,
+    updateCocAccountExternalPathParamsSchema,
+} from "./zod/updateCocAccountExternalSchema.ts";
 export {
     updateCocAccountWarWeight200Schema,
     updateCocAccountWarWeight401Schema,

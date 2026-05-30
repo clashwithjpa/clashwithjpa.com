@@ -241,6 +241,15 @@ export type {
 } from "./PostCOCPlayerVerify.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
+    SetUserAccountExternal200,
+    SetUserAccountExternal401,
+    SetUserAccountExternal404,
+    SetUserAccountExternal500,
+    SetUserAccountExternalMutation,
+    SetUserAccountExternalMutationResponse,
+    SetUserAccountExternalPathParams,
+} from "./SetUserAccountExternal.ts";
+export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,
@@ -268,6 +277,16 @@ export type {
     UpdateAdminSettingsMutationRequest,
     UpdateAdminSettingsMutationResponse,
 } from "./UpdateAdminSettings.ts";
+export type {
+    UpdateCocAccountExternal200,
+    UpdateCocAccountExternal401,
+    UpdateCocAccountExternal404,
+    UpdateCocAccountExternal500,
+    UpdateCocAccountExternalMutation,
+    UpdateCocAccountExternalMutationRequest,
+    UpdateCocAccountExternalMutationResponse,
+    UpdateCocAccountExternalPathParams,
+} from "./UpdateCocAccountExternal.ts";
 export type {
     UpdateCocAccountWarWeight200,
     UpdateCocAccountWarWeight401,
