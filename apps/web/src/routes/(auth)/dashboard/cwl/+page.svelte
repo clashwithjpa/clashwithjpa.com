@@ -113,10 +113,6 @@
             toast.error("Account clan is required");
             return;
         }
-        if (selectedAccountWeight === 0) {
-            toast.error("War weight is 0. Please contact an admin to update your war weight.");
-            return;
-        }
 
         isLoading = true;
         try {
@@ -224,7 +220,7 @@
                     {/if}
                 </Field.Root>
 
-                <Button type="submit" disabled={isLoading || !tag || (!selectedIsExternal && !accountClan) || selectedAccountWeight === 0}>
+                <Button type="submit" disabled={isLoading || !tag || (!selectedIsExternal && !accountClan)}>
                     {#if isLoading}
                         <span class="flex items-center justify-center gap-2">
                             <SvgSpinnersRingResize class="size-4" /> Submitting...
