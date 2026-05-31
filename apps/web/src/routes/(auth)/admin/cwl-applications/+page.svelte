@@ -1,18 +1,17 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Badge from "$lib/components/ui/Badge.svelte";
+    import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
+    import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
+    import Grid from "$lib/components/ui/Grid.svelte";
+    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { formatDate, formatDateTime } from "$lib/utils";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
+    import { fadeIn } from "$lib/utils/animations";
     import { assignCwlApplication, getCwlApplications, getJPACwlClans, type GetCwlApplications200 } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
-    import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import TablerExternalLink from "~icons/tabler/external-link";
-    import TablerListNumbers from "~icons/tabler/list-numbers";
-    import TablerScale from "~icons/tabler/scale";
     import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
@@ -26,7 +25,6 @@
     let total = $state(0);
     let loading = $state(true);
     let filterMode = $state<string>("all");
-    let processingId = $state<number | null>(null);
 
     const filterOptions: Option[] = [
         { label: "All", value: "all" },
@@ -77,7 +75,6 @@
     }
 
     async function assign(id: number, clanTag: string) {
-        processingId = id;
         try {
             const resp = await assignCwlApplication(
                 id,
@@ -85,16 +82,19 @@
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
             if (resp.success) {
-                applications = applications.map((a) => (a.id === id ? resp.data.application : a));
                 toast.success(clanTag ? "Application assigned" : "Application unassigned");
-            } else {
-                toast.error("Failed to assign application");
+                return resp.data.application.assignedTo ?? "";
             }
+            toast.error("Failed to assign application");
         } catch (e: any) {
             toast.error("Failed to assign application", { description: e?.message });
-        } finally {
-            processingId = null;
         }
+        return null;
+    }
+
+    function clanLabel(clanTag: string | null | undefined): string {
+        if (!clanTag) return "Unassigned";
+        return clanOptions.find((o) => o.value === clanTag)?.label ?? clanTag;
     }
 
     loadClans();
@@ -120,59 +120,85 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto">
+    <div class="relative flex-1 overflow-hidden">
+        <Grid
+            rowData={applications}
+            gridOptions={{
+                rowHeight: 56,
+                onCellValueChanged: async (event) => {
+                    if (event.colDef.field !== "assignedTo" || event.oldValue === event.newValue) return;
+                    const result = await assign(event.data.id, event.newValue || "");
+                    event.data.assignedTo = result ?? event.oldValue;
+                    event.api.refreshCells({ rowNodes: [event.node], columns: ["assignedTo"], force: true });
+                },
+            }}
+            columnDefs={[
+                {
+                    headerName: "Account",
+                    field: "cocAccountName",
+                    sortable: false,
+                    filter: false,
+                    flex: 2,
+                    cellRenderer: svelteRenderer(CwlAccountCell),
+                },
+                {
+                    headerName: "Clan",
+                    field: "cocAccountClan",
+                    sortable: false,
+                    filter: false,
+                    flex: 1,
+                    valueFormatter: (p) => p.value || "—",
+                },
+                { headerName: "Pref.", field: "preferenceNum", sortable: false, filter: false, width: 90 },
+                {
+                    headerName: "Weight",
+                    field: "cocAccountWeight",
+                    sortable: false,
+                    filter: false,
+                    flex: 1,
+                    valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
+                },
+                {
+                    headerName: "Discord",
+                    field: "discordUsername",
+                    sortable: false,
+                    filter: false,
+                    flex: 2,
+                    cellRenderer: svelteRenderer(CwlDiscordCell),
+                },
+                {
+                    headerName: "Applied",
+                    field: "appliedAt",
+                    sortable: false,
+                    filter: false,
+                    flex: 1,
+                    valueFormatter: (p) => (p.value ? formatDate(p.value) : ""),
+                    tooltipValueGetter: (p) => (p.value ? formatDateTime(p.value) : ""),
+                },
+                {
+                    headerName: "Assigned clan",
+                    field: "assignedTo",
+                    sortable: false,
+                    filter: false,
+                    flex: 2,
+                    editable: true,
+                    cellEditorPopup: true,
+                    cellEditor: "uiSelectEditor",
+                    cellEditorParams: () => ({ options: clanOptions }),
+                    valueGetter: (p) => p.data?.assignedTo ?? "",
+                    valueFormatter: (p) => clanLabel(p.value),
+                },
+            ]}
+        />
+
         {#if loading}
-            <div class="flex size-full items-center justify-center text-stone-400">
+            <div class="absolute inset-0 flex items-center justify-center bg-stone-950 text-stone-400">
                 <SvgSpinnersBlocksScale class="size-12" />
             </div>
         {:else if applications.length === 0}
-            <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400">
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-stone-950 text-stone-400">
                 <TablerX class="size-12" />
                 <span>No CWL applications found</span>
-            </div>
-        {:else}
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {#each applications as app (app.id)}
-                    <div in:fadeIn use:cardSlideIn class="flex min-w-0 flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0 flex-1">
-                                <span class="block truncate text-lg font-bold text-stone-50">{app.cocAccountName}</span>
-                                <span class="block truncate font-mono text-xs text-stone-400">{app.cocAccountTag}</span>
-                            </div>
-                            {#if app.isExternal}
-                                <Badge variant="red" content="External" icon={TablerExternalLink} />
-                            {/if}
-                        </div>
-
-                        <div class="flex flex-wrap gap-1">
-                            {#if app.cocAccountClan}
-                                <Badge variant="ghost" content={app.cocAccountClan} />
-                            {/if}
-                            <Badge variant="ghost" content="Pref. {app.preferenceNum}" icon={TablerListNumbers} />
-                            <Badge variant="ghost" content={app.cocAccountWeight.toLocaleString()} icon={TablerScale} />
-                        </div>
-
-                        <div class="flex flex-col gap-1 text-xs text-stone-400">
-                            <div class="flex items-center gap-1">
-                                <SimpleIconsDiscord class="size-3.5" />
-                                <span>{app.discordUsername}</span>
-                                <span class="font-mono">({app.discordUserId})</span>
-                            </div>
-                            <span title={formatDateTime(app.appliedAt)}>Applied {formatDate(app.appliedAt)}</span>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <span class="text-xs font-medium text-stone-400">Assigned clan</span>
-                            <Select
-                                value={app.assignedTo ?? ""}
-                                options={clanOptions}
-                                placeholder="Assign to..."
-                                disabled={processingId === app.id}
-                                onValueChange={(val: string) => assign(app.id, val)}
-                            />
-                        </div>
-                    </div>
-                {/each}
             </div>
         {/if}
     </div>

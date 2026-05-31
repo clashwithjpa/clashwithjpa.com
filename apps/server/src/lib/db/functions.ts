@@ -292,9 +292,11 @@ export async function getAllCwlApplications(
 
     const [rows, countResult] = await Promise.all([
         db
-            .select(cwlApplicationColumns)
+            .select({ ...cwlApplicationColumns, image: user.image })
             .from(cwlApplicationTable)
             .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+            .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
+            .leftJoin(user, eq(user.id, account.userId))
             .where(whereClause)
             .orderBy(desc(cwlApplicationTable.appliedAt))
             .limit(limit)
@@ -313,11 +315,13 @@ export async function assignCwlApplication(id: number, clanTag: string | null) {
     const row = result[0];
     if (!row) return null;
     const [acc] = await db
-        .select({ isExternal: cocAccountTable.isExternal })
+        .select({ isExternal: cocAccountTable.isExternal, image: user.image })
         .from(cocAccountTable)
+        .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
+        .leftJoin(user, eq(user.id, account.userId))
         .where(eq(cocAccountTable.cocAccountTag, row.cocAccountTag))
         .limit(1);
-    return { ...row, isExternal: acc?.isExternal ?? false };
+    return { ...row, isExternal: acc?.isExternal ?? false, image: acc?.image ?? null };
 }
 
 export async function getSettings() {

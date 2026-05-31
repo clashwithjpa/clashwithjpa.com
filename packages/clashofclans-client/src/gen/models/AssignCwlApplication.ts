@@ -57,6 +57,7 @@ export type AssignCwlApplication200 = {
              * @type boolean
              */
             isExternal: boolean;
+            image: string | null;
             /**
              * @type string
              */
