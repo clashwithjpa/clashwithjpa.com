@@ -9,6 +9,8 @@ export const getAdminCocAccountsQueryParamsSchema = z.object({
     search: z.optional(z.string()),
     limit: z.coerce.number().int().min(1).max(200).default(50),
     offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
+    sortBy: z.optional(z.string()),
+    sortDir: z.optional(z.enum(["asc", "desc"])),
 });
 
 /**

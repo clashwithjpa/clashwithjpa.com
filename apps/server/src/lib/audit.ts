@@ -14,6 +14,8 @@ export type AuditAction =
     | "cwl_application.create"
     | "cwl_application.assign"
     | "cwl_application.unassign"
+    | "cwl_application.bulk_assign"
+    | "cwl_application.bulk_unassign"
     // Settings
     | "settings.update"
     | "rules.update"

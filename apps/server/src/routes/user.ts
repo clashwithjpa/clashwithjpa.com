@@ -719,7 +719,6 @@ app.post(
                 cocAccountName: playerData.name,
                 cocAccountTag: tag,
                 cocAccountClan: isExternal ? null : (accountClan ?? null),
-                cocAccountWeight: resolvedWeight,
                 preferenceNum,
             });
             logAction(c, {
@@ -736,7 +735,7 @@ app.post(
             });
             return c.json({
                 success: true,
-                data: { application },
+                data: { application: { ...application, cocAccountWeight: resolvedWeight } },
             });
         } catch (error: any) {
             const { message, constraint, code } = getDbErrorMessage(error);

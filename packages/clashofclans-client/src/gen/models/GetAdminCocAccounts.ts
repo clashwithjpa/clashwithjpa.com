@@ -3,6 +3,14 @@
  * Do not edit manually.
  */
 
+export const getAdminCocAccountsQueryParamsSortDirEnum = {
+    asc: "asc",
+    desc: "desc",
+} as const;
+
+export type GetAdminCocAccountsQueryParamsSortDirEnumKey =
+    (typeof getAdminCocAccountsQueryParamsSortDirEnum)[keyof typeof getAdminCocAccountsQueryParamsSortDirEnum];
+
 export type GetAdminCocAccountsQueryParams = {
     /**
      * @type string | undefined
@@ -22,6 +30,14 @@ export type GetAdminCocAccountsQueryParams = {
      * @type integer | undefined
      */
     offset?: number;
+    /**
+     * @type string | undefined
+     */
+    sortBy?: string;
+    /**
+     * @type string | undefined
+     */
+    sortDir?: GetAdminCocAccountsQueryParamsSortDirEnumKey;
 };
 
 /**

@@ -24,6 +24,10 @@
     onMount(() => {
         const options: GridOptions = {
             theme: "legacy",
+            // Allow selecting/copying cell text (double-click, drag). Off by default in AG Grid.
+            // ensureDomOrder keeps copied text in the visible row order.
+            enableCellTextSelection: true,
+            ensureDomOrder: true,
             ...gridOptions,
             defaultColDef: {
                 minWidth: 100, // Safe minimum to prevent extreme squishing

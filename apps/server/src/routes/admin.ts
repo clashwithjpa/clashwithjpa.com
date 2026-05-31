@@ -3,6 +3,7 @@ import { logAction } from "@/lib/audit";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
     assignCwlApplication,
+    assignCwlApplicationsBulk,
     createClan,
     createCwlClan,
     deleteClan,
@@ -253,8 +254,9 @@ const getCwlApplicationsQuerySchema = z4.object({
     year: z4.coerce.number().int().optional(),
     assignedTo: z4.string().optional(),
     unassigned: z4.coerce.boolean().optional(),
-    limit: z4.coerce.number().int().min(1).max(200).default(50),
-    offset: z4.coerce.number().int().min(0).default(0),
+    // Optional: when omitted, the whole (filtered) season is returned.
+    limit: z4.coerce.number().int().min(1).optional(),
+    offset: z4.coerce.number().int().min(0).optional(),
 });
 const getCwlApplicationsData = z4.object({
     applications: z4.array(cwlApplicationSchema),
@@ -344,6 +346,51 @@ app.put(
             if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to assign CWL application" }, 500);
+        }
+    },
+);
+
+const bulkAssignCwlBodySchema = z4.object({
+    ids: z4.array(z4.number().int().min(1)).min(1).max(200),
+    clanTag: z4.string().nullable(),
+});
+const bulkAssignCwlData = z4.object({
+    count: z4.number(),
+    assignedTo: z4.string().nullable(),
+});
+app.post(
+    "/cwl-applications/assign-bulk",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "assignCwlApplicationsBulk",
+        description: "[Manager] Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Number of applications updated.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(bulkAssignCwlData)) } },
+            },
+            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", bulkAssignCwlBodySchema),
+    async (c) => {
+        try {
+            const { ids, clanTag } = c.req.valid("json");
+            const result = await assignCwlApplicationsBulk(ids, clanTag);
+            logAction(c, {
+                action: clanTag ? "cwl_application.bulk_assign" : "cwl_application.bulk_unassign",
+                targetType: "cwl_application",
+                metadata: { count: result.count, assignedClanTag: clanTag, ids: result.ids },
+            });
+            return c.json({ success: true, data: { count: result.count, assignedTo: clanTag } });
+        } catch (error: any) {
+            const { code } = getDbErrorMessage(error);
+            if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to assign CWL applications" }, 500);
         }
     },
 );
@@ -864,6 +911,8 @@ const getCocAccountsQuerySchema = z4.object({
     search: z4.string().optional(),
     limit: z4.coerce.number().int().min(1).max(200).default(50),
     offset: z4.coerce.number().int().min(0).default(0),
+    sortBy: z4.string().optional(),
+    sortDir: z4.enum(["asc", "desc"]).optional(),
 });
 const getCocAccountsData = z4.object({
     accounts: z4.array(cocAccountSchema),

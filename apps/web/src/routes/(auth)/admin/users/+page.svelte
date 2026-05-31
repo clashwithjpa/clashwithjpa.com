@@ -119,6 +119,13 @@
                         queryParams.searchField = searchType[0];
                     }
 
+                    // Server-side sorting (better-auth listUsers supports sortBy/sortDirection)
+                    const sort = params.sortModel?.[0];
+                    if (sort) {
+                        queryParams.sortBy = sort.colId;
+                        queryParams.sortDirection = sort.sort;
+                    }
+
                     const { data, error } = await authClient.admin.listUsers({ query: queryParams });
 
                     if (error || !data?.users) {
@@ -275,7 +282,7 @@
             },
         }}
         columnDefs={[
-            { headerName: "User", field: "name", sortable: false, filter: false, flex: 2, cellRenderer: svelteRenderer(UserCell) },
+            { headerName: "User", field: "name", sortable: true, filter: false, flex: 2, cellRenderer: svelteRenderer(UserCell) },
             {
                 headerName: "Role",
                 field: "role",
@@ -284,7 +291,7 @@
                     if (!me || params.data.id === me.id) return false;
                     return roleLevel(params.data.role) < roleLevel(me.role);
                 },
-                sortable: false,
+                sortable: true,
                 filter: false,
                 cellRenderer: svelteRenderer(RoleCell),
                 cellEditorPopup: true,

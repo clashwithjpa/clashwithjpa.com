@@ -20,9 +20,10 @@
                 try {
                     const offset = params.startRow || 0;
                     const limit = (params.endRow || 0) - offset;
+                    const sort = params.sortModel?.[0];
 
                     const resp = await getAdminCocAccounts(
-                        { limit, offset, search: searchText || undefined },
+                        { limit, offset, search: searchText || undefined, sortBy: sort?.colId, sortDir: sort?.sort },
                         { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
                     );
 
@@ -119,17 +120,17 @@
             {
                 headerName: "Owner",
                 field: "ownerName",
-                sortable: false,
+                sortable: true,
                 filter: false,
                 flex: 2,
                 valueFormatter: (p) => p.value ?? "Unknown",
             },
-            { headerName: "Account Tag", field: "cocAccountTag", sortable: false, filter: false, flex: 2, cellClass: "font-mono" },
-            { headerName: "Discord ID", field: "discordUserId", sortable: false, filter: false, flex: 2, cellClass: "font-mono" },
+            { headerName: "Account Tag", field: "cocAccountTag", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
+            { headerName: "Discord ID", field: "discordUserId", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
             {
                 headerName: "War Weight",
                 field: "warWeight",
-                sortable: false,
+                sortable: true,
                 filter: false,
                 flex: 1,
                 editable: true,
@@ -141,7 +142,7 @@
             {
                 headerName: "External",
                 field: "isExternal",
-                sortable: false,
+                sortable: true,
                 filter: false,
                 flex: 1,
                 editable: true,

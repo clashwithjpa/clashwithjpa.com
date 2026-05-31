@@ -1,6 +1,7 @@
 export type { ApplyCwlMutationKey } from "./createApplyCwl.ts";
 export type { ApplyUserAccountMutationKey } from "./createApplyUserAccount.ts";
 export type { AssignCwlApplicationMutationKey } from "./createAssignCwlApplication.ts";
+export type { AssignCwlApplicationsBulkMutationKey } from "./createAssignCwlApplicationsBulk.ts";
 export type { CreateAdminClanMutationKey } from "./createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./createCreateAdminCwlClan.ts";
 export type { DeleteAdminClanMutationKey } from "./createDeleteAdminClan.ts";
@@ -45,6 +46,8 @@ export { applyUserAccountMutationKey } from "./createApplyUserAccount.ts";
 export { createApplyUserAccount } from "./createApplyUserAccount.ts";
 export { assignCwlApplicationMutationKey } from "./createAssignCwlApplication.ts";
 export { createAssignCwlApplication } from "./createAssignCwlApplication.ts";
+export { assignCwlApplicationsBulkMutationKey } from "./createAssignCwlApplicationsBulk.ts";
+export { createAssignCwlApplicationsBulk } from "./createAssignCwlApplicationsBulk.ts";
 export { createAdminClanMutationKey } from "./createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./createCreateAdminCwlClan.ts";

@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" DROP COLUMN "coc_account_weight";

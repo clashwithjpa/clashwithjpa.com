@@ -1,6 +1,7 @@
 export { applyCwl } from "./applyCwl.ts";
 export { applyUserAccount } from "./applyUserAccount.ts";
 export { assignCwlApplication } from "./assignCwlApplication.ts";
+export { assignCwlApplicationsBulk } from "./assignCwlApplicationsBulk.ts";
 export { createAdminClan } from "./createAdminClan.ts";
 export { createAdminCwlClan } from "./createAdminCwlClan.ts";
 export { deleteAdminClan } from "./deleteAdminClan.ts";

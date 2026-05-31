@@ -28,6 +28,14 @@ export {
     assignCwlApplicationPathParamsSchema,
 } from "./assignCwlApplicationSchema.ts";
 export {
+    assignCwlApplicationsBulk200Schema,
+    assignCwlApplicationsBulk400Schema,
+    assignCwlApplicationsBulk401Schema,
+    assignCwlApplicationsBulk500Schema,
+    assignCwlApplicationsBulkMutationRequestSchema,
+    assignCwlApplicationsBulkMutationResponseSchema,
+} from "./assignCwlApplicationsBulkSchema.ts";
+export {
     createAdminClan200Schema,
     createAdminClan401Schema,
     createAdminClan409Schema,

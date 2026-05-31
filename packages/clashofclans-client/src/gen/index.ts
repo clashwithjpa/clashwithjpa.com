@@ -1,6 +1,7 @@
 export type { ApplyCwlMutationKey } from "./hooks/createApplyCwl.ts";
 export type { ApplyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
 export type { AssignCwlApplicationMutationKey } from "./hooks/createAssignCwlApplication.ts";
+export type { AssignCwlApplicationsBulkMutationKey } from "./hooks/createAssignCwlApplicationsBulk.ts";
 export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
@@ -72,6 +73,15 @@ export type {
     AssignCwlApplicationPathParams,
 } from "./models/AssignCwlApplication.ts";
 export type {
+    AssignCwlApplicationsBulk200,
+    AssignCwlApplicationsBulk400,
+    AssignCwlApplicationsBulk401,
+    AssignCwlApplicationsBulk500,
+    AssignCwlApplicationsBulkMutation,
+    AssignCwlApplicationsBulkMutationRequest,
+    AssignCwlApplicationsBulkMutationResponse,
+} from "./models/AssignCwlApplicationsBulk.ts";
+export type {
     CreateAdminClan200,
     CreateAdminClan401,
     CreateAdminClan409,
@@ -114,6 +124,7 @@ export type {
     GetAdminCocAccounts500,
     GetAdminCocAccountsQuery,
     GetAdminCocAccountsQueryParams,
+    GetAdminCocAccountsQueryParamsSortDirEnumKey,
     GetAdminCocAccountsQueryResponse,
 } from "./models/GetAdminCocAccounts.ts";
 export type {
@@ -353,6 +364,7 @@ export type {
 export { applyCwl } from "./clients/applyCwl.ts";
 export { applyUserAccount } from "./clients/applyUserAccount.ts";
 export { assignCwlApplication } from "./clients/assignCwlApplication.ts";
+export { assignCwlApplicationsBulk } from "./clients/assignCwlApplicationsBulk.ts";
 export { createAdminClan } from "./clients/createAdminClan.ts";
 export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
@@ -397,6 +409,8 @@ export { applyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
 export { createApplyUserAccount } from "./hooks/createApplyUserAccount.ts";
 export { assignCwlApplicationMutationKey } from "./hooks/createAssignCwlApplication.ts";
 export { createAssignCwlApplication } from "./hooks/createAssignCwlApplication.ts";
+export { assignCwlApplicationsBulkMutationKey } from "./hooks/createAssignCwlApplicationsBulk.ts";
+export { createAssignCwlApplicationsBulk } from "./hooks/createAssignCwlApplicationsBulk.ts";
 export { createAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./hooks/createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
@@ -497,6 +511,7 @@ export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountW
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
+export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
 export { warStateEnum } from "./models/GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./models/GetCOCClan.ts";
@@ -548,6 +563,14 @@ export {
     assignCwlApplicationMutationResponseSchema,
     assignCwlApplicationPathParamsSchema,
 } from "./zod/assignCwlApplicationSchema.ts";
+export {
+    assignCwlApplicationsBulk200Schema,
+    assignCwlApplicationsBulk400Schema,
+    assignCwlApplicationsBulk401Schema,
+    assignCwlApplicationsBulk500Schema,
+    assignCwlApplicationsBulkMutationRequestSchema,
+    assignCwlApplicationsBulkMutationResponseSchema,
+} from "./zod/assignCwlApplicationsBulkSchema.ts";
 export {
     createAdminClan200Schema,
     createAdminClan401Schema,

@@ -5,14 +5,16 @@
 
 import { z } from "zod/v4";
 
-export const getCwlApplicationsQueryParamsSchema = z.object({
-    month: z.optional(z.string()),
-    year: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
-    assignedTo: z.optional(z.string()),
-    unassigned: z.optional(z.boolean()),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
-    offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
-});
+export const getCwlApplicationsQueryParamsSchema = z
+    .object({
+        month: z.optional(z.string()),
+        year: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
+        assignedTo: z.optional(z.string()),
+        unassigned: z.optional(z.boolean()),
+        limit: z.optional(z.coerce.number().int().min(1).max(9007199254740991)),
+        offset: z.optional(z.coerce.number().int().min(0).max(9007199254740991)),
+    })
+    .optional();
 
 /**
  * @description Applications.

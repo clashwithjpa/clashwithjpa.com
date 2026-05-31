@@ -24,15 +24,13 @@ export type GetCwlApplicationsQueryParams = {
     unassigned?: boolean;
     /**
      * @minLength 1
-     * @maxLength 200
-     * @default 50
+     * @maxLength 9007199254740991
      * @type integer | undefined
      */
     limit?: number;
     /**
      * @minLength 0
      * @maxLength 9007199254740991
-     * @default 0
      * @type integer | undefined
      */
     offset?: number;

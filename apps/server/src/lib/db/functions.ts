@@ -11,7 +11,7 @@ import {
     settingsTable,
     user,
 } from "@/lib/db/schema";
-import { and, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -131,7 +131,6 @@ export async function addCwlApplication(data: {
     cocAccountName: string;
     cocAccountTag: string;
     cocAccountClan: string | null;
-    cocAccountWeight: number;
     preferenceNum: number;
 }) {
     const now = new Date();
@@ -160,7 +159,7 @@ const cwlApplicationColumns = {
     cocAccountName: cwlApplicationTable.cocAccountName,
     cocAccountTag: cwlApplicationTable.cocAccountTag,
     cocAccountClan: cwlApplicationTable.cocAccountClan,
-    cocAccountWeight: cwlApplicationTable.cocAccountWeight,
+    cocAccountWeight: sql<number>`coalesce(${cocAccountTable.warWeight}, 0)`,
     isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
     month: cwlApplicationTable.month,
     year: cwlApplicationTable.year,
@@ -280,7 +279,7 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
 export async function getAllCwlApplications(
     opts: { month?: string; year?: number; assignedTo?: string | null; limit?: number; offset?: number } = {},
 ) {
-    const { month, year, assignedTo, limit = 50, offset = 0 } = opts;
+    const { month, year, assignedTo, limit, offset } = opts;
 
     const conditions = [];
     if (month) conditions.push(eq(cwlApplicationTable.month, month));
@@ -290,17 +289,22 @@ export async function getAllCwlApplications(
 
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
+    // Without an explicit limit we return the whole result set (the admin grid
+    // loads a full CWL season client-side); paginate only when limit is given.
+    let rowsQuery = db
+        .select({ ...cwlApplicationColumns, image: user.image })
+        .from(cwlApplicationTable)
+        .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+        .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
+        .leftJoin(user, eq(user.id, account.userId))
+        .where(whereClause)
+        .orderBy(desc(cwlApplicationTable.appliedAt))
+        .$dynamic();
+    if (limit !== undefined) rowsQuery = rowsQuery.limit(limit);
+    if (offset !== undefined) rowsQuery = rowsQuery.offset(offset);
+
     const [rows, countResult] = await Promise.all([
-        db
-            .select({ ...cwlApplicationColumns, image: user.image })
-            .from(cwlApplicationTable)
-            .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
-            .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
-            .leftJoin(user, eq(user.id, account.userId))
-            .where(whereClause)
-            .orderBy(desc(cwlApplicationTable.appliedAt))
-            .limit(limit)
-            .offset(offset),
+        rowsQuery,
         db
             .select({ count: sql<number>`count(*)::int` })
             .from(cwlApplicationTable)
@@ -315,13 +319,25 @@ export async function assignCwlApplication(id: number, clanTag: string | null) {
     const row = result[0];
     if (!row) return null;
     const [acc] = await db
-        .select({ isExternal: cocAccountTable.isExternal, image: user.image })
+        .select({ warWeight: cocAccountTable.warWeight, isExternal: cocAccountTable.isExternal, image: user.image })
         .from(cocAccountTable)
         .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
         .leftJoin(user, eq(user.id, account.userId))
         .where(eq(cocAccountTable.cocAccountTag, row.cocAccountTag))
         .limit(1);
-    return { ...row, isExternal: acc?.isExternal ?? false, image: acc?.image ?? null };
+    return { ...row, cocAccountWeight: acc?.warWeight ?? 0, isExternal: acc?.isExternal ?? false, image: acc?.image ?? null };
+}
+
+// Assigns (or unassigns when clanTag is null) many CWL applications in a single
+// statement. Returns the ids that were actually updated.
+export async function assignCwlApplicationsBulk(ids: number[], clanTag: string | null) {
+    if (ids.length === 0) return { count: 0, ids: [] as number[] };
+    const updated = await db
+        .update(cwlApplicationTable)
+        .set({ assignedTo: clanTag })
+        .where(inArray(cwlApplicationTable.id, ids))
+        .returning({ id: cwlApplicationTable.id });
+    return { count: updated.length, ids: updated.map((r) => r.id) };
 }
 
 export async function getSettings() {
@@ -390,8 +406,20 @@ export async function getCocAccountsForUser(userId: string) {
     return db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordId));
 }
 
-export async function getAllCocAccounts(opts: { search?: string; limit?: number; offset?: number } = {}) {
-    const { search, limit = 50, offset = 0 } = opts;
+export async function getAllCocAccounts(opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDir?: "asc" | "desc" } = {}) {
+    const { search, limit = 50, offset = 0, sortBy, sortDir = "asc" } = opts;
+
+    // Whitelist of sortable columns mapped to their grid field/colId.
+    const sortColumns = {
+        ownerName: user.name,
+        cocAccountTag: cocAccountTable.cocAccountTag,
+        discordUserId: cocAccountTable.discordUserId,
+        warWeight: cocAccountTable.warWeight,
+        isExternal: cocAccountTable.isExternal,
+    } as const;
+    const sortColumn = sortBy && sortBy in sortColumns ? sortColumns[sortBy as keyof typeof sortColumns] : null;
+    // Default to heaviest war weight first when no explicit sort is requested.
+    const orderBy = sortColumn ? (sortDir === "asc" ? asc(sortColumn) : desc(sortColumn)) : desc(cocAccountTable.warWeight);
 
     // cocAccountTable.discordUserId stores the Discord accountId; join the
     // better-auth account table to resolve the owning user, then the user table
@@ -419,7 +447,7 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
             .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
             .leftJoin(user, eq(user.id, account.userId))
             .where(whereClause)
-            .orderBy(desc(cocAccountTable.warWeight))
+            .orderBy(orderBy)
             .limit(limit)
             .offset(offset),
         db

@@ -116,7 +116,6 @@ export const cwlApplicationTable = pgTable(
             .notNull()
             .references(() => cocAccountTable.cocAccountTag, { onDelete: "cascade" }),
         cocAccountClan: text("coc_account_clan"),
-        cocAccountWeight: integer("coc_account_weight").notNull(),
         month: text("month").notNull(),
         year: integer("year").notNull(),
         preferenceNum: integer("preference_num").notNull(),

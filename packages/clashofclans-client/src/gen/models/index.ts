@@ -31,6 +31,15 @@ export type {
     AssignCwlApplicationPathParams,
 } from "./AssignCwlApplication.ts";
 export type {
+    AssignCwlApplicationsBulk200,
+    AssignCwlApplicationsBulk400,
+    AssignCwlApplicationsBulk401,
+    AssignCwlApplicationsBulk500,
+    AssignCwlApplicationsBulkMutation,
+    AssignCwlApplicationsBulkMutationRequest,
+    AssignCwlApplicationsBulkMutationResponse,
+} from "./AssignCwlApplicationsBulk.ts";
+export type {
     CreateAdminClan200,
     CreateAdminClan401,
     CreateAdminClan409,
@@ -73,6 +82,7 @@ export type {
     GetAdminCocAccounts500,
     GetAdminCocAccountsQuery,
     GetAdminCocAccountsQueryParams,
+    GetAdminCocAccountsQueryParamsSortDirEnumKey,
     GetAdminCocAccountsQueryResponse,
 } from "./GetAdminCocAccounts.ts";
 export type {
@@ -309,6 +319,7 @@ export type {
     UpdateJoinApplicationStatusMutationResponse,
     UpdateJoinApplicationStatusPathParams,
 } from "./UpdateJoinApplicationStatus.ts";
+export { getAdminCocAccountsQueryParamsSortDirEnum } from "./GetAdminCocAccounts.ts";
 export { warBattleModifierEnum } from "./GetCOCCWLWar.ts";
 export { warStateEnum } from "./GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./GetCOCClan.ts";
