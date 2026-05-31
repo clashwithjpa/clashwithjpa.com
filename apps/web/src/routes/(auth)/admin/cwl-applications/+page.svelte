@@ -27,10 +27,6 @@
 
     type Application = GetCwlApplications200["data"]["applications"][number];
 
-    const now = new Date();
-    const currentMonth = now.toLocaleString("en-US", { month: "long" });
-    const currentYear = now.getFullYear();
-
     let applications = $state<Application[]>([]);
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
     let total = $state(0);
@@ -76,8 +72,6 @@
         try {
             const resp = await getCwlApplications(
                 {
-                    month: currentMonth,
-                    year: currentYear,
                     unassigned: filterMode === "unassigned" ? true : undefined,
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
@@ -181,8 +175,7 @@
         <div>
             <h1 class="text-2xl font-bold">CWL Applications</h1>
             <p class="text-sm text-stone-400">
-                {currentMonth}
-                {currentYear} &mdash; {total} application{total === 1 ? "" : "s"}
+                {total} application{total === 1 ? "" : "s"}
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
