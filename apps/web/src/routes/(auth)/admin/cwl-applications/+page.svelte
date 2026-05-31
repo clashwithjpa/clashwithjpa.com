@@ -2,6 +2,7 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
+    import Toolbar from "$lib/components/Toolbar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import Input from "$lib/components/ui/Input.svelte";
@@ -21,6 +22,7 @@
     import type { GridApi, IRowNode } from "ag-grid-community";
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import TablerSearch from "~icons/tabler/search";
     import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
@@ -40,6 +42,12 @@
     let bulkClan = $state<string>("");
     let bulkProcessing = $state(false);
     let selectCount = $state(30);
+    let searchText = $state("");
+
+    // Client-side instant search across the loaded season (name, tag, discord, clan).
+    function applySearch() {
+        gridApi?.setGridOption("quickFilterText", searchText);
+    }
     // Real clans only (exclude the "Unassigned" entry) so bulk assign can't accidentally mass-unassign.
     let bulkClanOptions = $derived(clanOptions.filter((o) => o.value !== ""));
 
@@ -233,6 +241,7 @@
                     filter: false,
                     flex: 2,
                     cellRenderer: svelteRenderer(CwlAccountCell),
+                    getQuickFilterText: (p) => `${p.data.cocAccountName} ${p.data.cocAccountTag}`,
                 },
                 {
                     headerName: "Clan",
@@ -258,6 +267,7 @@
                     filter: false,
                     flex: 2,
                     cellRenderer: svelteRenderer(CwlDiscordCell),
+                    getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
                 },
                 {
                     headerName: "Applied",
@@ -281,6 +291,7 @@
                     cellEditorParams: () => ({ options: clanOptions }),
                     valueGetter: (p) => p.data?.assignedTo ?? "",
                     valueFormatter: (p) => clanLabel(p.value),
+                    getQuickFilterText: (p) => clanLabel(p.value),
                 },
             ]}
         />
@@ -294,6 +305,13 @@
                 <TablerX class="size-12" />
                 <span>No CWL applications found</span>
             </div>
+        {:else}
+            <Toolbar>
+                <Input placeholder="Search by name, tag, Discord or clan..." bind:value={searchText} oninput={applySearch} class="h-11 lg:w-80" />
+                <Button variant="success" class="size-11 shrink-0 px-0" onclick={applySearch} tooltip="Search" tooltipPlacement="top">
+                    <TablerSearch class="size-5" />
+                </Button>
+            </Toolbar>
         {/if}
     </div>
 </div>
