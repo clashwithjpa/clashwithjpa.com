@@ -272,7 +272,7 @@
             </div>
         {:else}
             <Toolbar>
-                <div class="flex flex-col items-start justify-between gap-4 lg:flex-row">
+                <div class="flex size-full flex-col items-center justify-between gap-4 lg:flex-row">
                     <div class="flex flex-1 items-center gap-2">
                         <Input
                             placeholder="Search by name, tag, Discord or clan..."
@@ -286,6 +286,7 @@
                     </div>
 
                     {#if selectedIds.length > 0}
+                        <div class="hidden h-8 w-px self-stretch bg-stone-700 lg:block lg:self-auto"></div>
                         <div class="flex w-full flex-col gap-2 lg:w-fit lg:flex-row lg:items-center lg:gap-2">
                             <span class="text-sm font-medium whitespace-nowrap text-stone-200">
                                 {selectedIds.length} selected
