@@ -16,7 +16,6 @@ export const createAdminCwlClan200Schema = z.object({
             cocClanName: z.string(),
             cocClanLeague: z.string(),
             cocClanLeader: z.string(),
-            email: z.email(),
         }),
     }),
 });
@@ -50,7 +49,6 @@ export const createAdminCwlClanMutationRequestSchema = z.object({
     cocClanName: z.string().min(1),
     cocClanLeague: z.string().min(1),
     cocClanLeader: z.string().min(1),
-    email: z.email(),
 });
 
 export const createAdminCwlClanMutationResponseSchema = z.lazy(() => createAdminCwlClan200Schema);

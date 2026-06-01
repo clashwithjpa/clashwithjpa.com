@@ -195,6 +195,12 @@ export {
     setUserAccountExternalPathParamsSchema,
 } from "./setUserAccountExternalSchema.ts";
 export {
+    syncAdminCwlClanLeagues200Schema,
+    syncAdminCwlClanLeagues401Schema,
+    syncAdminCwlClanLeagues500Schema,
+    syncAdminCwlClanLeaguesMutationResponseSchema,
+} from "./syncAdminCwlClanLeaguesSchema.ts";
+export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,

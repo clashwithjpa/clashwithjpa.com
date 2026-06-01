@@ -6,11 +6,14 @@
 import { z } from "zod/v4";
 
 /**
- * @description Clans.
+ * @description Sync summary and the refreshed CWL clan list.
  */
-export const getAdminCwlClans200Schema = z.object({
+export const syncAdminCwlClanLeagues200Schema = z.object({
     success: z.literal(true),
     data: z.object({
+        updated: z.number(),
+        unchanged: z.number(),
+        failed: z.number(),
         clans: z.array(
             z.object({
                 cocClanTag: z.string(),
@@ -25,7 +28,7 @@ export const getAdminCwlClans200Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const getAdminCwlClans401Schema = z.object({
+export const syncAdminCwlClanLeagues401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -33,9 +36,9 @@ export const getAdminCwlClans401Schema = z.object({
 /**
  * @description Server error.
  */
-export const getAdminCwlClans500Schema = z.object({
+export const syncAdminCwlClanLeagues500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const getAdminCwlClansQueryResponseSchema = z.lazy(() => getAdminCwlClans200Schema);
+export const syncAdminCwlClanLeaguesMutationResponseSchema = z.lazy(() => syncAdminCwlClanLeagues200Schema);

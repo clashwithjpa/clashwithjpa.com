@@ -17,7 +17,6 @@ export const getJPACwlClans200Schema = z.object({
                 clanName: z.string(),
                 clanLeague: z.string(),
                 clanLeader: z.string(),
-                email: z.email(),
             }),
         ),
     }),

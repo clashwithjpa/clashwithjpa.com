@@ -21,6 +21,7 @@
     import TablerLogout2 from "~icons/tabler/logout-2";
     import TablerScale from "~icons/tabler/scale";
     import TablerSettings from "~icons/tabler/settings";
+    import TablerShield from "~icons/tabler/shield";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
     import TablerX from "~icons/tabler/x";
@@ -47,6 +48,7 @@
     let adminLinks: Link[] = [
         { name: "Home", icon: TablerHome, href: "/admin" },
         { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "manage" },
+        { name: "CWL Clans", icon: TablerShield, href: "/admin/cwl-clans", requiredPerm: "sudo" },
         { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications", requiredPerm: "review" },
         { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
         { name: "Weights", icon: TablerScale, href: "/admin/coc-accounts", requiredPerm: "manage" },

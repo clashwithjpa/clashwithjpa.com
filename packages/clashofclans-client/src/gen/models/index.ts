@@ -260,6 +260,13 @@ export type {
     SetUserAccountExternalPathParams,
 } from "./SetUserAccountExternal.ts";
 export type {
+    SyncAdminCwlClanLeagues200,
+    SyncAdminCwlClanLeagues401,
+    SyncAdminCwlClanLeagues500,
+    SyncAdminCwlClanLeaguesMutation,
+    SyncAdminCwlClanLeaguesMutationResponse,
+} from "./SyncAdminCwlClanLeagues.ts";
+export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,

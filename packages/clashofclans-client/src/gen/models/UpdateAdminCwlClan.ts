@@ -43,10 +43,6 @@ export type UpdateAdminCwlClan200 = {
              * @type string
              */
             cocClanLeader: string;
-            /**
-             * @type string, email
-             */
-            email: string;
         };
     };
 };
@@ -118,10 +114,6 @@ export type UpdateAdminCwlClanMutationRequest = {
      * @type string | undefined
      */
     cocClanLeader?: string;
-    /**
-     * @type string | undefined, email
-     */
-    email?: string;
 };
 
 export type UpdateAdminCwlClanMutationResponse = UpdateAdminCwlClan200;

@@ -34,6 +34,7 @@ export type { ImportUserAccountsMutationKey } from "./createImportUserAccounts.t
 export type { PostCOCPlayerVerifyMutationKey } from "./createPostCOCPlayerVerify.ts";
 export type { SetRulesMutationKey } from "./createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./createSetUserAccountExternal.ts";
+export type { SyncAdminCwlClanLeaguesMutationKey } from "./createSyncAdminCwlClanLeagues.ts";
 export type { UpdateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
 export type { UpdateAdminCwlClanMutationKey } from "./createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./createUpdateAdminSettings.ts";
@@ -136,6 +137,8 @@ export { createSetRules } from "./createSetRules.ts";
 export { setRulesMutationKey } from "./createSetRules.ts";
 export { createSetUserAccountExternal } from "./createSetUserAccountExternal.ts";
 export { setUserAccountExternalMutationKey } from "./createSetUserAccountExternal.ts";
+export { createSyncAdminCwlClanLeagues } from "./createSyncAdminCwlClanLeagues.ts";
+export { syncAdminCwlClanLeaguesMutationKey } from "./createSyncAdminCwlClanLeagues.ts";
 export { createUpdateAdminClan } from "./createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
 export { createUpdateAdminCwlClan } from "./createUpdateAdminCwlClan.ts";

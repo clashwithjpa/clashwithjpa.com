@@ -529,7 +529,6 @@ const getJPACwlClans = z4.object({
             clanName: z4.string(),
             clanLeague: z4.string(),
             clanLeader: z4.string(),
-            email: z4.email(),
         }),
     ),
 });

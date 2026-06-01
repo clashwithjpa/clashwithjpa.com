@@ -4,9 +4,9 @@
  */
 
 /**
- * @description Clans.
+ * @description Sync summary and the refreshed CWL clan list.
  */
-export type GetAdminCwlClans200 = {
+export type SyncAdminCwlClanLeagues200 = {
     /**
      * @type boolean
      */
@@ -15,6 +15,18 @@ export type GetAdminCwlClans200 = {
      * @type object
      */
     data: {
+        /**
+         * @type number
+         */
+        updated: number;
+        /**
+         * @type number
+         */
+        unchanged: number;
+        /**
+         * @type number
+         */
+        failed: number;
         /**
          * @type array
          */
@@ -42,7 +54,7 @@ export type GetAdminCwlClans200 = {
 /**
  * @description Unauthorized.
  */
-export type GetAdminCwlClans401 = {
+export type SyncAdminCwlClanLeagues401 = {
     /**
      * @type boolean
      */
@@ -57,7 +69,7 @@ export type GetAdminCwlClans401 = {
 /**
  * @description Server error.
  */
-export type GetAdminCwlClans500 = {
+export type SyncAdminCwlClanLeagues500 = {
     /**
      * @type boolean
      */
@@ -69,9 +81,9 @@ export type GetAdminCwlClans500 = {
           };
 };
 
-export type GetAdminCwlClansQueryResponse = GetAdminCwlClans200;
+export type SyncAdminCwlClanLeaguesMutationResponse = SyncAdminCwlClanLeagues200;
 
-export type GetAdminCwlClansQuery = {
-    Response: GetAdminCwlClans200;
-    Errors: GetAdminCwlClans401 | GetAdminCwlClans500;
+export type SyncAdminCwlClanLeaguesMutation = {
+    Response: SyncAdminCwlClanLeagues200;
+    Errors: SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
 };

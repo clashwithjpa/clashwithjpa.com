@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_clan_info_table" DROP COLUMN "email";

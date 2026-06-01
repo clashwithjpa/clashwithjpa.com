@@ -20,7 +20,6 @@ export const deleteAdminCwlClan200Schema = z.object({
             cocClanName: z.string(),
             cocClanLeague: z.string(),
             cocClanLeader: z.string(),
-            email: z.email(),
         }),
     }),
 });

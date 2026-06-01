@@ -12,6 +12,7 @@
     import TablerHistory from "~icons/tabler/history";
     import TablerScale from "~icons/tabler/scale";
     import TablerSettings from "~icons/tabler/settings";
+    import TablerShield from "~icons/tabler/shield";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
 
@@ -47,6 +48,13 @@
             description: "View linked accounts and edit war weights",
             icon: TablerScale,
             requiredPerm: "manage",
+        },
+        {
+            href: "/admin/cwl-clans",
+            title: "CWL Clans",
+            description: "Add or remove clans for CWL assignments",
+            icon: TablerShield,
+            requiredPerm: "sudo",
         },
         { href: "/admin/rules", title: "Rules", description: "Edit alliance rules", icon: TablerBook2, requiredPerm: "manage" },
         { href: "/admin/audit-log", title: "Audit Log", description: "View server actions history", icon: TablerHistory, requiredPerm: "manage" },

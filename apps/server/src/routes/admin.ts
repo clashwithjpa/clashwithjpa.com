@@ -1,5 +1,6 @@
 import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { logAction } from "@/lib/audit";
+import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
     assignCwlApplication,
@@ -680,7 +681,6 @@ const cwlClanSchema = z4.object({
     cocClanName: z4.string(),
     cocClanLeague: z4.string(),
     cocClanLeader: z4.string(),
-    email: z4.email(),
 });
 
 const getAdminCwlClansData = z4.object({
@@ -715,7 +715,6 @@ const cwlClanInputSchema = z4.object({
     cocClanName: z4.string().min(1),
     cocClanLeague: z4.string().min(1),
     cocClanLeader: z4.string().min(1),
-    email: z4.email(),
 });
 const upsertCwlClanData = z4.object({
     clan: cwlClanSchema,
@@ -831,6 +830,76 @@ app.delete(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete CWL clan" }, 500);
+        }
+    },
+);
+
+// Refresh each CWL clan's league from the Clash of Clans API (mirrors
+// scripts/update-cwl-leagues.ts). Unranked clans omit warLeague.
+const SYNC_CWL_LEAGUES_CONCURRENCY = 10;
+const syncCwlLeaguesData = z4.object({
+    updated: z4.number(),
+    unchanged: z4.number(),
+    failed: z4.number(),
+    clans: z4.array(cwlClanSchema),
+});
+app.post(
+    "/cwl-clans/sync-leagues",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "syncAdminCwlClanLeagues",
+        description: "[Admin/sudo] Refreshes every CWL clan's league from the Clash of Clans API.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Sync summary and the refreshed CWL clan list.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(syncCwlLeaguesData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const clans = await getAllCwlClans();
+            let updated = 0;
+            let unchanged = 0;
+            let failed = 0;
+
+            for (let i = 0; i < clans.length; i += SYNC_CWL_LEAGUES_CONCURRENCY) {
+                const batch = clans.slice(i, i + SYNC_CWL_LEAGUES_CONCURRENCY);
+                await Promise.all(
+                    batch.map(async (clan) => {
+                        try {
+                            const data = await cocClient.getClan(clan.cocClanTag);
+                            const league = data.warLeague?.name ?? "Unranked";
+                            if (league === clan.cocClanLeague) {
+                                unchanged++;
+                                return;
+                            }
+                            await updateCwlClan(clan.cocClanTag, { cocClanLeague: league });
+                            updated++;
+                        } catch (error) {
+                            failed++;
+                            Sentry.captureException(error);
+                        }
+                    }),
+                );
+            }
+
+            if (updated > 0) {
+                logAction(c, {
+                    action: "cwl_clan.sync_leagues",
+                    targetType: "cwl_clan",
+                    metadata: { updated, unchanged, failed },
+                });
+            }
+
+            const refreshed = await getAllCwlClans();
+            return c.json({ success: true, data: { updated, unchanged, failed, clans: refreshed } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to sync CWL leagues" }, 500);
         }
     },
 );

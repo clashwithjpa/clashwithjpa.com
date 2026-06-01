@@ -43,10 +43,6 @@ export type DeleteAdminCwlClan200 = {
              * @type string
              */
             cocClanLeader: string;
-            /**
-             * @type string, email
-             */
-            email: string;
         };
     };
 };

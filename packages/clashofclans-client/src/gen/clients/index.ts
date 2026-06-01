@@ -34,6 +34,7 @@ export { importUserAccounts } from "./importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./postCOCPlayerVerify.ts";
 export { setRules } from "./setRules.ts";
 export { setUserAccountExternal } from "./setUserAccountExternal.ts";
+export { syncAdminCwlClanLeagues } from "./syncAdminCwlClanLeagues.ts";
 export { updateAdminClan } from "./updateAdminClan.ts";
 export { updateAdminCwlClan } from "./updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./updateAdminSettings.ts";

@@ -13,7 +13,7 @@ function getGetUserCwlApplicationsUrl() {
 }
 
 /**
- * @description [Verified] Fetches the current user's CWL applications for the current month/year.
+ * @description [Verified] Fetches the current user's CWL applications.
  * {@link /user/cwl}
  */
 export async function getUserCwlApplications(config: Partial<RequestConfig> & { client?: Client } = {}) {

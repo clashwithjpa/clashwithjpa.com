@@ -188,7 +188,6 @@ export async function getCwlClans() {
                 clanName: clan.cocClanName,
                 clanLeague: clan.cocClanLeague,
                 clanLeader: clan.cocClanLeader,
-                email: clan.email,
             },
         ]),
     );

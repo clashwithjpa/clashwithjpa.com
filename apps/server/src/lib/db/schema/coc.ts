@@ -98,7 +98,6 @@ export const cwlClanInfoTable = pgTable(
         cocClanName: text("coc_clan_name").notNull(),
         cocClanLeague: text("coc_clan_league").notNull(),
         cocClanLeader: text("coc_clan_leader").notNull(),
-        email: text("email").notNull(),
     },
     (t) => [index("cwl_clan_info_coc_clan_tag_idx").on(t.cocClanTag)],
 );

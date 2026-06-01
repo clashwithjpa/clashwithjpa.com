@@ -20,7 +20,6 @@ export const updateAdminCwlClan200Schema = z.object({
             cocClanName: z.string(),
             cocClanLeague: z.string(),
             cocClanLeader: z.string(),
-            email: z.email(),
         }),
     }),
 });
@@ -54,7 +53,6 @@ export const updateAdminCwlClanMutationRequestSchema = z.object({
     cocClanName: z.optional(z.string().min(1)),
     cocClanLeague: z.optional(z.string().min(1)),
     cocClanLeader: z.optional(z.string().min(1)),
-    email: z.optional(z.email()),
 });
 
 export const updateAdminCwlClanMutationResponseSchema = z.lazy(() => updateAdminCwlClan200Schema);

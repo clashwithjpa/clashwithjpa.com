@@ -36,10 +36,6 @@ export type GetJPACwlClans200 = {
                  * @type string
                  */
                 clanLeader: string;
-                /**
-                 * @type string, email
-                 */
-                email: string;
             };
         };
     };
