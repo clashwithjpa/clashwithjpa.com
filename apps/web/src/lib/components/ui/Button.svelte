@@ -77,16 +77,16 @@
 
     const sizeClasses = {
         "": "",
-        sm: "text-sm px-3 py-1.5",
-        base: "text-base px-4 py-2",
-        lg: "text-lg px-6 py-3",
+        sm: "text-sm px-3 py-2 md:text-sm",
+        base: "text-base px-4 py-2 md:text-sm",
+        lg: "text-lg px-6 py-3 md:text-base",
         icon: "size-8 *:size-4",
     };
 
     const buttonClass = $derived(
         cn(
             variant &&
-                "flex cursor-pointer items-center justify-center rounded-lg border-2 transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50!",
+                "flex cursor-pointer items-center justify-center rounded-lg border-2 shadow-xs transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50!",
             variant && variantClasses[variant],
             variant && sizeClasses[size],
             className,

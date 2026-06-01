@@ -78,7 +78,7 @@
                 )}
                 onclick={() => selectOption(option.value)}
             >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-left">
                     {#if option.icon}
                         {#if typeof option.icon === "string"}
                             {#if option.icon.includes("http")}

@@ -5,8 +5,8 @@
     import Toolbar from "$lib/components/Toolbar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
+    import Input from "$lib/components/ui/Input.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -170,43 +170,15 @@
 
 <Seo title="CWL Applications" description="Manage CWL applications and assign players to clans" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4 overflow-hidden">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold">CWL Applications</h1>
-            <p class="text-sm text-stone-400">
-                {total} application{total === 1 ? "" : "s"}
-            </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <div class="flex items-center gap-2">
-                <Input type="number" bind:value={selectCount} min={1} max={200} class="h-10 w-20" aria-label="Number of applications to select" />
-                <Button variant="base" size="sm" class="shrink-0 whitespace-nowrap" onclick={() => selectUnassigned(selectCount)}>
-                    Select unassigned
-                </Button>
-            </div>
-            <div class="w-full max-w-xs sm:w-44">
-                <Select bind:value={filterMode} options={filterOptions} placeholder="Filter" />
-            </div>
-        </div>
+<div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
+    <div class="flex flex-col px-4 pt-4">
+        <h1 class="text-2xl font-bold">CWL Applications</h1>
+        <p class="text-sm text-stone-400">
+            {total} application{total === 1 ? "" : "s"}
+        </p>
     </div>
 
-    {#if selectedIds.length > 0}
-        <div in:fadeIn class="flex flex-wrap items-center gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3">
-            <span class="text-sm font-medium text-stone-200">
-                {selectedIds.length} selected
-            </span>
-            <div class="w-full max-w-xs">
-                <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign selected to..." />
-            </div>
-            <Button variant="success" size="sm" disabled={bulkProcessing || !bulkClan} onclick={bulkAssign}>
-                {bulkProcessing ? "Assigning…" : "Assign"}
-            </Button>
-            <Button variant="ghost" size="sm" disabled={bulkProcessing} onclick={clearSelection}>Clear</Button>
-        </div>
-    {/if}
-
-    <div class="relative flex-1 overflow-hidden">
+    <div class="flex-1 overflow-hidden">
         <Grid
             rowData={applications}
             gridOptions={{
@@ -300,10 +272,38 @@
             </div>
         {:else}
             <Toolbar>
-                <Input placeholder="Search by name, tag, Discord or clan..." bind:value={searchText} oninput={applySearch} class="h-11 lg:w-80" />
-                <Button variant="success" class="size-11 shrink-0 px-0" onclick={applySearch} tooltip="Search" tooltipPlacement="top">
-                    <TablerSearch class="size-5" />
-                </Button>
+                <div class="flex flex-col items-start justify-between gap-4 lg:flex-row">
+                    <div class="flex flex-1 items-center gap-2">
+                        <Input
+                            placeholder="Search by name, tag, Discord or clan..."
+                            bind:value={searchText}
+                            oninput={applySearch}
+                            class="flex-1 lg:max-w-80"
+                        />
+                        <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="top">
+                            <TablerSearch class="size-5" />
+                        </Button>
+                    </div>
+
+                    {#if selectedIds.length > 0}
+                        <div class="flex w-full flex-col gap-2 lg:w-fit lg:flex-row lg:items-center lg:gap-2">
+                            <span class="text-sm font-medium whitespace-nowrap text-stone-200">
+                                {selectedIds.length} selected
+                            </span>
+                            <div class="flex w-full flex-col gap-2 lg:w-fit lg:flex-row lg:items-center">
+                                <div class="lg:w-48">
+                                    <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
+                                </div>
+                                <div class="flex w-full gap-2 lg:w-fit">
+                                    <Button variant="success" size="sm" class="w-full" disabled={bulkProcessing || !bulkClan} onclick={bulkAssign}>
+                                        {bulkProcessing ? "…" : "Assign"}
+                                    </Button>
+                                    <Button variant="ghost" size="sm" class="w-full" disabled={bulkProcessing} onclick={clearSelection}>Clear</Button>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
             </Toolbar>
         {/if}
     </div>

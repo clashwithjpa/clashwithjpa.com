@@ -154,8 +154,8 @@
     />
 
     <Toolbar>
-        <Input placeholder="Search by owner, tag or Discord ID..." bind:value={searchText} onchange={handleSearchChange} class="h-11 lg:w-80" />
-        <Button variant="success" class="size-11 shrink-0 px-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
+        <Input placeholder="Search by owner, tag or Discord ID..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
+        <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
             <TablerSearch class="size-5" />
         </Button>
     </Toolbar>

@@ -43,9 +43,9 @@
     } = $props();
 
     const sizeClasses = {
-        sm: "px-2 py-1 text-xs",
-        base: "px-3 py-1.5 text-sm",
-        lg: "px-4 py-2 text-base",
+        sm: "px-3 py-2 text-sm md:text-sm",
+        base: "px-4 py-2 text-base md:text-sm",
+        lg: "px-6 py-3 text-lg md:text-base",
     };
 </script>
 

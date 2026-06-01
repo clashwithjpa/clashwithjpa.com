@@ -64,7 +64,7 @@
     let sidebarWidth = $state(0);
 
     let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
-    const noPaddingPaths: string[] = ["/admin/rules", "/admin/users", "/admin/coc-accounts"];
+    const noPaddingPaths: string[] = ["/admin/rules", "/admin/users", "/admin/coc-accounts", "/admin/cwl-applications"];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 

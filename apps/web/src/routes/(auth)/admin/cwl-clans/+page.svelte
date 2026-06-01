@@ -42,6 +42,7 @@
     let saving = $state(false);
     let syncing = $state(false);
     let removing = $state<string | null>(null);
+    let searchText = $state("");
 
     let dialogOpen = $state(false);
     // null = adding a new clan; otherwise the (immutable) tag of the clan being edited.
@@ -51,6 +52,15 @@
     function errMsg(error: unknown, fallback: string) {
         return typeof error === "string" ? error : fallback;
     }
+
+    let filteredClans = $derived(
+        clans.filter(
+            (clan) =>
+                clan.cocClanName.toLowerCase().includes(searchText.toLowerCase()) ||
+                clan.cocClanTag.toLowerCase().includes(searchText.toLowerCase()) ||
+                clan.cocClanLeader.toLowerCase().includes(searchText.toLowerCase()),
+        ),
+    );
 
     async function load() {
         loading = true;
@@ -253,40 +263,59 @@
             <p class="text-sm">No CWL clans yet. Add one to get started.</p>
         </div>
     {:else}
-        <div class="flex max-w-3xl flex-col gap-3">
-            {#each clans as clan (clan.cocClanTag)}
-                <div use:cardSlideIn class="flex items-start justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
-                    <div class="flex min-w-0 items-start gap-3">
-                        <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />
-                        <div class="min-w-0">
-                            <h3 class="truncate font-semibold text-stone-50">
-                                {clan.cocClanName} <span class="text-stone-400">({clan.cocClanTag})</span>
-                            </h3>
-                            <p class="text-xs text-stone-400">{clan.cocClanLeague} · Leader: {clan.cocClanLeader}</p>
+        <div class="flex w-full gap-2">
+            <Input placeholder="Search by clan name, tag, or leader..." bind:value={searchText} class="flex-1" />
+        </div>
+
+        {#if filteredClans.length === 0}
+            <div class="flex flex-1 flex-col items-center justify-center gap-3 text-stone-400">
+                <TablerShield class="size-12" />
+                <p class="text-sm">No clans match your search.</p>
+            </div>
+        {:else}
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {#each filteredClans as clan (clan.cocClanTag)}
+                    <div use:cardSlideIn class="flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                        <div class="flex min-w-0 gap-3">
+                            <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />
+                            <div class="min-w-0 flex-1">
+                                <h3 class="truncate font-semibold text-stone-50">
+                                    {clan.cocClanName}
+                                </h3>
+                                <p class="truncate text-xs text-stone-400">{clan.cocClanTag}</p>
+                                <p class="mt-1 text-xs text-stone-400">{clan.cocClanLeague}</p>
+                                <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Button variant="ghost" size="sm" class="flex-1" onclick={() => openEdit(clan)} disabled={removing === clan.cocClanTag}>
+                                <span class="flex items-center gap-2">
+                                    <TablerPencil class="size-4" /> Edit
+                                </span>
+                            </Button>
+                            <ConfirmationDialog
+                                title="Remove CWL Clan"
+                                description={`Remove ${clan.cocClanName} (${clan.cocClanTag}) from CWL clans? This cannot be undone.`}
+                                confirmText="Remove"
+                                onConfirm={() => removeClan(clan.cocClanTag)}
+                            >
+                                <Button variant="danger" size="sm" class="flex-1" disabled={removing === clan.cocClanTag}>
+                                    {#if removing === clan.cocClanTag}
+                                        <span class="flex items-center gap-2">
+                                            <SvgSpinnersRingResize class="size-4" /> Removing
+                                        </span>
+                                    {:else}
+                                        <span class="flex items-center gap-2">
+                                            <TablerTrash class="size-4" /> Remove
+                                        </span>
+                                    {/if}
+                                </Button>
+                            </ConfirmationDialog>
                         </div>
                     </div>
-                    <div class="flex shrink-0 items-center gap-2">
-                        <Button variant="ghost" size="icon" onclick={() => openEdit(clan)} disabled={removing === clan.cocClanTag}>
-                            <TablerPencil class="size-4" />
-                        </Button>
-                        <ConfirmationDialog
-                            title="Remove CWL Clan"
-                            description={`Remove ${clan.cocClanName} (${clan.cocClanTag}) from CWL clans? This cannot be undone.`}
-                            confirmText="Remove"
-                            onConfirm={() => removeClan(clan.cocClanTag)}
-                        >
-                            <Button variant="danger" size="icon" disabled={removing === clan.cocClanTag}>
-                                {#if removing === clan.cocClanTag}
-                                    <SvgSpinnersRingResize class="size-4" />
-                                {:else}
-                                    <TablerTrash class="size-4" />
-                                {/if}
-                            </Button>
-                        </ConfirmationDialog>
-                    </div>
-                </div>
-            {/each}
-        </div>
+                {/each}
+            </div>
+        {/if}
     {/if}
 </div>
 
