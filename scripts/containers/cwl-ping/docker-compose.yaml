@@ -1,0 +1,16 @@
+services:
+  cwl-ping:
+    container_name: cwl-ping
+    build:
+      context: .
+    image: clashwithjpa/cwl-ping:latest
+    env_file:
+      - .env
+    restart: "no"
+    networks:
+      - default
+
+networks:
+  default:
+    name: clashwithjpa-network
+    external: true

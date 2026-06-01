@@ -1,0 +1,14 @@
+{
+    "name": "cwl-ping",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dry-run": "CWL_PING_DRY_RUN=1 bun run main.ts",
+        "start": "bun run main.ts",
+        "typecheck": "bunx tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5.9.3"
+    }
+}
