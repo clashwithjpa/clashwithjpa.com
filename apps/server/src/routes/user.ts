@@ -549,7 +549,7 @@ app.get(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "getUserCwlApplications",
-        description: "[Verified] Fetches the current user's CWL applications for the current month/year.",
+        description: "[Verified] Fetches the current user's CWL applications.",
         tags: ["user"],
         responses: {
             200: {

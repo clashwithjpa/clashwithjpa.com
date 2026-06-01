@@ -66,18 +66,9 @@
         const canReview = await hasPermission($session.data?.user?.id, "review");
         if (!canReview) return;
 
-        const now = new Date();
         const [joinResp, cwlResp] = await Promise.allSettled([
             getJoinApplications({ status: "pending", limit: 1 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-            getCwlApplications(
-                {
-                    month: now.toLocaleString("en-US", { month: "long" }),
-                    year: now.getFullYear(),
-                    unassigned: true,
-                    limit: 1,
-                },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            ),
+            getCwlApplications({ unassigned: true, limit: 1 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
         ]);
 
         if (joinResp.status === "fulfilled" && joinResp.value.success) pendingJoin = joinResp.value.data.total;

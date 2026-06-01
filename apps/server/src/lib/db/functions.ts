@@ -169,15 +169,11 @@ const cwlApplicationColumns = {
 };
 
 export async function getUserCwlApplications(discordUserId: string) {
-    const now = new Date();
-    const month = now.toLocaleString("en-US", { month: "long" });
-    const year = now.getFullYear();
-
     const applications = await db
         .select(cwlApplicationColumns)
         .from(cwlApplicationTable)
         .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
-        .where(and(eq(cwlApplicationTable.discordUserId, discordUserId), eq(cwlApplicationTable.month, month), eq(cwlApplicationTable.year, year)));
+        .where(eq(cwlApplicationTable.discordUserId, discordUserId));
 
     return applications;
 }
