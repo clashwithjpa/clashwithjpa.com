@@ -4,6 +4,7 @@
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
+    import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
@@ -29,7 +30,6 @@
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerRefresh from "~icons/tabler/refresh";
-    import TablerSearch from "~icons/tabler/search";
     import TablerShield from "~icons/tabler/shield";
     import TablerX from "~icons/tabler/x";
 
@@ -302,25 +302,32 @@
                 {/if}
                 <div class="hidden h-4 w-px bg-stone-700 sm:block"></div>
                 {#each clanStats as stat (stat.clanTag)}
-                    <div class="flex items-center gap-1.5 rounded border-2 border-stone-700/50 bg-stone-900 px-2 py-1 text-xs">
-                        <TablerShield class="size-3.5 shrink-0 text-stone-400" />
-                        <span class="font-medium text-stone-100">{stat.name}</span>
-                        {#if stat.state === "ok"}
-                            <span class={stat.joined === stat.total ? "font-medium text-green-400" : "font-medium text-yellow-400"}>
-                                {stat.joined}/{stat.total}
-                            </span>
-                        {:else if stat.state === "loading"}
-                            <span class="text-stone-400">…/{stat.total}</span>
-                        {:else}
-                            <span class="font-medium text-red-400">check failed</span>
-                            <button
-                                type="button"
-                                class="cursor-pointer text-stone-400 transition-colors hover:text-stone-100"
-                                title="Retry fetching this clan's roster"
+                    {@const isMaxed = stat.joined === stat.total}
+
+                    {@const variant = stat.state === "ok" ? (isMaxed ? "green" : "yellow") : stat.state === "loading" ? "blue" : "red"}
+
+                    {@const statusText =
+                        stat.state === "ok" ? `${stat.joined}/${stat.total}` : stat.state === "loading" ? `…/${stat.total}` : "failed"}
+
+                    <div class="flex items-center gap-2">
+                        <Badge
+                            icon={stat.state === "loading" ? SvgSpinnersRingResize : TablerShield}
+                            content="{stat.name} • {statusText}"
+                            {variant}
+                            iconSize="size-4"
+                            class="px-2 py-1 font-medium transition-all duration-200"
+                        />
+
+                        {#if stat.state !== "ok" && stat.state !== "loading"}
+                            <Button
+                                variant="danger"
+                                size="icon"
+                                tooltip="Retry fetching this clan's roster"
+                                tooltipPlacement="top"
                                 onclick={() => retryRoster(stat.clanTag)}
                             >
                                 <TablerRefresh class="size-3.5" />
-                            </button>
+                            </Button>
                         {/if}
                     </div>
                 {/each}
@@ -460,9 +467,6 @@
                         </div>
                         <div class="flex flex-1 items-center gap-2">
                             <Input placeholder="Search anything" bind:value={searchText} oninput={applySearch} class="flex-1 lg:max-w-80" />
-                            <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="top">
-                                <TablerSearch class="size-5" />
-                            </Button>
                         </div>
                     </div>
 
