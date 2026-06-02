@@ -156,7 +156,7 @@
 
 <Seo title="Clan War League" description="Apply for Clan War League and manage your application." />
 
-<div in:fadeIn class="grid size-full grid-cols-1 gap-4 md:grid-cols-2">
+<div in:fadeIn class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
     {#await Promise.all([setOptions(), setClanOptions()])}
         <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
             <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
