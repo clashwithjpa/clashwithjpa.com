@@ -89,8 +89,8 @@
     </div>
 
     {#if loading}
-        <div class="flex flex-1 items-center justify-center text-stone-400">
-            <SvgSpinnersBlocksScale class="size-12" />
+        <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
+            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
         </div>
     {:else}
         <div class="flex max-w-2xl flex-col gap-4">

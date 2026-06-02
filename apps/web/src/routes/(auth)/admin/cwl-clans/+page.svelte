@@ -254,12 +254,12 @@
     </div>
 
     {#if loading}
-        <div class="flex flex-1 items-center justify-center text-stone-400">
-            <SvgSpinnersBlocksScale class="size-12" />
+        <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
+            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
         </div>
     {:else if clans.length === 0}
-        <div class="flex flex-1 flex-col items-center justify-center gap-3 text-stone-400">
-            <TablerShield class="size-12" />
+        <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
+            <TablerShield class="size-12 lg:size-16" />
             <p class="text-sm">No CWL clans yet. Add one to get started.</p>
         </div>
     {:else}

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient, hasPermission } from "$lib/auth";
+    import { authClient } from "$lib/auth";
     import Button from "$lib/components/ui/Button.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
@@ -15,7 +15,9 @@
     import TablerShield from "~icons/tabler/shield";
     import TablerSwords from "~icons/tabler/swords";
     import TablerUser from "~icons/tabler/user";
+    import type { PageProps } from "./$types";
 
+    let { data }: PageProps = $props();
     const session = authClient.useSession();
 
     type SummaryCard = {
@@ -71,8 +73,7 @@
     let unassignedCwl = $state<number | null>(null);
 
     onMount(async () => {
-        const canReview = await hasPermission($session.data?.user?.id, "review");
-        if (!canReview) return;
+        if (!data.permissions?.review) return;
 
         const [joinResp, cwlResp] = await Promise.allSettled([
             getJoinApplications({ status: "pending", limit: 1 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
@@ -123,20 +124,16 @@
         <h2 class="text-xl font-bold">Sections</h2>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {#each cards as card (card.href)}
-                {#await hasPermission($session.data?.user?.id, card.requiredPerm) then allowed}
-                    <Button
-                        variant="ghost"
-                        href={allowed ? card.href : undefined}
-                        disabled={!allowed}
-                        class="flex items-start justify-start gap-3 p-4 text-left"
-                    >
+                {@const allowed = !!data.permissions?.[card.requiredPerm]}
+                {#if allowed}
+                    <Button variant="ghost" href={card.href} class="flex items-start justify-start gap-3 p-4 text-left">
                         <card.icon class="size-8 shrink-0 text-stone-300" />
                         <div class="flex flex-col items-start gap-0.5">
                             <span class="font-semibold text-stone-50">{card.title}</span>
                             <span class="text-xs text-stone-400">{card.description}</span>
                         </div>
                     </Button>
-                {/await}
+                {/if}
             {/each}
         </div>
     </div>
