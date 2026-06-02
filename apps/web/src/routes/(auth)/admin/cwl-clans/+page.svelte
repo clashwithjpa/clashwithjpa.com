@@ -231,7 +231,7 @@
 
 <Seo title="CWL Clans" description="Add or remove CWL clans" />
 
-<div in:fadeIn class="flex size-full flex-col gap-6 overflow-y-auto p-2">
+<div in:fadeIn class="flex size-full flex-col gap-4">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold">CWL Clans</h1>

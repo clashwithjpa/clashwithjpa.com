@@ -328,7 +328,7 @@
         {/if}
     </div>
 
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1">
         <Grid
             rowData={displayedApplications}
             gridOptions={{
@@ -349,6 +349,15 @@
                 },
             }}
             columnDefs={[
+                {
+                    headerName: "Discord",
+                    field: "discordUsername",
+                    sortable: true,
+                    filter: false,
+                    flex: 2,
+                    cellRenderer: svelteRenderer(CwlDiscordCell),
+                    getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
+                },
                 {
                     headerName: "Account",
                     field: "cocAccountName",
@@ -374,15 +383,6 @@
                     filter: false,
                     flex: 1,
                     valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
-                },
-                {
-                    headerName: "Discord",
-                    field: "discordUsername",
-                    sortable: true,
-                    filter: false,
-                    flex: 2,
-                    cellRenderer: svelteRenderer(CwlDiscordCell),
-                    getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
                 },
                 {
                     headerName: "Applied",
@@ -459,12 +459,7 @@
                             </div>
                         </div>
                         <div class="flex flex-1 items-center gap-2">
-                            <Input
-                                placeholder="Search by name, tag, Discord or clan..."
-                                bind:value={searchText}
-                                oninput={applySearch}
-                                class="flex-1 lg:max-w-80"
-                            />
+                            <Input placeholder="Search anything" bind:value={searchText} oninput={applySearch} class="flex-1 lg:max-w-80" />
                             <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="top">
                                 <TablerSearch class="size-5" />
                             </Button>

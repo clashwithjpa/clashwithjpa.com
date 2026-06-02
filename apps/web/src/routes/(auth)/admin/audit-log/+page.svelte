@@ -215,7 +215,7 @@
 
 <Seo title="Audit Log" description="View server actions audit log" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4 overflow-hidden">
+<div in:fadeIn class="flex size-full flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold">Audit Log</h1>

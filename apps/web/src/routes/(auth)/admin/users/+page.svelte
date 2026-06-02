@@ -305,6 +305,7 @@
                 headerName: " ",
                 field: "id",
                 cellRenderer: svelteRenderer(ActionCell),
+                cellStyle: { justifyContent: "center" },
                 sortable: false,
                 filter: false,
                 lockPosition: "right",

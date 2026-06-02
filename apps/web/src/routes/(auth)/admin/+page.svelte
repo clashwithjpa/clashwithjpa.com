@@ -86,7 +86,7 @@
 
 <Seo title="Admin Panel" description="Admin control panel" />
 
-<div in:fadeIn class="flex size-full flex-col gap-8 overflow-y-auto p-2">
+<div in:fadeIn class="flex size-full flex-col gap-8">
     <div>
         <h1 class="text-3xl font-bold">Admin Panel</h1>
         <p class="text-sm text-stone-400">

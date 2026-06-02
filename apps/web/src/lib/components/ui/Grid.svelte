@@ -24,8 +24,6 @@
     onMount(() => {
         const options: GridOptions = {
             theme: "legacy",
-            // Allow selecting/copying cell text (double-click, drag). Off by default in AG Grid.
-            // ensureDomOrder keeps copied text in the visible row order.
             enableCellTextSelection: true,
             ensureDomOrder: true,
             ...gridOptions,
@@ -148,5 +146,23 @@
         background: transparent !important;
         box-shadow: none !important;
         padding: 0 !important;
+    }
+
+    :global(.ag-cell) {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: text;
+    }
+
+    /* Target the internal wrappers AG Grid uses for framework components */
+    :global(.ag-cell .ag-react-container),
+    :global(.ag-cell .ag-cell-wrapper) {
+        width: 100%;
+        height: 100%;
+        display: flex;
     }
 </style>

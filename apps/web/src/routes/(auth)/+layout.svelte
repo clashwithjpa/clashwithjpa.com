@@ -237,8 +237,10 @@
 {#snippet ContentPanel()}
     <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
         {#if $session.data}
-            <div in:fadeIn class={`size-full overflow-y-auto ${!noPaddingPaths.includes(page.url.pathname) ? "p-4" : ""}`}>
-                {@render children()}
+            <div in:fadeIn class="size-full overflow-y-auto">
+                <div class={!noPaddingPaths.includes(page.url.pathname) ? "p-4" : "size-full"}>
+                    {@render children()}
+                </div>
             </div>
         {:else}
             <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">

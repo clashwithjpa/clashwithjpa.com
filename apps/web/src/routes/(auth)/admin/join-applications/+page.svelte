@@ -108,7 +108,7 @@
 
 <Seo title="Join Applications" description="Review pending clan join applications" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4 overflow-hidden">
+<div in:fadeIn class="flex size-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold">Join Applications</h1>
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1">
         {#if loading}
             <div class="flex size-full items-center justify-center text-stone-400">
                 <SvgSpinnersBlocksScale class="size-12" />
