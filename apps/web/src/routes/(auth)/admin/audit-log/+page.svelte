@@ -1,14 +1,17 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import { carta } from "$lib/carta";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { formatDateTime } from "$lib/utils";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
+    import { cardSlideIn, DURATION, fadeIn } from "$lib/utils/animations";
     import { getAuditLog, type GetAuditLog200 } from "@repo/clashofclans-client";
+    import { PreRendered } from "carta-md";
     import { toast } from "svelte-sonner";
+    import { slide } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerChevronLeft from "~icons/tabler/chevron-left";
     import TablerChevronRight from "~icons/tabler/chevron-right";
@@ -29,34 +32,34 @@
 
     const actionOptions: Option[] = [
         { label: "All actions", value: "" },
-        { label: "Clan application — created", value: "clan_application.create" },
-        { label: "Clan application — accepted", value: "clan_application.accepted" },
-        { label: "Clan application — rejected", value: "clan_application.rejected" },
-        { label: "Clan application — pending", value: "clan_application.pending" },
-        { label: "CWL application — created", value: "cwl_application.create" },
-        { label: "CWL application — assigned", value: "cwl_application.assign" },
-        { label: "CWL application — unassigned", value: "cwl_application.unassign" },
-        { label: "Settings — updated", value: "settings.update" },
-        { label: "Rules — updated", value: "rules.update" },
-        { label: "Clan — created", value: "clan.create" },
-        { label: "Clan — updated", value: "clan.update" },
-        { label: "Clan — deleted", value: "clan.delete" },
-        { label: "CWL clan — created", value: "cwl_clan.create" },
-        { label: "CWL clan — updated", value: "cwl_clan.update" },
-        { label: "CWL clan — deleted", value: "cwl_clan.delete" },
-        { label: "COC account — imported", value: "coc_account.import" },
-        { label: "COC account — war weight updated", value: "coc_account.weight_update" },
-        { label: "COC account — marked external", value: "coc_account.mark_external" },
-        { label: "COC account — external status changed", value: "coc_account.external_update" },
-        { label: "User — role set", value: "user.role_set" },
-        { label: "User — created", value: "user.create" },
-        { label: "User — updated", value: "user.update" },
-        { label: "User — banned", value: "user.ban" },
-        { label: "User — unbanned", value: "user.unban" },
-        { label: "User — removed", value: "user.remove" },
-        { label: "User — password set", value: "user.password_set" },
-        { label: "User — session revoked", value: "user.session_revoked" },
-        { label: "User — sessions revoked", value: "user.sessions_revoked" },
+        { label: "Clan application - created", value: "clan_application.create" },
+        { label: "Clan application - accepted", value: "clan_application.accepted" },
+        { label: "Clan application - rejected", value: "clan_application.rejected" },
+        { label: "Clan application - pending", value: "clan_application.pending" },
+        { label: "CWL application - created", value: "cwl_application.create" },
+        { label: "CWL application - assigned", value: "cwl_application.assign" },
+        { label: "CWL application - unassigned", value: "cwl_application.unassign" },
+        { label: "Settings - updated", value: "settings.update" },
+        { label: "Rules - updated", value: "rules.update" },
+        { label: "Clan - created", value: "clan.create" },
+        { label: "Clan - updated", value: "clan.update" },
+        { label: "Clan - deleted", value: "clan.delete" },
+        { label: "CWL clan - created", value: "cwl_clan.create" },
+        { label: "CWL clan - updated", value: "cwl_clan.update" },
+        { label: "CWL clan - deleted", value: "cwl_clan.delete" },
+        { label: "COC account - imported", value: "coc_account.import" },
+        { label: "COC account - war weight updated", value: "coc_account.weight_update" },
+        { label: "COC account - marked external", value: "coc_account.mark_external" },
+        { label: "COC account - external status changed", value: "coc_account.external_update" },
+        { label: "User - role set", value: "user.role_set" },
+        { label: "User - created", value: "user.create" },
+        { label: "User - updated", value: "user.update" },
+        { label: "User - banned", value: "user.ban" },
+        { label: "User - unbanned", value: "user.unban" },
+        { label: "User - removed", value: "user.remove" },
+        { label: "User - password set", value: "user.password_set" },
+        { label: "User - session revoked", value: "user.session_revoked" },
+        { label: "User - sessions revoked", value: "user.sessions_revoked" },
     ];
 
     const targetTypeOptions: Option[] = [
@@ -171,7 +174,7 @@
             case "user.update":
                 return `${actor} updated user ${userTargetLabel(e, m)}${Array.isArray(m.changedFields) && m.changedFields.length ? ` (${m.changedFields.join(", ")})` : ""}`;
             case "user.ban":
-                return `${actor} banned ${userTargetLabel(e, m)}${m.banReason ? ` — ${m.banReason}` : ""}`;
+                return `${actor} banned ${userTargetLabel(e, m)}${m.banReason ? ` - ${m.banReason}` : ""}`;
             case "user.unban":
                 return `${actor} unbanned ${userTargetLabel(e, m)}`;
             case "user.remove":
@@ -211,6 +214,23 @@
     }
 
     const totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
+
+    let renderedMetadata = $state<Record<number, string>>({});
+
+    async function toggleDetails(entry: AuditEntry) {
+        const id = entry.id;
+
+        if (expanded[id]) {
+            expanded[id] = false;
+            return;
+        }
+
+        if (!renderedMetadata[id] && entry.metadata) {
+            renderedMetadata[id] = await carta.render(`\`\`\`json\n${JSON.stringify(entry.metadata, null, 2)}\n\`\`\``);
+        }
+
+        expanded[id] = true;
+    }
 </script>
 
 <Seo title="Audit Log" description="View server actions audit log" />
@@ -259,17 +279,17 @@
                                 <span class="font-mono">{entry.targetType}{entry.targetId ? `#${entry.targetId}` : ""}</span>
                             {/if}
                             {#if entry.metadata && Object.keys(entry.metadata).length > 0}
-                                <button class="text-stone-400 hover:text-stone-200" onclick={() => (expanded[entry.id] = !expanded[entry.id])}>
+                                <button class="cursor-pointer text-stone-400 hover:text-stone-200" onclick={() => toggleDetails(entry)}>
                                     {expanded[entry.id] ? "hide" : "show"} details
                                 </button>
                             {/if}
                         </div>
-                        {#if expanded[entry.id] && entry.metadata}
-                            <pre class="mt-1 overflow-x-auto rounded bg-stone-950 p-2 text-xs text-stone-300">{JSON.stringify(
-                                    entry.metadata,
-                                    null,
-                                    2,
-                                )}</pre>
+                        {#if expanded[entry.id]}
+                            <div transition:slide={{ duration: DURATION.MEDIUM }}>
+                                <div class="typography max-w-none! text-sm! **:mb-0!">
+                                    <PreRendered html={renderedMetadata[entry.id]} />
+                                </div>
+                            </div>
                         {/if}
                     </div>
                 {/each}
