@@ -123,7 +123,7 @@
                 sortable: true,
                 filter: false,
                 flex: 2,
-                valueFormatter: (p) => p.value ?? "Unknown",
+                valueFormatter: (p) => p.value,
             },
             { headerName: "Account Tag", field: "cocAccountTag", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
             { headerName: "Discord ID", field: "discordUserId", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
@@ -154,7 +154,7 @@
     />
 
     <Toolbar>
-        <Input placeholder="Search by owner, tag or Discord ID..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
+        <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
         <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
             <TablerSearch class="size-5" />
         </Button>

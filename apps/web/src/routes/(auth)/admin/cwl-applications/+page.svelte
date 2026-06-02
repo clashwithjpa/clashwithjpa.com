@@ -466,7 +466,7 @@
                             </div>
                         </div>
                         <div class="flex flex-1 items-center gap-2">
-                            <Input placeholder="Search anything" bind:value={searchText} oninput={applySearch} class="flex-1 lg:max-w-80" />
+                            <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="flex-1 lg:max-w-80" />
                         </div>
                     </div>
 

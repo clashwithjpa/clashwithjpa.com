@@ -272,7 +272,7 @@
                                 <ConfirmationDialog
                                     title="Mark as external?"
                                     class="w-full"
-                                    description="Convert {account.cocAccountTag} to an external account (e.g. one you only bring for CWL). This is one-way — only staff can change it back to a main account."
+                                    description="Convert {account.cocAccountTag} to an external account (e.g. one you only bring for CWL). This is one-way, only staff can change it back to a main account."
                                     confirmText="Mark as external"
                                     onConfirm={() => markExternal(account)}
                                 >

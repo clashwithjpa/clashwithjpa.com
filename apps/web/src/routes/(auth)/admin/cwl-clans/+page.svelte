@@ -34,6 +34,7 @@
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
+    import TablerX from "~icons/tabler/x";
 
     type CwlClan = GetAdminCwlClans200["data"]["clans"][number];
 
@@ -268,8 +269,8 @@
         </div>
 
         {#if filteredClans.length === 0}
-            <div class="flex flex-1 flex-col items-center justify-center gap-3 text-stone-400">
-                <TablerShield class="size-12" />
+            <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
+                <TablerX class="size-12 lg:size-16" />
                 <p class="text-sm">No clans match your search.</p>
             </div>
         {:else}
