@@ -5,69 +5,16 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { getCwlApplications, getJoinApplications } from "@repo/clashofclans-client";
-    import { onMount, type Component } from "svelte";
+    import { onMount } from "svelte";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import TablerBook2 from "~icons/tabler/book-2";
     import TablerFileDescription from "~icons/tabler/file-description";
-    import TablerHistory from "~icons/tabler/history";
-    import TablerScale from "~icons/tabler/scale";
-    import TablerSettings from "~icons/tabler/settings";
-    import TablerShield from "~icons/tabler/shield";
     import TablerSwords from "~icons/tabler/swords";
-    import TablerUser from "~icons/tabler/user";
     import type { PageProps } from "./$types";
 
     let { data }: PageProps = $props();
     const session = authClient.useSession();
 
-    type SummaryCard = {
-        href: string;
-        title: string;
-        description: string;
-        icon: Component;
-        requiredPerm: "review" | "manage" | "sudo";
-    };
-
-    const cards: SummaryCard[] = [
-        {
-            href: "/admin/join-applications",
-            title: "Join Applications",
-            description: "Review pending clan join applications",
-            icon: TablerFileDescription,
-            requiredPerm: "review",
-        },
-        {
-            href: "/admin/cwl-applications",
-            title: "CWL Applications",
-            description: "Manage CWL applications and assignments",
-            icon: TablerSwords,
-            requiredPerm: "manage",
-        },
-        { href: "/admin/users", title: "Users", description: "Manage users, roles and sessions", icon: TablerUser, requiredPerm: "manage" },
-        {
-            href: "/admin/coc-accounts",
-            title: "COC Accounts",
-            description: "View linked accounts and edit war weights",
-            icon: TablerScale,
-            requiredPerm: "manage",
-        },
-        {
-            href: "/admin/cwl-clans",
-            title: "CWL Clans",
-            description: "Add or remove clans for CWL assignments",
-            icon: TablerShield,
-            requiredPerm: "sudo",
-        },
-        { href: "/admin/rules", title: "Rules", description: "Edit alliance rules", icon: TablerBook2, requiredPerm: "manage" },
-        { href: "/admin/audit-log", title: "Audit Log", description: "View server actions history", icon: TablerHistory, requiredPerm: "manage" },
-        {
-            href: "/admin/settings",
-            title: "Settings",
-            description: "Site-wide toggles and configuration",
-            icon: TablerSettings,
-            requiredPerm: "sudo",
-        },
-    ];
+    let adminCards = $derived(data.adminLinks.filter((link) => link.description));
 
     let pendingJoin = $state<number | null>(null);
     let unassignedCwl = $state<number | null>(null);
@@ -123,13 +70,13 @@
     <div class="flex flex-col gap-3">
         <h2 class="text-xl font-bold">Sections</h2>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {#each cards as card (card.href)}
-                {@const allowed = !!data.permissions?.[card.requiredPerm]}
+            {#each adminCards as card (card.href)}
+                {@const allowed = !card.requiredPerm || !!data.permissions?.[card.requiredPerm]}
                 {#if allowed}
                     <Button variant="ghost" href={card.href} class="flex items-start justify-start gap-3 p-4 text-left">
                         <card.icon class="size-8 shrink-0 text-stone-300" />
                         <div class="flex flex-col items-start gap-0.5">
-                            <span class="font-semibold text-stone-50">{card.title}</span>
+                            <span class="font-semibold text-stone-50">{card.name}</span>
                             <span class="text-xs text-stone-400">{card.description}</span>
                         </div>
                     </Button>

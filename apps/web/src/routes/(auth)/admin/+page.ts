@@ -11,5 +11,5 @@ export const load: PageLoad = async ({ parent }) => {
         throw error(401, "Unauthorized");
     }
 
-    return { session, permissions };
+    return { session };
 };

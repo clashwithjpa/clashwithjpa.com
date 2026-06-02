@@ -9,56 +9,17 @@
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Splitter } from "@ark-ui/svelte/splitter";
-    import type { statement } from "@repo/auth-shared";
-    import { onMount, type Component } from "svelte";
+    import { onMount } from "svelte";
     import { Toaster } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
-    import TablerBook2 from "~icons/tabler/book-2";
-    import TablerFileDescription from "~icons/tabler/file-description";
-    import TablerHistory from "~icons/tabler/history";
-    import TablerHome from "~icons/tabler/home";
-    import TablerLogout2 from "~icons/tabler/logout-2";
-    import TablerScale from "~icons/tabler/scale";
-    import TablerSettings from "~icons/tabler/settings";
-    import TablerShield from "~icons/tabler/shield";
-    import TablerSwords from "~icons/tabler/swords";
-    import TablerUser from "~icons/tabler/user";
     import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
     let { children, data }: LayoutProps = $props();
     const session = authClient.useSession();
 
-    interface Link {
-        name: string;
-        icon: Component;
-        href: string;
-        requiredPerm?: (typeof statement.jpa)[number];
-    }
-
-    let dashboardLinks: Link[] = [
-        { name: "Home ", icon: TablerHome, href: "/dashboard" },
-        { name: "Apply", icon: TablerFileDescription, href: "/dashboard/apply", requiredPerm: "apply" },
-        { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", requiredPerm: "cwl" },
-        { name: "Settings", icon: TablerSettings, href: "/dashboard/settings" },
-        { name: "Leave", icon: TablerLogout2, href: "/" },
-    ];
-
-    let adminLinks: Link[] = [
-        { name: "Home", icon: TablerHome, href: "/admin" },
-        { name: "CWL", icon: TablerSwords, href: "/admin/cwl-applications", requiredPerm: "manage" },
-        { name: "CWL Clans", icon: TablerShield, href: "/admin/cwl-clans", requiredPerm: "sudo" },
-        { name: "Applications", icon: TablerFileDescription, href: "/admin/join-applications", requiredPerm: "review" },
-        { name: "Users", icon: TablerUser, href: "/admin/users", requiredPerm: "manage" },
-        { name: "Weights", icon: TablerScale, href: "/admin/coc-accounts", requiredPerm: "manage" },
-        { name: "Rules", icon: TablerBook2, href: "/admin/rules", requiredPerm: "manage" },
-        { name: "Audit Log", icon: TablerHistory, href: "/admin/audit-log", requiredPerm: "manage" },
-        { name: "Settings", icon: TablerSettings, href: "/admin/settings", requiredPerm: "sudo" },
-        { name: "Leave", icon: TablerLogout2, href: "/" },
-    ];
-
-    let links = $derived(page.url.pathname.startsWith("/admin") ? adminLinks : dashboardLinks);
+    let links = $derived(page.url.pathname.startsWith("/admin") ? data.adminLinks : data.dashboardLinks);
 
     let isMobile = $state(false);
     let sidebarWidth = $state(0);
@@ -68,18 +29,6 @@
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 
-    /*
-    Layout Config - All values in percentages (%) of viewport width
-    ╭─────────────┬─────┬─────┬─────────╮
-    │ Panel       │ Min │ Max │ Default │
-    ├─────────────┼─────┼─────┼─────────┤
-    │ sidebar     │ 6%  │ 16% │ 6%      │
-    │ content     │ 30% │ 85% │ 30%     │
-    │ infoSidebar │ 15% │ 45% │ 30%     │
-    ╰─────────────┴─────┴─────┴─────────╯
-    To adjust: Change any value below. Desktop total must not exceed 100%.
-    Mobile: Independently configured for smaller screens.
-    */
     const LAYOUT_CONFIG = {
         sidebar: { min: 6, max: 16, default: 6 },
         content: { min: 30, max: 85, default: 30 },
@@ -168,7 +117,7 @@
     {/snippet}
 </Toaster>
 
-{#snippet button(link: Link)}
+{#snippet button(link: any)}
     <div in:fadeIn>
         <Button
             variant={null}
