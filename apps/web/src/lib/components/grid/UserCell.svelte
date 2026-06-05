@@ -5,7 +5,7 @@
     import type { UserWithRole } from "better-auth/plugins";
 
     let { params }: { params: ICellRendererParams } = $props();
-    let user: UserWithRole | null = $derived(params.data || null);
+    let user: (UserWithRole & { discordId?: string | null }) | null = $derived(params.data || null);
 </script>
 
 {#if user}
@@ -13,6 +13,9 @@
         <Avatar src={user.image || null} name={user.name || "Unknown"} role={(user.role as Role) || "unverified"} size="sm" />
         <div class="flex min-w-0 flex-col justify-center">
             <span class="truncate text-sm font-medium text-stone-200">{user.name || "Unknown"}</span>
+            {#if user.discordId}
+                <span class="truncate font-mono text-xs text-stone-400">{user.discordId}</span>
+            {/if}
         </div>
     </div>
 {/if}

@@ -1,5 +1,5 @@
-import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { logAction } from "@/lib/audit";
+import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
@@ -9,6 +9,7 @@ import {
     createCwlClan,
     deleteClan,
     deleteCwlClan,
+    getAdminUsers,
     getAllClans,
     getAllCocAccounts,
     getAllCwlApplications,
@@ -16,7 +17,6 @@ import {
     getAuditLog,
     getClanApplications,
     getCocAccountsForUser,
-    getDiscordAccountId,
     getSettings,
     MissingDiscordAccountError,
     updateClan,
@@ -38,46 +38,43 @@ import z4 from "zod/v4";
 // Each route specifies its own permission-level middleware (review/manage/sudo)
 const app = new Hono<AppEnv>();
 
-const getDiscordIdPathSchema = z4.object({
-    userid: z4.string().min(1, "userid is required"),
-});
-const getDiscordIdData = z4.object({
-    accountId: z4.string(),
+// ============================================================
+// Users list with case-insensitive search (manage perm)
+// ============================================================
+
+const listUsersQuerySchema = z4.object({
+    search: z4.string().optional(),
+    limit: z4.coerce.number().int().min(1).max(200).default(50),
+    offset: z4.coerce.number().int().min(0).default(0),
+    sortBy: z4.string().optional(),
+    sortDirection: z4.enum(["asc", "desc"]).optional(),
 });
 app.get(
-    "/discord-id/:userid",
+    "/users",
     hasAccessAuthMiddleware(isManager),
     describeRoute({
-        operationId: "getDiscordIdByUserId",
-        description: "[Manager] Fetches the Discord accountId from Better Auth account table using a userid path param.",
+        operationId: "getAdminUsers",
+        description: "[Manager] Lists users with case-insensitive search across name and Discord id.",
         tags: ["admin"],
         responses: {
             200: {
-                description: "Successful response with the Discord accountId.",
-                content: { "application/json": { schema: resolver(SuccessResponseSchema(getDiscordIdData)) } },
+                description: "Users.",
+                content: {
+                    "application/json": { schema: resolver(SuccessResponseSchema(z4.object({ users: z4.array(z4.unknown()), total: z4.number() }))) },
+                },
             },
-            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("param", getDiscordIdPathSchema),
+    zValidator("query", listUsersQuerySchema),
     async (c) => {
-        const userId = c.req.param("userid");
-
         try {
-            const accountId = await getDiscordAccountId(userId);
-
-            if (!accountId) {
-                return c.json({ success: false, error: "No Discord account found for this userId" }, 404);
-            }
-
-            return c.json({
-                success: true,
-                data: { accountId },
-            });
-        } catch {
-            return c.json({ success: false, error: "Failed to fetch Discord accountId" }, 500);
+            const result = await getAdminUsers(c.req.valid("query"));
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch users" }, 500);
         }
     },
 );

@@ -11,7 +11,7 @@ import {
     settingsTable,
     user,
 } from "@/lib/db/schema";
-import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -454,6 +454,43 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
     ]);
 
     return { accounts: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function getAdminUsers(
+    opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDirection?: "asc" | "desc" } = {},
+) {
+    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc" } = opts;
+
+    const sortColumns = {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+    } as const;
+    const sortColumn = sortBy && sortBy in sortColumns ? sortColumns[sortBy as keyof typeof sortColumns] : user.createdAt;
+    const orderBy = sortDirection === "desc" ? desc(sortColumn) : asc(sortColumn);
+
+    const discordJoin = and(eq(account.userId, user.id), eq(account.providerId, "discord"));
+
+    const whereClause = search ? or(ilike(user.name, `%${search}%`), ilike(account.accountId, `%${search}%`)) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+        db
+            .select({ ...getTableColumns(user), discordId: account.accountId })
+            .from(user)
+            .leftJoin(account, discordJoin)
+            .where(whereClause)
+            .orderBy(orderBy)
+            .limit(limit)
+            .offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(user)
+            .leftJoin(account, discordJoin)
+            .where(whereClause),
+    ]);
+
+    return { users: rows, total: countResult[0]?.count ?? 0 };
 }
 
 export async function updateCocAccountWarWeight(id: number, warWeight: number) {

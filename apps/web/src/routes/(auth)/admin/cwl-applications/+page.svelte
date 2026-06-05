@@ -3,7 +3,6 @@
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
-    import Toolbar from "$lib/components/Toolbar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
@@ -25,13 +24,11 @@
     import type { GridApi, ICellRendererParams } from "ag-grid-community";
     import { untrack } from "svelte";
     import { toast } from "svelte-sonner";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
-    import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
 
@@ -59,24 +56,71 @@
     let bulkClan = $state<string>("");
     let bulkProcessing = $state(false);
     let searchText = $state("");
+    let scrollEl = $state<HTMLDivElement | null>(null);
+
+    // The edge fades are pure CSS (see the scroll-driven mask in the style block). This effect only
+    // suppresses the click that fires at the end of a drag-scroll so badges don't toggle.
+    $effect(() => {
+        const el = scrollEl;
+        if (!el) return;
+        function suppressClick(e: MouseEvent) {
+            if (hasDragged) {
+                e.stopPropagation();
+                e.preventDefault();
+                hasDragged = false;
+            }
+        }
+        el.addEventListener("click", suppressClick, { capture: true });
+        return () => el.removeEventListener("click", suppressClick, { capture: true });
+    });
+
+    let isDragging = $state(false);
+    let hasDragged = false;
+    let dragStartX = 0;
+    let dragScrollLeft = 0;
+    let dragCursorStyle: HTMLStyleElement | null = null;
+
+    function onDragStart(e: MouseEvent) {
+        if (!scrollEl) return;
+        isDragging = true;
+        hasDragged = false;
+        dragStartX = e.pageX - scrollEl.offsetLeft;
+        dragScrollLeft = scrollEl.scrollLeft;
+        dragCursorStyle = document.createElement("style");
+        dragCursorStyle.textContent = "* { cursor: grabbing !important; }";
+        document.head.appendChild(dragCursorStyle);
+        document.addEventListener("mousemove", onDragMove);
+        document.addEventListener("mouseup", onDragEnd);
+    }
+
+    function onDragMove(e: MouseEvent) {
+        if (!isDragging || !scrollEl) return;
+        e.preventDefault();
+        const dx = e.pageX - scrollEl.offsetLeft - dragStartX;
+        if (Math.abs(dx) > 4) hasDragged = true;
+        scrollEl.scrollLeft = dragScrollLeft - dx;
+    }
+
+    function onDragEnd() {
+        isDragging = false;
+        dragCursorStyle?.remove();
+        dragCursorStyle = null;
+        document.removeEventListener("mousemove", onDragMove);
+        document.removeEventListener("mouseup", onDragEnd);
+    }
 
     function applySearch() {
         gridApi?.setGridOption("quickFilterText", searchText);
     }
     // Exclude the "Unassigned" entry so bulk assign can't accidentally mass-unassign.
     let bulkClanOptions = $derived(clanOptions.filter((o) => o.value !== ""));
-    // Per-clan filter: only clans that actually have someone assigned to them.
-    let clanFilterOptions = $derived<Option[]>([
-        { label: "All clans", value: "all" },
-        ...bulkClanOptions.filter((o) => assignedClanTags.includes(normalizeTag(o.value))),
-    ]);
-    let displayedApplications = $derived(clanFilter === "all" ? applications : applications.filter((a) => a.assignedTo === clanFilter));
-
-    const filterOptions: Option[] = [
-        { label: "All", value: "all" },
-        { label: "Unassigned", value: "unassigned" },
-        { label: "Assigned", value: "assigned" },
-    ];
+    let displayedApplications = $derived(
+        clanFilter === "all"
+            ? applications
+            : clanFilter === "wrong-clan"
+              ? applications.filter((a) => joinedInfo(a).status === "wrong-clan")
+              : applications.filter((a) => a.assignedTo === clanFilter),
+    );
 
     async function loadClans() {
         try {
@@ -270,64 +314,91 @@
 <Seo title="CWL Applications" description="Manage CWL applications and assign players to clans" />
 
 <div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
-    <div class="flex flex-col px-4 pt-4">
-        <h1 class="text-2xl font-bold">CWL Applications</h1>
-        <p class="text-sm text-stone-400">
-            {#if displayedApplications.length !== total}
-                {displayedApplications.length} of {total} application{total === 1 ? "" : "s"}
-            {:else}
-                {total} application{total === 1 ? "" : "s"}
-            {/if}
-        </p>
+    <div class="flex flex-col gap-4 px-4 pt-4">
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold">CWL Applications</h1>
+                <p class="text-sm text-stone-400">
+                    {#if displayedApplications.length !== total}
+                        {displayedApplications.length} of {total} application{total === 1 ? "" : "s"}
+                    {:else}
+                        {total} application{total === 1 ? "" : "s"}
+                    {/if}
+                </p>
+            </div>
+            <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+                <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
+                {#if selectedIds.length > 0}
+                    <div class="hidden h-8 w-px bg-stone-700 lg:block"></div>
+                    <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+                        <span class="text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
+                        <div class="flex w-full gap-2 lg:w-fit">
+                            <div class="w-full lg:w-44">
+                                <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
+                            </div>
+                            <Button variant="success" size="sm" disabled={bulkProcessing || !bulkClan} onclick={bulkAssign}>
+                                {bulkProcessing ? "…" : "Assign"}
+                            </Button>
+                            <Button variant="ghost" size="sm" disabled={bulkProcessing} onclick={clearSelection}>Clear</Button>
+                        </div>
+                    </div>
+                {/if}
+            </div>
+        </div>
 
         {#if clanStats.length > 0}
-            <div class="mt-3 flex flex-wrap items-center gap-2">
-                <span class="flex items-center gap-1.5 text-sm font-medium text-stone-200">
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+                bind:this={scrollEl}
+                onmousedown={onDragStart}
+                class="edge-fade flex cursor-grab items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden {isDragging ? 'select-none' : ''}"
+                style="scrollbar-width: none;"
+            >
+                <span class="flex shrink-0 items-center gap-1.5 text-sm font-medium text-stone-200">
                     {totalJoined} / {totalAssigned} joined their CWL clan
                     {#if rostersLoading}
                         <SvgSpinnersRingResize class="size-3.5 text-stone-400" />
                     {/if}
                 </span>
                 {#if erroredClans > 0}
-                    <span class="flex items-center gap-1 text-xs text-red-400">
-                        <TablerAlertTriangle class="size-3.5" />
-                        couldn't check {erroredClans} clan{erroredClans === 1 ? "" : "s"}
-                    </span>
+                    <Badge
+                        icon={TablerAlertTriangle}
+                        content="Couldn't check {erroredClans} clan{erroredClans === 1 ? '' : 's'}"
+                        variant="red"
+                        iconSize="size-4"
+                        class="shrink-0 px-2 py-1"
+                    />
                 {/if}
                 {#if wrongClanCount > 0}
-                    <span class="flex items-center gap-1 text-xs text-blue-400">
-                        <TablerArrowsExchange class="size-3.5" />
-                        {wrongClanCount} in a different CWL clan
-                    </span>
+                    {@const isWrongClanActive = clanFilter === "wrong-clan"}
+                    <Badge
+                        icon={TablerArrowsExchange}
+                        content="{wrongClanCount} in different clan"
+                        variant="blue"
+                        iconSize="size-4"
+                        onclick={() => (clanFilter = isWrongClanActive ? "all" : "wrong-clan")}
+                        class="shrink-0 px-2 py-1 {isWrongClanActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
+                    />
                 {/if}
-                <div class="hidden h-4 w-px bg-stone-700 sm:block"></div>
+                <div class="h-4 w-px shrink-0 bg-stone-700"></div>
                 {#each clanStats as stat (stat.clanTag)}
+                    {@const isActive = clanFilter === stat.clanTag}
                     {@const isMaxed = stat.joined === stat.total}
-
                     {@const variant = stat.state === "ok" ? (isMaxed ? "green" : "yellow") : stat.state === "loading" ? "blue" : "red"}
-
                     {@const statusText =
                         stat.state === "ok" ? `${stat.joined}/${stat.total}` : stat.state === "loading" ? `…/${stat.total}` : "failed"}
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex shrink-0 items-center gap-2">
                         <Badge
                             icon={stat.state === "loading" ? SvgSpinnersRingResize : TablerShield}
                             content="{stat.name} • {statusText}"
                             {variant}
                             iconSize="size-4"
-                            class="px-2 py-1 font-medium transition-all duration-200"
+                            onclick={() => (clanFilter = isActive ? "all" : stat.clanTag)}
+                            class="px-2 py-1 font-medium {isActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
                         />
-
                         {#if stat.state !== "ok" && stat.state !== "loading"}
-                            <Button
-                                variant="danger"
-                                size="icon"
-                                tooltip="Retry fetching this clan's roster"
-                                tooltipPlacement="top"
-                                onclick={() => retryRoster(stat.clanTag)}
-                            >
-                                <TablerRefresh class="size-3.5" />
-                            </Button>
+                            <Badge icon={TablerRefresh} variant="red" onclick={() => retryRoster(stat.clanTag)} class="px-2 py-1" iconSize="size-4" />
                         {/if}
                     </div>
                 {/each}
@@ -431,66 +502,56 @@
                 },
             ]}
         />
-
-        {#if loading}
-            <div class="absolute inset-0 flex items-center justify-center bg-stone-950 text-stone-400">
-                <SvgSpinnersBlocksScale class="size-12" />
-            </div>
-        {:else if applications.length === 0}
-            <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-stone-950 text-stone-400">
-                <TablerX class="size-12" />
-                <span>No CWL applications found</span>
-            </div>
-        {:else}
-            <Toolbar>
-                <div class="flex size-full flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-center">
-                    <div class="flex w-full flex-col gap-2 lg:w-auto lg:flex-1 lg:flex-row lg:items-center">
-                        <div class="flex gap-2">
-                            <div class="w-full lg:w-36">
-                                <Select
-                                    bind:value={filterMode}
-                                    options={filterOptions}
-                                    placeholder="Status"
-                                    onValueChange={(v) => {
-                                        if (v === "unassigned") clanFilter = "all";
-                                    }}
-                                />
-                            </div>
-                            <div class="w-full lg:w-56">
-                                <Select
-                                    bind:value={clanFilter}
-                                    options={clanFilterOptions}
-                                    placeholder="Filter by clan"
-                                    disabled={filterMode === "unassigned"}
-                                />
-                            </div>
-                        </div>
-                        <div class="flex flex-1 items-center gap-2">
-                            <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="flex-1 lg:max-w-80" />
-                        </div>
-                    </div>
-
-                    {#if selectedIds.length > 0}
-                        <div class="hidden h-8 w-px self-stretch bg-stone-700 lg:block lg:self-auto"></div>
-                        <div class="flex w-full flex-col gap-2 lg:w-fit lg:flex-row lg:items-center lg:gap-2">
-                            <span class="text-sm font-medium whitespace-nowrap text-stone-200">
-                                {selectedIds.length} selected
-                            </span>
-                            <div class="flex w-full flex-col gap-2 lg:w-fit lg:flex-row lg:items-center">
-                                <div class="lg:w-48">
-                                    <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
-                                </div>
-                                <div class="flex w-full gap-2 lg:w-fit">
-                                    <Button variant="success" size="sm" class="w-full" disabled={bulkProcessing || !bulkClan} onclick={bulkAssign}>
-                                        {bulkProcessing ? "…" : "Assign"}
-                                    </Button>
-                                    <Button variant="ghost" size="sm" class="w-full" disabled={bulkProcessing} onclick={clearSelection}>Clear</Button>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-                </div>
-            </Toolbar>
-        {/if}
     </div>
 </div>
+
+<style>
+    /* Animatable so the scroll-driven keyframes below can tween the fade amount. */
+    @property --fade-l {
+        syntax: "<number>";
+        inherits: false;
+        initial-value: 0;
+    }
+    @property --fade-r {
+        syntax: "<number>";
+        inherits: false;
+        initial-value: 0;
+    }
+
+    .edge-fade {
+        --fade-size: 2rem;
+        --fade-l: 0;
+        --fade-r: 0;
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            #000 calc(var(--fade-size) * var(--fade-l)),
+            #000 calc(100% - var(--fade-size) * var(--fade-r)),
+            transparent
+        );
+        animation:
+            edge-fade-left linear both,
+            edge-fade-right linear both;
+        animation-timeline: scroll(self inline), scroll(self inline);
+        animation-range:
+            0 var(--fade-size),
+            calc(100% - var(--fade-size)) 100%;
+    }
+
+    @keyframes edge-fade-left {
+        from {
+            --fade-l: 0;
+        }
+        to {
+            --fade-l: 1;
+        }
+    }
+    @keyframes edge-fade-right {
+        from {
+            --fade-r: 1;
+        }
+        to {
+            --fade-r: 0;
+        }
+    }
+</style>

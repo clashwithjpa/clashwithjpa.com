@@ -100,6 +100,15 @@ export type {
     GetAdminSettingsQueryResponse,
 } from "./GetAdminSettings.ts";
 export type {
+    GetAdminUsers200,
+    GetAdminUsers401,
+    GetAdminUsers500,
+    GetAdminUsersQuery,
+    GetAdminUsersQueryParams,
+    GetAdminUsersQueryParamsSortDirectionEnumKey,
+    GetAdminUsersQueryResponse,
+} from "./GetAdminUsers.ts";
+export type {
     GetAuditLog200,
     GetAuditLog401,
     GetAuditLog500,
@@ -181,15 +190,6 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./GetCwlApplications.ts";
-export type {
-    GetDiscordIdByUserId200,
-    GetDiscordIdByUserId400,
-    GetDiscordIdByUserId404,
-    GetDiscordIdByUserId500,
-    GetDiscordIdByUserIdPathParams,
-    GetDiscordIdByUserIdQuery,
-    GetDiscordIdByUserIdQueryResponse,
-} from "./GetDiscordIdByUserId.ts";
 export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
@@ -327,6 +327,7 @@ export type {
     UpdateJoinApplicationStatusPathParams,
 } from "./UpdateJoinApplicationStatus.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./GetAdminCocAccounts.ts";
+export { getAdminUsersQueryParamsSortDirectionEnum } from "./GetAdminUsers.ts";
 export { warBattleModifierEnum } from "./GetCOCCWLWar.ts";
 export { warStateEnum } from "./GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./GetCOCClan.ts";

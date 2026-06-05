@@ -77,9 +77,9 @@
 
     const sizeClasses = {
         "": "",
-        sm: "text-sm px-3 py-2 md:text-sm",
-        base: "text-base px-4 py-2 md:text-sm",
-        lg: "text-lg px-6 py-3 md:text-base",
+        sm: "text-sm px-3 py-2",
+        base: "text-sm px-4 py-2",
+        lg: "text-base px-6 py-3",
         icon: "size-8 *:size-4",
     };
 

@@ -117,7 +117,7 @@
                 {statusFilter ? `with status "${statusFilter}"` : "total"}
             </p>
         </div>
-        <div class="w-full max-w-xs">
+        <div class="w-full sm:max-w-xs">
             <Select bind:value={statusFilter} options={statusOptions} placeholder="Filter by status" />
         </div>
     </div>

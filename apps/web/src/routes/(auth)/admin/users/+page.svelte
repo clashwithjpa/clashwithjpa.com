@@ -13,17 +13,13 @@
     import { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
-    import ToggleGroup from "$lib/components/ui/ToggleGroup.svelte";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
     import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
-    import { getDiscordIdByUserId } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
-    import TablerAbc from "~icons/tabler/abc";
-    import TablerAt from "~icons/tabler/at";
     import TablerSearch from "~icons/tabler/search";
 
     let isProcessing = $state<string | null>(null);
@@ -44,30 +40,8 @@
 
     const session = authClient.useSession();
     let searchText = $state("");
-    let isDragging = $state(false);
-    let searchType: ["name"] | ["email"] = $state(["name"]);
 
-    async function enrichUserWithDiscordId(user: UserWithRole): Promise<UserWithRole & { discordId: string }> {
-        const discordId = await getDiscordIdByUserId(user.id, {
-            baseURL: PUBLIC_SERVER_URL,
-            credentials: "include",
-        })
-            .then((res) => (res.success && res.data?.accountId ? res.data.accountId : ""))
-            .catch(() => "");
-        return { ...user, discordId };
-    }
-
-    async function loadSidebarUser(userId: string): Promise<(UserWithRole & { discordId: string }) | null> {
-        const { data } = await authClient.admin.getUser({ query: { id: userId } });
-
-        if (!data) {
-            return null;
-        }
-
-        return enrichUserWithDiscordId(data);
-    }
-
-    function openUserSidebar(user: UserWithRole) {
+    function openUserSidebar(user: UserWithRole & { discordId?: string }) {
         selectedSidebarUser = user;
         userSidebar?.open(user.id);
     }
@@ -77,28 +51,29 @@
         selectedSidebarUser = null;
     }
 
-    function updateGridRow(user: UserWithRole) {
+    function updateGridRow(user: Partial<UserWithRole> & { id: string }) {
         gridApi?.forEachNode((node) => {
             if (node.data?.id === user.id) {
-                node.setData(user);
+                // Merge so the row keeps the discordId it was loaded with.
+                node.setData({ ...node.data, ...user });
             }
         });
         gridApi?.refreshCells({ force: true });
     }
 
     async function syncUserViews(userId: string) {
-        const refreshedUser = await loadSidebarUser(userId);
+        const { data: refreshedUser } = await authClient.admin.getUser({ query: { id: userId } });
 
         if (!refreshedUser) {
             return null;
         }
 
-        // Update grid with user data (without discordId to keep grid lightweight)
-        const { discordId, ...gridUser } = refreshedUser;
-        updateGridRow(gridUser);
+        // discordId is stable across role/ban changes, so we merge the refreshed
+        // user onto the grid row and sidebar, both of which already carry it.
+        updateGridRow(refreshedUser);
 
         if (selectedSidebarUser?.id === userId) {
-            selectedSidebarUser = refreshedUser;
+            selectedSidebarUser = { ...selectedSidebarUser, ...refreshedUser };
         }
 
         return refreshedUser;
@@ -110,30 +85,24 @@
                 try {
                     const skip = params.startRow || 0;
                     const limit = (params.endRow || 0) - skip;
-
-                    const queryParams: any = { limit, offset: skip };
-
-                    // Server-side name search with operator
-                    if (searchText) {
-                        queryParams.searchValue = searchText;
-                        queryParams.searchField = searchType[0];
-                    }
-
-                    // Server-side sorting (better-auth listUsers supports sortBy/sortDirection)
                     const sort = params.sortModel?.[0];
+
+                    const query = new URLSearchParams({ limit: String(limit), offset: String(skip) });
+                    if (searchText) query.set("search", searchText);
                     if (sort) {
-                        queryParams.sortBy = sort.colId;
-                        queryParams.sortDirection = sort.sort;
+                        query.set("sortBy", sort.colId);
+                        query.set("sortDirection", sort.sort ?? "asc");
                     }
 
-                    const { data, error } = await authClient.admin.listUsers({ query: queryParams });
+                    const resp = await fetch(`${PUBLIC_SERVER_URL}/admin/users?${query}`, { credentials: "include" });
+                    const json = await resp.json();
 
-                    if (error || !data?.users) {
+                    if (!resp.ok || !json.success) {
                         params.failCallback();
                         return;
                     }
 
-                    params.successCallback(data.users, data.total);
+                    params.successCallback(json.data.users, json.data.total);
                 } catch (error) {
                     toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
                     params.failCallback();
@@ -227,21 +196,6 @@
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow.toISOString().split("T")[0];
     }
-
-    $effect(() => {
-        if (searchType) gridApi?.setGridOption("datasource", createDatasource());
-    });
-
-    $effect(() => {
-        // Fetch discordId when sidebar opens for a user (non-blocking)
-        if (selectedSidebarUser && !selectedSidebarUser.discordId) {
-            loadSidebarUser(selectedSidebarUser.id).then((enrichedUser) => {
-                if (enrichedUser) {
-                    selectedSidebarUser = enrichedUser;
-                }
-            });
-        }
-    });
 </script>
 
 <Seo
@@ -314,18 +268,8 @@
         ]}
     />
 
-    <Toolbar onDragStart={() => (isDragging = true)} onDragEnd={() => (isDragging = false)}>
-        <ToggleGroup
-            bind:value={searchType}
-            options={[
-                { icon: TablerAbc, value: "name", tooltip: "Search by name" },
-                { icon: TablerAt, value: "email", tooltip: "Search by email" },
-            ]}
-            tooltip={true}
-            contentClass="size-5"
-            class="shrink-0"
-        />
-        <Input placeholder="Search by {searchType}..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
+    <Toolbar>
+        <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
         <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
             <TablerSearch class="size-5" />
         </Button>

@@ -88,6 +88,13 @@ export {
     getAdminSettingsQueryResponseSchema,
 } from "./getAdminSettingsSchema.ts";
 export {
+    getAdminUsers200Schema,
+    getAdminUsers401Schema,
+    getAdminUsers500Schema,
+    getAdminUsersQueryParamsSchema,
+    getAdminUsersQueryResponseSchema,
+} from "./getAdminUsersSchema.ts";
+export {
     getAuditLog200Schema,
     getAuditLog401Schema,
     getAuditLog500Schema,
@@ -128,14 +135,6 @@ export {
     getCwlApplicationsQueryParamsSchema,
     getCwlApplicationsQueryResponseSchema,
 } from "./getCwlApplicationsSchema.ts";
-export {
-    getDiscordIdByUserId200Schema,
-    getDiscordIdByUserId400Schema,
-    getDiscordIdByUserId404Schema,
-    getDiscordIdByUserId500Schema,
-    getDiscordIdByUserIdPathParamsSchema,
-    getDiscordIdByUserIdQueryResponseSchema,
-} from "./getDiscordIdByUserIdSchema.ts";
 export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,

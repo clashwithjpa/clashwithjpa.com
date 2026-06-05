@@ -82,7 +82,7 @@
         bind:this={ref}
         data-slot="input"
         class={cn(
-            "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-base text-stone-50 shadow-xs outline-none  selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
+            "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-50 shadow-xs outline-none selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50!",
             "transition-colors duration-200 ease-in-out focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50",
             "aria-invalid:border-red-700/50 aria-invalid:ring-red-700/50 dark:aria-invalid:ring-red-700/50",
             className,
@@ -98,7 +98,7 @@
             bind:this={ref}
             data-slot="input"
             class={cn(
-                "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-base text-stone-50 shadow-xs outline-none  selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
+                "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-50 shadow-xs outline-none selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50!",
                 "transition-colors duration-200 ease-in-out focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50",
                 "aria-invalid:border-red-700/50 aria-invalid:ring-red-700/50 dark:aria-invalid:ring-red-700/50",
                 "pr-10",
@@ -129,7 +129,7 @@
             bind:this={ref}
             data-slot="input"
             class={cn(
-                "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 py-2 pr-10 pl-4 text-base text-stone-50 shadow-xs outline-none  selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
+                "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 py-2 pr-10 pl-4 text-sm text-stone-50 shadow-xs outline-none selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50!",
                 "transition-colors duration-200 ease-in-out focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50",
                 "aria-invalid:border-red-700/50 aria-invalid:ring-red-700/50 dark:aria-invalid:ring-red-700/50",
                 "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
@@ -353,7 +353,7 @@
         bind:this={ref}
         data-slot="input"
         class={cn(
-            "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-base text-stone-50 shadow-xs outline-none  selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50! md:text-sm",
+            "flex w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-50 shadow-xs outline-none selection:bg-stone-700 selection:text-stone-50 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50!",
             "transition-colors duration-200 ease-in-out focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50",
             "aria-invalid:border-red-700/50 aria-invalid:ring-red-700/50 dark:aria-invalid:ring-red-700/50",
             className,

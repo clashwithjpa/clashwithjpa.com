@@ -10,6 +10,7 @@ export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
 export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
 export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
+export type { GetAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
@@ -19,7 +20,6 @@ export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.
 export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export type { GetCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
-export type { GetDiscordIdByUserIdQueryKey } from "./hooks/createGetDiscordIdByUserId.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
@@ -143,6 +143,15 @@ export type {
     GetAdminSettingsQueryResponse,
 } from "./models/GetAdminSettings.ts";
 export type {
+    GetAdminUsers200,
+    GetAdminUsers401,
+    GetAdminUsers500,
+    GetAdminUsersQuery,
+    GetAdminUsersQueryParams,
+    GetAdminUsersQueryParamsSortDirectionEnumKey,
+    GetAdminUsersQueryResponse,
+} from "./models/GetAdminUsers.ts";
+export type {
     GetAuditLog200,
     GetAuditLog401,
     GetAuditLog500,
@@ -224,15 +233,6 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./models/GetCwlApplications.ts";
-export type {
-    GetDiscordIdByUserId200,
-    GetDiscordIdByUserId400,
-    GetDiscordIdByUserId404,
-    GetDiscordIdByUserId500,
-    GetDiscordIdByUserIdPathParams,
-    GetDiscordIdByUserIdQuery,
-    GetDiscordIdByUserIdQueryResponse,
-} from "./models/GetDiscordIdByUserId.ts";
 export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
@@ -381,6 +381,7 @@ export { getAdminClans } from "./clients/getAdminClans.ts";
 export { getAdminCocAccounts } from "./clients/getAdminCocAccounts.ts";
 export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
 export { getAdminSettings } from "./clients/getAdminSettings.ts";
+export { getAdminUsers } from "./clients/getAdminUsers.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
@@ -390,7 +391,6 @@ export { getCOCClanMembers } from "./clients/getCOCClanMembers.ts";
 export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
 export { getCwlApplications } from "./clients/getCwlApplications.ts";
-export { getDiscordIdByUserId } from "./clients/getDiscordIdByUserId.ts";
 export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
@@ -440,6 +440,9 @@ export { getAdminCwlClansQueryOptions } from "./hooks/createGetAdminCwlClans.ts"
 export { createGetAdminSettings } from "./hooks/createGetAdminSettings.ts";
 export { getAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
 export { getAdminSettingsQueryOptions } from "./hooks/createGetAdminSettings.ts";
+export { createGetAdminUsers } from "./hooks/createGetAdminUsers.ts";
+export { getAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
+export { getAdminUsersQueryOptions } from "./hooks/createGetAdminUsers.ts";
 export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
@@ -467,9 +470,6 @@ export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBat
 export { createGetCwlApplications } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryOptions } from "./hooks/createGetCwlApplications.ts";
-export { createGetDiscordIdByUserId } from "./hooks/createGetDiscordIdByUserId.ts";
-export { getDiscordIdByUserIdQueryKey } from "./hooks/createGetDiscordIdByUserId.ts";
-export { getDiscordIdByUserIdQueryOptions } from "./hooks/createGetDiscordIdByUserId.ts";
 export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
@@ -523,6 +523,7 @@ export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAcc
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
+export { getAdminUsersQueryParamsSortDirectionEnum } from "./models/GetAdminUsers.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
 export { warStateEnum } from "./models/GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./models/GetCOCClan.ts";
@@ -640,6 +641,13 @@ export {
     getAdminSettingsQueryResponseSchema,
 } from "./zod/getAdminSettingsSchema.ts";
 export {
+    getAdminUsers200Schema,
+    getAdminUsers401Schema,
+    getAdminUsers500Schema,
+    getAdminUsersQueryParamsSchema,
+    getAdminUsersQueryResponseSchema,
+} from "./zod/getAdminUsersSchema.ts";
+export {
     getAuditLog200Schema,
     getAuditLog401Schema,
     getAuditLog500Schema,
@@ -690,14 +698,6 @@ export {
     getCwlApplicationsQueryParamsSchema,
     getCwlApplicationsQueryResponseSchema,
 } from "./zod/getCwlApplicationsSchema.ts";
-export {
-    getDiscordIdByUserId200Schema,
-    getDiscordIdByUserId400Schema,
-    getDiscordIdByUserId404Schema,
-    getDiscordIdByUserId500Schema,
-    getDiscordIdByUserIdPathParamsSchema,
-    getDiscordIdByUserIdQueryResponseSchema,
-} from "./zod/getDiscordIdByUserIdSchema.ts";
 export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,
