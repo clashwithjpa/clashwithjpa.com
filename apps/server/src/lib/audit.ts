@@ -22,6 +22,7 @@ export type AuditAction =
     | "cwl_clan.create"
     | "cwl_clan.update"
     | "cwl_clan.delete"
+    | "cwl_clan.sync_leagues"
     | "coc_account.create"
     | "coc_account.import"
     | "coc_account.weight_update"

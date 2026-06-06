@@ -19,6 +19,7 @@
         getCOCClanMembers,
         getCwlApplications,
         getJPACwlClans,
+        updateCocAccountWarWeight,
         type GetCwlApplications200,
     } from "@repo/clashofclans-client";
     import type { GridApi, ICellRendererParams } from "ag-grid-community";
@@ -411,7 +412,35 @@
                     selectedIds = event.api.getSelectedRows().map((r) => r.id);
                 },
                 onCellValueChanged: async (event) => {
-                    if (event.colDef.field !== "assignedTo" || event.oldValue === event.newValue) return;
+                    if (event.oldValue === event.newValue) return;
+                    if (event.colDef.field === "cocAccountWeight") {
+                        const warWeight = Number(event.newValue);
+                        if (!Number.isInteger(warWeight) || warWeight < 0) {
+                            toast.error("Weight must be a non-negative whole number");
+                            event.data.cocAccountWeight = event.oldValue;
+                            event.api.refreshCells({ rowNodes: [event.node], columns: ["cocAccountWeight"], force: true });
+                            return;
+                        }
+                        try {
+                            const resp = await updateCocAccountWarWeight(
+                                event.data.cocAccountId,
+                                { warWeight },
+                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                            );
+                            if (resp.success) {
+                                event.data.cocAccountWeight = resp.data.account.warWeight;
+                                toast.success(`Weight updated for ${event.data.cocAccountName}`);
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (e: any) {
+                            toast.error("Failed to update weight", { description: e?.message });
+                            event.data.cocAccountWeight = event.oldValue;
+                        }
+                        event.api.refreshCells({ rowNodes: [event.node], columns: ["cocAccountWeight"], force: true });
+                        return;
+                    }
+                    if (event.colDef.field !== "assignedTo") return;
                     const result = await assign(event.data.id, event.newValue || "");
                     event.data.assignedTo = result ?? event.oldValue;
                     event.api.refreshCells({ rowNodes: [event.node], columns: ["assignedTo", "joinedStatus"], force: true });
@@ -451,6 +480,10 @@
                     sortable: true,
                     filter: false,
                     flex: 1,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
                     valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
                 },
                 {

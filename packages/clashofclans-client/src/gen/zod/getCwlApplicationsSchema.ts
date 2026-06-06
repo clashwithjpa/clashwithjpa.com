@@ -38,6 +38,7 @@ export const getCwlApplications200Schema = z.object({
                 preferenceNum: z.number(),
                 appliedAt: z.iso.datetime(),
                 assignedTo: z.union([z.string(), z.null()]),
+                cocAccountId: z.number(),
             }),
         ),
         total: z.number(),

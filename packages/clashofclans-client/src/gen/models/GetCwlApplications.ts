@@ -99,6 +99,10 @@ export type GetCwlApplications200 = {
              */
             appliedAt: string;
             assignedTo: string | null;
+            /**
+             * @type number
+             */
+            cocAccountId: number;
         }[];
         /**
          * @type number

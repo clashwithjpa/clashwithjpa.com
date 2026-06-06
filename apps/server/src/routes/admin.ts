@@ -247,8 +247,9 @@ const getCwlApplicationsQuerySchema = z4.object({
     limit: z4.coerce.number().int().min(1).optional(),
     offset: z4.coerce.number().int().min(0).optional(),
 });
+const cwlApplicationWithAccountSchema = cwlApplicationSchema.extend({ cocAccountId: z4.number() });
 const getCwlApplicationsData = z4.object({
-    applications: z4.array(cwlApplicationSchema),
+    applications: z4.array(cwlApplicationWithAccountSchema),
     total: z4.number(),
 });
 app.get(
