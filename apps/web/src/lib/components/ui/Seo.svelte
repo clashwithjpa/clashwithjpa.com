@@ -16,13 +16,11 @@
     <meta name="background-color" content="#020617" />
     <meta name="author" content={author} />
 
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title ? `${title}` : "JPA"} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary" />
     <meta property="twitter:title" content={title ? `${title}` : "JPA"} />
     <meta property="twitter:description" content={description} />

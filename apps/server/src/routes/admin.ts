@@ -34,13 +34,10 @@ import { Hono } from "hono";
 import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
-// All routes have /admin as a prefix
 // Each route specifies its own permission-level middleware (review/manage/sudo)
 const app = new Hono<AppEnv>();
 
-// ============================================================
 // Users list with case-insensitive search (manage perm)
-// ============================================================
 
 const listUsersQuerySchema = z4.object({
     search: z4.string().optional(),
@@ -79,9 +76,7 @@ app.get(
     },
 );
 
-// ============================================================
 // User COC accounts (for admin user sidebar - manage perm)
-// ============================================================
 
 const getUserCocAccountsPathSchema = z4.object({
     userid: z4.string().min(1, "userid is required"),
@@ -124,9 +119,7 @@ app.get(
     },
 );
 
-// ============================================================
 // Join applications (clan applications) - reviewer perm
-// ============================================================
 
 const clanApplicationSchema = z4.object({
     id: z4.number(),
@@ -226,9 +219,7 @@ app.put(
     },
 );
 
-// ============================================================
 // CWL applications - manager perm
-// ============================================================
 
 const cwlApplicationSchema = z4.object({
     id: z4.number(),
@@ -393,9 +384,7 @@ app.post(
     },
 );
 
-// ============================================================
 // Settings - manage for read + toggles, sudo for siteMaintenance/guildId/clan CRUD
-// ============================================================
 
 const settingsSchema = z4.object({
     id: z4.number(),
@@ -495,9 +484,7 @@ app.put(
     },
 );
 
-// ============================================================
 // JPA Clans CRUD - manage read, sudo write
-// ============================================================
 
 const clanInfoSchema = z4.object({
     id: z4.number(),
@@ -669,9 +656,7 @@ app.delete(
     },
 );
 
-// ============================================================
 // CWL Clans CRUD - manage read, sudo write
-// ============================================================
 
 const cwlClanSchema = z4.object({
     cocClanTag: z4.string(),
@@ -901,9 +886,7 @@ app.post(
     },
 );
 
-// ============================================================
 // Audit log - manager+
-// ============================================================
 
 const auditLogEntrySchema = z4.object({
     id: z4.number(),
@@ -959,9 +942,7 @@ app.get(
     },
 );
 
-// ============================================================
 // COC accounts war weight - manager+
-// ============================================================
 
 const cocAccountSchema = z4.object({
     id: z4.number(),

@@ -10,7 +10,6 @@ export const load: PageLoad = async () => {
         throw error(401, "Unauthorized");
     }
 
-    // Verified+ members (the "cwl" permission) may add external accounts directly.
     const canAddExternal = await hasPermission(session.data?.user?.id, "cwl");
 
     return { session, canAddExternal };

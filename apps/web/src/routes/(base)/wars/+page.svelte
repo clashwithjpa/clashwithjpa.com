@@ -27,7 +27,6 @@
 
     <br />
 
-    <!-- Wars Grid -->
     {#if data.clans.success && Object.keys(data.clans.data.clans).length > 0}
         <div class="war-cards grid grid-cols-1 gap-6 opacity-0 md:grid-cols-2 lg:grid-cols-3">
             {#each Object.keys(data.clans.data.clans) as clanTag, index}

@@ -218,7 +218,6 @@
         }
     }
 
-    // Rotate button based on open/close state
     $effect(() => {
         page.url.pathname;
         void tick().then(checkVideo);
@@ -245,7 +244,6 @@
 
 <div
     {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd }), bounds(BoundsFrom.viewport())])}
-    // No "cursor-grab" class, as it may conflict with the button cursor, we do not want the grab cursor to conflict with the button's cursor when hovering over it
     class="fixed right-4 bottom-4 z-60 active:cursor-grabbing"
     class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
 >

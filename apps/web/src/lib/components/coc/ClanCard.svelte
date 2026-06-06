@@ -119,7 +119,6 @@
         </div>
     {:else}
         <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fadeIn use:cardSlideIn>
-            <!-- Header with Badge, Name, Tag -->
             <div class="flex items-center gap-4">
                 <div
                     class="size-16 shrink-0 bg-cover bg-center bg-no-repeat drop-shadow-lg"
@@ -148,14 +147,12 @@
                 </div>
             </div>
 
-            <!-- Member Count -->
             <div class="flex items-center justify-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                 <Icon name="labels/international" class="size-10" />
                 <span class="font-coc text-2xl font-black text-stone-900">{clanData.members}</span>
                 <span class="font-coc text-base font-bold text-stone-700">/50</span>
             </div>
 
-            <!-- Minimum Requirements Section -->
             <div class="flex flex-col gap-2">
                 <h4 class="font-coc text-sm font-bold text-stone-800 uppercase">Minimum Requirements</h4>
                 <div class="grid grid-cols-2 gap-2">
@@ -183,7 +180,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="mt-auto grid grid-cols-2 gap-2">
                 <CocPopup title="{clanData.name}'s Info" placement="right">
                     {#snippet trigger()}
@@ -193,7 +189,6 @@
                     {/snippet}
                     {#snippet children()}
                         <div class="flex flex-col gap-4">
-                            <!-- Description -->
                             {#if clanData?.description}
                                 <div class="rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                     <p class="font-coc text-sm leading-relaxed text-stone-900">
@@ -202,7 +197,6 @@
                                 </div>
                             {/if}
 
-                            <!-- Stats Grid -->
                             <div class="flex flex-col gap-2">
                                 <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Clan Statistics</h4>
                                 <div class="grid grid-cols-2 gap-2">
@@ -249,7 +243,6 @@
                                 {/if}
                             </div>
 
-                            <!-- Leadership Section -->
                             {#if leader || coLeaders.length > 0}
                                 <div>
                                     <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Leadership</h4>

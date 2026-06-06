@@ -30,7 +30,6 @@
     let timeRemaining = $state("");
     let tagCopied = $state(false);
 
-    // Safe accessors with defaults
     const warState = $derived(warData?.state || "notInWar");
     const ourStars = $derived(warData?.clan?.stars || 0);
     const opponentStars = $derived(warData?.opponent?.stars || 0);
@@ -112,7 +111,6 @@
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-                    // Zero-pad minutes and seconds for consistent display
                     const pad = (num: number) => num.toString().padStart(2, "0");
                     timeRemaining = `${hours}h ${pad(minutes)}m ${pad(seconds)}s`;
                 };
@@ -189,7 +187,6 @@
         </div>
     {:else}
         <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fadeIn use:cardSlideIn>
-            <!-- Header with Badge, Name, Tag and War State -->
             <div class="flex items-center gap-4">
                 {#if displayBadge}
                     <div
@@ -229,9 +226,7 @@
                 </div>
             </div>
 
-            <!-- Battle Stats: Stars Comparison -->
             <div class="flex items-center justify-center gap-6 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                <!-- Our Stars -->
                 <div class="flex items-start gap-2">
                     <Icon name="star" class="size-8" />
                     <div class="flex flex-col items-center justify-center">
@@ -240,10 +235,8 @@
                     </div>
                 </div>
 
-                <!-- VS -->
                 <span class="font-coc text-2xl font-black text-stone-700">VS</span>
 
-                <!-- Opponent Stars -->
                 <div class="flex items-start gap-2">
                     <div class="flex flex-col items-center justify-center">
                         <span class="font-coc text-4xl font-black text-stone-900">{opponentStars}</span>
@@ -253,7 +246,6 @@
                 </div>
             </div>
 
-            <!-- Timer -->
             {#if warState === "inWar" || warState === "preparation"}
                 <div class="flex items-center justify-center gap-6 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                     <Icon name="clock" class="size-8" />
@@ -266,7 +258,6 @@
                 </div>
             {/if}
 
-            <!-- Attack Progress (Side by Side) -->
             {#if warState === "inWar" && attacksPerMember > 0}
                 <div class="grid grid-cols-2 gap-2">
                     <div class="flex flex-col items-center gap-1 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
@@ -282,7 +273,6 @@
                 </div>
             {/if}
 
-            <!-- Town Hall Breakdown -->
             {#if ourMembers.length > 0}
                 <div>
                     <h4 class="mb-2 font-coc text-xs font-bold tracking-wide text-stone-800 uppercase">Our Town Halls</h4>
@@ -302,7 +292,6 @@
                 </div>
             {/if}
 
-            <!-- Action Buttons -->
             <div class="mt-auto grid grid-cols-2 gap-2">
                 <CocBtn
                     variant="orange"

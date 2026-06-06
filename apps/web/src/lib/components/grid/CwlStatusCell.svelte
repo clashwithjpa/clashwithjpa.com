@@ -7,8 +7,6 @@
     import TablerCheck from "~icons/tabler/check";
     import TablerX from "~icons/tabler/x";
 
-    // params.value is the join status; params.wrongClan (when "wrong-clan") names the clan
-    // the applicant is actually in.
     let { params }: { params: ICellRendererParams & { wrongClan?: string } } = $props();
     let status = $derived(params.value as string);
     let wrongClan = $derived(params.wrongClan ?? "");

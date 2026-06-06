@@ -36,9 +36,7 @@ export class SvelteCellRenderer implements ICellRendererComp {
     }
 
     refresh(params: ICellRendererParams) {
-        // In Svelte 5, updating props cleanly from outside a component needs `$state` wrappers
-        // Returning false tells AG Grid to tear down and recreate the cell which is fine for most cases
-        // However, it can be optimized using signals if needed later
+        // Returning false makes AG Grid recreate the cell (Svelte 5 props update via `$state`); fine here.
         return false;
     }
 

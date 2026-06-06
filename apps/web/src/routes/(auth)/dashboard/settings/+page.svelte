@@ -4,7 +4,6 @@
     import { fadeIn } from "$lib/utils/animations";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerServer from "~icons/tabler/server";
-    // Browser Icons
     import SessionCard from "$lib/components/SessionCard.svelte";
 
     let session = authClient.useSession();

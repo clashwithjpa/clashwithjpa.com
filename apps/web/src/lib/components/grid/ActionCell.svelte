@@ -12,12 +12,9 @@
 
     let user: UserWithRole = $derived(params.data);
     let isCurrentUser = $derived(user?.id === params.context?.currentUserId);
-    // Disable destructive buttons when the target is at or above the caller's
-    // level. Server enforces the same rule via the `before` hook in
-    // apps/server/src/lib/auth/index.ts.
+    // Mirror the server's rule (`before` hook in apps/server): can't act on users at or above your level.
     let isAboveOrEqual = $derived(roleLevel(user?.role) >= (params.context?.currentUserLevel ?? 0));
     let canAct = $derived(!isCurrentUser && !isAboveOrEqual);
-    // Remove requires `user:delete` — admin+ only (managers can't delete).
     let canRemoveRole = $derived((params.context?.currentUserLevel ?? 0) >= ROLE_LEVELS.admin);
 
     function handleOpen() {

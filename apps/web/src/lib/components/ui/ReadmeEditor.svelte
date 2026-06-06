@@ -342,7 +342,6 @@
                 const placeholderIndex = docText.indexOf(uploadPlaceholder);
 
                 if (placeholderIndex !== -1) {
-                    // Replace the placeholder with the actual image markdown
                     const imageMarkdown = `\n![${file.name}](${url})\n`;
                     view.dispatch({
                         changes: {
@@ -466,7 +465,6 @@
         overflow: auto;
     }
 
-    /* Pulse cursor blinking */
     :global(.cm-cursorLayer) {
         animation: cm-blink-pulse 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite !important;
     }
@@ -485,7 +483,6 @@
         }
     }
 
-    /* Smooth cursor caret animation */
     :global(.cm-cursor) {
         transition:
             left 80ms ease-out,

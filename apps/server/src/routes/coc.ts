@@ -17,7 +17,6 @@ import { Hono } from "hono";
 import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
-// All routes have /coc as a prefix
 // For routes you need to have specific auth requirements add the middleware
 const app = new Hono<AppEnv>();
 

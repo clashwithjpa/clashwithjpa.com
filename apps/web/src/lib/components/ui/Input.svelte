@@ -53,7 +53,6 @@
         }
     }
 
-    // Ark UI Date Picker Initialization
     const dateId = $derived(restProps.id || Math.random().toString(36).substring(7));
     const datePicker = $derived(
         useDatePicker({

@@ -49,12 +49,8 @@
         isExternal: boolean;
     };
 
-    // Verified members and up can manage their accounts; unverified users only see
-    // the import banner (handled separately below).
     const canManageAccounts = $derived(!!$session.data && $session.data.user.role !== "unverified");
 
-    // Accounts are held in state (rather than rendered straight from the fetch) so
-    // marking one external can update its card in place without a full reload.
     let accounts = $state<LinkedAccount[] | null>(null);
     let markingId = $state<number | null>(null);
 
@@ -124,7 +120,6 @@
                 importDismissed = true;
             } else {
                 toast.success(`Imported ${imported.length} account${imported.length === 1 ? "" : "s"}.`);
-                // Refresh to pick up new role + linked accounts.
                 location.reload();
             }
         } catch (err) {

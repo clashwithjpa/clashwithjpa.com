@@ -83,7 +83,7 @@
     }
 
     $effect(() => {
-        statusFilter; // track for reactivity
+        statusFilter; // track
         load();
     });
 

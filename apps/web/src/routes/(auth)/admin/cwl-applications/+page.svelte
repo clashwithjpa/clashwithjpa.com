@@ -34,15 +34,13 @@
 
     let applications = $state<Application[]>([]);
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
-    // Clan tag (normalized) -> display name.
     let clanNameByTag = $state<Record<string, string>>({});
     let total = $state(0);
     let loading = $state(true);
     let filterMode = $state<string>("all");
     let clanFilter = $state<string>("all");
 
-    // Clan tag (normalized) -> in-game roster. Missing key = not fetched yet; `ok: false` =
-    // fetch failed, kept distinct from "fetched, applicant simply absent".
+    // Missing key = not yet fetched; `{ ok: false }` = fetch failed.
     type RosterEntry = { ok: true; tags: Set<string> } | { ok: false };
     let clanRosters = $state<Record<string, RosterEntry>>({});
     let rostersLoading = $state(false);
@@ -58,8 +56,7 @@
     let searchText = $state("");
     let scrollEl = $state<HTMLDivElement | null>(null);
 
-    // The edge fades are pure CSS (see the scroll-driven mask in the style block). This effect only
-    // suppresses the click that fires at the end of a drag-scroll so badges don't toggle.
+    // Suppress the click that fires at the end of a drag-scroll so badges don't toggle.
     $effect(() => {
         const el = scrollEl;
         if (!el) return;
@@ -215,10 +212,8 @@
         return clanOptions.find((o) => o.value === clanTag)?.label ?? clanTag;
     }
 
-    // Clans with at least one assigned applicant — the only rosters we fetch.
     let assignedClanTags = $derived([...new Set(applications.filter((a) => a.assignedTo).map((a) => normalizeTag(a.assignedTo)))]);
 
-    // Fetch the in-game roster for each clan we haven't fetched yet.
     async function loadClanRosters(tags: string[]) {
         const missing = tags.filter((t) => t && !(t in clanRosters));
         if (missing.length === 0) return;
@@ -250,8 +245,6 @@
         loadClanRosters([tag]);
     }
 
-    // Has the applicant joined the clan they were assigned to, in-game?
-    //   joined / wrong-clan (in a different fetched clan) / missing / error / unknown / ""
     type JoinStatus = "joined" | "wrong-clan" | "missing" | "error" | "unknown" | "";
     function joinedInfo(app: Application | undefined): { status: JoinStatus; wrongClan: string } {
         if (!app?.assignedTo) return { status: "", wrongClan: "" };
@@ -298,13 +291,11 @@
         filterMode; // track
         load();
     });
-    // Fetch rosters when the set of assigned clans changes; untrack so reading the cache
-    // inside doesn't re-trigger this effect.
+    // untrack so reading the roster cache inside doesn't re-trigger this effect.
     $effect(() => {
         const tags = assignedClanTags; // track
         untrack(() => loadClanRosters(tags));
     });
-    // Repaint the Status column once rosters arrive.
     $effect(() => {
         clanRosters; // track
         gridApi?.refreshCells({ force: true, columns: ["joinedStatus"] });

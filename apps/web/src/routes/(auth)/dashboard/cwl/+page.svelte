@@ -17,7 +17,6 @@
     let options: (Option & { warWeight: number; clanTag?: string; isExternal: boolean })[] = $state([]);
     let clanOptions: Option[] = $state([]);
 
-    // Form fields
     let tag = $state("");
     let preferenceNum = $state<number>(1);
     let accountClan = $state("");

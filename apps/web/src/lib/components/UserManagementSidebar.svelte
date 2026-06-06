@@ -39,22 +39,17 @@
     let { user, onBanToggle, onRemove, isCurrentUser = false, isProcessing = false }: Props = $props();
 
     const currentSession = authClient.useSession();
-    // Session-management endpoints (listUserSessions, revokeUserSession) are
-    // gated on the `session:list` / `session:revoke` permissions, which only
-    // superadmin currently has. Hide the tab from anyone who can't use it.
+    // Session endpoints are superadmin-only; hide the tab from anyone who can't use them.
     let canManageSessions = $derived(
         ($currentSession.data?.user?.role ?? "")
             .split(",")
             .map((r) => r.trim())
             .includes("superadmin"),
     );
-    // Server blocks ban/remove on users at or above the caller's level
-    // (see `before` hook in apps/server/src/lib/auth/index.ts). Mirror in UI.
+    // Mirror the server's rule: can't ban/remove users at or above your own level.
     let canActOnTarget = $derived(roleLevel(user.role) < roleLevel($currentSession.data?.user?.role));
-    // Impersonate requires the `user:impersonate` perm — superadmin only.
     let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.superadmin);
     let canImpersonate = $derived(canImpersonateRole && canActOnTarget);
-    // Remove requires the `user:delete` perm — admin+ only (managers can't delete).
     let canRemoveRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
     let impersonating = $state(false);
 
@@ -88,7 +83,6 @@
 </script>
 
 <div class="flex size-full flex-col overflow-hidden">
-    <!-- User Header Card -->
     <div>
         <div class="mb-4 flex items-center gap-4">
             <Avatar src={user.image} name={user.name} role={user.role as Role} size="lg" />
@@ -97,7 +91,6 @@
             </div>
         </div>
 
-        <!-- Status Badge -->
         <div class="mb-4 flex gap-2">
             {#if user.banned}
                 <Badge variant="red" content="Banned" />
@@ -107,7 +100,6 @@
             <RoleBadge role={user.role as Role} />
         </div>
 
-        <!-- Tab Navigation -->
         <div class="flex gap-1 border-b border-stone-700/50">
             {#each tabs as tab (tab)}
                 <button
@@ -122,11 +114,9 @@
         </div>
     </div>
 
-    <!-- Tab Content -->
     <div class="flex-1 overflow-y-auto py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {#if activeTab === "overview"}
             <div class="space-y-4">
-                <!-- Discord ID -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                         <SimpleIconsDiscord class="size-4" />
@@ -155,7 +145,6 @@
                     </div>
                 </div>
 
-                <!-- User ID -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                         <TablerIdBadge class="size-4" />
@@ -182,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- Joined Date -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                         <TablerLogin2 class="size-4" />
@@ -191,7 +179,6 @@
                     <p class="text-sm text-stone-200">{formatDateTime(user.createdAt)}</p>
                 </div>
 
-                <!-- Last Active -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                         <TablerClock class="size-4" />
@@ -200,7 +187,6 @@
                     <p class="text-sm text-stone-200">{formatDateTime(user.updatedAt)}</p>
                 </div>
 
-                <!-- Ban Status -->
                 <div class="space-y-1">
                     <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                         <TablerBan class="size-4" />
@@ -305,7 +291,6 @@
         {/if}
     </div>
 
-    <!-- Action Buttons Footer -->
     <div class="border-t border-stone-700/50 pt-4">
         {#if !isCurrentUser && canActOnTarget}
             <div class="space-y-2">
@@ -316,7 +301,6 @@
                     </Button>
                 {/if}
 
-                <!-- Ban/Unban Button -->
                 <Button
                     class="w-full gap-2"
                     variant={user.banned ? "success" : "danger"}
@@ -332,7 +316,6 @@
                     {/if}
                 </Button>
 
-                <!-- Remove Button -->
                 {#if canRemoveRole}
                     <Button class="w-full gap-2" variant="danger" disabled={isProcessing} onclick={() => onRemove(user.id)}>
                         <TablerTrash class="size-5" />

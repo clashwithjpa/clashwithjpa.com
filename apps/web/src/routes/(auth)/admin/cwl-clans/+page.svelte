@@ -127,7 +127,6 @@
     }
 
     async function createClan() {
-        // Normalize the tag: clans tags are uppercase and prefixed with '#'.
         let tag = form.cocClanTag.trim().toUpperCase();
         if (tag && !tag.startsWith("#")) tag = `#${tag}`;
         const name = form.cocClanName.trim();
@@ -141,8 +140,7 @@
 
         saving = true;
         try {
-            // The fetch client returns the parsed body without throwing, so widen the
-            // type to the error variants to read the server's message (e.g. duplicate tag).
+            // Widen to the error variants so we can read the server's message (e.g. duplicate tag).
             const resp = (await createAdminCwlClan(
                 { cocClanTag: tag, cocClanName: name, cocClanLeague: league, cocClanLeader: leader },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
@@ -208,7 +206,6 @@
     async function removeClan(tag: string) {
         removing = tag;
         try {
-            // The tag contains '#', so it must be URL-encoded into the path.
             const resp = (await deleteAdminCwlClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
                 | Awaited<ReturnType<typeof deleteAdminCwlClan>>
                 | DeleteAdminCwlClan401

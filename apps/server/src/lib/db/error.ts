@@ -6,10 +6,8 @@
 import { DrizzleQueryError, DrizzleError } from "drizzle-orm";
 import { DatabaseError } from "pg";
 
-// Defines the shape of the error handler functions
 type ErrorHandler = (error: DatabaseError) => { message: string; constraint: string | null; code: string | null };
 
-// Maps PostgreSQL error codes to specific handler functions
 const PostgresErrorHandlers: Record<string, ErrorHandler> = {
     "23505": (error) => ({
         message: "A duplicate entry was found for a unique field.",
@@ -87,7 +85,6 @@ export function getDbErrorMessage(error: unknown): { message: string; constraint
             return handler(originalError);
         }
 
-        // Default case for any other unhandled DatabaseError
         return {
             message: `A database error occurred: ${originalError.message}`,
             constraint: null,
@@ -95,7 +92,6 @@ export function getDbErrorMessage(error: unknown): { message: string; constraint
         };
     }
 
-    // Fallback for generic Drizzle errors or other Error instances
     if (error instanceof DrizzleError || error instanceof Error) {
         return {
             message: error.message || "An unexpected error occurred.",
@@ -104,6 +100,5 @@ export function getDbErrorMessage(error: unknown): { message: string; constraint
         };
     }
 
-    // Final fallback for unknown error types
     return { message: "An unknown error occurred.", constraint: null, code: null };
 }

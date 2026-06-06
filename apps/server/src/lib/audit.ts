@@ -5,35 +5,28 @@ import { auditLogTable } from "@/lib/db/schema";
 import type { AppEnv } from "@/lib/types";
 
 export type AuditAction =
-    // Clan join applications
     | "clan_application.create"
     | "clan_application.accepted"
     | "clan_application.rejected"
     | "clan_application.pending"
-    // CWL applications
     | "cwl_application.create"
     | "cwl_application.assign"
     | "cwl_application.unassign"
     | "cwl_application.bulk_assign"
     | "cwl_application.bulk_unassign"
-    // Settings
     | "settings.update"
     | "rules.update"
-    // JPA clans
     | "clan.create"
     | "clan.update"
     | "clan.delete"
-    // CWL clans
     | "cwl_clan.create"
     | "cwl_clan.update"
     | "cwl_clan.delete"
-    // COC account links
     | "coc_account.create"
     | "coc_account.import"
     | "coc_account.weight_update"
     | "coc_account.external_update"
     | "coc_account.mark_external"
-    // Better-auth admin endpoints
     | "user.role_set"
     | "user.create"
     | "user.update"

@@ -53,7 +53,7 @@ app.use(
 
         rateLimiter({
             windowMs: 1 * 60 * 1000, // 1 minute
-            limit: 120, // Limit each client to 120 requests per window
+            limit: 120,
             skip: (c) => {
                 // Better Auth applies its own per-path rate limits to /api/auth/*,
                 // so let it own that namespace instead of double-limiting here.
@@ -164,7 +164,6 @@ app.get(
     },
 );
 
-// Routes here
 app.route("/coc", coc);
 app.route("/admin", admin);
 app.route("/manage", manage);

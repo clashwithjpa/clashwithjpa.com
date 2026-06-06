@@ -15,36 +15,28 @@ function required(key: string): string {
 export const config = {
     NODE_ENV: process.env.NODE_ENV ?? "development",
 
-    // Database
     JPA_DATABASE_URL: required("JPA_DATABASE_URL"),
 
-    // Redis
     JPA_REDIS_URL: required("JPA_REDIS_URL"),
 
-    // Auth
     JPA_AUTH_SECRET: required("JPA_AUTH_SECRET"),
     JPA_AUTH_URL: required("JPA_AUTH_URL"),
     JPA_APP_URL: required("JPA_APP_URL"),
 
-    // Discord
     JPA_DISCORD_ID: required("JPA_DISCORD_ID"),
     JPA_DISCORD_SECRET: required("JPA_DISCORD_SECRET"),
     JPA_DISCORD_BOT_TOKEN: required("JPA_DISCORD_BOT_TOKEN"),
 
-    // Clash of Clans
     PUBLIC_COC_API_BASE_URI: required("PUBLIC_COC_API_BASE_URI"),
     JPA_COC_API_TOKEN: required("JPA_COC_API_TOKEN"),
 
-    // Cloudflare Turnstile
     JPA_TURNSTILE_SECRET_KEY: required("JPA_TURNSTILE_SECRET_KEY"),
 
-    // MinIO / Storage
     MINIO_ENDPOINT: required("MINIO_ENDPOINT"),
     MINIO_ROOT_USER: required("MINIO_ROOT_USER"),
     MINIO_ROOT_PASSWORD: required("MINIO_ROOT_PASSWORD"),
     MINIO_PUBLIC_URL: required("MINIO_PUBLIC_URL"),
 
-    // Sentry (optional)
     SENTRY_DSN: process.env.SENTRY_DSN,
     SENTRY_SPOTLIGHT: process.env.SENTRY_SPOTLIGHT,
 } as const;

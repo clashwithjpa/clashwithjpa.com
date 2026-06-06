@@ -37,4 +37,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .backups
 .claude
 .commandcode
+.github/skills.dual-graph/
+.dual-graph/
 .github/skills
+CLAUDE.md

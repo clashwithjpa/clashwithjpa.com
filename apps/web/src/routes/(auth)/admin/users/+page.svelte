@@ -54,7 +54,6 @@
     function updateGridRow(user: Partial<UserWithRole> & { id: string }) {
         gridApi?.forEachNode((node) => {
             if (node.data?.id === user.id) {
-                // Merge so the row keeps the discordId it was loaded with.
                 node.setData({ ...node.data, ...user });
             }
         });
@@ -68,8 +67,6 @@
             return null;
         }
 
-        // discordId is stable across role/ban changes, so we merge the refreshed
-        // user onto the grid row and sidebar, both of which already carry it.
         updateGridRow(refreshedUser);
 
         if (selectedSidebarUser?.id === userId) {
@@ -130,7 +127,6 @@
                     description: reason,
                 },
             );
-            // Refresh grid data
             gridApi?.refreshInfiniteCache();
         }
     }
@@ -161,7 +157,6 @@
                 if (selectedSidebarUser?.id === userId) {
                     closeUserSidebar();
                 }
-                // Refresh grid data
                 gridApi?.refreshInfiniteCache();
             }
             isProcessing = null;
@@ -176,7 +171,6 @@
                 else {
                     const refreshedUser = await syncUserViews(userId);
                     toast.success(`${refreshedUser?.name ?? "User"} has been unbanned`);
-                    // Refresh grid data
                     gridApi?.refreshInfiniteCache();
                 }
             } else {

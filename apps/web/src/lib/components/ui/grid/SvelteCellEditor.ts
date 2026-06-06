@@ -52,8 +52,6 @@ export class SvelteCellEditor implements ICellEditorComp {
     }
 
     isPopup() {
-        // If the editor is a popup, return true.
-        // We can expose an initial param if it should act as a popup.
         return (this.params as any).isPopupEditor === true;
     }
 }
