@@ -13,19 +13,35 @@
 
     let activeId = $state("");
 
-    function scrollTo(id: string) {
+    function setHash(id: string) {
+        if (typeof history !== "undefined") history.replaceState(null, "", `#${id}`);
+    }
+
+    function navigate(event: MouseEvent, id: string) {
+        event.preventDefault();
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
         activeId = id;
+        setHash(id);
     }
 
     $effect(() => {
         const els = data.sections.map((s) => document.getElementById(s.id)).filter((el): el is HTMLElement => !!el);
         if (!els.length) return;
 
+        // Jump to the section referenced by the initial URL hash, if any.
+        const initial = decodeURIComponent(location.hash.slice(1));
+        if (initial && data.sections.some((s) => s.id === initial)) {
+            document.getElementById(initial)?.scrollIntoView({ block: "start" });
+            activeId = initial;
+        }
+
         const observer = new IntersectionObserver(
             (entries) => {
                 const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-                if (visible[0]) activeId = visible[0].target.id;
+                if (visible[0]) {
+                    activeId = visible[0].target.id;
+                    setHash(activeId);
+                }
             },
             { rootMargin: "-30% 0px -60% 0px", threshold: 0 },
         );
@@ -62,9 +78,9 @@
                 <CocCard contentClass="flex flex-col gap-1 p-3">
                     <nav class="flex flex-col gap-1">
                         {#each data.sections as section (section.id)}
-                            <button
-                                type="button"
-                                onclick={() => scrollTo(section.id)}
+                            <a
+                                href="#{section.id}"
+                                onclick={(e) => navigate(e, section.id)}
                                 class={cn(
                                     "cursor-pointer rounded-lg px-3 py-2 text-left font-coc text-sm font-bold transition-colors duration-200 ease-in-out outline-none",
                                     activeId === section.id
@@ -73,7 +89,7 @@
                                 )}
                             >
                                 <span class="block truncate">{section.title}</span>
-                            </button>
+                            </a>
                         {/each}
                     </nav>
                 </CocCard>
@@ -96,7 +112,15 @@
                 {#each data.sections as section (section.id)}
                     <section id={section.id} class="scroll-mt-28">
                         <CocCard contentClass="p-6 md:p-8">
-                            <h2 class="mb-6 font-coc text-2xl font-black tracking-wide text-stone-900 md:text-3xl">{section.title}</h2>
+                            <h2 class="mb-6 font-coc text-2xl font-black tracking-wide text-stone-900 md:text-3xl">
+                                <a
+                                    href="#{section.id}"
+                                    onclick={(e) => navigate(e, section.id)}
+                                    class="transition-colors duration-200 ease-in-out hover:text-stone-700"
+                                >
+                                    {section.title}
+                                </a>
+                            </h2>
                             <div class="typography-coc">
                                 <PreRendered html={section.html} />
                             </div>

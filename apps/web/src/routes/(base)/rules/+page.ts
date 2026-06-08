@@ -28,26 +28,32 @@ function slugify(text: string): string {
         .replace(/(^-|-$)/g, "");
 }
 function parseRules(html: string): { intro: string; sections: RuleSection[] } {
-    // Drop the leading top-level title (the page renders its own heading).
-    const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
-    if (h1Match?.index !== undefined) {
-        html = html.slice(0, h1Match.index) + html.slice(h1Match.index + h1Match[0].length);
-    }
+    // Split into cards on horizontal rules (rendered from `---`).
+    const chunks = html.split(/<hr\b[^>]*\/?>/i);
 
-    const headings = [...html.matchAll(/<h2\b([^>]*)>([\s\S]*?)<\/h2>/gi)];
+    const sections: RuleSection[] = [];
+    const introParts: string[] = [];
 
-    const intro = headings.length ? html.slice(0, headings[0].index).trim() : html.trim();
+    chunks.forEach((chunk) => {
+        const trimmed = chunk.trim();
+        if (!trimmed) return;
 
-    const sections: RuleSection[] = headings.map((match, i) => {
-        const attrs = match[1];
-        const title = stripTags(match[2]);
-        const id = attrs.match(/id="([^"]*)"/i)?.[1] || slugify(title) || `section-${i + 1}`;
-        const start = (match.index ?? 0) + match[0].length;
-        const end = i + 1 < headings.length ? (headings[i + 1].index ?? html.length) : html.length;
-        const body = html.slice(start, end).trim();
-        return { id, title, html: body };
+        // The first heading of any level (#, ##, ###, …) becomes the card title.
+        const headingMatch = trimmed.match(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/i);
+        if (!headingMatch) {
+            introParts.push(trimmed);
+            return;
+        }
+
+        const title = stripTags(headingMatch[2]);
+        const id = slugify(title) || `section-${sections.length + 1}`;
+
+        // Drop the title heading from the body; the page renders it separately.
+        const body = (trimmed.slice(0, headingMatch.index) + trimmed.slice((headingMatch.index ?? 0) + headingMatch[0].length)).trim();
+        sections.push({ id, title, html: body });
     });
 
+    const intro = introParts.join("\n").trim();
     return { intro: stripTags(intro) ? intro : "", sections };
 }
 

@@ -80,7 +80,7 @@ body {
 }
 
 .typography-coc {
-    @apply prose max-w-none font-coc text-base prose-stone prose-headings:text-stone-900 prose-p:text-stone-800 prose-a:text-emerald-800 prose-a:hover:text-emerald-900 prose-blockquote:rounded-lg prose-blockquote:border-l-emerald-600 prose-blockquote:bg-green-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-stone-800 prose-blockquote:not-italic prose-strong:text-stone-900 prose-code:text-stone-900 prose-ol:marker:text-stone-700 prose-ul:marker:text-stone-700 prose-li:text-stone-800 prose-hr:hidden [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
+    @apply prose max-w-none font-coc text-base prose-stone prose-headings:text-stone-900 prose-p:text-stone-800 prose-a:text-emerald-800 prose-a:hover:text-emerald-900 prose-blockquote:rounded-lg prose-blockquote:border-l-emerald-600 prose-blockquote:bg-green-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-emerald-800 prose-blockquote:not-italic prose-strong:text-stone-900 prose-code:text-stone-900 prose-ol:marker:text-stone-700 prose-ul:marker:text-stone-700 prose-li:text-stone-800 prose-hr:hidden [&_blockquote_p]:text-emerald-800 [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
 }
 
 .typography-coc a {
