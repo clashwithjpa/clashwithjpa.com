@@ -3,6 +3,7 @@
     import H1 from "$lib/components/ui/coc/H1.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { fadeIn, fadeUp, textGlide } from "$lib/utils/animations";
+    import { LINKS } from "$lib/utils/links";
     import SimpleIconsAppstore from "~icons/simple-icons/appstore";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SimpleIconsGoogleplay from "~icons/simple-icons/googleplay";
@@ -53,13 +54,13 @@
         {/each}
     </div>
     <div class="flex items-center justify-center gap-4 pb-4">
-        <CocBtn variant="green" size="sm" class="social-btn">
+        <CocBtn variant="green" size="sm" class="social-btn" href={LINKS.playstore} target="_blank">
             <SimpleIconsGoogleplay />
         </CocBtn>
-        <CocBtn variant="orange" size="sm" class="social-btn">
+        <CocBtn variant="orange" size="sm" class="social-btn" href={LINKS.appstore} target="_blank">
             <SimpleIconsAppstore />
         </CocBtn>
-        <CocBtn variant="blurple" size="sm" class="social-btn">
+        <CocBtn variant="blurple" size="sm" class="social-btn" href={LINKS.discord} target="_blank">
             <SimpleIconsDiscord />
         </CocBtn>
     </div>

@@ -71,10 +71,19 @@ body {
 }
 
 .typography {
-    @apply prose prose-stone dark:prose-invert prose-headings:font-black prose-headings:text-amber-400 prose-a:text-yellow-400 prose-a:hover:text-yellow-400 prose-blockquote:rounded-lg prose-blockquote:border-l-green-400 prose-blockquote:bg-stone-900 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-sm prose-blockquote:text-green-400 prose-blockquote:not-italic prose-strong:text-amber-400 prose-ol:marker:text-amber-400 prose-ul:marker:text-amber-400 [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
+    @apply prose text-base prose-stone dark:prose-invert prose-headings:text-amber-400 prose-a:text-yellow-400 prose-a:hover:text-yellow-400 prose-blockquote:rounded-lg prose-blockquote:border-l-green-400 prose-blockquote:bg-stone-900 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-sm prose-blockquote:text-green-400 prose-blockquote:not-italic prose-strong:text-amber-400 prose-ol:marker:text-amber-400 prose-ul:marker:text-amber-400 [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
 }
 
 .typography a {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.typography-coc {
+    @apply prose max-w-none font-coc text-base prose-stone prose-headings:text-stone-900 prose-p:text-stone-800 prose-a:text-emerald-800 prose-a:hover:text-emerald-900 prose-blockquote:rounded-lg prose-blockquote:border-l-emerald-600 prose-blockquote:bg-green-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-stone-800 prose-blockquote:not-italic prose-strong:text-stone-900 prose-code:text-stone-900 prose-ol:marker:text-stone-700 prose-ul:marker:text-stone-700 prose-li:text-stone-800 prose-hr:hidden [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
+}
+
+.typography-coc a {
     pointer-events: auto;
     cursor: pointer;
 }
