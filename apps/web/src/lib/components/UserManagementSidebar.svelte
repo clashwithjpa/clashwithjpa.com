@@ -60,6 +60,7 @@
             toast.error("Failed to impersonate user", { description: error.message });
             impersonating = false;
         } else {
+            await $currentSession.refetch?.();
             toast.success(`Now impersonating ${user.name}`);
             await goto("/dashboard", { invalidateAll: true });
         }

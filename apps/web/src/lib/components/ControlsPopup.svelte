@@ -5,7 +5,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
-    import { rotateToggle } from "$lib/utils/animations";
+    import { drawRing, emptyRing, rotateToggle } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { onMount, tick } from "svelte";
@@ -31,6 +31,7 @@
             toast.error("Failed to stop impersonating", { description: error.message });
             stoppingImpersonation = false;
         } else {
+            await $session.refetch?.();
             toast.success("Stopped impersonating");
             await goto("/admin/users", { invalidateAll: true });
             stoppingImpersonation = false;
@@ -116,6 +117,21 @@
 
     let open = $state(false);
     let triggerButton = $state<HTMLElement | null>(null);
+    let impersonationRing = $state<SVGCircleElement | null>(null);
+    let showRing = $state(false);
+
+    $effect(() => {
+        if (isImpersonating) showRing = true;
+    });
+
+    $effect(() => {
+        if (!impersonationRing) return;
+        if (isImpersonating) {
+            drawRing(impersonationRing);
+        } else if (showRing) {
+            emptyRing(impersonationRing, () => (showRing = false));
+        }
+    });
 
     function handleOpenChange() {
         if (open) {
@@ -158,8 +174,10 @@
                 <Button class="size-14 rounded-full" size="" variant="ghost">
                     <TablerIcons class="pointer-events-none size-6" />
                 </Button>
-                {#if isImpersonating}
-                    <span class="absolute top-1 right-1 size-3 animate-pulse rounded-full border-2 border-stone-900 bg-amber-500"></span>
+                {#if showRing}
+                    <svg class="pointer-events-none absolute inset-0 size-full -rotate-90 overflow-visible" viewBox="0 0 56 56" fill="none">
+                        <circle bind:this={impersonationRing} cx="28" cy="28" r="27" stroke="#f59e0b" stroke-width="2" />
+                    </svg>
                 {/if}
             </div>
         {/snippet}
@@ -168,7 +186,8 @@
             {#if isImpersonating}
                 <Button
                     tooltip={`Stop impersonating ${$session.data?.user.name ?? "user"}`}
-                    class="size-12 rounded-full bg-amber-700/80 hover:bg-amber-600"
+                    variant="orange"
+                    class="size-12 rounded-full"
                     size=""
                     disabled={stoppingImpersonation}
                     onclick={stopImpersonating}

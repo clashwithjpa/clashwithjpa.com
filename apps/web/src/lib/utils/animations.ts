@@ -1,4 +1,4 @@
-import { animate, splitText, stagger } from "animejs";
+import { animate, splitText, stagger, svg } from "animejs";
 
 export const DURATION = { FAST: 150, MEDIUM: 200, SMOOTH: 800 };
 
@@ -121,6 +121,23 @@ export const rotateToggle = (el: Element, isOpen: boolean) => {
     animationMap.set(el, animation);
 
     return animation;
+};
+
+export const drawRing = (el: Element) => {
+    return animate(svg.createDrawable(el), {
+        draw: ["0 0", "0 1"],
+        duration: DURATION.SMOOTH,
+        ease: "out(3)",
+    });
+};
+
+export const emptyRing = (el: Element, onComplete: () => void) => {
+    return animate(svg.createDrawable(el), {
+        draw: ["0 1", "0 0"],
+        duration: DURATION.SMOOTH,
+        ease: "out(3)",
+        onComplete,
+    });
 };
 
 export const cardSlideIn = (el: Element) => {
