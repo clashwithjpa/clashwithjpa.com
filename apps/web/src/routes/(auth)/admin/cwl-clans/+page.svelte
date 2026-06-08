@@ -1,10 +1,11 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import CwlClanFormSidebar from "$lib/components/CwlClanFormSidebar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { Sidebar } from "$lib/components/ui/sidebar";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import {
         createAdminCwlClan,
@@ -45,7 +46,7 @@
     let removing = $state<string | null>(null);
     let searchText = $state("");
 
-    let dialogOpen = $state(false);
+    let clanSidebar: Sidebar | null = $state(null);
     // null = adding a new clan; otherwise the (immutable) tag of the clan being edited.
     let editingTag = $state<string | null>(null);
     let form = $state({ cocClanTag: "", cocClanName: "", cocClanLeague: "", cocClanLeader: "" });
@@ -89,7 +90,7 @@
             if (resp.success) {
                 clans = resp.data.clans;
                 const { updated, unchanged, failed } = resp.data;
-                toast.success(`Leagues synced — ${updated} updated, ${unchanged} unchanged${failed ? `, ${failed} failed` : ""}`);
+                toast.success(`Leagues synced: ${updated} updated, ${unchanged} unchanged${failed ? `, ${failed} failed` : ""}`);
             } else {
                 toast.error(errMsg(resp.error, "Failed to sync leagues"));
             }
@@ -107,7 +108,7 @@
     function openAdd() {
         editingTag = null;
         resetForm();
-        dialogOpen = true;
+        clanSidebar?.open("add");
     }
 
     function openEdit(clan: CwlClan) {
@@ -118,7 +119,13 @@
             cocClanLeague: clan.cocClanLeague,
             cocClanLeader: clan.cocClanLeader,
         };
-        dialogOpen = true;
+        clanSidebar?.open(clan.cocClanTag);
+    }
+
+    function closeSidebar() {
+        clanSidebar?.close();
+        editingTag = null;
+        resetForm();
     }
 
     function submit() {
@@ -148,7 +155,7 @@
             if (resp.success) {
                 clans = [...clans, resp.data.clan].sort((a, b) => a.cocClanTag.localeCompare(b.cocClanTag));
                 toast.success(`Added ${resp.data.clan.cocClanName}`);
-                resetForm();
+                closeSidebar();
             } else {
                 toast.error(errMsg(resp.error, "Failed to add CWL clan"));
             }
@@ -191,8 +198,7 @@
             if (resp.success) {
                 clans = clans.map((c) => (c.cocClanTag === tag ? resp.data.clan : c));
                 toast.success(`Updated ${resp.data.clan.cocClanName}`);
-                editingTag = null;
-                resetForm();
+                closeSidebar();
             } else {
                 toast.error(errMsg(resp.error, "Failed to update CWL clan"));
             }
@@ -317,32 +323,6 @@
     {/if}
 </div>
 
-<Dialog
-    bind:open={dialogOpen}
-    title={editingTag === null ? "Add CWL Clan" : "Edit CWL Clan"}
-    description={editingTag === null ? "Register a clan so it can be assigned CWL applications." : "Update this CWL clan's details."}
-    confirmText={saving ? "Saving..." : editingTag === null ? "Add Clan" : "Save Changes"}
-    onConfirm={submit}
->
-    <div class="flex flex-col gap-4">
-        <div class="flex flex-col items-start justify-center gap-1">
-            <p class="text-sm font-medium">Clan tag</p>
-            <Input placeholder="#ABC123" bind:value={form.cocClanTag} disabled={saving || editingTag !== null} />
-            {#if editingTag !== null}
-                <p class="text-xs text-stone-400">The clan tag can't be changed. Remove and re-add the clan to change it.</p>
-            {/if}
-        </div>
-        <div class="flex flex-col items-start justify-center gap-1">
-            <p class="text-sm font-medium">Clan name</p>
-            <Input placeholder="Clan name" bind:value={form.cocClanName} disabled={saving} />
-        </div>
-        <div class="flex flex-col items-start justify-center gap-1">
-            <p class="text-sm font-medium">League</p>
-            <Input placeholder="e.g. Master League I" bind:value={form.cocClanLeague} disabled={saving} />
-        </div>
-        <div class="flex flex-col items-start justify-center gap-1">
-            <p class="text-sm font-medium">Leader</p>
-            <Input placeholder="Leader name" bind:value={form.cocClanLeader} disabled={saving} />
-        </div>
-    </div>
-</Dialog>
+<Sidebar bind:this={clanSidebar}>
+    <CwlClanFormSidebar {editingTag} bind:form {saving} onSubmit={submit} onCancel={closeSidebar} />
+</Sidebar>

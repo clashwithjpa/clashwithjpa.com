@@ -88,7 +88,7 @@
         <div class="mb-4 flex items-center gap-4">
             <Avatar src={user.image} name={user.name} role={user.role as Role} size="lg" />
             <div class="flex-1 overflow-hidden">
-                <h3 class="truncate text-sm font-medium text-stone-50">{user.name}</h3>
+                <h3 class="truncate text-xl font-medium text-stone-50">{user.name}</h3>
             </div>
         </div>
 
