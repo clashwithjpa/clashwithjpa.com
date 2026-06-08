@@ -14,6 +14,7 @@ export const AUDIT_ACTIONS = [
     "cwl_application.unassign",
     "cwl_application.bulk_assign",
     "cwl_application.bulk_unassign",
+    "cwl_application.bulk_delete",
     "settings.update",
     "rules.update",
     "clan.create",

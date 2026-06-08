@@ -75,6 +75,13 @@ export {
     deleteCocAccountMutationResponseSchema,
     deleteCocAccountPathParamsSchema,
 } from "./deleteCocAccountSchema.ts";
+export {
+    deleteCwlApplicationsBulk200Schema,
+    deleteCwlApplicationsBulk401Schema,
+    deleteCwlApplicationsBulk500Schema,
+    deleteCwlApplicationsBulkMutationRequestSchema,
+    deleteCwlApplicationsBulkMutationResponseSchema,
+} from "./deleteCwlApplicationsBulkSchema.ts";
 export { getAdminClans200Schema, getAdminClans401Schema, getAdminClans500Schema, getAdminClansQueryResponseSchema } from "./getAdminClansSchema.ts";
 export {
     getAdminCocAccounts200Schema,

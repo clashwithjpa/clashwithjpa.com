@@ -5,6 +5,7 @@
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
@@ -16,6 +17,7 @@
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,
+        deleteCwlApplicationsBulk,
         getCOCClanMembers,
         getCwlApplications,
         getJPACwlClans,
@@ -28,10 +30,15 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
+    import TablerCheck from "~icons/tabler/check";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
+    import TablerTrash from "~icons/tabler/trash";
+    import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
+
+    let { data }: { data: { canDelete: boolean } } = $props();
 
     let applications = $state<Application[]>([]);
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
@@ -178,26 +185,66 @@
         return null;
     }
 
+    // The bulk endpoints cap each request at 200 ids, so split larger selections
+    // (e.g. "select all" across a full season) into sequential batches.
+    const BULK_BATCH_SIZE = 200;
+    function chunk<T>(items: T[], size: number): T[][] {
+        const batches: T[][] = [];
+        for (let i = 0; i < items.length; i += size) batches.push(items.slice(i, i + size));
+        return batches;
+    }
+
     async function bulkAssign() {
         if (selectedIds.length === 0 || !bulkClan) return;
         bulkProcessing = true;
         const ids = selectedIds;
         try {
-            const resp = await assignCwlApplicationsBulk(
-                { ids, clanTag: bulkClan },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
-                const idSet = new Set(ids);
-                applications = applications.map((a) => (idSet.has(a.id) ? { ...a, assignedTo: bulkClan } : a));
-                toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
-                clearSelection();
-                bulkClan = "";
-            } else {
-                toast.error("Failed to assign applications");
+            let count = 0;
+            for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
+                const resp = await assignCwlApplicationsBulk(
+                    { ids: batch, clanTag: bulkClan },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                );
+                if (!resp.success) throw new Error("Failed to assign applications");
+                count += resp.data.count;
             }
+            const idSet = new Set(ids);
+            applications = applications.map((a) => (idSet.has(a.id) ? { ...a, assignedTo: bulkClan } : a));
+            toast.success(`${count} application${count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
+            clearSelection();
+            bulkClan = "";
         } catch (e: any) {
             toast.error("Failed to assign applications", { description: e?.message });
+            // A later batch may have failed after earlier ones succeeded; resync.
+            load();
+        } finally {
+            bulkProcessing = false;
+        }
+    }
+
+    async function bulkDelete() {
+        if (selectedIds.length === 0) return;
+        bulkProcessing = true;
+        const ids = selectedIds;
+        try {
+            let count = 0;
+            for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
+                const resp = await deleteCwlApplicationsBulk(
+                    { ids: batch },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                );
+                if (!resp.success) throw new Error("Failed to delete applications");
+                count += resp.data.count;
+            }
+            const idSet = new Set(ids);
+            applications = applications.filter((a) => !idSet.has(a.id));
+            total = Math.max(0, total - count);
+            toast.success(`${count} application${count === 1 ? "" : "s"} deleted`);
+            clearSelection();
+        } catch (e: any) {
+            toast.error("Failed to delete applications", { description: e?.message });
+            // A later batch may have failed after earlier ones succeeded; resync.
+            load();
         } finally {
             bulkProcessing = false;
         }
@@ -328,10 +375,50 @@
                             <div class="w-full lg:w-44">
                                 <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
                             </div>
-                            <Button variant="success" size="sm" disabled={bulkProcessing || !bulkClan} onclick={bulkAssign}>
-                                {bulkProcessing ? "…" : "Assign"}
+                            <Button
+                                variant="success"
+                                size="icon"
+                                disabled={bulkProcessing || !bulkClan}
+                                onclick={bulkAssign}
+                                tooltip="Assign to clan"
+                                tooltipPlacement="bottom"
+                            >
+                                {#if bulkProcessing}
+                                    <SvgSpinnersRingResize />
+                                {:else}
+                                    <TablerCheck />
+                                {/if}
                             </Button>
-                            <Button variant="ghost" size="sm" disabled={bulkProcessing} onclick={clearSelection}>Clear</Button>
+                            {#if data.canDelete}
+                                <ConfirmationDialog
+                                    title="Delete applications?"
+                                    description="Permanently delete {selectedIds.length} selected CWL application{selectedIds.length === 1
+                                        ? ''
+                                        : 's'}. This cannot be undone."
+                                    confirmText="Delete"
+                                    onConfirm={bulkDelete}
+                                >
+                                    <Button
+                                        variant="danger"
+                                        size="icon"
+                                        disabled={bulkProcessing}
+                                        tooltip="Delete selected"
+                                        tooltipPlacement="bottom"
+                                    >
+                                        <TablerTrash />
+                                    </Button>
+                                </ConfirmationDialog>
+                            {/if}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                disabled={bulkProcessing}
+                                onclick={clearSelection}
+                                tooltip="Clear selection"
+                                tooltipPlacement="bottom"
+                            >
+                                <TablerX />
+                            </Button>
                         </div>
                     </div>
                 {/if}

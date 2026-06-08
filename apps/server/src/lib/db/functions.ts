@@ -335,6 +335,14 @@ export async function assignCwlApplicationsBulk(ids: number[], clanTag: string |
     return { count: updated.length, ids: updated.map((r) => r.id) };
 }
 
+// Admin-only: permanently delete many CWL applications in a single statement.
+// Returns the ids that were actually deleted.
+export async function deleteCwlApplicationsBulk(ids: number[]) {
+    if (ids.length === 0) return { count: 0, ids: [] as number[] };
+    const deleted = await db.delete(cwlApplicationTable).where(inArray(cwlApplicationTable.id, ids)).returning({ id: cwlApplicationTable.id });
+    return { count: deleted.length, ids: deleted.map((r) => r.id) };
+}
+
 export async function getSettings() {
     const result = await db.select().from(settingsTable).orderBy(desc(settingsTable.updatedAt)).limit(1);
     return result[0] ?? null;

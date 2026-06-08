@@ -9,6 +9,7 @@ import {
     createCwlClan,
     deleteClan,
     deleteCocAccount,
+    deleteCwlApplicationsBulk,
     deleteCwlClan,
     getAdminUsers,
     getAllClans,
@@ -384,6 +385,46 @@ app.post(
             if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to assign CWL applications" }, 500);
+        }
+    },
+);
+
+const bulkDeleteCwlBodySchema = z4.object({
+    ids: z4.array(z4.number().int().min(1)).min(1).max(200),
+});
+const bulkDeleteCwlData = z4.object({
+    count: z4.number(),
+});
+app.post(
+    "/cwl-applications/delete-bulk",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "deleteCwlApplicationsBulk",
+        description: "[Admin] Permanently deletes many CWL applications in one request. Deletion is an admin-only (sudo) power.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Number of applications deleted.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(bulkDeleteCwlData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", bulkDeleteCwlBodySchema),
+    async (c) => {
+        try {
+            const { ids } = c.req.valid("json");
+            const result = await deleteCwlApplicationsBulk(ids);
+            logAction(c, {
+                action: "cwl_application.bulk_delete",
+                targetType: "cwl_application",
+                metadata: { count: result.count, ids: result.ids },
+            });
+            return c.json({ success: true, data: { count: result.count } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to delete CWL applications" }, 500);
         }
     },
 );

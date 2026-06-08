@@ -84,6 +84,14 @@ export type {
     DeleteCocAccountMutationResponse,
     DeleteCocAccountPathParams,
 } from "./DeleteCocAccount.ts";
+export type {
+    DeleteCwlApplicationsBulk200,
+    DeleteCwlApplicationsBulk401,
+    DeleteCwlApplicationsBulk500,
+    DeleteCwlApplicationsBulkMutation,
+    DeleteCwlApplicationsBulkMutationRequest,
+    DeleteCwlApplicationsBulkMutationResponse,
+} from "./DeleteCwlApplicationsBulk.ts";
 export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./GetAdminClans.ts";
 export type {
     GetAdminCocAccounts200,

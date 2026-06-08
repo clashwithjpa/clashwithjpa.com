@@ -118,6 +118,12 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "ghost",
         describe: (m) => `unassigned ${m.count ?? "?"} CWL application${m.count === 1 ? "" : "s"}`,
     },
+    "cwl_application.bulk_delete": {
+        label: "CWL application · bulk deleted",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m) => `deleted ${m.count ?? "?"} CWL application${m.count === 1 ? "" : "s"}`,
+    },
     "settings.update": {
         label: "Settings · updated",
         icon: TablerSettings,
