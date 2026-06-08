@@ -8,6 +8,7 @@ import {
     createClan,
     createCwlClan,
     deleteClan,
+    deleteCocAccount,
     deleteCwlClan,
     getAdminUsers,
     getAllClans,
@@ -89,6 +90,7 @@ const getUserCocAccountsData = z4.object({
             discordUserId: z4.string(),
             cocAccountTag: z4.string(),
             warWeight: z4.number(),
+            isExternal: z4.boolean(),
         }),
     ),
 });
@@ -1086,6 +1088,47 @@ app.put(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update external status" }, 500);
+        }
+    },
+);
+
+const deleteCocAccountData = z4.object({
+    account: cocAccountSchema,
+});
+app.delete(
+    "/coc-accounts/:id",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "deleteCocAccount",
+        description:
+            "[Admin] Permanently unlinks a Clash of Clans account. Cascades to that account's CWL applications. Deletion is an admin-only (sudo) power.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Deleted COC account.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(deleteCocAccountData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", cocAccountIdPathSchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const account = await deleteCocAccount(id);
+            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            logAction(c, {
+                action: "coc_account.delete",
+                targetType: "coc_account",
+                targetId: account.id,
+                metadata: { cocAccountTag: account.cocAccountTag, discordUserId: account.discordUserId },
+            });
+            return c.json({ success: true, data: { account } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to delete COC account" }, 500);
         }
     },
 );

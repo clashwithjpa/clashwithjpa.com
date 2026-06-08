@@ -5,7 +5,7 @@
     import type { Role } from "$lib/config/roles";
     import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
-    import { getUserCocAccountsByUserId } from "@repo/clashofclans-client";
+    import { deleteCocAccount, getCOCPlayer, getUserCocAccountsByUserId } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -15,18 +15,24 @@
     import TablerClock from "~icons/tabler/clock";
     import TablerClockQuestion from "~icons/tabler/clock-question";
     import TablerCopy from "~icons/tabler/copy";
+    import TablerExternalLink from "~icons/tabler/external-link";
+    import TablerHash from "~icons/tabler/hash";
     import TablerIdBadge from "~icons/tabler/id-badge";
     import TablerLogin2 from "~icons/tabler/login-2";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerSpy from "~icons/tabler/spy";
     import TablerTrash from "~icons/tabler/trash";
     import TablerUserX from "~icons/tabler/user-x";
+    import TablerWeight from "~icons/tabler/weight";
     import TablerWorldX from "~icons/tabler/world-x";
     import SessionCard from "./SessionCard.svelte";
     import Avatar from "./ui/Avatar.svelte";
     import Badge from "./ui/Badge.svelte";
     import Button from "./ui/Button.svelte";
+    import ConfirmationDialog from "./ui/ConfirmationDialog.svelte";
+    import Icon from "./ui/Icon.svelte";
     import RoleBadge from "./ui/RoleBadge.svelte";
+    import Tooltip from "./ui/Tooltip.svelte";
 
     interface Props {
         user: UserWithRole & { discordId?: string };
@@ -51,6 +57,9 @@
     let canImpersonateRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.superadmin);
     let canImpersonate = $derived(canImpersonateRole && canActOnTarget);
     let canRemoveRole = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Deleting a linked CoC account is destructive (cascades to CWL applications),
+    // so it mirrors the server's admin-only (sudo) gate on DELETE /coc-accounts/:id.
+    let canDeleteAccount = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
     let impersonating = $state(false);
 
     async function handleImpersonate() {
@@ -73,6 +82,8 @@
 
     let copied: Record<string, boolean> = $state({});
     let sessionsRefreshKey = $state(0);
+    let accountsRefreshKey = $state(0);
+    let deletingAccountId = $state<number | null>(null);
 
     function copyToClipboard(text: string, id: string) {
         navigator.clipboard.writeText(text);
@@ -81,7 +92,69 @@
             copied[id] = false;
         }, 2000);
     }
+
+    async function handleDeleteAccount(account: { id: number; cocAccountTag: string }) {
+        deletingAccountId = account.id;
+        try {
+            const resp = await deleteCocAccount(account.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                toast.success(`Unlinked ${account.cocAccountTag}`);
+                accountsRefreshKey++;
+            } else {
+                toast.error("Failed to unlink account");
+            }
+        } catch (err) {
+            console.error("Delete account error:", err);
+            toast.error("Failed to unlink account");
+        } finally {
+            deletingAccountId = null;
+        }
+    }
 </script>
+
+{#snippet accountActions(account: { id: number; cocAccountTag: string })}
+    <div class="flex shrink-0 items-center gap-2">
+        <Button
+            size="icon"
+            variant={copied[`account-${account.id}`] ? "success" : "base"}
+            onclick={() => copyToClipboard(account.cocAccountTag, `account-${account.id}`)}
+            tooltip={copied[`account-${account.id}`] ? "Copied!" : "Copy tag"}
+            tooltipPlacement="bottom"
+        >
+            {#if copied[`account-${account.id}`]}
+                <TablerCheck />
+            {:else}
+                <TablerCopy />
+            {/if}
+        </Button>
+        <Button
+            size="icon"
+            variant="base"
+            href={`https://link.clashofclans.com/en/?action=OpenPlayerProfile&tag=${encodeURIComponent(account.cocAccountTag)}`}
+            target="_blank"
+            tooltip="Open in game"
+            tooltipPlacement="bottom"
+        >
+            <TablerExternalLink />
+        </Button>
+        {#if canDeleteAccount}
+            <ConfirmationDialog
+                title="Unlink account?"
+                description="Permanently unlink {account.cocAccountTag} from this user. This also removes the account's CWL applications and cannot be undone."
+                confirmText="Unlink account"
+                onConfirm={() => handleDeleteAccount(account)}
+            >
+                <Button size="icon" variant="danger" disabled={deletingAccountId === account.id} tooltip="Unlink account" tooltipPlacement="bottom">
+                    {#if deletingAccountId === account.id}
+                        <SvgSpinnersBlocksScale />
+                    {:else}
+                        <TablerTrash />
+                    {/if}
+                </Button>
+            </ConfirmationDialog>
+        {/if}
+    </div>
+{/snippet}
 
 <div class="flex size-full flex-col overflow-hidden">
     <div>
@@ -247,48 +320,92 @@
                 {/await}
             {/key}
         {:else if activeTab === "accounts"}
-            {#await getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
-                <div class="py-8">
-                    <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
-                </div>
-            {:then response}
-                {#if !response.success || response.data.accounts.length === 0}
+            {#key accountsRefreshKey}
+                {#await getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
+                    <div class="py-8">
+                        <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
+                    </div>
+                {:then response}
+                    {#if !response.success || response.data.accounts.length === 0}
+                        <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
+                            <div class="flex items-center gap-2 text-stone-400">
+                                <TablerWorldX class="size-6" />
+                                <span>No linked CoC accounts</span>
+                            </div>
+                        </div>
+                    {:else}
+                        <div class="space-y-2">
+                            {#each response.data.accounts as account (account.id)}
+                                <div class="rounded-lg bg-stone-800 px-3 py-2">
+                                    {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )}
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="flex min-w-0 items-center gap-2">
+                                                <SvgSpinnersBlocksScale class="size-10 shrink-0 text-stone-400" />
+                                                <code class="truncate font-mono text-sm font-medium text-stone-50">{account.cocAccountTag}</code>
+                                            </div>
+                                            {@render accountActions(account)}
+                                        </div>
+                                    {:then acc}
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="flex min-w-0 items-center gap-2">
+                                                {#if acc.success}
+                                                    <Tooltip title="Town Hall {acc.data.player.townHallLevel}" placement="top">
+                                                        <Icon name="th/{acc.data.player.townHallLevel}" class="size-10 shrink-0" />
+                                                    </Tooltip>
+                                                {:else}
+                                                    <div
+                                                        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-stone-700/50 text-stone-300"
+                                                    >
+                                                        <TablerHash class="size-5" />
+                                                    </div>
+                                                {/if}
+                                                <div class="min-w-0">
+                                                    {#if acc.success}
+                                                        <Tooltip title={acc.data.player.name} placement="top" class="block w-full text-left">
+                                                            <p class="truncate text-sm font-medium text-stone-50">{acc.data.player.name}</p>
+                                                        </Tooltip>
+                                                    {/if}
+                                                    <code class="block truncate font-mono text-xs text-stone-400">{account.cocAccountTag}</code>
+                                                </div>
+                                            </div>
+                                            {@render accountActions(account)}
+                                        </div>
+                                        {#if account.isExternal || (acc.success && acc.data.player.clan)}
+                                            <div class="mt-2 flex flex-wrap gap-1">
+                                                {#if account.isExternal}
+                                                    <Badge variant="red" content="External" icon={TablerExternalLink} />
+                                                {/if}
+                                                {#if acc.success && acc.data.player.clan}
+                                                    <Badge
+                                                        variant="blue"
+                                                        content={acc.data.player.clan.name}
+                                                        icon={acc.data.player.clan.badgeUrls.small}
+                                                        iconSize="size-4"
+                                                    />
+                                                {/if}
+                                            </div>
+                                        {/if}
+                                    {/await}
+                                    <div class="mt-2 flex items-center gap-1 border-t border-stone-700/50 pt-2 text-xs">
+                                        <TablerWeight class="size-4 text-stone-400" />
+                                        <span class="text-stone-400">War Weight</span>
+                                        <span class="ml-auto font-mono text-stone-200">
+                                            {account.warWeight ? account.warWeight.toLocaleString() : "Not set"}
+                                        </span>
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                    {/if}
+                {:catch}
                     <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
                         <div class="flex items-center gap-2 text-stone-400">
                             <TablerWorldX class="size-6" />
-                            <span>No linked CoC accounts</span>
+                            <span>Failed to load accounts</span>
                         </div>
                     </div>
-                {:else}
-                    <div class="space-y-2">
-                        {#each response.data.accounts as account (account.id)}
-                            <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-800 px-3 py-2">
-                                <code class="truncate font-mono text-sm text-stone-200">{account.cocAccountTag}</code>
-                                <Button
-                                    size="icon"
-                                    variant="base"
-                                    onclick={() =>
-                                        window.open(
-                                            `https://link.clashofclans.com/en/?action=OpenPlayerProfile&tag=${encodeURIComponent(account.cocAccountTag)}`,
-                                            "_blank",
-                                        )}
-                                    tooltip="Open in game"
-                                    tooltipPlacement="left"
-                                >
-                                    <TablerCopy />
-                                </Button>
-                            </div>
-                        {/each}
-                    </div>
-                {/if}
-            {:catch}
-                <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
-                    <div class="flex items-center gap-2 text-stone-400">
-                        <TablerWorldX class="size-6" />
-                        <span>Failed to load accounts</span>
-                    </div>
-                </div>
-            {/await}
+                {/await}
+            {/key}
         {/if}
     </div>
 

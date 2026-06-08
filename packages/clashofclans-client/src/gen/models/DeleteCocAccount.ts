@@ -3,18 +3,19 @@
  * Do not edit manually.
  */
 
-export type GetUserCocAccountsByUserIdPathParams = {
+export type DeleteCocAccountPathParams = {
     /**
      * @minLength 1
-     * @type string
+     * @maxLength 9007199254740991
+     * @type integer
      */
-    userid: string;
+    id: number;
 };
 
 /**
- * @description User\'s COC accounts.
+ * @description Deleted COC account.
  */
-export type GetUserCocAccountsByUserId200 = {
+export type DeleteCocAccount200 = {
     /**
      * @type boolean
      */
@@ -24,9 +25,9 @@ export type GetUserCocAccountsByUserId200 = {
      */
     data: {
         /**
-         * @type array
+         * @type object
          */
-        accounts: {
+        account: {
             /**
              * @type number
              */
@@ -47,14 +48,31 @@ export type GetUserCocAccountsByUserId200 = {
              * @type boolean
              */
             isExternal: boolean;
-        }[];
+            ownerUserId: string | null;
+            ownerName: string | null;
+        };
     };
 };
 
 /**
  * @description Unauthorized.
  */
-export type GetUserCocAccountsByUserId401 = {
+export type DeleteCocAccount401 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
+ * @description Not found.
+ */
+export type DeleteCocAccount404 = {
     /**
      * @type boolean
      */
@@ -69,7 +87,7 @@ export type GetUserCocAccountsByUserId401 = {
 /**
  * @description Server error.
  */
-export type GetUserCocAccountsByUserId500 = {
+export type DeleteCocAccount500 = {
     /**
      * @type boolean
      */
@@ -81,10 +99,10 @@ export type GetUserCocAccountsByUserId500 = {
           };
 };
 
-export type GetUserCocAccountsByUserIdQueryResponse = GetUserCocAccountsByUserId200;
+export type DeleteCocAccountMutationResponse = DeleteCocAccount200;
 
-export type GetUserCocAccountsByUserIdQuery = {
-    Response: GetUserCocAccountsByUserId200;
-    PathParams: GetUserCocAccountsByUserIdPathParams;
-    Errors: GetUserCocAccountsByUserId401 | GetUserCocAccountsByUserId500;
+export type DeleteCocAccountMutation = {
+    Response: DeleteCocAccount200;
+    PathParams: DeleteCocAccountPathParams;
+    Errors: DeleteCocAccount401 | DeleteCocAccount404 | DeleteCocAccount500;
 };

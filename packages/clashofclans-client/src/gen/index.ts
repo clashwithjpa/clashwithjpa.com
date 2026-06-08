@@ -6,6 +6,7 @@ export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.t
 export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
+export type { DeleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
 export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
 export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
@@ -118,6 +119,15 @@ export type {
     DeleteAdminCwlClanMutationResponse,
     DeleteAdminCwlClanPathParams,
 } from "./models/DeleteAdminCwlClan.ts";
+export type {
+    DeleteCocAccount200,
+    DeleteCocAccount401,
+    DeleteCocAccount404,
+    DeleteCocAccount500,
+    DeleteCocAccountMutation,
+    DeleteCocAccountMutationResponse,
+    DeleteCocAccountPathParams,
+} from "./models/DeleteCocAccount.ts";
 export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./models/GetAdminClans.ts";
 export type {
     GetAdminCocAccounts200,
@@ -382,6 +392,7 @@ export { createAdminClan } from "./clients/createAdminClan.ts";
 export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
+export { deleteCocAccount } from "./clients/deleteCocAccount.ts";
 export { getAdminClans } from "./clients/getAdminClans.ts";
 export { getAdminCocAccounts } from "./clients/getAdminCocAccounts.ts";
 export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
@@ -433,6 +444,8 @@ export { createDeleteAdminClan } from "./hooks/createDeleteAdminClan.ts";
 export { deleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export { createDeleteAdminCwlClan } from "./hooks/createDeleteAdminCwlClan.ts";
 export { deleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
+export { createDeleteCocAccount } from "./hooks/createDeleteCocAccount.ts";
+export { deleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
 export { createGetAdminClans } from "./hooks/createGetAdminClans.ts";
 export { getAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export { getAdminClansQueryOptions } from "./hooks/createGetAdminClans.ts";
@@ -625,6 +638,14 @@ export {
     deleteAdminCwlClanMutationResponseSchema,
     deleteAdminCwlClanPathParamsSchema,
 } from "./zod/deleteAdminCwlClanSchema.ts";
+export {
+    deleteCocAccount200Schema,
+    deleteCocAccount401Schema,
+    deleteCocAccount404Schema,
+    deleteCocAccount500Schema,
+    deleteCocAccountMutationResponseSchema,
+    deleteCocAccountPathParamsSchema,
+} from "./zod/deleteCocAccountSchema.ts";
 export {
     getAdminClans200Schema,
     getAdminClans401Schema,

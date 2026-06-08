@@ -216,6 +216,12 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "yellow",
         describe: (m) => `marked ${m.cocAccountTag ?? "?"} as external`,
     },
+    "coc_account.delete": {
+        label: "COC account · unlinked",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m) => `unlinked COC account ${m.cocAccountTag ?? "?"}`,
+    },
     "user.role_set": {
         label: "User · role set",
         icon: TablerShieldHalf,

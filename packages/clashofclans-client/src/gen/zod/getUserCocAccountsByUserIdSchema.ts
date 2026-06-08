@@ -21,6 +21,7 @@ export const getUserCocAccountsByUserId200Schema = z.object({
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
+                isExternal: z.boolean(),
             }),
         ),
     }),

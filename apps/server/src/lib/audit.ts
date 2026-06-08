@@ -28,6 +28,7 @@ export const AUDIT_ACTIONS = [
     "coc_account.weight_update",
     "coc_account.external_update",
     "coc_account.mark_external",
+    "coc_account.delete",
     "user.role_set",
     "user.create",
     "user.update",

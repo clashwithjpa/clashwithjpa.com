@@ -75,6 +75,15 @@ export type {
     DeleteAdminCwlClanMutationResponse,
     DeleteAdminCwlClanPathParams,
 } from "./DeleteAdminCwlClan.ts";
+export type {
+    DeleteCocAccount200,
+    DeleteCocAccount401,
+    DeleteCocAccount404,
+    DeleteCocAccount500,
+    DeleteCocAccountMutation,
+    DeleteCocAccountMutationResponse,
+    DeleteCocAccountPathParams,
+} from "./DeleteCocAccount.ts";
 export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./GetAdminClans.ts";
 export type {
     GetAdminCocAccounts200,

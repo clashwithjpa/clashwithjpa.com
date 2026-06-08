@@ -505,6 +505,13 @@ export async function updateCocAccountExternal(id: number, isExternal: boolean) 
     return result[0] ?? null;
 }
 
+// Admin-only: permanently unlink a CoC account. Cascades to that tag's CWL
+// applications (cwlApplicationTable.cocAccountTag has onDelete: "cascade").
+export async function deleteCocAccount(id: number) {
+    const result = await db.delete(cocAccountTable).where(eq(cocAccountTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
 // Member self-service: convert one of their OWN accounts to external (one-way).
 // Scoped to discordUserId so a member can only touch their own accounts, and only
 // ever sets isExternal to true — reverting to a main account is staff-only (see
