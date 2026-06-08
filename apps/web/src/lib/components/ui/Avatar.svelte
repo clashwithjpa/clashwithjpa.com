@@ -12,11 +12,11 @@
         src?: string | null;
         name: string;
         role?: Role | null;
-        size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+        size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
         class?: string;
     } = $props();
 
-    const sizeClass = { sm: "size-10", md: "size-12", lg: "size-16", xl: "size-20", "2xl": "size-24", "3xl": "size-32" } as const;
+    const sizeClass = { xs: "size-8", sm: "size-10", md: "size-12", lg: "size-16", xl: "size-20", "2xl": "size-24", "3xl": "size-32" } as const;
 
     const config = $derived(role && role in ROLE_CONFIG ? ROLE_CONFIG[role] : null);
     const imgSrc = $derived(src ?? `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(name)}`);

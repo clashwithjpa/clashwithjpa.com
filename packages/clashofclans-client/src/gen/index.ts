@@ -152,11 +152,16 @@ export type {
     GetAdminUsersQueryResponse,
 } from "./models/GetAdminUsers.ts";
 export type {
+    EntriesActionEnumKey,
+    EntriesActorCurrentRoleEnumKey,
+    EntriesTargetTypeEnumKey,
     GetAuditLog200,
     GetAuditLog401,
     GetAuditLog500,
     GetAuditLogQuery,
     GetAuditLogQueryParams,
+    GetAuditLogQueryParamsActionEnumKey,
+    GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./models/GetAuditLog.ts";
 export type {
@@ -524,6 +529,11 @@ export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinAppli
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
 export { getAdminUsersQueryParamsSortDirectionEnum } from "./models/GetAdminUsers.ts";
+export { entriesActionEnum } from "./models/GetAuditLog.ts";
+export { entriesActorCurrentRoleEnum } from "./models/GetAuditLog.ts";
+export { entriesTargetTypeEnum } from "./models/GetAuditLog.ts";
+export { getAuditLogQueryParamsActionEnum } from "./models/GetAuditLog.ts";
+export { getAuditLogQueryParamsTargetTypeEnum } from "./models/GetAuditLog.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
 export { warStateEnum } from "./models/GetCOCCWLWar.ts";
 export { clanTypeEnum } from "./models/GetCOCClan.ts";

@@ -1,44 +1,49 @@
-import type { Context } from "hono";
-import * as Sentry from "@sentry/bun";
 import { db } from "@/lib/db";
 import { auditLogTable } from "@/lib/db/schema";
 import type { AppEnv } from "@/lib/types";
+import * as Sentry from "@sentry/bun";
+import type { Context } from "hono";
 
-export type AuditAction =
-    | "clan_application.create"
-    | "clan_application.accepted"
-    | "clan_application.rejected"
-    | "clan_application.pending"
-    | "cwl_application.create"
-    | "cwl_application.assign"
-    | "cwl_application.unassign"
-    | "cwl_application.bulk_assign"
-    | "cwl_application.bulk_unassign"
-    | "settings.update"
-    | "rules.update"
-    | "clan.create"
-    | "clan.update"
-    | "clan.delete"
-    | "cwl_clan.create"
-    | "cwl_clan.update"
-    | "cwl_clan.delete"
-    | "cwl_clan.sync_leagues"
-    | "coc_account.create"
-    | "coc_account.import"
-    | "coc_account.weight_update"
-    | "coc_account.external_update"
-    | "coc_account.mark_external"
-    | "user.role_set"
-    | "user.create"
-    | "user.update"
-    | "user.ban"
-    | "user.unban"
-    | "user.remove"
-    | "user.password_set"
-    | "user.session_revoked"
-    | "user.sessions_revoked";
+export const AUDIT_ACTIONS = [
+    "clan_application.create",
+    "clan_application.accepted",
+    "clan_application.rejected",
+    "clan_application.pending",
+    "cwl_application.create",
+    "cwl_application.assign",
+    "cwl_application.unassign",
+    "cwl_application.bulk_assign",
+    "cwl_application.bulk_unassign",
+    "settings.update",
+    "rules.update",
+    "clan.create",
+    "clan.update",
+    "clan.delete",
+    "cwl_clan.create",
+    "cwl_clan.update",
+    "cwl_clan.delete",
+    "cwl_clan.sync_leagues",
+    "coc_account.create",
+    "coc_account.import",
+    "coc_account.weight_update",
+    "coc_account.external_update",
+    "coc_account.mark_external",
+    "user.role_set",
+    "user.create",
+    "user.update",
+    "user.ban",
+    "user.unban",
+    "user.remove",
+    "user.password_set",
+    "user.session_revoked",
+    "user.sessions_revoked",
+] as const;
 
-export type AuditTargetType = "clan_application" | "cwl_application" | "settings" | "rules" | "clan" | "cwl_clan" | "coc_account" | "user";
+export const AUDIT_TARGET_TYPES = ["clan_application", "cwl_application", "settings", "rules", "clan", "cwl_clan", "coc_account", "user"] as const;
+
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+
+export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[number];
 
 export type LogActionInput = {
     action: AuditAction;

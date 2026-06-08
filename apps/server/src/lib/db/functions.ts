@@ -541,7 +541,7 @@ export async function getAuditLog(
     if (before) conditions.push(lte(auditLogTable.createdAt, before));
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
-    // Left join user to pull the live display name; fall back to the snapshot stored in the row.
+    const discordJoin = and(eq(account.userId, auditLogTable.actorId), eq(account.providerId, "discord"));
     const [rows, countResult] = await Promise.all([
         db
             .select({
@@ -549,6 +549,9 @@ export async function getAuditLog(
                 actorId: auditLogTable.actorId,
                 actorName: auditLogTable.actorName,
                 actorCurrentName: user.name,
+                actorCurrentImage: user.image,
+                actorCurrentRole: user.role,
+                actorDiscordId: account.accountId,
                 action: auditLogTable.action,
                 targetType: auditLogTable.targetType,
                 targetId: auditLogTable.targetId,
@@ -557,6 +560,7 @@ export async function getAuditLog(
             })
             .from(auditLogTable)
             .leftJoin(user, eq(auditLogTable.actorId, user.id))
+            .leftJoin(account, discordJoin)
             .where(whereClause)
             .orderBy(desc(auditLogTable.createdAt))
             .limit(limit)

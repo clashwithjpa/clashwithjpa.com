@@ -39,7 +39,7 @@
     bind:open
     class={cn("relative w-full", className)}
     contentClass="p-2 z-9999"
-    maxWidth="w-[var(--reference-width)] sm:w-[var(--reference-width)] min-w-48"
+    maxWidth="w-max min-w-[var(--reference-width)] max-w-[var(--available-width)]"
 >
     {#snippet trigger()}
         <div
@@ -49,20 +49,20 @@
                 disabled && "cursor-not-allowed opacity-50!",
             )}
         >
-            <div class="flex items-center gap-2 truncate">
+            <div class="flex min-w-0 items-center gap-2">
                 {#if selectedOption?.icon}
                     {#if typeof selectedOption.icon === "string"}
                         {#if selectedOption.icon.includes("http")}
-                            <div class="size-5 bg-cover bg-center" style="background-image: url({selectedOption.icon})"></div>
+                            <div class="size-5 shrink-0 bg-cover bg-center" style="background-image: url({selectedOption.icon})"></div>
                         {:else}
-                            <Icon name={selectedOption.icon} class="size-5" />
+                            <Icon name={selectedOption.icon} class="size-5 shrink-0" />
                         {/if}
                     {:else}
                         {@const IconComponent = selectedOption.icon}
-                        <IconComponent class="size-5" />
+                        <IconComponent class="size-5 shrink-0" />
                     {/if}
                 {/if}
-                <span>{selectedLabel}</span>
+                <span class="truncate">{selectedLabel}</span>
             </div>
             <TablerChevronDown class={cn("size-4 shrink-0 text-stone-400 transition-transform duration-200", open && "rotate-180")} />
         </div>
@@ -78,20 +78,20 @@
                 )}
                 onclick={() => selectOption(option.value)}
             >
-                <div class="flex items-center gap-2 text-left">
+                <div class="flex min-w-0 items-center gap-2 text-left">
                     {#if option.icon}
                         {#if typeof option.icon === "string"}
                             {#if option.icon.includes("http")}
-                                <div class="size-5 bg-cover bg-center" style="background-image: url({option.icon})"></div>
+                                <div class="size-5 shrink-0 bg-cover bg-center" style="background-image: url({option.icon})"></div>
                             {:else}
-                                <Icon name={option.icon} class="size-5" />
+                                <Icon name={option.icon} class="size-5 shrink-0" />
                             {/if}
                         {:else}
                             {@const IconComponent = option.icon}
-                            <IconComponent class="size-5" />
+                            <IconComponent class="size-5 shrink-0" />
                         {/if}
                     {/if}
-                    <span>{option.label}</span>
+                    <span class="truncate">{option.label}</span>
                 </div>
             </button>
         {/each}

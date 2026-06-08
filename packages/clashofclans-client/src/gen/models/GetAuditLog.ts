@@ -3,6 +3,57 @@
  * Do not edit manually.
  */
 
+export const getAuditLogQueryParamsActionEnum = {
+    "clan_application.create": "clan_application.create",
+    "clan_application.accepted": "clan_application.accepted",
+    "clan_application.rejected": "clan_application.rejected",
+    "clan_application.pending": "clan_application.pending",
+    "cwl_application.create": "cwl_application.create",
+    "cwl_application.assign": "cwl_application.assign",
+    "cwl_application.unassign": "cwl_application.unassign",
+    "cwl_application.bulk_assign": "cwl_application.bulk_assign",
+    "cwl_application.bulk_unassign": "cwl_application.bulk_unassign",
+    "settings.update": "settings.update",
+    "rules.update": "rules.update",
+    "clan.create": "clan.create",
+    "clan.update": "clan.update",
+    "clan.delete": "clan.delete",
+    "cwl_clan.create": "cwl_clan.create",
+    "cwl_clan.update": "cwl_clan.update",
+    "cwl_clan.delete": "cwl_clan.delete",
+    "cwl_clan.sync_leagues": "cwl_clan.sync_leagues",
+    "coc_account.create": "coc_account.create",
+    "coc_account.import": "coc_account.import",
+    "coc_account.weight_update": "coc_account.weight_update",
+    "coc_account.external_update": "coc_account.external_update",
+    "coc_account.mark_external": "coc_account.mark_external",
+    "user.role_set": "user.role_set",
+    "user.create": "user.create",
+    "user.update": "user.update",
+    "user.ban": "user.ban",
+    "user.unban": "user.unban",
+    "user.remove": "user.remove",
+    "user.password_set": "user.password_set",
+    "user.session_revoked": "user.session_revoked",
+    "user.sessions_revoked": "user.sessions_revoked",
+} as const;
+
+export type GetAuditLogQueryParamsActionEnumKey = (typeof getAuditLogQueryParamsActionEnum)[keyof typeof getAuditLogQueryParamsActionEnum];
+
+export const getAuditLogQueryParamsTargetTypeEnum = {
+    clan_application: "clan_application",
+    cwl_application: "cwl_application",
+    settings: "settings",
+    rules: "rules",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    coc_account: "coc_account",
+    user: "user",
+} as const;
+
+export type GetAuditLogQueryParamsTargetTypeEnumKey =
+    (typeof getAuditLogQueryParamsTargetTypeEnum)[keyof typeof getAuditLogQueryParamsTargetTypeEnum];
+
 export type GetAuditLogQueryParams = {
     /**
      * @type string | undefined
@@ -11,11 +62,11 @@ export type GetAuditLogQueryParams = {
     /**
      * @type string | undefined
      */
-    action?: string;
+    action?: GetAuditLogQueryParamsActionEnumKey;
     /**
      * @type string | undefined
      */
-    targetType?: string;
+    targetType?: GetAuditLogQueryParamsTargetTypeEnumKey;
     /**
      * @type string | undefined
      */
@@ -44,6 +95,67 @@ export type GetAuditLogQueryParams = {
     offset?: number;
 };
 
+export const entriesActorCurrentRoleEnum = {
+    unverified: "unverified",
+    verified: "verified",
+    reviewer: "reviewer",
+    manager: "manager",
+    admin: "admin",
+    superadmin: "superadmin",
+} as const;
+
+export type EntriesActorCurrentRoleEnumKey = (typeof entriesActorCurrentRoleEnum)[keyof typeof entriesActorCurrentRoleEnum];
+
+export const entriesActionEnum = {
+    "clan_application.create": "clan_application.create",
+    "clan_application.accepted": "clan_application.accepted",
+    "clan_application.rejected": "clan_application.rejected",
+    "clan_application.pending": "clan_application.pending",
+    "cwl_application.create": "cwl_application.create",
+    "cwl_application.assign": "cwl_application.assign",
+    "cwl_application.unassign": "cwl_application.unassign",
+    "cwl_application.bulk_assign": "cwl_application.bulk_assign",
+    "cwl_application.bulk_unassign": "cwl_application.bulk_unassign",
+    "settings.update": "settings.update",
+    "rules.update": "rules.update",
+    "clan.create": "clan.create",
+    "clan.update": "clan.update",
+    "clan.delete": "clan.delete",
+    "cwl_clan.create": "cwl_clan.create",
+    "cwl_clan.update": "cwl_clan.update",
+    "cwl_clan.delete": "cwl_clan.delete",
+    "cwl_clan.sync_leagues": "cwl_clan.sync_leagues",
+    "coc_account.create": "coc_account.create",
+    "coc_account.import": "coc_account.import",
+    "coc_account.weight_update": "coc_account.weight_update",
+    "coc_account.external_update": "coc_account.external_update",
+    "coc_account.mark_external": "coc_account.mark_external",
+    "user.role_set": "user.role_set",
+    "user.create": "user.create",
+    "user.update": "user.update",
+    "user.ban": "user.ban",
+    "user.unban": "user.unban",
+    "user.remove": "user.remove",
+    "user.password_set": "user.password_set",
+    "user.session_revoked": "user.session_revoked",
+    "user.sessions_revoked": "user.sessions_revoked",
+} as const;
+
+export type EntriesActionEnumKey = (typeof entriesActionEnum)[keyof typeof entriesActionEnum];
+
+export const entriesTargetTypeEnum = {
+    clan_application: "clan_application",
+    cwl_application: "cwl_application",
+    settings: "settings",
+    rules: "rules",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    coc_account: "coc_account",
+    user: "user",
+} as const;
+
+export type EntriesTargetTypeEnumKey = (typeof entriesTargetTypeEnum)[keyof typeof entriesTargetTypeEnum];
+
 /**
  * @description Audit log entries.
  */
@@ -67,11 +179,14 @@ export type GetAuditLog200 = {
             actorId: string | null;
             actorName: string | null;
             actorCurrentName: string | null;
+            actorCurrentImage: string | null;
+            actorCurrentRole: EntriesActorCurrentRoleEnumKey | null;
+            actorDiscordId: string | null;
             /**
              * @type string
              */
-            action: string;
-            targetType: string | null;
+            action: EntriesActionEnumKey;
+            targetType: EntriesTargetTypeEnumKey | null;
             targetId: string | null;
             metadata: any | null;
             /**

@@ -1,4 +1,4 @@
-import { logAction } from "@/lib/audit";
+import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
 import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
@@ -29,6 +29,7 @@ import {
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
+import { ROLES } from "@repo/auth-shared";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
 import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
@@ -894,8 +895,11 @@ const auditLogEntrySchema = z4.object({
     actorId: z4.string().nullable(),
     actorName: z4.string().nullable(),
     actorCurrentName: z4.string().nullable(),
-    action: z4.string(),
-    targetType: z4.string().nullable(),
+    actorCurrentImage: z4.string().nullable(),
+    actorCurrentRole: z4.enum(ROLES).nullable(),
+    actorDiscordId: z4.string().nullable(),
+    action: z4.enum(AUDIT_ACTIONS),
+    targetType: z4.enum(AUDIT_TARGET_TYPES).nullable(),
     targetId: z4.string().nullable(),
     metadata: z4.unknown().nullable(),
     createdAt: z4.date(),
@@ -903,8 +907,8 @@ const auditLogEntrySchema = z4.object({
 
 const getAuditLogQuerySchema = z4.object({
     actorId: z4.string().optional(),
-    action: z4.string().optional(),
-    targetType: z4.string().optional(),
+    action: z4.enum(AUDIT_ACTIONS).optional(),
+    targetType: z4.enum(AUDIT_TARGET_TYPES).optional(),
     targetId: z4.string().optional(),
     before: z4.coerce.date().optional(),
     after: z4.coerce.date().optional(),

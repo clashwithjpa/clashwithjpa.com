@@ -2,7 +2,6 @@
     "extends": ["@repo/typescript-config/hono.json"],
     "compilerOptions": {
         "ignoreDeprecations": "6.0",
-        "baseUrl": ".",
         "types": ["bun"],
         "paths": {
             "@/*": ["./src/*"],
