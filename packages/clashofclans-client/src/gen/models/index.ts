@@ -289,6 +289,15 @@ export type {
     SyncAdminCwlClanLeaguesMutationResponse,
 } from "./SyncAdminCwlClanLeagues.ts";
 export type {
+    SyncCocAccounts200,
+    SyncCocAccounts400,
+    SyncCocAccounts401,
+    SyncCocAccounts500,
+    SyncCocAccountsMutation,
+    SyncCocAccountsMutationRequest,
+    SyncCocAccountsMutationResponse,
+} from "./SyncCocAccounts.ts";
+export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,

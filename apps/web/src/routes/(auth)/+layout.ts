@@ -76,7 +76,7 @@ export const load: LayoutLoad = async ({ url }) => {
             requiredPerm: "manage",
         },
         {
-            name: "Weights",
+            name: "COC Accounts",
             icon: TablerScale,
             href: "/admin/coc-accounts",
             description: "View linked accounts and edit war weights",

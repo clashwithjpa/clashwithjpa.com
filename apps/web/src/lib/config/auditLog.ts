@@ -222,6 +222,13 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "yellow",
         describe: (m) => `marked ${m.cocAccountTag ?? "?"} as external`,
     },
+    "coc_account.sync": {
+        label: "COC account · synced",
+        icon: TablerRefresh,
+        variant: "blue",
+        describe: (m) =>
+            `synced stats for ${m.updated ?? "?"} account${m.updated === 1 ? "" : "s"} from a sheet${m.notLinked ? ` (${m.notLinked} not linked)` : ""}`,
+    },
     "coc_account.delete": {
         label: "COC account · unlinked",
         icon: TablerTrash,

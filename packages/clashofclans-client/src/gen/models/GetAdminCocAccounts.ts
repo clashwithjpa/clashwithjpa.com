@@ -76,6 +76,35 @@ export type GetAdminCocAccounts200 = {
              * @type boolean
              */
             isExternal: boolean;
+            currentClan: string | null;
+            /**
+             * @type number
+             */
+            townHall: number;
+            /**
+             * @type number
+             */
+            totalDonated: number;
+            /**
+             * @type number
+             */
+            totalReceived: number;
+            /**
+             * @type number
+             */
+            clanGames: number;
+            /**
+             * @type number
+             */
+            capitalGoldLooted: number;
+            /**
+             * @type number
+             */
+            capitalGoldContributed: number;
+            /**
+             * @type number
+             */
+            activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
         }[];

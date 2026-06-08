@@ -419,6 +419,14 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
         discordUserId: cocAccountTable.discordUserId,
         warWeight: cocAccountTable.warWeight,
         isExternal: cocAccountTable.isExternal,
+        currentClan: cocAccountTable.currentClan,
+        townHall: cocAccountTable.townHall,
+        totalDonated: cocAccountTable.totalDonated,
+        totalReceived: cocAccountTable.totalReceived,
+        clanGames: cocAccountTable.clanGames,
+        capitalGoldLooted: cocAccountTable.capitalGoldLooted,
+        capitalGoldContributed: cocAccountTable.capitalGoldContributed,
+        activityScore: cocAccountTable.activityScore,
     } as const;
     const sortColumn = sortBy && sortBy in sortColumns ? sortColumns[sortBy as keyof typeof sortColumns] : null;
     // Default to heaviest war weight first when no explicit sort is requested.
@@ -443,6 +451,14 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
                 cocAccountTag: cocAccountTable.cocAccountTag,
                 warWeight: cocAccountTable.warWeight,
                 isExternal: cocAccountTable.isExternal,
+                currentClan: cocAccountTable.currentClan,
+                townHall: cocAccountTable.townHall,
+                totalDonated: cocAccountTable.totalDonated,
+                totalReceived: cocAccountTable.totalReceived,
+                clanGames: cocAccountTable.clanGames,
+                capitalGoldLooted: cocAccountTable.capitalGoldLooted,
+                capitalGoldContributed: cocAccountTable.capitalGoldContributed,
+                activityScore: cocAccountTable.activityScore,
                 ownerUserId: account.userId,
                 ownerName: user.name,
             })
@@ -462,6 +478,70 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
     ]);
 
     return { accounts: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export type CocAccountSheetStats = {
+    cocAccountTag: string;
+    currentClan: string | null;
+    townHall: number;
+    totalDonated: number;
+    totalReceived: number;
+    clanGames: number;
+    capitalGoldLooted: number;
+    capitalGoldContributed: number;
+    activityScore: number;
+};
+
+// Tags vary in case/whitespace/leading-# across sources; normalize before matching.
+const normalizeCocTag = (tag: string) => {
+    const t = tag.trim().toUpperCase().replace(/\s+/g, "");
+    return t.startsWith("#") ? t : `#${t}`;
+};
+
+export async function syncCocAccountStats(rows: CocAccountSheetStats[]) {
+    const existing = await db
+        .select({ id: cocAccountTable.id, cocAccountTag: cocAccountTable.cocAccountTag, ownerName: user.name })
+        .from(cocAccountTable)
+        .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
+        .leftJoin(user, eq(user.id, account.userId));
+    const accByTag = new Map(existing.map((a) => [normalizeCocTag(a.cocAccountTag), a]));
+
+    const matched: { id: number; row: CocAccountSheetStats }[] = [];
+    const matchedIds = new Set<number>();
+    const notFound: string[] = [];
+    for (const row of rows) {
+        const acc = accByTag.get(normalizeCocTag(row.cocAccountTag));
+        if (!acc) notFound.push(row.cocAccountTag);
+        else {
+            matched.push({ id: acc.id, row });
+            matchedIds.add(acc.id);
+        }
+    }
+
+    if (matched.length > 0) {
+        await db.transaction(async (tx) => {
+            for (const { id, row } of matched) {
+                await tx
+                    .update(cocAccountTable)
+                    .set({
+                        currentClan: row.currentClan,
+                        townHall: row.townHall,
+                        totalDonated: row.totalDonated,
+                        totalReceived: row.totalReceived,
+                        clanGames: row.clanGames,
+                        capitalGoldLooted: row.capitalGoldLooted,
+                        capitalGoldContributed: row.capitalGoldContributed,
+                        activityScore: row.activityScore,
+                    })
+                    .where(eq(cocAccountTable.id, id));
+            }
+        });
+    }
+
+    // Linked accounts that had no matching row in the sheet.
+    const notInSheet = existing.filter((a) => !matchedIds.has(a.id)).map((a) => ({ cocAccountTag: a.cocAccountTag, ownerName: a.ownerName }));
+
+    return { updated: matched.length, notFound, notInSheet };
 }
 
 export async function getAdminUsers(

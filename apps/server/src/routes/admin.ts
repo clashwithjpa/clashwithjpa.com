@@ -21,6 +21,7 @@ import {
     getCocAccountsForUser,
     getSettings,
     MissingDiscordAccountError,
+    syncCocAccountStats,
     updateClan,
     updateClanApplicationStatus,
     updateCocAccountExternal,
@@ -33,6 +34,7 @@ import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { ROLES } from "@repo/auth-shared";
 import * as Sentry from "@sentry/bun";
+import { parse } from "csv-parse/sync";
 import { Hono } from "hono";
 import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
@@ -998,6 +1000,14 @@ const cocAccountSchema = z4.object({
     cocAccountTag: z4.string(),
     warWeight: z4.number(),
     isExternal: z4.boolean(),
+    currentClan: z4.string().nullable(),
+    townHall: z4.number(),
+    totalDonated: z4.number(),
+    totalReceived: z4.number(),
+    clanGames: z4.number(),
+    capitalGoldLooted: z4.number(),
+    capitalGoldContributed: z4.number(),
+    activityScore: z4.number(),
     ownerUserId: z4.string().nullable(),
     ownerName: z4.string().nullable(),
 });
@@ -1037,6 +1047,116 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch COC accounts" }, 500);
+        }
+    },
+);
+
+const SHEET_ID_RE = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/;
+const SHEET_GID_RE = /[?#&]gid=(\d+)/;
+const syncCocAccountsBodySchema = z4.object({
+    sheetUrl: z4.url(),
+});
+const syncCocAccountsData = z4.object({
+    updated: z4.number(),
+    skipped: z4.number(),
+    // Sheet rows whose tag isn't a linked account in the DB.
+    notLinked: z4.array(z4.object({ tag: z4.string(), name: z4.string() })),
+    // Linked accounts that had no row in the sheet.
+    notInSheet: z4.array(z4.object({ cocAccountTag: z4.string(), ownerName: z4.string().nullable() })),
+});
+app.post(
+    "/coc-accounts/sync",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "syncCocAccounts",
+        description:
+            "[Manager] Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Sync result.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(syncCocAccountsData)) } },
+            },
+            400: {
+                description: "Invalid sheet URL or sheet not publicly viewable.",
+                content: { "application/json": { schema: resolver(ErrorResponseSchema) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", syncCocAccountsBodySchema),
+    async (c) => {
+        try {
+            const { sheetUrl } = c.req.valid("json");
+            const sheetId = sheetUrl.match(SHEET_ID_RE)?.[1];
+            if (!sheetId) return c.json({ success: false, error: "Not a valid Google Sheets URL" }, 400);
+            const gid = sheetUrl.match(SHEET_GID_RE)?.[1] ?? "0";
+
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+            let res: Response;
+            try {
+                res = await fetch(csvUrl, { redirect: "follow", signal: AbortSignal.timeout(20000) });
+            } catch {
+                return c.json({ success: false, error: "Could not reach Google Sheets" }, 400);
+            }
+            const body = await res.text();
+            // A private sheet redirects to an HTML sign-in page instead of CSV.
+            if (!res.ok || res.headers.get("content-type")?.includes("text/html") || body.trimStart().startsWith("<")) {
+                return c.json(
+                    { success: false, error: "Sheet isn't publicly viewable. Set sharing to 'Anyone with the link' (Viewer) and try again." },
+                    400,
+                );
+            }
+
+            let records: Record<string, string>[];
+            try {
+                records = parse(body, { columns: true, skip_empty_lines: true, relax_column_count: true, bom: true, trim: true }) as Record<
+                    string,
+                    string
+                >[];
+            } catch {
+                return c.json({ success: false, error: "Could not parse the sheet as CSV" }, 400);
+            }
+            const header = records[0];
+            if (!header || !("Tag" in header)) {
+                return c.json({ success: false, error: "Sheet must have a header row with a 'Tag' column" }, 400);
+            }
+
+            const toInt = (v: string | undefined) => {
+                const n = parseInt((v ?? "").replace(/,/g, ""), 10);
+                return Number.isFinite(n) ? n : 0;
+            };
+            const rows = records
+                .filter((r) => (r["Tag"] ?? "").trim() !== "")
+                .map((r) => ({
+                    cocAccountTag: (r["Tag"] ?? "").trim(),
+                    name: (r["Name"] ?? r["Username"] ?? "").trim(),
+                    currentClan: (r["Current Clan"] ?? "").trim() || null,
+                    townHall: toInt(r["Town Hall"]),
+                    totalDonated: toInt(r["Total Donated"]),
+                    totalReceived: toInt(r["Total Received"]),
+                    clanGames: toInt(r["Clan Games"]),
+                    capitalGoldLooted: toInt(r["Capital Gold Looted"]),
+                    capitalGoldContributed: toInt(r["Capital Gold Contributed"]),
+                    activityScore: toInt(r["Activity Score"]),
+                }));
+
+            const skipped = records.length - rows.length;
+            const { updated, notFound, notInSheet } = await syncCocAccountStats(rows);
+            const nameByTag = new Map(rows.map((r) => [r.cocAccountTag, r.name]));
+            const notLinked = notFound.map((tag) => ({ tag, name: nameByTag.get(tag) ?? "" }));
+
+            logAction(c, {
+                action: "coc_account.sync",
+                targetType: "coc_account",
+                metadata: { sheetId, gid, updated, skipped, notLinked: notLinked.length, notInSheet: notInSheet.length },
+            });
+
+            return c.json({ success: true, data: { updated, skipped, notLinked, notInSheet } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to sync COC accounts" }, 500);
         }
     },
 );

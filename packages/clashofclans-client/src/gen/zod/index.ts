@@ -215,6 +215,14 @@ export {
     syncAdminCwlClanLeaguesMutationResponseSchema,
 } from "./syncAdminCwlClanLeaguesSchema.ts";
 export {
+    syncCocAccounts200Schema,
+    syncCocAccounts400Schema,
+    syncCocAccounts401Schema,
+    syncCocAccounts500Schema,
+    syncCocAccountsMutationRequestSchema,
+    syncCocAccountsMutationResponseSchema,
+} from "./syncCocAccountsSchema.ts";
+export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,
