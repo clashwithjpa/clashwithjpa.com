@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onNavigate } from "$app/navigation";
     import type { Snippet } from "svelte";
     import { sidebarStore } from "./sidebar.svelte";
 
@@ -21,4 +22,8 @@
     export function isOpenFor(key?: string) {
         return sidebarStore.isOpen && sidebarStore.contentKey === key;
     }
+
+    onNavigate(() => {
+        sidebarStore.close();
+    });
 </script>
