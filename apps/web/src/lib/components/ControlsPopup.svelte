@@ -8,7 +8,6 @@
     import { rotateToggle } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
-    import { animate } from "animejs";
     import { onMount, tick } from "svelte";
     import { toast } from "svelte-sonner";
     import TablerIcons from "~icons/tabler/icons";
@@ -44,12 +43,6 @@
     let isFullscreen = $state(false);
     let audio: HTMLAudioElement;
 
-    let audioCtx: AudioContext | null = null;
-    let analyser: AnalyserNode | null = null;
-    let animFrameId: number | null = null;
-    let lastBeatTime = 0;
-    let musicBtnWrapper: HTMLElement | null = null;
-
     onMount(() => {
         audio = new Audio("/music/coc_lofi.ogg");
         audio.loop = true;
@@ -64,94 +57,12 @@
         if (video) isVideoPlaying = !video.paused;
     }
 
-    function setupAudio() {
-        if (audioCtx) return;
-        audioCtx = new AudioContext();
-        const source = audioCtx.createMediaElementSource(audio);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
-        analyser.smoothingTimeConstant = 0.2;
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-    }
-
-    function startBeatDetection() {
-        if (!analyser || animFrameId !== null) return;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        const prevData = new Uint8Array(bufferLength);
-        const HISTORY = 43;
-        const fluxHistory = new Float32Array(HISTORY);
-        let histIdx = 0,
-            histFilled = 0,
-            pprevFlux = 0,
-            prevFlux = 0;
-
-        function loop() {
-            if (!analyser) {
-                animFrameId = null;
-                return;
-            }
-            analyser.getByteFrequencyData(dataArray);
-
-            let flux = 0;
-            for (let i = 2; i <= 18; i++) {
-                const d = dataArray[i] - prevData[i];
-                if (d > 0) flux += d;
-            }
-            prevData.set(dataArray);
-
-            fluxHistory[histIdx] = flux;
-            histIdx = (histIdx + 1) % HISTORY;
-            if (histFilled < HISTORY) {
-                histFilled++;
-                pprevFlux = prevFlux;
-                prevFlux = flux;
-                animFrameId = requestAnimationFrame(loop);
-                return;
-            }
-
-            let mean = 0;
-            for (let i = 0; i < HISTORY; i++) mean += fluxHistory[i];
-            mean /= HISTORY;
-            let variance = 0;
-            for (let i = 0; i < HISTORY; i++) variance += (fluxHistory[i] - mean) ** 2;
-            const stddev = Math.sqrt(variance / HISTORY);
-            const threshold = mean + 1.5 * stddev;
-
-            const now = performance.now();
-            if (prevFlux > pprevFlux && prevFlux > flux && prevFlux > threshold && now - lastBeatTime > 350) {
-                lastBeatTime = now;
-                triggerBeatPulse(Math.min((prevFlux - threshold) / (stddev * 2), 1));
-            }
-
-            pprevFlux = prevFlux;
-            prevFlux = flux;
-            animFrameId = requestAnimationFrame(loop);
-        }
-
-        animFrameId = requestAnimationFrame(loop);
-    }
-
-    function triggerBeatPulse(intensity: number) {
-        if (!musicBtnWrapper) return;
-        const s = 1.04 + intensity * 0.08;
-        animate(musicBtnWrapper, { scale: [1, s, 1 - (s - 1) * 0.5, 1 + (s - 1) * 0.2, 1], duration: 220, ease: "out(4)" });
-    }
-
     function toggleMusic() {
         if (!audio) return;
         if (isMusicPlaying) {
             audio.pause();
-            if (animFrameId !== null) {
-                cancelAnimationFrame(animFrameId);
-                animFrameId = null;
-            }
         } else {
-            setupAudio();
-            if (audioCtx?.state === "suspended") audioCtx.resume();
             audio.play().catch(console.error);
-            startBeatDetection();
         }
         isMusicPlaying = !isMusicPlaying;
     }
@@ -209,12 +120,6 @@
     function handleOpenChange() {
         if (open) {
             checkVideo();
-            if (isMusicPlaying) startBeatDetection();
-        } else {
-            if (animFrameId !== null) {
-                cancelAnimationFrame(animFrameId);
-                animFrameId = null;
-            }
         }
     }
 
@@ -301,15 +206,13 @@
                 </Button>
             {/if}
 
-            <span bind:this={musicBtnWrapper}>
-                <Button tooltip="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
-                    {#if isMusicPlaying}
-                        <TablerMusic class="size-6 animate-spin animation-duration-8000" />
-                    {:else}
-                        <TablerMusicOff class="size-6" />
-                    {/if}
-                </Button>
-            </span>
+            <Button tooltip="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
+                {#if isMusicPlaying}
+                    <TablerMusic class="size-6 animate-spin animation-duration-8000" />
+                {:else}
+                    <TablerMusicOff class="size-6" />
+                {/if}
+            </Button>
         {/snippet}
     </RawPopup>
 </div>
