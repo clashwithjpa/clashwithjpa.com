@@ -10,20 +10,24 @@
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
-    import { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
+    import RoleBadge, { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
     import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
-    import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
+    import type { CellValueChangedEvent, GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
+    import TablerArrowRight from "~icons/tabler/arrow-right";
     import TablerSearch from "~icons/tabler/search";
 
     let isProcessing = $state<string | null>(null);
     let banUserDialogOpen = $state(false);
+    let roleDialogOpen = $state(false);
+    let pendingRoleChange = $state<{ event: CellValueChangedEvent; oldValue: string; newValue: string } | null>(null);
+    let lastRevert: { id: string; value: string } | null = null;
     let gridApi: GridApi | null = $state(null);
     let userSidebar: Sidebar | null = $state(null);
     let selectedSidebarUser: (UserWithRole & { discordId?: string }) | null = $state(null);
@@ -131,6 +135,39 @@
         }
     }
 
+    function revertRoleCell(change: { event: CellValueChangedEvent; oldValue: string }) {
+        lastRevert = { id: change.event.data.id, value: change.oldValue };
+        change.event.node.setDataValue("role", change.oldValue);
+    }
+
+    async function confirmRoleChange() {
+        const change = pendingRoleChange;
+        if (!change) return;
+        pendingRoleChange = null;
+
+        const { event, newValue, oldValue } = change;
+        isProcessing = event.data.id;
+        const { error } = await authClient.admin.setRole({
+            userId: event.data.id,
+            role: newValue as Parameters<typeof authClient.admin.setRole>[0]["role"],
+        });
+
+        if (error) {
+            toast.error("Failed to update role: " + error.message);
+            revertRoleCell({ event, oldValue });
+        } else {
+            toast.success("Role updated successfully");
+            await syncUserViews(event.data.id);
+        }
+        isProcessing = null;
+    }
+
+    function cancelRoleChange() {
+        if (!pendingRoleChange) return;
+        revertRoleCell(pendingRoleChange);
+        pendingRoleChange = null;
+    }
+
     const gridContext = {
         get isProcessing() {
             return isProcessing;
@@ -209,24 +246,14 @@
                 gridApi = params.api;
                 gridApi.setGridOption("datasource", createDatasource());
             },
-            onCellValueChanged: async (event) => {
-                if (event.colDef.field === "role" && event.oldValue !== event.newValue) {
-                    isProcessing = event.data.id;
-                    const { error } = await authClient.admin.setRole({
-                        userId: event.data.id,
-                        role: event.newValue,
-                    });
-
-                    if (error) {
-                        toast.error("Failed to update role: " + error.message);
-                        event.data.role = event.oldValue;
-                        event.api.refreshCells({ rowNodes: [event.node] });
-                    } else {
-                        toast.success("Role updated successfully");
-                        await syncUserViews(event.data.id);
-                    }
-                    isProcessing = null;
+            onCellValueChanged: (event) => {
+                if (event.colDef.field !== "role" || event.oldValue === event.newValue) return;
+                if (lastRevert && event.data.id === lastRevert.id && event.newValue === lastRevert.value) {
+                    lastRevert = null;
+                    return;
                 }
+                pendingRoleChange = { event, oldValue: event.oldValue, newValue: event.newValue };
+                roleDialogOpen = true;
             },
         }}
         columnDefs={[
@@ -304,4 +331,23 @@
             <Input type="date" bind:value={selectedUser.duration} min={getMinDate()} />
         </div>
     </div>
+</Dialog>
+
+<Dialog
+    bind:open={roleDialogOpen}
+    title="Change Role"
+    description={pendingRoleChange
+        ? `Are you sure you want to change ${pendingRoleChange.event.data.name}'s role?`
+        : "Are you sure you want to change this user's role?"}
+    confirmText="Change role"
+    onConfirm={confirmRoleChange}
+    onClose={cancelRoleChange}
+>
+    {#if pendingRoleChange}
+        <div class="flex items-center justify-center gap-3">
+            <RoleBadge role={pendingRoleChange.oldValue} />
+            <TablerArrowRight class="size-5 shrink-0 text-stone-400" />
+            <RoleBadge role={pendingRoleChange.newValue} />
+        </div>
+    {/if}
 </Dialog>
