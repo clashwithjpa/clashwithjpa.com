@@ -301,7 +301,7 @@
                             {@render statTile(TablerBolt, "Level", p.expLevel != null ? String(p.expLevel) : "—")}
                         </div>
 
-                        <Tooltip title={formatDateTime(app.createdAt)} placement="left">
+                        <Tooltip title={formatDateTime(app.createdAt)} placement="top">
                             <div class="flex items-center gap-1 text-xs text-stone-400">
                                 <TablerClock class="size-3.5 shrink-0" />
                                 <span>Applied {formatDate(app.createdAt)}</span>
