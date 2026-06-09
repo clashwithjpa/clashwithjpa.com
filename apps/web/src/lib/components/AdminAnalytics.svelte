@@ -200,10 +200,7 @@
 
 {#if canReview || canManage}
     <div in:fadeIn class="flex flex-col gap-3">
-        <h2 class="flex items-center gap-2 text-xl font-bold">
-            <TablerChartBarPopular class="size-5 text-stone-300" />
-            Analytics
-        </h2>
+        <h2 class="flex items-center gap-2 text-2xl font-bold">Analytics</h2>
         {#if loading}
             <div class="flex items-center justify-start gap-2 text-stone-400">
                 <SvgSpinnersBlocksScale class="size-8" />
