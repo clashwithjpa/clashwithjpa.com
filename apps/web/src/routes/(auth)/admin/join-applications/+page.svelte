@@ -32,6 +32,8 @@
     import TablerTrophy from "~icons/tabler/trophy";
     import TablerX from "~icons/tabler/x";
 
+    let { data }: { data: { canDelete: boolean } } = $props();
+
     type Application = GetJoinApplications200["data"]["applications"][number];
     type Status = Application["status"];
 
@@ -197,21 +199,23 @@
             <div class="flex-1 sm:w-64">
                 <Select bind:value={statusFilter} options={statusOptions} placeholder="Filter by status" />
             </div>
-            <ConfirmationDialog
-                title="Clear accepted applications?"
-                description="Permanently delete all accepted clan join applications. This cannot be undone."
-                confirmText="Clear accepted"
-                onConfirm={clearAccepted}
-            >
-                <Button variant="danger" class="shrink-0 gap-1" disabled={clearingAccepted}>
-                    {#if clearingAccepted}
-                        <SvgSpinnersRingResize class="size-4" />
-                    {:else}
-                        <TablerTrash class="size-4" />
-                    {/if}
-                    Clear accepted
-                </Button>
-            </ConfirmationDialog>
+            {#if data.canDelete}
+                <ConfirmationDialog
+                    title="Clear accepted applications?"
+                    description="Permanently delete all accepted clan join applications. This cannot be undone."
+                    confirmText="Clear accepted"
+                    onConfirm={clearAccepted}
+                >
+                    <Button variant="danger" class="shrink-0 gap-1" disabled={clearingAccepted}>
+                        {#if clearingAccepted}
+                            <SvgSpinnersRingResize class="size-4" />
+                        {:else}
+                            <TablerTrash class="size-4" />
+                        {/if}
+                        Clear accepted
+                    </Button>
+                </ConfirmationDialog>
+            {/if}
         </div>
     </div>
 
@@ -242,20 +246,22 @@
                             </div>
                             <div class="flex shrink-0 items-center gap-2">
                                 <Badge variant={statusVariant[app.status]} content={app.status} />
-                                <Button
-                                    size="icon"
-                                    variant="danger"
-                                    disabled={processingId === app.id}
-                                    tooltip="Delete application"
-                                    tooltipPlacement="bottom"
-                                    onclick={() => requestDelete(app)}
-                                >
-                                    {#if processingId === app.id}
-                                        <SvgSpinnersRingResize class="size-4" />
-                                    {:else}
-                                        <TablerTrash class="size-4" />
-                                    {/if}
-                                </Button>
+                                {#if data.canDelete}
+                                    <Button
+                                        size="icon"
+                                        variant="danger"
+                                        disabled={processingId === app.id}
+                                        tooltip="Delete application"
+                                        tooltipPlacement="bottom"
+                                        onclick={() => requestDelete(app)}
+                                    >
+                                        {#if processingId === app.id}
+                                            <SvgSpinnersRingResize class="size-4" />
+                                        {:else}
+                                            <TablerTrash class="size-4" />
+                                        {/if}
+                                    </Button>
+                                {/if}
                             </div>
                         </div>
 

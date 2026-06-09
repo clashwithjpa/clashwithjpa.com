@@ -10,5 +10,7 @@ export const load: PageLoad = async () => {
         throw error(401, "Unauthorized");
     }
 
-    return { session };
+    const canDelete = await hasPermission(session.data?.user?.id, "sudo");
+
+    return { session, canDelete };
 };
