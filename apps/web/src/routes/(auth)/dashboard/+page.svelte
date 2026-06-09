@@ -20,6 +20,7 @@
         getJPACwlClans,
         getUserAccounts,
         getUserCwlApplications,
+        importUserAccounts,
         setUserAccountExternal,
         type SetUserAccountExternal500,
     } from "@repo/clashofclans-client";
@@ -30,6 +31,7 @@
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
     import TablerDownload from "~icons/tabler/download";
     import TablerExternalLink from "~icons/tabler/external-link";
+    import TablerWorld from "~icons/tabler/world";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerListNumbers from "~icons/tabler/list-numbers";
     import TablerMapPin from "~icons/tabler/map-pin";
@@ -97,21 +99,13 @@
     async function importAccounts() {
         isImporting = true;
         try {
-            const res = await fetch(`${PUBLIC_SERVER_URL}/user/accounts/import`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-            const body = (await res.json()) as
-                | { success: true; data: { imported: { cocAccountTag: string }[]; available: number } }
-                | { success: false; error: string };
-
-            if (!body.success) {
-                toast.error(body.error || "Failed to import accounts");
+            const resp = await importUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (!resp.success) {
+                toast.error("Failed to import accounts");
                 return;
             }
 
-            const { imported, available } = body.data;
+            const { imported, available } = resp.data;
             if (available === 0) {
                 toast.info("No pre-existing accounts found for your Discord ID. Please apply manually.");
                 importDismissed = true;
@@ -195,7 +189,7 @@
 {#if canManageAccounts}
     {#if accounts === null}
         <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-            <SvgSpinnersBlocksScale />
+            <SvgSpinnersRingResize />
             <span>Linked Accounts</span>
         </div>
     {:else}
@@ -247,7 +241,7 @@
                                             </div>
                                             <div class="flex shrink-0 flex-wrap gap-1">
                                                 {#if account.isExternal}
-                                                    <Badge variant="red" content="External" icon={TablerExternalLink} />
+                                                    <Badge variant="red" content="External" icon={TablerWorld} />
                                                 {/if}
                                                 {#if acc.data.player.clan}
                                                     <Badge
@@ -275,7 +269,7 @@
                                         {#if markingId === account.id}
                                             <SvgSpinnersRingResize class="size-3.5" />
                                         {:else}
-                                            <TablerExternalLink class="size-3.5" />
+                                            <TablerWorld class="size-3.5" />
                                         {/if}
                                         Mark as external
                                     </Button>
@@ -295,7 +289,7 @@
     {#if canApplyCWL}
         {#await Promise.all( [getUserCwlApplications( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, ), getJPAClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, ), getJPACwlClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )], )}
             <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-                <SvgSpinnersBlocksScale />
+                <SvgSpinnersRingResize />
                 <span>CWL Applications</span>
             </div>
         {:then [resp, jpaClansResp, jpaCwlClansResp]}
@@ -333,7 +327,7 @@
                                             </span>
                                         </Tooltip>
                                         {#if application.isExternal}
-                                            <Badge variant="red" content="External" class="mt-2" icon={TablerExternalLink} />
+                                            <Badge variant="red" content="External" class="mt-2" icon={TablerWorld} />
                                         {/if}
                                     </div>
                                 </div>

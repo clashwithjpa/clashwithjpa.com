@@ -207,8 +207,28 @@ export async function getClanApplications(opts: { status?: ClanApplicationStatus
 
     const whereClause = status ? eq(clanApplicationTable.status, status) : undefined;
 
+    // Resolve the applicant's Discord profile (avatar/name) and site role by joining
+    // the better-auth account table (discordUserId is the Discord accountId) to the user.
     const [rows, countResult] = await Promise.all([
-        db.select().from(clanApplicationTable).where(whereClause).orderBy(desc(clanApplicationTable.createdAt)).limit(limit).offset(offset),
+        db
+            .select({
+                id: clanApplicationTable.id,
+                cocAccountTag: clanApplicationTable.cocAccountTag,
+                cocAccountData: clanApplicationTable.cocAccountData,
+                discordUserId: clanApplicationTable.discordUserId,
+                status: clanApplicationTable.status,
+                createdAt: clanApplicationTable.createdAt,
+                image: user.image,
+                discordUsername: user.name,
+                discordRole: user.role,
+            })
+            .from(clanApplicationTable)
+            .leftJoin(account, eq(account.accountId, clanApplicationTable.discordUserId))
+            .leftJoin(user, eq(user.id, account.userId))
+            .where(whereClause)
+            .orderBy(desc(clanApplicationTable.createdAt))
+            .limit(limit)
+            .offset(offset),
         db
             .select({ count: sql<number>`count(*)::int` })
             .from(clanApplicationTable)
@@ -216,6 +236,19 @@ export async function getClanApplications(opts: { status?: ClanApplicationStatus
     ]);
 
     return { applications: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function deleteClanApplication(id: number) {
+    const [deleted] = await db.delete(clanApplicationTable).where(eq(clanApplicationTable.id, id)).returning();
+    return deleted ?? null;
+}
+
+export async function deleteAcceptedClanApplications() {
+    const deleted = await db
+        .delete(clanApplicationTable)
+        .where(eq(clanApplicationTable.status, "accepted"))
+        .returning({ id: clanApplicationTable.id });
+    return deleted.length;
 }
 
 export async function updateClanApplicationStatus(id: number, status: ClanApplicationStatus) {
@@ -461,6 +494,8 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
                 activityScore: cocAccountTable.activityScore,
                 ownerUserId: account.userId,
                 ownerName: user.name,
+                ownerImage: user.image,
+                ownerRole: user.role,
             })
             .from(cocAccountTable)
             .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))

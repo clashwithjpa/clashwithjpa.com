@@ -107,6 +107,8 @@ export type GetAdminCocAccounts200 = {
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
+            ownerImage: string | null;
+            ownerRole: string | null;
         }[];
         /**
          * @type number

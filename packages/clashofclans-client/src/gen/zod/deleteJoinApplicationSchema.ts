@@ -5,14 +5,14 @@
 
 import { z } from "zod/v4";
 
-export const updateJoinApplicationStatusPathParamsSchema = z.object({
+export const deleteJoinApplicationPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
 });
 
 /**
- * @description Updated application.
+ * @description Deleted application.
  */
-export const updateJoinApplicationStatus200Schema = z.object({
+export const deleteJoinApplication200Schema = z.object({
     success: z.literal(true),
     data: z.object({
         application: z.object({
@@ -32,7 +32,7 @@ export const updateJoinApplicationStatus200Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const updateJoinApplicationStatus401Schema = z.object({
+export const deleteJoinApplication401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -40,7 +40,7 @@ export const updateJoinApplicationStatus401Schema = z.object({
 /**
  * @description Not found.
  */
-export const updateJoinApplicationStatus404Schema = z.object({
+export const deleteJoinApplication404Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -48,13 +48,9 @@ export const updateJoinApplicationStatus404Schema = z.object({
 /**
  * @description Server error.
  */
-export const updateJoinApplicationStatus500Schema = z.object({
+export const deleteJoinApplication500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const updateJoinApplicationStatusMutationRequestSchema = z.object({
-    status: z.enum(["pending", "accepted", "rejected"]),
-});
-
-export const updateJoinApplicationStatusMutationResponseSchema = z.lazy(() => updateJoinApplicationStatus200Schema);
+export const deleteJoinApplicationMutationResponseSchema = z.lazy(() => deleteJoinApplication200Schema);

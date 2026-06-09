@@ -5,7 +5,7 @@
     import type { Role } from "$lib/config/roles";
     import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
-    import { deleteCocAccount, getCOCPlayer, getUserCocAccountsByUserId } from "@repo/clashofclans-client";
+    import { deleteCocAccount, getCOCPlayer, getUserCocAccountsByUserId, updateCocAccountExternal } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -20,10 +20,12 @@
     import TablerIdBadge from "~icons/tabler/id-badge";
     import TablerLogin2 from "~icons/tabler/login-2";
     import TablerQuestionMark from "~icons/tabler/question-mark";
+    import TablerShieldCheck from "~icons/tabler/shield-check";
     import TablerSpy from "~icons/tabler/spy";
     import TablerTrash from "~icons/tabler/trash";
     import TablerUserX from "~icons/tabler/user-x";
     import TablerWeight from "~icons/tabler/weight";
+    import TablerWorld from "~icons/tabler/world";
     import TablerWorldX from "~icons/tabler/world-x";
     import SessionCard from "./SessionCard.svelte";
     import Avatar from "./ui/Avatar.svelte";
@@ -60,7 +62,10 @@
     // Deleting a linked CoC account is destructive (cascades to CWL applications),
     // so it mirrors the server's admin-only (sudo) gate on DELETE /coc-accounts/:id.
     let canDeleteAccount = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Toggling external/main mirrors the server's manager+ gate on PATCH /coc-accounts/:id.
+    let canToggleExternal = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.manager);
     let impersonating = $state(false);
+    let togglingExternalId = $state<number | null>(null);
 
     async function handleImpersonate() {
         impersonating = true;
@@ -93,6 +98,29 @@
         }, 2000);
     }
 
+    async function handleToggleExternal(account: { id: number; cocAccountTag: string; isExternal: boolean }) {
+        togglingExternalId = account.id;
+        const nextExternal = !account.isExternal;
+        try {
+            const resp = await updateCocAccountExternal(
+                account.id,
+                { isExternal: nextExternal },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (resp.success) {
+                toast.success(`${account.cocAccountTag} set to ${nextExternal ? "external" : "main"}`);
+                accountsRefreshKey++;
+            } else {
+                toast.error("Failed to update external status");
+            }
+        } catch (err) {
+            console.error("Toggle external error:", err);
+            toast.error("Failed to update external status");
+        } finally {
+            togglingExternalId = null;
+        }
+    }
+
     async function handleDeleteAccount(account: { id: number; cocAccountTag: string }) {
         deletingAccountId = account.id;
         try {
@@ -112,7 +140,7 @@
     }
 </script>
 
-{#snippet accountActions(account: { id: number; cocAccountTag: string })}
+{#snippet accountActions(account: { id: number; cocAccountTag: string; isExternal: boolean })}
     <div class="flex shrink-0 items-center gap-2">
         <Button
             size="icon"
@@ -137,6 +165,24 @@
         >
             <TablerExternalLink />
         </Button>
+        {#if canToggleExternal}
+            <Button
+                size="icon"
+                variant={account.isExternal ? "success" : "danger"}
+                disabled={togglingExternalId === account.id}
+                onclick={() => handleToggleExternal(account)}
+                tooltip={account.isExternal ? "Mark as main" : "Mark as external"}
+                tooltipPlacement="bottom"
+            >
+                {#if togglingExternalId === account.id}
+                    <SvgSpinnersBlocksScale />
+                {:else if account.isExternal}
+                    <TablerShieldCheck />
+                {:else}
+                    <TablerWorld />
+                {/if}
+            </Button>
+        {/if}
         {#if canDeleteAccount}
             <ConfirmationDialog
                 title="Unlink account?"
@@ -373,7 +419,7 @@
                                         {#if account.isExternal || (acc.success && acc.data.player.clan)}
                                             <div class="mt-2 flex flex-wrap gap-1">
                                                 {#if account.isExternal}
-                                                    <Badge variant="red" content="External" icon={TablerExternalLink} />
+                                                    <Badge variant="red" content="External" icon={TablerWorld} />
                                                 {/if}
                                                 {#if acc.success && acc.data.player.clan}
                                                     <Badge

@@ -78,6 +78,9 @@ export type GetJoinApplications200 = {
              * @type string, date-time
              */
             createdAt: string;
+            image: string | null;
+            discordUsername: string | null;
+            discordRole: string | null;
         }[];
         /**
          * @type number

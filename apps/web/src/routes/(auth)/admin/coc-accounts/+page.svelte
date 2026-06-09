@@ -1,18 +1,23 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
+    import CocAccountCell from "$lib/components/grid/CocAccountCell.svelte";
+    import CocOwnerCell from "$lib/components/grid/CocOwnerCell.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
+    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { Sidebar } from "$lib/components/ui/sidebar";
     import { fadeIn } from "$lib/utils/animations";
     import { getAdminCocAccounts, syncCocAccounts, updateCocAccountExternal, updateCocAccountWarWeight } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import { toast } from "svelte-sonner";
     import TablerCopy from "~icons/tabler/copy";
-    import TablerRefresh from "~icons/tabler/refresh";
     import TablerSearch from "~icons/tabler/search";
+    import TablerTableDashed from "~icons/tabler/table-dashed";
 
     type SyncResult = {
         updated: number;
@@ -27,6 +32,17 @@
     let sheetUrl = $state("");
     let syncResult = $state<SyncResult | null>(null);
     let syncResultOpen = $state(false);
+    let accountSidebar: Sidebar | null = $state(null);
+    let selectedAccount = $state<Record<string, unknown> | null>(null);
+
+    // Account data is fetched lazily in the sidebar (one CoC API call on demand)
+    // rather than enriching every row on load.
+    const gridContext = {
+        openAccountSidebar: (account: Record<string, unknown>) => {
+            selectedAccount = account;
+            accountSidebar?.open(String(account.id));
+        },
+    };
 
     function createDatasource(): IDatasource {
         return {
@@ -102,6 +118,7 @@
 <div class="relative flex size-full flex-col overflow-hidden" in:fadeIn>
     <Grid
         gridOptions={{
+            context: gridContext,
             rowHeight: 56,
             rowModelType: "infinite",
             cacheBlockSize: 50,
@@ -169,25 +186,32 @@
         }}
         columnDefs={[
             {
-                headerName: "Owner",
+                headerName: "User",
                 field: "ownerName",
                 sortable: true,
                 filter: false,
                 flex: 2,
-                valueFormatter: (p) => p.value,
+                minWidth: 200,
+                cellRenderer: svelteRenderer(CocOwnerCell),
             },
-            { headerName: "Account Tag", field: "cocAccountTag", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
-            { headerName: "Discord ID", field: "discordUserId", sortable: true, filter: false, flex: 2, cellClass: "font-mono" },
             {
-                headerName: "Current Clan",
+                headerName: "Account",
+                field: "cocAccountTag",
+                sortable: true,
+                filter: false,
+                flex: 2,
+                minWidth: 200,
+                cellRenderer: svelteRenderer(CocAccountCell),
+            },
+            {
+                headerName: "Clan",
                 field: "currentClan",
                 sortable: true,
                 filter: false,
                 flex: 2,
-                minWidth: 140,
+                minWidth: 160,
                 valueFormatter: (p) => p.value ?? "—",
             },
-            { headerName: "Town Hall", field: "townHall", sortable: true, filter: false, flex: 1, minWidth: 110, valueFormatter: formatNumber },
             {
                 headerName: "War Weight",
                 field: "warWeight",
@@ -266,10 +290,16 @@
             <TablerSearch class="size-5" />
         </Button>
         <Button variant="base" class="shrink-0" onclick={() => (syncDialogOpen = true)} tooltip="Sync from Google Sheet" tooltipPlacement="top">
-            <TablerRefresh class="size-5" />
+            <TablerTableDashed class="size-5" />
         </Button>
     </Toolbar>
 </div>
+
+<Sidebar bind:this={accountSidebar}>
+    {#if selectedAccount}
+        <CocAccountSidebar account={selectedAccount as any} />
+    {/if}
+</Sidebar>
 
 <Dialog
     bind:open={syncDialogOpen}
@@ -281,7 +311,7 @@
     <div class="flex flex-col items-start justify-center gap-1">
         <p class="text-sm font-medium">Sheet URL</p>
         <Input placeholder="https://docs.google.com/spreadsheets/d/.../edit?gid=0" bind:value={sheetUrl} />
-        <p class="mt-1 text-xs text-stone-400">The sheet must be shared as “Anyone with the link → Viewer”. No API key needed.</p>
+        <p class="mt-1 text-xs text-stone-400">The sheet must be shared as “Anyone with the link → Viewer”.</p>
     </div>
 </Dialog>
 

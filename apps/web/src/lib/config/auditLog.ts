@@ -10,7 +10,6 @@ import TablerCheck from "~icons/tabler/check";
 import TablerClock from "~icons/tabler/clock";
 import TablerDownload from "~icons/tabler/download";
 import TablerEdit from "~icons/tabler/edit";
-import TablerExternalLink from "~icons/tabler/external-link";
 import TablerGavel from "~icons/tabler/gavel";
 import TablerKey from "~icons/tabler/key";
 import TablerList from "~icons/tabler/list";
@@ -21,6 +20,7 @@ import TablerRefresh from "~icons/tabler/refresh";
 import TablerScale from "~icons/tabler/scale";
 import TablerSend from "~icons/tabler/send";
 import TablerSettings from "~icons/tabler/settings";
+import TablerShieldCheck from "~icons/tabler/shield-check";
 import TablerShieldHalf from "~icons/tabler/shield-half";
 import TablerSwords from "~icons/tabler/swords";
 import TablerTrash from "~icons/tabler/trash";
@@ -29,6 +29,7 @@ import TablerUserCheck from "~icons/tabler/user-check";
 import TablerUserMinus from "~icons/tabler/user-minus";
 import TablerUserPlus from "~icons/tabler/user-plus";
 import TablerUsers from "~icons/tabler/users";
+import TablerWorld from "~icons/tabler/world";
 import TablerX from "~icons/tabler/x";
 
 export type AuditEntry = GetAuditLog200["data"]["entries"][number];
@@ -86,6 +87,18 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         icon: TablerClock,
         variant: "yellow",
         describe: (m) => `marked the clan application from ${m.cocAccountTag ?? "?"} as pending`,
+    },
+    "clan_application.delete": {
+        label: "Clan application · deleted",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m) => `deleted the clan application from ${m.cocAccountTag ?? "?"}`,
+    },
+    "clan_application.clear_accepted": {
+        label: "Clan application · cleared accepted",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m) => `cleared ${m.deleted ?? "?"} accepted clan application${m.deleted === 1 ? "" : "s"}`,
     },
     "cwl_application.create": {
         label: "CWL application · submitted",
@@ -210,17 +223,17 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "yellow",
         describe: (m) => `set the war weight of ${m.cocAccountTag ?? "?"} to ${m.warWeight ?? "?"}`,
     },
-    "coc_account.external_update": {
-        label: "COC account · external status",
-        icon: TablerExternalLink,
-        variant: "yellow",
-        describe: (m) => `set ${m.cocAccountTag ?? "?"} to ${m.isExternal ? "external" : "main"}`,
-    },
     "coc_account.mark_external": {
         label: "COC account · marked external",
-        icon: TablerExternalLink,
+        icon: TablerWorld,
         variant: "yellow",
         describe: (m) => `marked ${m.cocAccountTag ?? "?"} as external`,
+    },
+    "coc_account.mark_main": {
+        label: "COC account · marked main",
+        icon: TablerShieldCheck,
+        variant: "green",
+        describe: (m) => `marked ${m.cocAccountTag ?? "?"} as main`,
     },
     "coc_account.sync": {
         label: "COC account · synced",

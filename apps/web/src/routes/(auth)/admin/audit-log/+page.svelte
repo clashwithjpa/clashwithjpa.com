@@ -20,6 +20,7 @@
     import { toast } from "svelte-sonner";
     import { slide } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import TablerChevronLeft from "~icons/tabler/chevron-left";
     import TablerChevronRight from "~icons/tabler/chevron-right";
@@ -268,7 +269,7 @@
                                         >{actorLabel(entry)}</span
                                     >
                                     {#if openingEntryId === entry.id}
-                                        <SvgSpinnersBlocksScale class="size-4 shrink-0 text-stone-400" />
+                                        <SvgSpinnersRingResize class="size-4 shrink-0 text-stone-400" />
                                     {/if}
                                 </button>
                                 <div class="flex shrink-0 items-center gap-2">

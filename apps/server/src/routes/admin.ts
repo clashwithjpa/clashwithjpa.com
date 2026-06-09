@@ -8,6 +8,8 @@ import {
     createClan,
     createCwlClan,
     deleteClan,
+    deleteAcceptedClanApplications,
+    deleteClanApplication,
     deleteCocAccount,
     deleteCwlApplicationsBulk,
     deleteCwlClan,
@@ -134,6 +136,9 @@ const clanApplicationSchema = z4.object({
     discordUserId: z4.string(),
     status: z4.enum(["pending", "accepted", "rejected"]),
     createdAt: z4.date(),
+    image: z4.string().nullable(),
+    discordUsername: z4.string().nullable(),
+    discordRole: z4.string().nullable(),
 });
 
 const getJoinApplicationsQuerySchema = z4.object({
@@ -221,6 +226,77 @@ app.put(
             }
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update application" }, 500);
+        }
+    },
+);
+
+const clearAcceptedJoinApplicationsData = z4.object({ deleted: z4.number() });
+app.delete(
+    "/join-applications/accepted",
+    hasAccessAuthMiddleware(isReviewer),
+    describeRoute({
+        operationId: "clearAcceptedJoinApplications",
+        description: "[Reviewer] Deletes all accepted clan join applications.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Number of deleted applications.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(clearAcceptedJoinApplicationsData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const deleted = await deleteAcceptedClanApplications();
+            logAction(c, {
+                action: "clan_application.clear_accepted",
+                targetType: "clan_application",
+                metadata: { deleted },
+            });
+            return c.json({ success: true, data: { deleted } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to clear accepted applications" }, 500);
+        }
+    },
+);
+
+const deleteJoinApplicationData = z4.object({ application: clanApplicationSchema });
+app.delete(
+    "/join-applications/:id",
+    hasAccessAuthMiddleware(isReviewer),
+    describeRoute({
+        operationId: "deleteJoinApplication",
+        description: "[Reviewer] Permanently deletes a single clan join application.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Deleted application.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(deleteJoinApplicationData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", updateJoinApplicationPathSchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const application = await deleteClanApplication(id);
+            if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            logAction(c, {
+                action: "clan_application.delete",
+                targetType: "clan_application",
+                targetId: application.id,
+                metadata: { cocAccountTag: application.cocAccountTag },
+            });
+            return c.json({ success: true, data: { application } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to delete application" }, 500);
         }
     },
 );
@@ -1010,6 +1086,8 @@ const cocAccountSchema = z4.object({
     activityScore: z4.number(),
     ownerUserId: z4.string().nullable(),
     ownerName: z4.string().nullable(),
+    ownerImage: z4.string().nullable(),
+    ownerRole: z4.string().nullable(),
 });
 
 const getCocAccountsQuerySchema = z4.object({
@@ -1240,7 +1318,7 @@ app.put(
             const account = await updateCocAccountExternal(id, isExternal);
             if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
             logAction(c, {
-                action: "coc_account.external_update",
+                action: account.isExternal ? "coc_account.mark_external" : "coc_account.mark_main",
                 targetType: "coc_account",
                 targetId: account.id,
                 metadata: { cocAccountTag: account.cocAccountTag, isExternal: account.isExternal },

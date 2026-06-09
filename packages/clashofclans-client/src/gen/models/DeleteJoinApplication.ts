@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateJoinApplicationStatusPathParams = {
+export type DeleteJoinApplicationPathParams = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,18 +12,18 @@ export type UpdateJoinApplicationStatusPathParams = {
     id: number;
 };
 
-export const applicationStatusEnum = {
+export const applicationStatusEnum2 = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type ApplicationStatusEnumKey = (typeof applicationStatusEnum)[keyof typeof applicationStatusEnum];
+export type ApplicationStatusEnum2Key = (typeof applicationStatusEnum2)[keyof typeof applicationStatusEnum2];
 
 /**
- * @description Updated application.
+ * @description Deleted application.
  */
-export type UpdateJoinApplicationStatus200 = {
+export type DeleteJoinApplication200 = {
     /**
      * @type boolean
      */
@@ -52,7 +52,7 @@ export type UpdateJoinApplicationStatus200 = {
             /**
              * @type string
              */
-            status: ApplicationStatusEnumKey;
+            status: ApplicationStatusEnum2Key;
             /**
              * @type string, date-time
              */
@@ -67,7 +67,7 @@ export type UpdateJoinApplicationStatus200 = {
 /**
  * @description Unauthorized.
  */
-export type UpdateJoinApplicationStatus401 = {
+export type DeleteJoinApplication401 = {
     /**
      * @type boolean
      */
@@ -82,7 +82,7 @@ export type UpdateJoinApplicationStatus401 = {
 /**
  * @description Not found.
  */
-export type UpdateJoinApplicationStatus404 = {
+export type DeleteJoinApplication404 = {
     /**
      * @type boolean
      */
@@ -97,7 +97,7 @@ export type UpdateJoinApplicationStatus404 = {
 /**
  * @description Server error.
  */
-export type UpdateJoinApplicationStatus500 = {
+export type DeleteJoinApplication500 = {
     /**
      * @type boolean
      */
@@ -109,27 +109,10 @@ export type UpdateJoinApplicationStatus500 = {
           };
 };
 
-export const updateJoinApplicationStatusMutationRequestStatusEnum = {
-    pending: "pending",
-    accepted: "accepted",
-    rejected: "rejected",
-} as const;
+export type DeleteJoinApplicationMutationResponse = DeleteJoinApplication200;
 
-export type UpdateJoinApplicationStatusMutationRequestStatusEnumKey =
-    (typeof updateJoinApplicationStatusMutationRequestStatusEnum)[keyof typeof updateJoinApplicationStatusMutationRequestStatusEnum];
-
-export type UpdateJoinApplicationStatusMutationRequest = {
-    /**
-     * @type string
-     */
-    status: UpdateJoinApplicationStatusMutationRequestStatusEnumKey;
-};
-
-export type UpdateJoinApplicationStatusMutationResponse = UpdateJoinApplicationStatus200;
-
-export type UpdateJoinApplicationStatusMutation = {
-    Response: UpdateJoinApplicationStatus200;
-    Request: UpdateJoinApplicationStatusMutationRequest;
-    PathParams: UpdateJoinApplicationStatusPathParams;
-    Errors: UpdateJoinApplicationStatus401 | UpdateJoinApplicationStatus404 | UpdateJoinApplicationStatus500;
+export type DeleteJoinApplicationMutation = {
+    Response: DeleteJoinApplication200;
+    PathParams: DeleteJoinApplicationPathParams;
+    Errors: DeleteJoinApplication401 | DeleteJoinApplication404 | DeleteJoinApplication500;
 };

@@ -31,6 +31,8 @@ export const updateCocAccountExternal200Schema = z.object({
             activityScore: z.number(),
             ownerUserId: z.union([z.string(), z.null()]),
             ownerName: z.union([z.string(), z.null()]),
+            ownerImage: z.union([z.string(), z.null()]),
+            ownerRole: z.union([z.string(), z.null()]),
         }),
     }),
 });
