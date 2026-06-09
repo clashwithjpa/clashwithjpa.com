@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Portal } from "@ark-ui/svelte/portal";
     import { Tooltip } from "@ark-ui/svelte/tooltip";
-    import type { Snippet } from "svelte";
+    import { getContext, type Snippet } from "svelte";
 
     let {
         children,
@@ -35,13 +35,15 @@
         if (disabled) return;
         if (onclick) onclick(e);
     }
+
+    const renderInline = getContext<boolean>("tooltip-render-inline") ?? false;
 </script>
 
 <Tooltip.Root openDelay={200} interactive={false} closeOnPointerDown={true} positioning={{ placement, gutter: 12 }}>
     <Tooltip.Trigger {disabled} aria-label={title} class={className} onclick={handleClick}>
         {@render children()}
     </Tooltip.Trigger>
-    <Portal>
+    <Portal disabled={renderInline}>
         <Tooltip.Positioner class="z-60">
             <Tooltip.Content
                 style="--arrow-background: var(--color-stone-900); --arrow-size: 12px;"

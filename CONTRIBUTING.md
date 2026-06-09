@@ -138,6 +138,13 @@ Do not invent intermediate z-indexes outside of this scale.
 >   - `aboveNavbar={false}` (default): Uses `z-30` for body popups that should stay below the navbar
 >   - `aboveNavbar={true}`: Uses `z-9999` for navbar popups that should appear above the navbar
 
----
-
-*Remember: Check this guide before contributing new components to ensure consistency!*
+> [!WARNING]
+> **Tooltips inside Dialogs**
+>
+> Both `<Dialog>` and `<Tooltip>` use Ark UI `<Portal>`, which appends content to `<body>`, making them siblings in the same stacking context. A tooltip's positioner is `z-60`; a dialog's positioner is `z-9999` — so the tooltip paints *underneath* the dialog.
+>
+> Raising the z-index on `Tooltip.Content` won't fix this: the parent `Tooltip.Positioner` already creates its own stacking context at `z-60`, so any z-index on a child is resolved *inside* that context and can never exceed `z-60` relative to the body.
+>
+> **How it's handled:** `<Dialog>` sets a `tooltip-render-inline` Svelte context. `<Tooltip>` reads it and passes `disabled` to its `<Portal>`, rendering the tooltip inline inside the dialog's `z-9999` stacking context instead of portaling to `<body>`. This is automatic — no per-button changes needed.
+>
+> Apply the same pattern (set a context → disable the portal) whenever a `z-60` overlay must appear above a `z-9999` container.

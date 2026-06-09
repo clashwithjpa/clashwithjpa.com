@@ -5,8 +5,10 @@
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { Dialog } from "@ark-ui/svelte/dialog";
     import { Portal } from "@ark-ui/svelte/portal";
-    import { onMount, type Snippet } from "svelte";
+    import { onMount, setContext, type Snippet } from "svelte";
     import TablerX from "~icons/tabler/x";
+
+    setContext("tooltip-render-inline", true);
 
     let {
         open = $bindable(false),

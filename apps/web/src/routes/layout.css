@@ -70,6 +70,95 @@ body {
     background: transparent;
 }
 
+@property --fade-l {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+@property --fade-r {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+@property --fade-t {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+@property --fade-b {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+
+.edge-fade {
+    --fade-size: 2rem;
+    --fade-l: 0;
+    --fade-r: 0;
+    --fade-t: 0;
+    --fade-b: 0;
+    mask-image:
+        linear-gradient(
+            to right,
+            transparent,
+            #000 calc(var(--fade-size) * var(--fade-l)),
+            #000 calc(100% - var(--fade-size) * var(--fade-r)),
+            transparent
+        ),
+        linear-gradient(
+            to bottom,
+            transparent,
+            #000 calc(var(--fade-size) * var(--fade-t)),
+            #000 calc(100% - var(--fade-size) * var(--fade-b)),
+            transparent
+        );
+    mask-composite: intersect;
+    animation:
+        edge-fade-left linear both,
+        edge-fade-right linear both,
+        edge-fade-top linear both,
+        edge-fade-bottom linear both;
+    animation-timeline: scroll(self inline), scroll(self inline), scroll(self block), scroll(self block);
+    animation-range:
+        0 var(--fade-size),
+        calc(100% - var(--fade-size)) 100%,
+        0 var(--fade-size),
+        calc(100% - var(--fade-size)) 100%;
+}
+
+@keyframes edge-fade-left {
+    from {
+        --fade-l: 0;
+    }
+    to {
+        --fade-l: 1;
+    }
+}
+@keyframes edge-fade-right {
+    from {
+        --fade-r: 1;
+    }
+    to {
+        --fade-r: 0;
+    }
+}
+@keyframes edge-fade-top {
+    from {
+        --fade-t: 0;
+    }
+    to {
+        --fade-t: 1;
+    }
+}
+@keyframes edge-fade-bottom {
+    from {
+        --fade-b: 1;
+    }
+    to {
+        --fade-b: 0;
+    }
+}
+
 .typography {
     @apply prose text-base prose-stone dark:prose-invert prose-headings:text-amber-400 prose-a:text-yellow-400 prose-a:hover:text-yellow-400 prose-blockquote:rounded-lg prose-blockquote:border-l-green-400 prose-blockquote:bg-green-900/20 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-sm prose-blockquote:text-green-400 prose-blockquote:not-italic prose-strong:text-amber-400 prose-ol:marker:text-amber-400 prose-ul:marker:text-amber-400 [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
 }

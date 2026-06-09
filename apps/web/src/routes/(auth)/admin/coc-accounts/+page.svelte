@@ -15,6 +15,7 @@
     import { getAdminCocAccounts, syncCocAccounts, updateCocAccountExternal, updateCocAccountWarWeight } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import { toast } from "svelte-sonner";
+    import TablerCheck from "~icons/tabler/check";
     import TablerCopy from "~icons/tabler/copy";
     import TablerSearch from "~icons/tabler/search";
     import TablerTableDashed from "~icons/tabler/table-dashed";
@@ -34,6 +35,7 @@
     let syncResultOpen = $state(false);
     let accountSidebar: Sidebar | null = $state(null);
     let selectedAccount = $state<Record<string, unknown> | null>(null);
+    let copied: Record<string, boolean> = $state({});
 
     // Account data is fetched lazily in the sidebar (one CoC API call on demand)
     // rather than enriching every row on load.
@@ -80,6 +82,7 @@
             toast.error("Paste a Google Sheet URL first");
             return;
         }
+        const toastId = toast.loading("Syncing from Google Sheet…");
         try {
             // The fetch client returns the parsed body even on 4xx, so handle the error shape too.
             const resp = (await syncCocAccounts(
@@ -87,12 +90,14 @@
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             )) as { success: true; data: SyncResult } | { success: false; error: string | Record<string, unknown> };
             if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Sheet could not be read");
+            toast.success(`Synced ${resp.data.updated} account${resp.data.updated === 1 ? "" : "s"}`, { id: toastId });
             syncResult = resp.data;
             syncResultOpen = true;
             sheetUrl = "";
             gridApi?.setGridOption("datasource", createDatasource());
         } catch (error) {
             toast.error("Sync failed", {
+                id: toastId,
                 description: error instanceof Error && error.message ? error.message : "Make sure the sheet is link-viewable",
             });
             // Dialog auto-closes on confirm; reopen so the URL can be fixed and retried.
@@ -100,11 +105,14 @@
         }
     }
 
-    async function copyList(rows: { name: string; tag: string }[]) {
+    async function copyList(rows: { name: string; tag: string }[], key: string) {
         const text = rows.map((r) => `${r.name} ${r.tag}`.trim()).join("\n");
         try {
             await navigator.clipboard.writeText(text);
-            toast.success(`Copied ${rows.length} row${rows.length === 1 ? "" : "s"}`);
+            copied[key] = true;
+            setTimeout(() => {
+                copied[key] = false;
+            }, 2000);
         } catch {
             toast.error("Couldn't copy to clipboard");
         }
@@ -332,13 +340,21 @@
                     <p class="font-medium text-stone-100">Not in sheet ({syncResult.notInSheet.length})</p>
                     {#if syncResult.notInSheet.length}
                         <Button
-                            variant="ghost"
+                            variant={copied["notInSheet"] ? "success" : "ghost"}
                             size="icon"
-                            tooltip="Copy name + tag"
+                            tooltip={copied["notInSheet"] ? "Copied!" : "Copy name + tag"}
                             tooltipPlacement="top"
-                            onclick={() => copyList(syncResult!.notInSheet.map((a) => ({ name: a.ownerName ?? "", tag: a.cocAccountTag })))}
+                            onclick={() =>
+                                copyList(
+                                    syncResult!.notInSheet.map((a) => ({ name: a.ownerName ?? "", tag: a.cocAccountTag })),
+                                    "notInSheet",
+                                )}
                         >
-                            <TablerCopy class="size-4" />
+                            {#if copied["notInSheet"]}
+                                <TablerCheck class="size-4" />
+                            {:else}
+                                <TablerCopy class="size-4" />
+                            {/if}
                         </Button>
                     {/if}
                 </div>
@@ -362,13 +378,21 @@
                     <p class="font-medium text-stone-100">Not linked ({syncResult.notLinked.length})</p>
                     {#if syncResult.notLinked.length}
                         <Button
-                            variant="ghost"
+                            variant={copied["notLinked"] ? "success" : "ghost"}
                             size="icon"
-                            tooltip="Copy name + tag"
+                            tooltip={copied["notLinked"] ? "Copied!" : "Copy name + tag"}
                             tooltipPlacement="top"
-                            onclick={() => copyList(syncResult!.notLinked.map((r) => ({ name: r.name, tag: r.tag })))}
+                            onclick={() =>
+                                copyList(
+                                    syncResult!.notLinked.map((r) => ({ name: r.name, tag: r.tag })),
+                                    "notLinked",
+                                )}
                         >
-                            <TablerCopy class="size-4" />
+                            {#if copied["notLinked"]}
+                                <TablerCheck class="size-4" />
+                            {:else}
+                                <TablerCopy class="size-4" />
+                            {/if}
                         </Button>
                     {/if}
                 </div>

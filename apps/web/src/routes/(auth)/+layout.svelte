@@ -148,7 +148,7 @@
         class="flex items-center {isMobile ? 'min-h-16 w-full justify-center py-2' : 'h-full flex-col justify-between py-4'}"
     >
         {#if isMobile}
-            <div class="w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div class="edge-fade w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div class="flex w-max min-w-full items-center justify-evenly gap-8 px-4" bind:this={navButtonsRef}>
                     {#each permittedLinks as link (link.href)}
                         <div class="dash-nav-btn shrink-0">
@@ -158,7 +158,11 @@
                 </div>
             </div>
         {:else}
-            <div class="flex w-full flex-col justify-start gap-6 p-2" bind:clientWidth={sidebarWidth} bind:this={navButtonsRef}>
+            <div
+                class="edge-fade flex min-h-0 w-full flex-1 flex-col justify-start gap-6 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                bind:clientWidth={sidebarWidth}
+                bind:this={navButtonsRef}
+            >
                 {#each permittedLinks as link (link.href)}
                     <div class="dash-nav-btn">
                         {@render button(link)}
