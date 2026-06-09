@@ -126,14 +126,14 @@
         try {
             const resp = await deleteCocAccount(account.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
             if (resp.success) {
-                toast.success(`Unlinked ${account.cocAccountTag}`);
+                toast.success(`Deleted ${account.cocAccountTag}`);
                 accountsRefreshKey++;
             } else {
-                toast.error("Failed to unlink account");
+                toast.error("Failed to delete account");
             }
         } catch (err) {
             console.error("Delete account error:", err);
-            toast.error("Failed to unlink account");
+            toast.error("Failed to delete account");
         } finally {
             deletingAccountId = null;
         }
@@ -185,12 +185,12 @@
         {/if}
         {#if canDeleteAccount}
             <ConfirmationDialog
-                title="Unlink account?"
-                description="Permanently unlink {account.cocAccountTag} from this user. This also removes the account's CWL applications and cannot be undone."
-                confirmText="Unlink account"
+                title="Delete account?"
+                description="Permanently delete {account.cocAccountTag} from this user. This also removes the account's CWL applications and cannot be undone."
+                confirmText="Delete account"
                 onConfirm={() => handleDeleteAccount(account)}
             >
-                <Button size="icon" variant="danger" disabled={deletingAccountId === account.id} tooltip="Unlink account" tooltipPlacement="bottom">
+                <Button size="icon" variant="danger" disabled={deletingAccountId === account.id} tooltip="Delete account" tooltipPlacement="bottom">
                     {#if deletingAccountId === account.id}
                         <SvgSpinnersBlocksScale />
                     {:else}

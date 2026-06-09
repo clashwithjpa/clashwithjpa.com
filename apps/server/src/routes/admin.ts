@@ -7,10 +7,11 @@ import {
     assignCwlApplicationsBulk,
     createClan,
     createCwlClan,
-    deleteClan,
     deleteAcceptedClanApplications,
+    deleteClan,
     deleteClanApplication,
     deleteCocAccount,
+    deleteCocAccountsBulk,
     deleteCwlApplicationsBulk,
     deleteCwlClan,
     getAdminUsers,
@@ -1398,7 +1399,7 @@ app.delete(
     describeRoute({
         operationId: "deleteCocAccount",
         description:
-            "[Admin] Permanently unlinks a Clash of Clans account. Cascades to that account's CWL applications. Deletion is an admin-only (sudo) power.",
+            "[Admin] Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications. Deletion is an admin-only (sudo) power.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1426,6 +1427,47 @@ app.delete(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete COC account" }, 500);
+        }
+    },
+);
+
+const bulkDeleteCocAccountsBodySchema = z4.object({
+    ids: z4.array(z4.number().int().min(1)).min(1).max(200),
+});
+const bulkDeleteCocAccountsData = z4.object({
+    count: z4.number(),
+});
+app.post(
+    "/coc-accounts/delete-bulk",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "deleteCocAccountsBulk",
+        description:
+            "[Admin] Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications. Deletion is an admin-only (sudo) power.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Number of accounts deleted.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(bulkDeleteCocAccountsData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", bulkDeleteCocAccountsBodySchema),
+    async (c) => {
+        try {
+            const { ids } = c.req.valid("json");
+            const result = await deleteCocAccountsBulk(ids);
+            logAction(c, {
+                action: "coc_account.bulk_delete",
+                targetType: "coc_account",
+                metadata: { count: result.count, cocAccountTags: result.accounts.map((a) => a.cocAccountTag) },
+            });
+            return c.json({ success: true, data: { count: result.count } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to delete COC accounts" }, 500);
         }
     },
 );

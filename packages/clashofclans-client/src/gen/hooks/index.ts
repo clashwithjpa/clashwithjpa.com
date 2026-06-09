@@ -8,6 +8,7 @@ export type { CreateAdminCwlClanMutationKey } from "./createCreateAdminCwlClan.t
 export type { DeleteAdminClanMutationKey } from "./createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./createDeleteAdminCwlClan.ts";
 export type { DeleteCocAccountMutationKey } from "./createDeleteCocAccount.ts";
+export type { DeleteCocAccountsBulkMutationKey } from "./createDeleteCocAccountsBulk.ts";
 export type { DeleteCwlApplicationsBulkMutationKey } from "./createDeleteCwlApplicationsBulk.ts";
 export type { DeleteJoinApplicationMutationKey } from "./createDeleteJoinApplication.ts";
 export type { GetAdminClansQueryKey } from "./createGetAdminClans.ts";
@@ -67,6 +68,8 @@ export { createDeleteAdminCwlClan } from "./createDeleteAdminCwlClan.ts";
 export { deleteAdminCwlClanMutationKey } from "./createDeleteAdminCwlClan.ts";
 export { createDeleteCocAccount } from "./createDeleteCocAccount.ts";
 export { deleteCocAccountMutationKey } from "./createDeleteCocAccount.ts";
+export { createDeleteCocAccountsBulk } from "./createDeleteCocAccountsBulk.ts";
+export { deleteCocAccountsBulkMutationKey } from "./createDeleteCocAccountsBulk.ts";
 export { createDeleteCwlApplicationsBulk } from "./createDeleteCwlApplicationsBulk.ts";
 export { deleteCwlApplicationsBulkMutationKey } from "./createDeleteCwlApplicationsBulk.ts";
 export { createDeleteJoinApplication } from "./createDeleteJoinApplication.ts";

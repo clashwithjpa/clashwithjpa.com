@@ -82,6 +82,13 @@ export {
     deleteCocAccountPathParamsSchema,
 } from "./deleteCocAccountSchema.ts";
 export {
+    deleteCocAccountsBulk200Schema,
+    deleteCocAccountsBulk401Schema,
+    deleteCocAccountsBulk500Schema,
+    deleteCocAccountsBulkMutationRequestSchema,
+    deleteCocAccountsBulkMutationResponseSchema,
+} from "./deleteCocAccountsBulkSchema.ts";
+export {
     deleteCwlApplicationsBulk200Schema,
     deleteCwlApplicationsBulk401Schema,
     deleteCwlApplicationsBulk500Schema,

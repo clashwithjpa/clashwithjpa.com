@@ -5,6 +5,7 @@
     import CocOwnerCell from "$lib/components/grid/CocOwnerCell.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
@@ -13,6 +14,7 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import { fadeIn } from "$lib/utils/animations";
     import {
+        deleteCocAccountsBulk,
         getAdminCocAccounts,
         syncCocAccounts,
         updateCocAccountExternal,
@@ -21,10 +23,14 @@
     } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import { toast } from "svelte-sonner";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCheck from "~icons/tabler/check";
     import TablerCopy from "~icons/tabler/copy";
+    import TablerDownload from "~icons/tabler/download";
     import TablerSearch from "~icons/tabler/search";
     import TablerTableDashed from "~icons/tabler/table-dashed";
+    import TablerTrash from "~icons/tabler/trash";
+    import TablerX from "~icons/tabler/x";
 
     type SyncResult = {
         updated: number;
@@ -33,8 +39,13 @@
         notInSheet: { cocAccountTag: string; ownerName: string | null }[];
     };
 
+    let { data }: { data: { canDelete: boolean } } = $props();
+
     let gridApi: GridApi | null = $state(null);
     let searchText = $state("");
+    let selectedIds = $state<number[]>([]);
+    let bulkProcessing = $state(false);
+    let downloading = $state(false);
     let syncDialogOpen = $state(false);
     let sheetUrl = $state("");
     let syncResult = $state<SyncResult | null>(null);
@@ -124,6 +135,104 @@
         }
     }
 
+    function clearSelection() {
+        gridApi?.deselectAll();
+        selectedIds = [];
+    }
+
+    // The bulk delete endpoint caps each request at 200 ids, so split larger
+    // selections into sequential batches.
+    const BULK_BATCH_SIZE = 200;
+    function chunk<T>(items: T[], size: number): T[][] {
+        const batches: T[][] = [];
+        for (let i = 0; i < items.length; i += size) batches.push(items.slice(i, i + size));
+        return batches;
+    }
+
+    async function bulkDelete() {
+        if (selectedIds.length === 0) return;
+        bulkProcessing = true;
+        const ids = selectedIds;
+        try {
+            let count = 0;
+            for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
+                const resp = await deleteCocAccountsBulk(
+                    { ids: batch },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                );
+                if (!resp.success) throw new Error("Failed to delete accounts");
+                count += resp.data.count;
+            }
+            toast.success(`${count} account${count === 1 ? "" : "s"} deleted`);
+            clearSelection();
+            // Refresh the loaded blocks in place; replacing the datasource would
+            // purge the whole cache and reset scroll, making the table "reshuffle".
+            gridApi?.refreshInfiniteCache();
+        } catch (error) {
+            toast.error("Failed to delete accounts", { description: error instanceof Error ? error.message : undefined });
+            // A later batch may have failed after earlier ones succeeded; resync.
+            gridApi?.refreshInfiniteCache();
+        } finally {
+            bulkProcessing = false;
+        }
+    }
+
+    // Wraps a CSV cell so commas, quotes and newlines survive a round-trip.
+    function csvCell(value: unknown): string {
+        const s = value == null ? "" : String(value);
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    // Columns mirror the Google Sheet import shape (see syncCocAccounts), so an
+    // exported file can be edited and synced straight back in.
+    const CSV_COLUMNS: { header: string; field: string }[] = [
+        { header: "Tag", field: "cocAccountTag" },
+        { header: "Discord ID", field: "discordUserId" },
+        { header: "Current Clan", field: "currentClan" },
+        { header: "Town Hall", field: "townHall" },
+        { header: "Total Donated", field: "totalDonated" },
+        { header: "Total Received", field: "totalReceived" },
+        { header: "Clan Games", field: "clanGames" },
+        { header: "Capital Gold Looted", field: "capitalGoldLooted" },
+        { header: "Capital Gold Contributed", field: "capitalGoldContributed" },
+        { header: "Activity Score", field: "activityScore" },
+    ];
+
+    async function downloadCsv() {
+        downloading = true;
+        const toastId = toast.loading("Preparing CSV…");
+        try {
+            const PAGE = 200;
+            const rows: Record<string, unknown>[] = [];
+            for (let offset = 0; ; offset += PAGE) {
+                const resp = await getAdminCocAccounts(
+                    { limit: PAGE, offset, search: searchText || undefined },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
+                );
+                if (!resp.success) throw new Error("Failed to load accounts");
+                rows.push(...resp.data.accounts);
+                if (rows.length >= resp.data.total || resp.data.accounts.length === 0) break;
+            }
+
+            const lines = [
+                CSV_COLUMNS.map((c) => csvCell(c.header)).join(","),
+                ...rows.map((r) => CSV_COLUMNS.map((c) => csvCell(r[c.field])).join(",")),
+            ];
+            const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `coc-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success(`Exported ${rows.length} account${rows.length === 1 ? "" : "s"}`, { id: toastId });
+        } catch (error) {
+            toast.error("Failed to export CSV", { id: toastId, description: error instanceof Error ? error.message : undefined });
+        } finally {
+            downloading = false;
+        }
+    }
+
     const formatNumber = (p: { value: unknown }) => (p.value != null ? Number(p.value).toLocaleString() : "");
 
     // Sheet-synced columns that are manually editable in the grid (see updateCocAccountStats).
@@ -140,9 +249,13 @@
             rowModelType: "infinite",
             cacheBlockSize: 50,
             blockLoadDebounceMillis: 300,
+            rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
             onGridReady: (params) => {
                 gridApi = params.api;
                 gridApi.setGridOption("datasource", createDatasource());
+            },
+            onSelectionChanged: (event) => {
+                selectedIds = event.api.getSelectedRows().map((r) => r.id);
             },
             onCellValueChanged: async (event) => {
                 if (event.oldValue === event.newValue) return;
@@ -271,7 +384,7 @@
                 minWidth: 160,
                 editable: true,
                 cellEditor: "uiInputEditor",
-                valueFormatter: (p) => p.value ?? "—",
+                valueFormatter: (p) => p.value ?? "",
             },
             {
                 headerName: "War Weight",
@@ -280,6 +393,7 @@
                 filter: false,
                 flex: 1,
                 editable: true,
+                sort: "desc",
                 cellEditor: "uiInputEditor",
                 cellEditorParams: { type: "number" },
                 valueParser: (p) => Number(p.newValue),
@@ -377,14 +491,62 @@
         ]}
     />
 
-    <Toolbar>
-        <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
-        <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
-            <TablerSearch class="size-5" />
-        </Button>
-        <Button variant="base" class="shrink-0" onclick={() => (syncDialogOpen = true)} tooltip="Sync from Google Sheet" tooltipPlacement="top">
-            <TablerTableDashed class="size-5" />
-        </Button>
+    <Toolbar class="w-full flex-wrap sm:w-auto sm:flex-nowrap">
+        {#if selectedIds.length > 0}
+            <div class="flex shrink-0 items-center gap-2">
+                <span class="px-2 text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
+                {#if data.canDelete}
+                    <ConfirmationDialog
+                        title="Delete accounts?"
+                        description="Permanently delete {selectedIds.length} selected Clash of Clans account{selectedIds.length === 1
+                            ? ''
+                            : 's'}. This also removes their CWL applications and cannot be undone."
+                        confirmText="Delete accounts"
+                        onConfirm={bulkDelete}
+                    >
+                        <Button variant="danger" class="shrink-0" disabled={bulkProcessing} tooltip="Delete selected" tooltipPlacement="top">
+                            {#if bulkProcessing}
+                                <SvgSpinnersRingResize class="size-5" />
+                            {:else}
+                                <TablerTrash class="size-5" />
+                            {/if}
+                        </Button>
+                    </ConfirmationDialog>
+                {/if}
+                <Button
+                    variant="ghost"
+                    class="shrink-0"
+                    disabled={bulkProcessing}
+                    onclick={clearSelection}
+                    tooltip="Clear selection"
+                    tooltipPlacement="top"
+                >
+                    <TablerX class="size-5" />
+                </Button>
+            </div>
+            <div class="hidden h-8 w-px shrink-0 bg-stone-700 sm:block"></div>
+        {/if}
+        <div class="flex w-full items-center gap-2 sm:w-auto">
+            <Input
+                placeholder="Search anything..."
+                bind:value={searchText}
+                onchange={handleSearchChange}
+                class="min-w-0 flex-1 sm:w-64 sm:flex-none lg:w-80"
+            />
+            <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
+                <TablerSearch class="size-5" />
+            </Button>
+            <Button variant="base" class="shrink-0" onclick={() => (syncDialogOpen = true)} tooltip="Sync from Google Sheet" tooltipPlacement="top">
+                <TablerTableDashed class="size-5" />
+            </Button>
+            <Button variant="base" class="shrink-0" disabled={downloading} onclick={downloadCsv} tooltip="Download as CSV" tooltipPlacement="top">
+                {#if downloading}
+                    <SvgSpinnersRingResize class="size-5" />
+                {:else}
+                    <TablerDownload class="size-5" />
+                {/if}
+            </Button>
+        </div>
     </Toolbar>
 </div>
 

@@ -92,6 +92,14 @@ export type {
     DeleteCocAccountPathParams,
 } from "./DeleteCocAccount.ts";
 export type {
+    DeleteCocAccountsBulk200,
+    DeleteCocAccountsBulk401,
+    DeleteCocAccountsBulk500,
+    DeleteCocAccountsBulkMutation,
+    DeleteCocAccountsBulkMutationRequest,
+    DeleteCocAccountsBulkMutationResponse,
+} from "./DeleteCocAccountsBulk.ts";
+export type {
     DeleteCwlApplicationsBulk200,
     DeleteCwlApplicationsBulk401,
     DeleteCwlApplicationsBulk500,

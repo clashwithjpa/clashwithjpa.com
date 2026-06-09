@@ -463,7 +463,10 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
     } as const;
     const sortColumn = sortBy && sortBy in sortColumns ? sortColumns[sortBy as keyof typeof sortColumns] : null;
     // Default to heaviest war weight first when no explicit sort is requested.
-    const orderBy = sortColumn ? (sortDir === "asc" ? asc(sortColumn) : desc(sortColumn)) : desc(cocAccountTable.warWeight);
+    const primaryOrder = sortColumn ? (sortDir === "asc" ? asc(sortColumn) : desc(sortColumn)) : desc(cocAccountTable.warWeight);
+    // Tiebreak on id so rows with equal sort values keep a stable order across
+    // paged re-fetches (otherwise they swap places when the grid refreshes).
+    const orderBy = [primaryOrder, asc(cocAccountTable.id)];
 
     // cocAccountTable.discordUserId stores the Discord accountId; join the
     // better-auth account table to resolve the owning user, then the user table
@@ -501,7 +504,7 @@ export async function getAllCocAccounts(opts: { search?: string; limit?: number;
             .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
             .leftJoin(user, eq(user.id, account.userId))
             .where(whereClause)
-            .orderBy(orderBy)
+            .orderBy(...orderBy)
             .limit(limit)
             .offset(offset),
         db
@@ -645,11 +648,22 @@ export async function updateCocAccountStats(id: number, values: CocAccountStatsU
     return result[0] ?? null;
 }
 
-// Admin-only: permanently unlink a CoC account. Cascades to that tag's CWL
+// Admin-only: permanently delete a CoC account. Cascades to that tag's CWL
 // applications (cwlApplicationTable.cocAccountTag has onDelete: "cascade").
 export async function deleteCocAccount(id: number) {
     const result = await db.delete(cocAccountTable).where(eq(cocAccountTable.id, id)).returning();
     return result[0] ?? null;
+}
+
+// Admin-only: permanently delete many CoC accounts in a single statement.
+// Cascades to each tag's CWL applications. Returns the deleted ids and tags.
+export async function deleteCocAccountsBulk(ids: number[]) {
+    if (ids.length === 0) return { count: 0, accounts: [] as { id: number; cocAccountTag: string }[] };
+    const deleted = await db
+        .delete(cocAccountTable)
+        .where(inArray(cocAccountTable.id, ids))
+        .returning({ id: cocAccountTable.id, cocAccountTag: cocAccountTable.cocAccountTag });
+    return { count: deleted.length, accounts: deleted };
 }
 
 // Member self-service: convert one of their OWN accounts to external (one-way).

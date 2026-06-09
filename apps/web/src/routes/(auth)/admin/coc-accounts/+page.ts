@@ -10,5 +10,8 @@ export const load: PageLoad = async () => {
         throw error(401, "Unauthorized");
     }
 
-    return { session };
+    // Deleting accounts is an admin-only (sudo) power, mirroring the server gate.
+    const canDelete = await hasPermission(session.data?.user?.id, "sudo");
+
+    return { session, canDelete };
 };

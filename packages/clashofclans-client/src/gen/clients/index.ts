@@ -8,6 +8,7 @@ export { createAdminCwlClan } from "./createAdminCwlClan.ts";
 export { deleteAdminClan } from "./deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./deleteAdminCwlClan.ts";
 export { deleteCocAccount } from "./deleteCocAccount.ts";
+export { deleteCocAccountsBulk } from "./deleteCocAccountsBulk.ts";
 export { deleteCwlApplicationsBulk } from "./deleteCwlApplicationsBulk.ts";
 export { deleteJoinApplication } from "./deleteJoinApplication.ts";
 export { getAdminClans } from "./getAdminClans.ts";

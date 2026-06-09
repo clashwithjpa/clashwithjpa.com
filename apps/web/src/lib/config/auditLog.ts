@@ -249,10 +249,24 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
             `synced stats for ${m.updated ?? "?"} account${m.updated === 1 ? "" : "s"} from a sheet${m.notLinked ? ` (${m.notLinked} not linked)` : ""}`,
     },
     "coc_account.delete": {
-        label: "COC account · unlinked",
+        label: "COC account · deleted",
         icon: TablerTrash,
         variant: "red",
-        describe: (m) => `unlinked COC account ${m.cocAccountTag ?? "?"}`,
+        describe: (m) => `deleted COC account ${m.cocAccountTag ?? "?"}`,
+    },
+    "coc_account.bulk_delete": {
+        label: "COC account · bulk deleted",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m) => {
+            const tags = Array.isArray(m.cocAccountTags) ? (m.cocAccountTags as string[]) : [];
+            const count = typeof m.count === "number" ? m.count : tags.length;
+            // Show the tags when the list is short enough to stay readable, mirroring
+            // the single delete; otherwise fall back to a plain count.
+            const shown = tags.slice(0, 5);
+            const suffix = shown.length ? ` (${shown.join(", ")}${tags.length > shown.length ? `, +${tags.length - shown.length} more` : ""})` : "";
+            return `deleted ${count} COC account${count === 1 ? "" : "s"}${suffix}`;
+        },
     },
     "user.role_set": {
         label: "User · role set",

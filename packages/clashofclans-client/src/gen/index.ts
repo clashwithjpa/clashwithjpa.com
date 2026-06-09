@@ -8,6 +8,7 @@ export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwl
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
 export type { DeleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
+export type { DeleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
 export type { DeleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
 export type { DeleteJoinApplicationMutationKey } from "./hooks/createDeleteJoinApplication.ts";
 export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
@@ -140,6 +141,14 @@ export type {
     DeleteCocAccountMutationResponse,
     DeleteCocAccountPathParams,
 } from "./models/DeleteCocAccount.ts";
+export type {
+    DeleteCocAccountsBulk200,
+    DeleteCocAccountsBulk401,
+    DeleteCocAccountsBulk500,
+    DeleteCocAccountsBulkMutation,
+    DeleteCocAccountsBulkMutationRequest,
+    DeleteCocAccountsBulkMutationResponse,
+} from "./models/DeleteCocAccountsBulk.ts";
 export type {
     DeleteCwlApplicationsBulk200,
     DeleteCwlApplicationsBulk401,
@@ -444,6 +453,7 @@ export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
 export { deleteCocAccount } from "./clients/deleteCocAccount.ts";
+export { deleteCocAccountsBulk } from "./clients/deleteCocAccountsBulk.ts";
 export { deleteCwlApplicationsBulk } from "./clients/deleteCwlApplicationsBulk.ts";
 export { deleteJoinApplication } from "./clients/deleteJoinApplication.ts";
 export { getAdminClans } from "./clients/getAdminClans.ts";
@@ -503,6 +513,8 @@ export { createDeleteAdminCwlClan } from "./hooks/createDeleteAdminCwlClan.ts";
 export { deleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
 export { createDeleteCocAccount } from "./hooks/createDeleteCocAccount.ts";
 export { deleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
+export { createDeleteCocAccountsBulk } from "./hooks/createDeleteCocAccountsBulk.ts";
+export { deleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
 export { createDeleteCwlApplicationsBulk } from "./hooks/createDeleteCwlApplicationsBulk.ts";
 export { deleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
 export { createDeleteJoinApplication } from "./hooks/createDeleteJoinApplication.ts";
@@ -718,6 +730,13 @@ export {
     deleteCocAccountMutationResponseSchema,
     deleteCocAccountPathParamsSchema,
 } from "./zod/deleteCocAccountSchema.ts";
+export {
+    deleteCocAccountsBulk200Schema,
+    deleteCocAccountsBulk401Schema,
+    deleteCocAccountsBulk500Schema,
+    deleteCocAccountsBulkMutationRequestSchema,
+    deleteCocAccountsBulkMutationResponseSchema,
+} from "./zod/deleteCocAccountsBulkSchema.ts";
 export {
     deleteCwlApplicationsBulk200Schema,
     deleteCwlApplicationsBulk401Schema,
