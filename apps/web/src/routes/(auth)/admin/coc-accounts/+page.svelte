@@ -12,7 +12,13 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import { fadeIn } from "$lib/utils/animations";
-    import { getAdminCocAccounts, syncCocAccounts, updateCocAccountExternal, updateCocAccountWarWeight } from "@repo/clashofclans-client";
+    import {
+        getAdminCocAccounts,
+        syncCocAccounts,
+        updateCocAccountExternal,
+        updateCocAccountStats,
+        updateCocAccountWarWeight,
+    } from "@repo/clashofclans-client";
     import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import { toast } from "svelte-sonner";
     import TablerCheck from "~icons/tabler/check";
@@ -119,6 +125,9 @@
     }
 
     const formatNumber = (p: { value: unknown }) => (p.value != null ? Number(p.value).toLocaleString() : "");
+
+    // Sheet-synced columns that are manually editable in the grid (see updateCocAccountStats).
+    const STAT_FIELDS = ["currentClan", "totalDonated", "totalReceived", "clanGames", "capitalGoldLooted", "capitalGoldContributed", "activityScore"];
 </script>
 
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
@@ -190,6 +199,48 @@
                     }
                     return;
                 }
+
+                // Sheet-synced stat columns are edited one cell at a time and patched individually.
+                // A later Google Sheet sync will overwrite these manual edits.
+                const field = event.colDef.field;
+                if (field && STAT_FIELDS.includes(field)) {
+                    let value: string | number | null;
+                    if (field === "currentClan") {
+                        const text = String(event.newValue ?? "").trim();
+                        value = text === "" ? null : text;
+                    } else {
+                        const n = Number(event.newValue);
+                        if (!Number.isInteger(n) || n < 0) {
+                            toast.error(`${event.colDef.headerName} must be a non-negative whole number`);
+                            event.data[field] = event.oldValue;
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                            return;
+                        }
+                        value = n;
+                    }
+
+                    try {
+                        const resp = await updateCocAccountStats(
+                            event.data.id,
+                            { [field]: value },
+                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                        );
+                        if (resp.success) {
+                            event.data[field] = (resp.data.account as Record<string, unknown>)[field];
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                            toast.success(`${event.colDef.headerName} updated for ${event.data.cocAccountTag}`);
+                        } else {
+                            throw new Error();
+                        }
+                    } catch (error) {
+                        toast.error(`Failed to update ${event.colDef.headerName?.toLowerCase()}`, {
+                            description: error instanceof Error ? error.message : undefined,
+                        });
+                        event.data[field] = event.oldValue;
+                        event.api.refreshCells({ rowNodes: [event.node], force: true });
+                    }
+                    return;
+                }
             },
         }}
         columnDefs={[
@@ -218,6 +269,8 @@
                 filter: false,
                 flex: 2,
                 minWidth: 160,
+                editable: true,
+                cellEditor: "uiInputEditor",
                 valueFormatter: (p) => p.value ?? "—",
             },
             {
@@ -250,6 +303,10 @@
                 filter: false,
                 flex: 1,
                 minWidth: 130,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
                 valueFormatter: formatNumber,
             },
             {
@@ -259,9 +316,25 @@
                 filter: false,
                 flex: 1,
                 minWidth: 130,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
                 valueFormatter: formatNumber,
             },
-            { headerName: "Clan Games", field: "clanGames", sortable: true, filter: false, flex: 1, minWidth: 120, valueFormatter: formatNumber },
+            {
+                headerName: "Clan Games",
+                field: "clanGames",
+                sortable: true,
+                filter: false,
+                flex: 1,
+                minWidth: 120,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
+                valueFormatter: formatNumber,
+            },
             {
                 headerName: "Capital Looted",
                 field: "capitalGoldLooted",
@@ -269,6 +342,10 @@
                 filter: false,
                 flex: 1,
                 minWidth: 140,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
                 valueFormatter: formatNumber,
             },
             {
@@ -278,6 +355,10 @@
                 filter: false,
                 flex: 1,
                 minWidth: 160,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
                 valueFormatter: formatNumber,
             },
             {
@@ -287,6 +368,10 @@
                 filter: false,
                 flex: 1,
                 minWidth: 130,
+                editable: true,
+                cellEditor: "uiInputEditor",
+                cellEditorParams: { type: "number" },
+                valueParser: (p) => Number(p.newValue),
                 valueFormatter: formatNumber,
             },
         ]}

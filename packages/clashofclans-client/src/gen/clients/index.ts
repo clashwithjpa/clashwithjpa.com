@@ -44,5 +44,6 @@ export { updateAdminClan } from "./updateAdminClan.ts";
 export { updateAdminCwlClan } from "./updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./updateCocAccountExternal.ts";
+export { updateCocAccountStats } from "./updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./updateCocAccountWarWeight.ts";
 export { updateJoinApplicationStatus } from "./updateJoinApplicationStatus.ts";

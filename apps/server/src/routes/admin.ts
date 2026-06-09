@@ -27,6 +27,7 @@ import {
     updateClan,
     updateClanApplicationStatus,
     updateCocAccountExternal,
+    updateCocAccountStats,
     updateCocAccountWarWeight,
     updateCwlClan,
     updateSettings,
@@ -1272,10 +1273,10 @@ app.put(
             const account = await updateCocAccountWarWeight(id, warWeight);
             if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
             logAction(c, {
-                action: "coc_account.weight_update",
+                action: "coc_account.stats_update",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, warWeight: account.warWeight },
+                metadata: { cocAccountTag: account.cocAccountTag, fields: ["warWeight"], warWeight: account.warWeight },
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -1327,6 +1328,63 @@ app.put(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update external status" }, 500);
+        }
+    },
+);
+
+const updateCocAccountStatsBodySchema = z4
+    .object({
+        currentClan: z4.string().nullable(),
+        totalDonated: z4.number().int().min(0),
+        totalReceived: z4.number().int().min(0),
+        clanGames: z4.number().int().min(0),
+        capitalGoldLooted: z4.number().int().min(0),
+        capitalGoldContributed: z4.number().int().min(0),
+        activityScore: z4.number().int().min(0),
+    })
+    // Grid edits one cell at a time, so every field is optional; at least one is required.
+    .partial()
+    .refine((v) => Object.keys(v).length > 0, { message: "No fields to update" });
+const updateCocAccountStatsData = z4.object({
+    account: cocAccountSchema,
+});
+app.put(
+    "/coc-accounts/:id/stats",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "updateCocAccountStats",
+        description:
+            "[Manager] Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated COC account.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCocAccountStatsData)) } },
+            },
+            400: { description: "Invalid request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", cocAccountIdPathSchema),
+    zValidator("json", updateCocAccountStatsBodySchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const values = c.req.valid("json");
+            const account = await updateCocAccountStats(id, values);
+            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            logAction(c, {
+                action: "coc_account.stats_update",
+                targetType: "coc_account",
+                targetId: account.id,
+                metadata: { cocAccountTag: account.cocAccountTag, fields: Object.keys(values) },
+            });
+            return c.json({ success: true, data: { account } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update COC account" }, 500);
         }
     },
 );

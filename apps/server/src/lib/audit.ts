@@ -28,7 +28,7 @@ export const AUDIT_ACTIONS = [
     "cwl_clan.sync_leagues",
     "coc_account.create",
     "coc_account.import",
-    "coc_account.weight_update",
+    "coc_account.stats_update",
     "coc_account.mark_main",
     "coc_account.mark_external",
     "coc_account.sync",

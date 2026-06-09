@@ -628,6 +628,23 @@ export async function updateCocAccountExternal(id: number, isExternal: boolean) 
     return result[0] ?? null;
 }
 
+// Admin-only: manually edit the sheet-synced stat columns from the grid.
+// Only the provided fields are written, so a single-cell edit touches one column.
+// The next sheet sync will overwrite these with the sheet's values.
+export type CocAccountStatsUpdate = Partial<{
+    currentClan: string | null;
+    totalDonated: number;
+    totalReceived: number;
+    clanGames: number;
+    capitalGoldLooted: number;
+    capitalGoldContributed: number;
+    activityScore: number;
+}>;
+export async function updateCocAccountStats(id: number, values: CocAccountStatsUpdate) {
+    const result = await db.update(cocAccountTable).set(values).where(eq(cocAccountTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
 // Admin-only: permanently unlink a CoC account. Cascades to that tag's CWL
 // applications (cwlApplicationTable.cocAccountTag has onDelete: "cascade").
 export async function deleteCocAccount(id: number) {

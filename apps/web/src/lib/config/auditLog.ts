@@ -17,7 +17,6 @@ import TablerLogout from "~icons/tabler/logout";
 import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerPlus from "~icons/tabler/plus";
 import TablerRefresh from "~icons/tabler/refresh";
-import TablerScale from "~icons/tabler/scale";
 import TablerSend from "~icons/tabler/send";
 import TablerSettings from "~icons/tabler/settings";
 import TablerShieldCheck from "~icons/tabler/shield-check";
@@ -217,11 +216,18 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "blue",
         describe: (m) => `imported ${m.count ?? "?"} COC account${m.count === 1 ? "" : "s"}`,
     },
-    "coc_account.weight_update": {
-        label: "COC account · war weight",
-        icon: TablerScale,
+    "coc_account.stats_update": {
+        label: "COC account · stats edited",
+        icon: TablerEdit,
         variant: "yellow",
-        describe: (m) => `set the war weight of ${m.cocAccountTag ?? "?"} to ${m.warWeight ?? "?"}`,
+        describe: (m) => {
+            // War weight edits log through this action too, with the value in metadata.
+            if (m.warWeight != null && Array.isArray(m.fields) && m.fields.length === 1 && m.fields[0] === "warWeight")
+                return `set the war weight of ${m.cocAccountTag ?? "?"} to ${m.warWeight}`;
+            return Array.isArray(m.fields) && m.fields.length
+                ? `edited stats for ${m.cocAccountTag ?? "?"} (${m.fields.join(", ")})`
+                : `edited stats for ${m.cocAccountTag ?? "?"}`;
+        },
     },
     "coc_account.mark_external": {
         label: "COC account · marked external",

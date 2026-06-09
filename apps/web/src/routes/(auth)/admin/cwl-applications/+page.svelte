@@ -377,16 +377,15 @@
                             </div>
                             <Button
                                 variant="success"
-                                size="icon"
                                 disabled={bulkProcessing || !bulkClan}
                                 onclick={bulkAssign}
                                 tooltip="Assign to clan"
                                 tooltipPlacement="bottom"
                             >
                                 {#if bulkProcessing}
-                                    <SvgSpinnersRingResize />
+                                    <SvgSpinnersRingResize class="size-5" />
                                 {:else}
-                                    <TablerCheck />
+                                    <TablerCheck class="size-5" />
                                 {/if}
                             </Button>
                             {#if data.canDelete}
@@ -398,26 +397,19 @@
                                     confirmText="Delete"
                                     onConfirm={bulkDelete}
                                 >
-                                    <Button
-                                        variant="danger"
-                                        size="icon"
-                                        disabled={bulkProcessing}
-                                        tooltip="Delete selected"
-                                        tooltipPlacement="bottom"
-                                    >
-                                        <TablerTrash />
+                                    <Button variant="danger" disabled={bulkProcessing} tooltip="Delete selected" tooltipPlacement="bottom">
+                                        <TablerTrash class="size-5" />
                                     </Button>
                                 </ConfirmationDialog>
                             {/if}
                             <Button
                                 variant="ghost"
-                                size="icon"
                                 disabled={bulkProcessing}
                                 onclick={clearSelection}
                                 tooltip="Clear selection"
                                 tooltipPlacement="bottom"
                             >
-                                <TablerX />
+                                <TablerX class="size-5" />
                             </Button>
                         </div>
                     </div>

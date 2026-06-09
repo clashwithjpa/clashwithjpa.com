@@ -353,6 +353,17 @@ export type {
     UpdateCocAccountExternalPathParams,
 } from "./UpdateCocAccountExternal.ts";
 export type {
+    UpdateCocAccountStats200,
+    UpdateCocAccountStats400,
+    UpdateCocAccountStats401,
+    UpdateCocAccountStats404,
+    UpdateCocAccountStats500,
+    UpdateCocAccountStatsMutation,
+    UpdateCocAccountStatsMutationRequest,
+    UpdateCocAccountStatsMutationResponse,
+    UpdateCocAccountStatsPathParams,
+} from "./UpdateCocAccountStats.ts";
+export type {
     UpdateCocAccountWarWeight200,
     UpdateCocAccountWarWeight401,
     UpdateCocAccountWarWeight404,

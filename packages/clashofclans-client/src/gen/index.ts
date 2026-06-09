@@ -44,6 +44,7 @@ export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.t
 export type { UpdateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
 export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
+export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type {
@@ -401,6 +402,17 @@ export type {
     UpdateCocAccountExternalPathParams,
 } from "./models/UpdateCocAccountExternal.ts";
 export type {
+    UpdateCocAccountStats200,
+    UpdateCocAccountStats400,
+    UpdateCocAccountStats401,
+    UpdateCocAccountStats404,
+    UpdateCocAccountStats500,
+    UpdateCocAccountStatsMutation,
+    UpdateCocAccountStatsMutationRequest,
+    UpdateCocAccountStatsMutationResponse,
+    UpdateCocAccountStatsPathParams,
+} from "./models/UpdateCocAccountStats.ts";
+export type {
     UpdateCocAccountWarWeight200,
     UpdateCocAccountWarWeight401,
     UpdateCocAccountWarWeight404,
@@ -468,6 +480,7 @@ export { updateAdminClan } from "./clients/updateAdminClan.ts";
 export { updateAdminCwlClan } from "./clients/updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
+export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
@@ -586,6 +599,8 @@ export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts"
 export { updateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
 export { createUpdateCocAccountExternal } from "./hooks/createUpdateCocAccountExternal.ts";
 export { updateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
+export { createUpdateCocAccountStats } from "./hooks/createUpdateCocAccountStats.ts";
+export { updateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
@@ -907,6 +922,16 @@ export {
     updateCocAccountExternalMutationResponseSchema,
     updateCocAccountExternalPathParamsSchema,
 } from "./zod/updateCocAccountExternalSchema.ts";
+export {
+    updateCocAccountStats200Schema,
+    updateCocAccountStats400Schema,
+    updateCocAccountStats401Schema,
+    updateCocAccountStats404Schema,
+    updateCocAccountStats500Schema,
+    updateCocAccountStatsMutationRequestSchema,
+    updateCocAccountStatsMutationResponseSchema,
+    updateCocAccountStatsPathParamsSchema,
+} from "./zod/updateCocAccountStatsSchema.ts";
 export {
     updateCocAccountWarWeight200Schema,
     updateCocAccountWarWeight401Schema,

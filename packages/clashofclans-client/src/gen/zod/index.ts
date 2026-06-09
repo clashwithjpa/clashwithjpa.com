@@ -271,6 +271,16 @@ export {
     updateCocAccountExternalPathParamsSchema,
 } from "./updateCocAccountExternalSchema.ts";
 export {
+    updateCocAccountStats200Schema,
+    updateCocAccountStats400Schema,
+    updateCocAccountStats401Schema,
+    updateCocAccountStats404Schema,
+    updateCocAccountStats500Schema,
+    updateCocAccountStatsMutationRequestSchema,
+    updateCocAccountStatsMutationResponseSchema,
+    updateCocAccountStatsPathParamsSchema,
+} from "./updateCocAccountStatsSchema.ts";
+export {
     updateCocAccountWarWeight200Schema,
     updateCocAccountWarWeight401Schema,
     updateCocAccountWarWeight404Schema,
