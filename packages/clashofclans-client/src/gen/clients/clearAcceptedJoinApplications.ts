@@ -17,7 +17,7 @@ function getClearAcceptedJoinApplicationsUrl() {
 }
 
 /**
- * @description [Reviewer] Deletes all accepted clan join applications.
+ * @description [Admin] Deletes all accepted clan join applications. Deletion is an admin-only (sudo) power.
  * {@link /admin/join-applications/accepted}
  */
 export async function clearAcceptedJoinApplications(config: Partial<RequestConfig> & { client?: Client } = {}) {

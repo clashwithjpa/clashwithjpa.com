@@ -19,7 +19,7 @@ function getDeleteJoinApplicationUrl(id: DeleteJoinApplicationPathParams["id"]) 
 }
 
 /**
- * @description [Reviewer] Permanently deletes a single clan join application.
+ * @description [Admin] Permanently deletes a single clan join application. Deletion is an admin-only (sudo) power.
  * {@link /admin/join-applications/:id}
  */
 export async function deleteJoinApplication(id: DeleteJoinApplicationPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {

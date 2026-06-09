@@ -20,7 +20,7 @@ export const deleteJoinApplicationMutationKey = () => [{ url: "/admin/join-appli
 export type DeleteJoinApplicationMutationKey = ReturnType<typeof deleteJoinApplicationMutationKey>;
 
 /**
- * @description [Reviewer] Permanently deletes a single clan join application.
+ * @description [Admin] Permanently deletes a single clan join application. Deletion is an admin-only (sudo) power.
  * {@link /admin/join-applications/:id}
  */
 export function createDeleteJoinApplication<TContext>(

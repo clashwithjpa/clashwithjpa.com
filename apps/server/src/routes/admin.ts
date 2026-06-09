@@ -235,10 +235,10 @@ app.put(
 const clearAcceptedJoinApplicationsData = z4.object({ deleted: z4.number() });
 app.delete(
     "/join-applications/accepted",
-    hasAccessAuthMiddleware(isReviewer),
+    hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "clearAcceptedJoinApplications",
-        description: "[Reviewer] Deletes all accepted clan join applications.",
+        description: "[Admin] Deletes all accepted clan join applications. Deletion is an admin-only (sudo) power.",
         tags: ["admin"],
         responses: {
             200: {
@@ -268,10 +268,10 @@ app.delete(
 const deleteJoinApplicationData = z4.object({ application: clanApplicationSchema });
 app.delete(
     "/join-applications/:id",
-    hasAccessAuthMiddleware(isReviewer),
+    hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteJoinApplication",
-        description: "[Reviewer] Permanently deletes a single clan join application.",
+        description: "[Admin] Permanently deletes a single clan join application. Deletion is an admin-only (sudo) power.",
         tags: ["admin"],
         responses: {
             200: {
