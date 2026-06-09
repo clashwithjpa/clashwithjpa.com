@@ -31,11 +31,12 @@
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
     import TablerDownload from "~icons/tabler/download";
     import TablerExternalLink from "~icons/tabler/external-link";
-    import TablerWorld from "~icons/tabler/world";
+    import TablerFilePlus from "~icons/tabler/file-plus";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerListNumbers from "~icons/tabler/list-numbers";
     import TablerMapPin from "~icons/tabler/map-pin";
     import TablerScale from "~icons/tabler/scale";
+    import TablerWorld from "~icons/tabler/world";
     import TablerX from "~icons/tabler/x";
 
     const session = authClient.useSession();
@@ -193,19 +194,55 @@
             <span>Linked Accounts</span>
         </div>
     {:else}
-        {#if accounts.length === 0}
-            {@render importBanner()}
-        {/if}
         <div in:fadeIn>
             <h1 class="text-2xl font-bold">Linked Accounts</h1>
             <br />
-            <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {#if accounts.length === 0}
-                    <div class="flex items-center justify-start gap-1 text-stone-400">
-                        <TablerX />
-                        <span>No linked accounts found</span>
-                    </div>
-                {:else}
+            {#if accounts.length === 0}
+                <div
+                    in:fadeIn
+                    use:cardSlideIn
+                    class="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
+                >
+                    {#if importDismissed}
+                        <div class="rounded-full bg-stone-800 p-3">
+                            <TablerX class="size-7 text-stone-400" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-lg font-semibold text-stone-100">No linked accounts</span>
+                            <span class="max-w-sm text-sm text-stone-400">
+                                You don't have any Clash accounts linked yet. Apply to link your accounts with JPA.
+                            </span>
+                        </div>
+                        <Button href="/dashboard/apply">
+                            <span class="flex items-center justify-center gap-2">
+                                <TablerFilePlus class="size-4" /> Apply
+                            </span>
+                        </Button>
+                    {:else}
+                        <div class="rounded-full bg-stone-800 p-3">
+                            <TablerDownload class="size-7 text-stone-300" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-lg font-semibold text-stone-100">Import your existing accounts</span>
+                            <span class="max-w-md text-sm text-stone-400">
+                                If you were previously a JPA member, we can link your Clash accounts automatically using your Discord ID.
+                            </span>
+                        </div>
+                        <Button disabled={isImporting} onclick={importAccounts}>
+                            {#if isImporting}
+                                <span class="flex items-center justify-center gap-2">
+                                    <SvgSpinnersRingResize class="size-4" /> Importing...
+                                </span>
+                            {:else}
+                                <span class="flex items-center justify-center gap-2">
+                                    <TablerDownload class="size-4" /> Import accounts
+                                </span>
+                            {/if}
+                        </Button>
+                    {/if}
+                </div>
+            {:else}
+                <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                     {#each accounts as account (account.id)}
                         <div
                             class="flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
@@ -277,8 +314,8 @@
                             {/if}
                         </div>
                     {/each}
-                {/if}
-            </div>
+                </div>
+            {/if}
         </div>
     {/if}
 {/if}

@@ -5,7 +5,7 @@
     import { getAuditLog, getCwlApplications, getJoinApplications } from "@repo/clashofclans-client";
     import type { AgCartesianChartOptions, AgPolarChartOptions } from "ag-charts-community";
     import { onMount } from "svelte";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerChartBarPopular from "~icons/tabler/chart-bar-popular";
 
     interface Props {
@@ -199,26 +199,28 @@
 </script>
 
 {#if canReview || canManage}
-    <div in:fadeIn class="flex flex-col gap-3">
-        <h2 class="flex items-center gap-2 text-2xl font-bold">Analytics</h2>
-        {#if loading}
-            <div class="flex items-center justify-start gap-2 text-stone-400">
-                <SvgSpinnersBlocksScale class="size-8" />
-                <span>Crunching numbers...</span>
-            </div>
-        {:else if charts.length === 0}
-            <div class="flex items-center justify-start gap-2 text-stone-400">
-                <TablerChartBarPopular class="size-5 text-stone-300" />
-                <span>No analytics data available</span>
-            </div>
-        {:else}
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {#each charts as options (options.title?.text)}
-                    <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
-                        <Chart {options} />
-                    </div>
-                {/each}
-            </div>
-        {/if}
-    </div>
+    {#if loading}
+        <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
+            <SvgSpinnersRingResize />
+            <span>Analytics</span>
+        </div>
+    {:else}
+        <div in:fadeIn class="flex flex-col gap-3">
+            <h2 class="text-2xl font-bold">Analytics</h2>
+            {#if charts.length === 0}
+                <div class="flex items-center justify-start gap-2 text-stone-400">
+                    <TablerChartBarPopular class="size-5 text-stone-300" />
+                    <span>No analytics data available</span>
+                </div>
+            {:else}
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {#each charts as options (options.title?.text)}
+                        <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            <Chart {options} />
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+    {/if}
 {/if}
