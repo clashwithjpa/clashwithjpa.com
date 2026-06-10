@@ -5,6 +5,10 @@ import TablerArrowBackUp from "~icons/tabler/arrow-back-up";
 import TablerArrowRight from "~icons/tabler/arrow-right";
 import TablerArrowsLeft from "~icons/tabler/arrows-left";
 import TablerArrowsRight from "~icons/tabler/arrows-right";
+import TablerCalendarCheck from "~icons/tabler/calendar-check";
+import TablerCalendarMinus from "~icons/tabler/calendar-minus";
+import TablerCalendarX from "~icons/tabler/calendar-x";
+import TablerCoin from "~icons/tabler/coin";
 import TablerBan from "~icons/tabler/ban";
 import TablerCheck from "~icons/tabler/check";
 import TablerClock from "~icons/tabler/clock";
@@ -135,6 +139,24 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         icon: TablerTrash,
         variant: "red",
         describe: (m) => `deleted ${m.count ?? "?"} CWL application${m.count === 1 ? "" : "s"}`,
+    },
+    "cwl_bonus.month_tick": {
+        label: "CWL bonus · month ticked",
+        icon: TablerCalendarCheck,
+        variant: "green",
+        describe: (m) => `ticked ${m.month ?? "?"} bonus for ${m.cocAccountTag ?? "?"}`,
+    },
+    "cwl_bonus.month_untick": {
+        label: "CWL bonus · month unticked",
+        icon: TablerCalendarMinus,
+        variant: "ghost",
+        describe: (m) => `unticked ${m.month ?? "?"} bonus for ${m.cocAccountTag ?? "?"}`,
+    },
+    "cwl_bonus.month_remove": {
+        label: "CWL bonus · month removed",
+        icon: TablerCalendarX,
+        variant: "red",
+        describe: (m) => `removed the ${m.month ?? "?"} bonus month`,
     },
     "settings.update": {
         label: "Settings · updated",
@@ -328,6 +350,7 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
 export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
     clan_application: "Clan applications",
     cwl_application: "CWL applications",
+    cwl_bonus: "CWL bonus",
     settings: "Settings",
     rules: "Rules",
     clan: "Clans",
@@ -339,6 +362,7 @@ export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
 export const AUDIT_TARGET_ICONS: Record<AuditTargetType, Component> = {
     clan_application: TablerUserPlus,
     cwl_application: TablerSwords,
+    cwl_bonus: TablerCoin,
     settings: TablerSettings,
     rules: TablerGavel,
     clan: TablerShieldHalf,

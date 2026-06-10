@@ -113,6 +113,20 @@
             "when": 1780920971273,
             "tag": "0015_easy_drax",
             "breakpoints": true
+        },
+        {
+            "idx": 16,
+            "version": "7",
+            "when": 1781104534334,
+            "tag": "0016_tan_dust",
+            "breakpoints": true
+        },
+        {
+            "idx": 17,
+            "version": "7",
+            "when": 1781114298457,
+            "tag": "0017_nostalgic_metal_master",
+            "breakpoints": true
         }
     ]
 }

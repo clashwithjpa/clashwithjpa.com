@@ -17,6 +17,8 @@ export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts
 export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
 export type { GetAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
+export type { GetBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
+export type { GetBonusHistoryQueryKey } from "./hooks/createGetBonusHistory.ts";
 export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
 export type { GetCOCClanCWLGroupQueryKey } from "./hooks/createGetCOCClanCWLGroup.ts";
@@ -37,6 +39,8 @@ export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCo
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export type { RemoveBonusMonthMutationKey } from "./hooks/createRemoveBonusMonth.ts";
+export type { SetAccountMonthSelectionMutationKey } from "./hooks/createSetAccountMonthSelection.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
@@ -213,6 +217,14 @@ export type {
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./models/GetAuditLog.ts";
+export type { GetBonusData200, GetBonusData401, GetBonusData500, GetBonusDataQuery, GetBonusDataQueryResponse } from "./models/GetBonusData.ts";
+export type {
+    GetBonusHistory200,
+    GetBonusHistory401,
+    GetBonusHistory500,
+    GetBonusHistoryQuery,
+    GetBonusHistoryQueryResponse,
+} from "./models/GetBonusHistory.ts";
 export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
@@ -346,6 +358,25 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./models/PostCOCPlayerVerify.ts";
+export type {
+    RemoveBonusMonth200,
+    RemoveBonusMonth401,
+    RemoveBonusMonth500,
+    RemoveBonusMonthMutation,
+    RemoveBonusMonthMutationResponse,
+    RemoveBonusMonthPathParams,
+    RemoveBonusMonthPathParamsMonthEnumKey,
+} from "./models/RemoveBonusMonth.ts";
+export type {
+    SetAccountMonthSelection200,
+    SetAccountMonthSelection400,
+    SetAccountMonthSelection401,
+    SetAccountMonthSelection500,
+    SetAccountMonthSelectionMutation,
+    SetAccountMonthSelectionMutationRequest,
+    SetAccountMonthSelectionMutationRequestMonthEnumKey,
+    SetAccountMonthSelectionMutationResponse,
+} from "./models/SetAccountMonthSelection.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -462,6 +493,8 @@ export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
 export { getAdminSettings } from "./clients/getAdminSettings.ts";
 export { getAdminUsers } from "./clients/getAdminUsers.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
+export { getBonusData } from "./clients/getBonusData.ts";
+export { getBonusHistory } from "./clients/getBonusHistory.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
 export { getCOCClanCWLGroup } from "./clients/getCOCClanCWLGroup.ts";
@@ -482,6 +515,8 @@ export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
+export { removeBonusMonth } from "./clients/removeBonusMonth.ts";
+export { setAccountMonthSelection } from "./clients/setAccountMonthSelection.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
@@ -537,6 +572,12 @@ export { getAdminUsersQueryOptions } from "./hooks/createGetAdminUsers.ts";
 export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
+export { createGetBonusData } from "./hooks/createGetBonusData.ts";
+export { getBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
+export { getBonusDataQueryOptions } from "./hooks/createGetBonusData.ts";
+export { createGetBonusHistory } from "./hooks/createGetBonusHistory.ts";
+export { getBonusHistoryQueryKey } from "./hooks/createGetBonusHistory.ts";
+export { getBonusHistoryQueryOptions } from "./hooks/createGetBonusHistory.ts";
 export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryOptions } from "./hooks/createGetCOCCWLWar.ts";
@@ -595,6 +636,10 @@ export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export { createRemoveBonusMonth } from "./hooks/createRemoveBonusMonth.ts";
+export { removeBonusMonthMutationKey } from "./hooks/createRemoveBonusMonth.ts";
+export { createSetAccountMonthSelection } from "./hooks/createSetAccountMonthSelection.ts";
+export { setAccountMonthSelectionMutationKey } from "./hooks/createSetAccountMonthSelection.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
@@ -645,6 +690,8 @@ export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
 export { applicationsStatusEnum } from "./models/GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./models/GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
+export { removeBonusMonthPathParamsMonthEnum } from "./models/RemoveBonusMonth.ts";
+export { setAccountMonthSelectionMutationRequestMonthEnum } from "./models/SetAccountMonthSelection.ts";
 export { applicationStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
 export {
@@ -791,6 +838,13 @@ export {
     getAuditLogQueryParamsSchema,
     getAuditLogQueryResponseSchema,
 } from "./zod/getAuditLogSchema.ts";
+export { getBonusData200Schema, getBonusData401Schema, getBonusData500Schema, getBonusDataQueryResponseSchema } from "./zod/getBonusDataSchema.ts";
+export {
+    getBonusHistory200Schema,
+    getBonusHistory401Schema,
+    getBonusHistory500Schema,
+    getBonusHistoryQueryResponseSchema,
+} from "./zod/getBonusHistorySchema.ts";
 export {
     getCOCCWLWar200Schema,
     getCOCCWLWar500Schema,
@@ -884,6 +938,21 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./zod/postCOCPlayerVerifySchema.ts";
+export {
+    removeBonusMonth200Schema,
+    removeBonusMonth401Schema,
+    removeBonusMonth500Schema,
+    removeBonusMonthMutationResponseSchema,
+    removeBonusMonthPathParamsSchema,
+} from "./zod/removeBonusMonthSchema.ts";
+export {
+    setAccountMonthSelection200Schema,
+    setAccountMonthSelection400Schema,
+    setAccountMonthSelection401Schema,
+    setAccountMonthSelection500Schema,
+    setAccountMonthSelectionMutationRequestSchema,
+    setAccountMonthSelectionMutationResponseSchema,
+} from "./zod/setAccountMonthSelectionSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

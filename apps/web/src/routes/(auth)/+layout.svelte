@@ -36,6 +36,7 @@
         "/admin/users",
         "/admin/coc-accounts",
         "/admin/cwl-applications",
+        "/admin/bonus",
     ];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);

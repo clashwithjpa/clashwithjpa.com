@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_bonus_table" DROP COLUMN "amount";

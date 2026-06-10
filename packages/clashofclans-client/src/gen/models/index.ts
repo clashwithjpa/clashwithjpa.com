@@ -163,6 +163,14 @@ export type {
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./GetAuditLog.ts";
+export type { GetBonusData200, GetBonusData401, GetBonusData500, GetBonusDataQuery, GetBonusDataQueryResponse } from "./GetBonusData.ts";
+export type {
+    GetBonusHistory200,
+    GetBonusHistory401,
+    GetBonusHistory500,
+    GetBonusHistoryQuery,
+    GetBonusHistoryQueryResponse,
+} from "./GetBonusHistory.ts";
 export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
@@ -296,6 +304,25 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
+export type {
+    RemoveBonusMonth200,
+    RemoveBonusMonth401,
+    RemoveBonusMonth500,
+    RemoveBonusMonthMutation,
+    RemoveBonusMonthMutationResponse,
+    RemoveBonusMonthPathParams,
+    RemoveBonusMonthPathParamsMonthEnumKey,
+} from "./RemoveBonusMonth.ts";
+export type {
+    SetAccountMonthSelection200,
+    SetAccountMonthSelection400,
+    SetAccountMonthSelection401,
+    SetAccountMonthSelection500,
+    SetAccountMonthSelectionMutation,
+    SetAccountMonthSelectionMutationRequest,
+    SetAccountMonthSelectionMutationRequestMonthEnumKey,
+    SetAccountMonthSelectionMutationResponse,
+} from "./SetAccountMonthSelection.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -421,5 +448,7 @@ export { itemsBattleTypeEnum } from "./GetCOCPlayerBattleLog.ts";
 export { applicationsStatusEnum } from "./GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./PostCOCPlayerVerify.ts";
+export { removeBonusMonthPathParamsMonthEnum } from "./RemoveBonusMonth.ts";
+export { setAccountMonthSelectionMutationRequestMonthEnum } from "./SetAccountMonthSelection.ts";
 export { applicationStatusEnum } from "./UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./UpdateJoinApplicationStatus.ts";

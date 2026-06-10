@@ -7,6 +7,7 @@ import {
     clanInfoTable,
     cocAccountTable,
     cwlApplicationTable,
+    cwlBonusTable,
     cwlClanInfoTable,
     settingsTable,
     user,
@@ -340,6 +341,86 @@ export async function getAllCwlApplications(
     ]);
 
     return { applications: rows, total: countResult[0]?.count ?? 0 };
+}
+
+export async function getBonusData() {
+    const rows = await db
+        .select({
+            // CWL application identity (used for assigning the bonus clan)
+            id: cwlApplicationTable.id,
+            // Linked account id (used for war weight / stat edits)
+            cocAccountId: sql<number>`${cocAccountTable.id}`,
+            discordUserId: cwlApplicationTable.discordUserId,
+            discordUsername: cwlApplicationTable.discordUsername,
+            image: user.image,
+            cocAccountName: cwlApplicationTable.cocAccountName,
+            cocAccountTag: cwlApplicationTable.cocAccountTag,
+            // Clan the account applied with (from the CWL application)
+            cocAccountClan: cwlApplicationTable.cocAccountClan,
+            preferenceNum: cwlApplicationTable.preferenceNum,
+            assignedTo: cwlApplicationTable.assignedTo,
+            // Account-level fields (coalesced so a missing join never yields null)
+            isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
+            warWeight: sql<number>`coalesce(${cocAccountTable.warWeight}, 0)`,
+            currentClan: cocAccountTable.currentClan,
+            townHall: sql<number>`coalesce(${cocAccountTable.townHall}, 0)`,
+            totalDonated: sql<number>`coalesce(${cocAccountTable.totalDonated}, 0)`,
+            totalReceived: sql<number>`coalesce(${cocAccountTable.totalReceived}, 0)`,
+            clanGames: sql<number>`coalesce(${cocAccountTable.clanGames}, 0)`,
+            capitalGoldLooted: sql<number>`coalesce(${cocAccountTable.capitalGoldLooted}, 0)`,
+            capitalGoldContributed: sql<number>`coalesce(${cocAccountTable.capitalGoldContributed}, 0)`,
+            activityScore: sql<number>`coalesce(${cocAccountTable.activityScore}, 0)`,
+            // Owning Discord user (for the COC account detail sidebar)
+            ownerName: user.name,
+            ownerImage: user.image,
+            ownerRole: user.role,
+        })
+        .from(cwlApplicationTable)
+        .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+        .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
+        .leftJoin(user, eq(user.id, account.userId))
+        .orderBy(desc(cocAccountTable.warWeight), asc(cocAccountTable.id));
+
+    return { rows, total: rows.length };
+}
+
+export async function getBonusHistory() {
+    const bonuses = await db
+        .select({
+            cocAccountTag: cwlBonusTable.cocAccountTag,
+            discordUserId: cwlBonusTable.discordUserId,
+            months: cwlBonusTable.months,
+        })
+        .from(cwlBonusTable);
+    return { bonuses };
+}
+
+// Ticks or unticks a month for a CoC account (toggles it within the months array).
+export async function setAccountMonthSelection(cocAccountTag: string, discordUserId: string, month: string, selected: boolean) {
+    if (selected) {
+        const result = await db
+            .insert(cwlBonusTable)
+            .values({ cocAccountTag, discordUserId, months: [month] })
+            .onConflictDoUpdate({
+                target: cwlBonusTable.cocAccountTag,
+                // array_append(array_remove(...)) keeps the months array de-duplicated.
+                set: { months: sql`array_append(array_remove(${cwlBonusTable.months}, ${month}), ${month})`, discordUserId },
+            })
+            .returning();
+        return result[0] ?? null;
+    }
+    const result = await db
+        .update(cwlBonusTable)
+        .set({ months: sql`array_remove(${cwlBonusTable.months}, ${month})` })
+        .where(eq(cwlBonusTable.cocAccountTag, cocAccountTag))
+        .returning();
+    return result[0] ?? { cocAccountTag, discordUserId, months: [] };
+}
+
+// Removes a month column entirely by stripping it from every account's months.
+export async function removeBonusMonth(month: string) {
+    await db.update(cwlBonusTable).set({ months: sql`array_remove(${cwlBonusTable.months}, ${month})` });
+    return { month };
 }
 
 export async function assignCwlApplication(id: number, clanTag: string | null) {

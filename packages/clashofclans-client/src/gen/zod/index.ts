@@ -137,6 +137,13 @@ export {
     getAuditLogQueryParamsSchema,
     getAuditLogQueryResponseSchema,
 } from "./getAuditLogSchema.ts";
+export { getBonusData200Schema, getBonusData401Schema, getBonusData500Schema, getBonusDataQueryResponseSchema } from "./getBonusDataSchema.ts";
+export {
+    getBonusHistory200Schema,
+    getBonusHistory401Schema,
+    getBonusHistory500Schema,
+    getBonusHistoryQueryResponseSchema,
+} from "./getBonusHistorySchema.ts";
 export { getCOCCWLWar200Schema, getCOCCWLWar500Schema, getCOCCWLWarPathParamsSchema, getCOCCWLWarQueryResponseSchema } from "./getCOCCWLWarSchema.ts";
 export {
     getCOCClanCWLGroup200Schema,
@@ -220,6 +227,21 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./postCOCPlayerVerifySchema.ts";
+export {
+    removeBonusMonth200Schema,
+    removeBonusMonth401Schema,
+    removeBonusMonth500Schema,
+    removeBonusMonthMutationResponseSchema,
+    removeBonusMonthPathParamsSchema,
+} from "./removeBonusMonthSchema.ts";
+export {
+    setAccountMonthSelection200Schema,
+    setAccountMonthSelection400Schema,
+    setAccountMonthSelection401Schema,
+    setAccountMonthSelection500Schema,
+    setAccountMonthSelectionMutationRequestSchema,
+    setAccountMonthSelectionMutationResponseSchema,
+} from "./setAccountMonthSelectionSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

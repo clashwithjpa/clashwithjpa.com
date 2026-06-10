@@ -20,10 +20,14 @@ import {
     getAllCwlApplications,
     getAllCwlClans,
     getAuditLog,
+    getBonusData,
+    getBonusHistory,
     getClanApplications,
     getCocAccountsForUser,
     getSettings,
     MissingDiscordAccountError,
+    removeBonusMonth,
+    setAccountMonthSelection,
     syncCocAccountStats,
     updateClan,
     updateClanApplicationStatus,
@@ -505,6 +509,176 @@ app.post(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete CWL applications" }, 500);
+        }
+    },
+);
+
+// Bonus table - manager perm (read-only join of CWL applications + account stats)
+
+const bonusRowSchema = z4.object({
+    id: z4.number(),
+    cocAccountId: z4.number(),
+    discordUserId: z4.string(),
+    discordUsername: z4.string(),
+    image: z4.string().nullable(),
+    cocAccountName: z4.string(),
+    cocAccountTag: z4.string(),
+    cocAccountClan: z4.string().nullable(),
+    preferenceNum: z4.number(),
+    assignedTo: z4.string().nullable(),
+    isExternal: z4.boolean(),
+    warWeight: z4.number(),
+    currentClan: z4.string().nullable(),
+    townHall: z4.number(),
+    totalDonated: z4.number(),
+    totalReceived: z4.number(),
+    clanGames: z4.number(),
+    capitalGoldLooted: z4.number(),
+    capitalGoldContributed: z4.number(),
+    activityScore: z4.number(),
+    ownerName: z4.string().nullable(),
+    ownerImage: z4.string().nullable(),
+    ownerRole: z4.string().nullable(),
+});
+const getBonusDataResponse = z4.object({
+    rows: z4.array(bonusRowSchema),
+    total: z4.number(),
+});
+app.get(
+    "/bonus",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getBonusData",
+        description:
+            "[Manager] Lists CWL applications joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity) for the bonus assignment table.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Bonus rows.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getBonusDataResponse)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const result = await getBonusData();
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch bonus data" }, 500);
+        }
+    },
+);
+
+// CWL bonus ledger (one row per CoC account: ticked months) - manager perm
+
+const BONUS_MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"] as const;
+const bonusMonthSchema = z4.enum(BONUS_MONTHS);
+
+const getBonusHistoryResponse = z4.object({
+    bonuses: z4.array(z4.object({ cocAccountTag: z4.string(), discordUserId: z4.string(), months: z4.array(z4.string()) })),
+});
+app.get(
+    "/bonus-history",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getBonusHistory",
+        description: "[Manager] Lists every per-account bonus row (ticked months) for the bonus table.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Bonus rows.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getBonusHistoryResponse)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const result = await getBonusHistory();
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch bonus history" }, 500);
+        }
+    },
+);
+
+const bonusRowData = z4.object({
+    bonus: z4.object({ cocAccountTag: z4.string(), discordUserId: z4.string(), months: z4.array(z4.string()) }),
+});
+
+const setBonusMonthBodySchema = z4.object({
+    cocAccountTag: z4.string().min(1),
+    discordUserId: z4.string().min(1),
+    month: bonusMonthSchema,
+    selected: z4.boolean(),
+});
+app.put(
+    "/bonus-history/month",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "setAccountMonthSelection",
+        description: "[Manager] Ticks or unticks a month for a CoC account.",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Updated bonus.", content: { "application/json": { schema: resolver(SuccessResponseSchema(bonusRowData)) } } },
+            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", setBonusMonthBodySchema),
+    async (c) => {
+        try {
+            const { cocAccountTag, discordUserId, month, selected } = c.req.valid("json");
+            const bonus = await setAccountMonthSelection(cocAccountTag, discordUserId, month, selected);
+            logAction(c, {
+                action: selected ? "cwl_bonus.month_tick" : "cwl_bonus.month_untick",
+                targetType: "cwl_bonus",
+                targetId: cocAccountTag,
+                metadata: { cocAccountTag, month },
+            });
+            return c.json({ success: true, data: { bonus } });
+        } catch (error: any) {
+            const { code } = getDbErrorMessage(error);
+            if (code === "23503") return c.json({ success: false, error: "Unknown account." }, 400);
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update month" }, 500);
+        }
+    },
+);
+
+const removeBonusMonthPathSchema = z4.object({ month: bonusMonthSchema });
+app.delete(
+    "/bonus-history/months/:month",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "removeBonusMonth",
+        description: "[Manager] Removes a month column by unticking it for every account.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Removed month.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(z4.object({ month: z4.string() }))) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", removeBonusMonthPathSchema),
+    async (c) => {
+        try {
+            const { month } = c.req.valid("param");
+            await removeBonusMonth(month);
+            logAction(c, { action: "cwl_bonus.month_remove", targetType: "cwl_bonus", targetId: month, metadata: { month } });
+            return c.json({ success: true, data: { month } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to remove month" }, 500);
         }
     },
 );

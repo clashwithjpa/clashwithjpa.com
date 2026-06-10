@@ -17,6 +17,9 @@ export const AUDIT_ACTIONS = [
     "cwl_application.bulk_assign",
     "cwl_application.bulk_unassign",
     "cwl_application.bulk_delete",
+    "cwl_bonus.month_tick",
+    "cwl_bonus.month_untick",
+    "cwl_bonus.month_remove",
     "settings.update",
     "rules.update",
     "clan.create",
@@ -45,7 +48,17 @@ export const AUDIT_ACTIONS = [
     "user.sessions_revoked",
 ] as const;
 
-export const AUDIT_TARGET_TYPES = ["clan_application", "cwl_application", "settings", "rules", "clan", "cwl_clan", "coc_account", "user"] as const;
+export const AUDIT_TARGET_TYPES = [
+    "clan_application",
+    "cwl_application",
+    "cwl_bonus",
+    "settings",
+    "rules",
+    "clan",
+    "cwl_clan",
+    "coc_account",
+    "user",
+] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

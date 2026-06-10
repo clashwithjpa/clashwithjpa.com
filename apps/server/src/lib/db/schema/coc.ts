@@ -1,5 +1,5 @@
-import { boolean, check, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique, index } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
+import { boolean, check, index, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
 import { account, user } from "./ba-auth";
 
 export const settingsTable = pgTable(
@@ -140,6 +140,17 @@ export const cwlApplicationTable = pgTable(
         index("cwl_application_assigned_to_idx").on(t.assignedTo),
     ],
 );
+
+export const cwlBonusTable = pgTable("cwl_bonus_table", {
+    cocAccountTag: text("coc_account_tag")
+        .notNull()
+        .primaryKey()
+        .references(() => cocAccountTable.cocAccountTag, { onDelete: "cascade" }),
+    discordUserId: text("discord_user_id")
+        .notNull()
+        .references(() => account.accountId, { onDelete: "cascade" }),
+    months: text("months").array().notNull().default([]),
+});
 
 export const cwlRelations = relations(cwlApplicationTable, ({ one }) => ({
     assignedClan: one(cwlClanInfoTable, {

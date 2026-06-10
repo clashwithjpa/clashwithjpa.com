@@ -8,6 +8,7 @@ import TablerBook2 from "~icons/tabler/book-2";
 import TablerFileDescription from "~icons/tabler/file-description";
 import TablerHistory from "~icons/tabler/history";
 import TablerHome from "~icons/tabler/home";
+import TablerMedal from "~icons/tabler/medal";
 import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerScale from "~icons/tabler/scale";
 import TablerSettings from "~icons/tabler/settings";
@@ -60,6 +61,13 @@ export const load: LayoutLoad = async ({ url }) => {
             href: "/admin/cwl-clans",
             description: "Add or remove clans for CWL assignments",
             requiredPerm: "sudo",
+        },
+        {
+            name: "Bonus",
+            icon: TablerMedal,
+            href: "/admin/bonus",
+            description: "Assign CWL bonuses and review account stats",
+            requiredPerm: "manage",
         },
         {
             name: "Applications",
