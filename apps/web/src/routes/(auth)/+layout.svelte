@@ -23,6 +23,10 @@
 
     let isMobile = $state(false);
     let sidebarWidth = $state(0);
+    let windowWidth = $state(1920);
+
+    const SIDEBAR_PX = { min: 88, collapsed: 88, max: 260 };
+    const pxToPct = (px: number) => (windowWidth > 0 ? (px / windowWidth) * 100 : px / 19.2);
 
     let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
     const noPaddingPaths: string[] = [
@@ -37,7 +41,6 @@
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
 
     const LAYOUT_CONFIG = {
-        sidebar: { min: 6, max: 16, default: 6 },
         content: { min: 30, max: 85, default: 30 },
         infoSidebar: { min: 15, max: 45, default: 30 },
         mobile: {
@@ -46,7 +49,8 @@
         },
     };
 
-    let userSidebarWidth = $state(LAYOUT_CONFIG.sidebar.default);
+    let userSidebarPx = $state(SIDEBAR_PX.collapsed);
+    let userSidebarWidth = $derived(pxToPct(userSidebarPx));
     let userInfoWidth = $state(LAYOUT_CONFIG.infoSidebar.default);
     let mobileSize = $state([LAYOUT_CONFIG.mobile.content.default, LAYOUT_CONFIG.mobile.sidebar.default]);
 
@@ -60,7 +64,7 @@
     });
 
     const desktopPanels = $derived.by(() => [
-        { id: "sidebar", minSize: LAYOUT_CONFIG.sidebar.min, maxSize: LAYOUT_CONFIG.sidebar.max },
+        { id: "sidebar", minSize: pxToPct(SIDEBAR_PX.min), maxSize: pxToPct(SIDEBAR_PX.max) },
         { id: "content", minSize: LAYOUT_CONFIG.content.min },
         {
             id: "infosidebar",
@@ -84,7 +88,7 @@
         if (isMobile) return;
         const s = details.size;
         if (s.length === 3) {
-            userSidebarWidth = s[0];
+            userSidebarPx = (s[0] / 100) * windowWidth;
             if (showInfo && s[2] > 0) {
                 userInfoWidth = s[2];
             }
@@ -92,10 +96,16 @@
     }
 
     onMount(() => {
+        const updateWidth = () => (windowWidth = window.innerWidth);
+        updateWidth();
+        window.addEventListener("resize", updateWidth);
         const cleanup = createMobileMediaQuery((m) => {
             isMobile = m;
         }, "lg");
-        return cleanup;
+        return () => {
+            window.removeEventListener("resize", updateWidth);
+            cleanup();
+        };
     });
 
     let navButtonsRef: HTMLElement | null = $state(null);
