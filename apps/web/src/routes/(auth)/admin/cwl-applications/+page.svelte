@@ -20,6 +20,7 @@
         deleteCwlApplicationsBulk,
         getCOCClanMembers,
         getCwlApplications,
+        getCwlSeasons,
         getJPACwlClans,
         updateCocAccountWarWeight,
         type GetCwlApplications200,
@@ -47,6 +48,9 @@
     let loading = $state(true);
     let filterMode = $state<string>("all");
     let clanFilter = $state<string>("all");
+    let seasons = $state<{ id: number; name: string }[]>([]);
+    let selectedSeasonValue = $state<string>("");
+    let seasonOptions = $derived<Option[]>(seasons.map((s) => ({ label: s.name, value: String(s.id) })));
 
     // Missing key = not yet fetched; `{ ok: false }` = fetch failed.
     type RosterEntry = { ok: true; tags: Set<string> } | { ok: false };
@@ -143,11 +147,21 @@
         }
     }
 
+    async function loadSeasons() {
+        try {
+            const resp = await getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) seasons = resp.data.seasons;
+        } catch {
+            // season selector falls back to empty
+        }
+    }
+
     async function load() {
         loading = true;
         try {
             const resp = await getCwlApplications(
                 {
+                    seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
                     unassigned: filterMode === "unassigned" ? true : undefined,
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
@@ -157,6 +171,7 @@
                 if (filterMode === "assigned") list = list.filter((a) => a.assignedTo);
                 applications = list;
                 total = resp.data.total;
+                if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
             } else {
                 toast.error("Failed to load CWL applications");
             }
@@ -335,8 +350,10 @@
     let wrongClanCount = $derived(applications.filter((a) => joinedInfo(a).status === "wrong-clan").length);
 
     loadClans();
+    loadSeasons();
     $effect(() => {
         filterMode; // track
+        selectedSeasonValue; // track
         load();
     });
     // untrack so reading the roster cache inside doesn't re-trigger this effect.
@@ -366,6 +383,11 @@
                 </p>
             </div>
             <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+                {#if seasonOptions.length > 0}
+                    <div class="w-full lg:w-44">
+                        <Select options={seasonOptions} bind:value={selectedSeasonValue} placeholder="Season" />
+                    </div>
+                {/if}
                 <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
                 {#if selectedIds.length > 0}
                     <div class="hidden h-8 w-px bg-stone-700 lg:block"></div>

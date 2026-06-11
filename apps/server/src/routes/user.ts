@@ -681,6 +681,9 @@ app.post(
         if (!settings?.cwlEnabled) {
             return c.json({ success: false, error: "CWL applications are currently closed." }, 403);
         }
+        if (!settings.currentCwlSeasonId) {
+            return c.json({ success: false, error: "No active CWL season is set." }, 403);
+        }
 
         const { preferenceNum, tag, accountClan } = c.req.valid("json");
 
@@ -719,6 +722,7 @@ app.post(
                 cocAccountTag: tag,
                 cocAccountClan: isExternal ? null : (accountClan ?? null),
                 preferenceNum,
+                seasonId: settings.currentCwlSeasonId,
             });
             logAction(c, {
                 action: "cwl_application.create",
@@ -726,8 +730,7 @@ app.post(
                 targetId: application.id,
                 metadata: {
                     cocAccountTag: tag,
-                    month: application.month,
-                    year: application.year,
+                    seasonId: application.seasonId,
                     preferenceNum,
                     isExternal,
                 },
@@ -740,7 +743,7 @@ app.post(
             const { message, constraint, code } = getDbErrorMessage(error);
             if (code === "23505") {
                 const errorMessage =
-                    constraint === "cwl_table_accountTag_month_year_unique"
+                    constraint === "cwl_table_accountTag_season_unique"
                         ? "You've already applied with this account this season."
                         : "This preference number is already in use. Each preference number can only be used once per account and per user.";
                 return c.json({ success: false, error: errorMessage }, 409);

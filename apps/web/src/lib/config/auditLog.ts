@@ -140,23 +140,35 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "red",
         describe: (m) => `deleted ${m.count ?? "?"} CWL application${m.count === 1 ? "" : "s"}`,
     },
-    "cwl_bonus.month_tick": {
-        label: "CWL bonus · month ticked",
+    "cwl_application.update_notes": {
+        label: "CWL application · notes updated",
+        icon: TablerEdit,
+        variant: "yellow",
+        describe: () => `updated CWL application notes`,
+    },
+    "cwl_bonus.tick": {
+        label: "CWL bonus · awarded",
         icon: TablerCalendarCheck,
         variant: "green",
-        describe: (m) => `ticked ${m.month ?? "?"} bonus for ${m.cocAccountTag ?? "?"}`,
+        describe: (m) => `awarded a CWL bonus${m.cocAccountTag ? ` (${m.cocAccountTag})` : ""}`,
     },
-    "cwl_bonus.month_untick": {
-        label: "CWL bonus · month unticked",
+    "cwl_bonus.untick": {
+        label: "CWL bonus · removed",
         icon: TablerCalendarMinus,
         variant: "ghost",
-        describe: (m) => `unticked ${m.month ?? "?"} bonus for ${m.cocAccountTag ?? "?"}`,
+        describe: () => `removed a CWL bonus`,
     },
-    "cwl_bonus.month_remove": {
-        label: "CWL bonus · month removed",
+    "cwl_season.create": {
+        label: "CWL season · created",
+        icon: TablerCalendarCheck,
+        variant: "green",
+        describe: (m) => `created CWL season ${m.name ?? "?"}`,
+    },
+    "cwl_season.delete": {
+        label: "CWL season · deleted",
         icon: TablerCalendarX,
         variant: "red",
-        describe: (m) => `removed the ${m.month ?? "?"} bonus month`,
+        describe: (m) => `deleted CWL season ${m.name ?? "?"}`,
     },
     "settings.update": {
         label: "Settings · updated",
@@ -351,6 +363,7 @@ export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
     clan_application: "Clan applications",
     cwl_application: "CWL applications",
     cwl_bonus: "CWL bonus",
+    cwl_season: "CWL seasons",
     settings: "Settings",
     rules: "Rules",
     clan: "Clans",
@@ -363,6 +376,7 @@ export const AUDIT_TARGET_ICONS: Record<AuditTargetType, Component> = {
     clan_application: TablerUserPlus,
     cwl_application: TablerSwords,
     cwl_bonus: TablerCoin,
+    cwl_season: TablerCalendarCheck,
     settings: TablerSettings,
     rules: TablerGavel,
     clan: TablerShieldHalf,

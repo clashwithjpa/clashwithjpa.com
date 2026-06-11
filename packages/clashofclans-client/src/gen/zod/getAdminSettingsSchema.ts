@@ -19,6 +19,7 @@ export const getAdminSettings200Schema = z.object({
                 siteMaintenanceMode: z.boolean(),
                 rulesContent: z.union([z.string(), z.null()]),
                 guildId: z.union([z.string(), z.null()]),
+                currentCwlSeasonId: z.union([z.number(), z.null()]),
                 updatedAt: z.union([z.iso.datetime(), z.null()]),
             }),
             z.null(),

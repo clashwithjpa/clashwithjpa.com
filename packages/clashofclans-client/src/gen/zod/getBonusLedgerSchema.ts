@@ -6,16 +6,16 @@
 import { z } from "zod/v4";
 
 /**
- * @description Bonus rows.
+ * @description Bonus ledger.
  */
-export const getBonusHistory200Schema = z.object({
+export const getBonusLedger200Schema = z.object({
     success: z.literal(true),
     data: z.object({
         bonuses: z.array(
             z.object({
-                cocAccountTag: z.string(),
                 discordUserId: z.string(),
-                months: z.array(z.string()),
+                seasonId: z.number(),
+                cocAccountTag: z.union([z.string(), z.null()]),
             }),
         ),
     }),
@@ -24,7 +24,7 @@ export const getBonusHistory200Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const getBonusHistory401Schema = z.object({
+export const getBonusLedger401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -32,9 +32,9 @@ export const getBonusHistory401Schema = z.object({
 /**
  * @description Server error.
  */
-export const getBonusHistory500Schema = z.object({
+export const getBonusLedger500Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const getBonusHistoryQueryResponseSchema = z.lazy(() => getBonusHistory200Schema);
+export const getBonusLedgerQueryResponseSchema = z.lazy(() => getBonusLedger200Schema);

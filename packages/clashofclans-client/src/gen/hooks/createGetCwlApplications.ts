@@ -35,7 +35,7 @@ export function getCwlApplicationsQueryOptions(params?: GetCwlApplicationsQueryP
 }
 
 /**
- * @description [Manager] Lists CWL applications. Filter by month/year/assignedTo or unassigned=true.
+ * @description [Manager] Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.
  * {@link /admin/cwl-applications}
  */
 export function createGetCwlApplications<

@@ -127,6 +127,27 @@
             "when": 1781114298457,
             "tag": "0017_nostalgic_metal_master",
             "breakpoints": true
+        },
+        {
+            "idx": 18,
+            "version": "7",
+            "when": 1781118433927,
+            "tag": "0018_tiresome_zuras",
+            "breakpoints": true
+        },
+        {
+            "idx": 19,
+            "version": "7",
+            "when": 1781125701824,
+            "tag": "0019_petite_vampiro",
+            "breakpoints": true
+        },
+        {
+            "idx": 20,
+            "version": "7",
+            "when": 1781157583354,
+            "tag": "0020_damp_killer_shrike",
+            "breakpoints": true
         }
     ]
 }

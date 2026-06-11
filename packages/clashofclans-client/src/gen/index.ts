@@ -5,11 +5,13 @@ export type { AssignCwlApplicationsBulkMutationKey } from "./hooks/createAssignC
 export type { ClearAcceptedJoinApplicationsMutationKey } from "./hooks/createClearAcceptedJoinApplications.ts";
 export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
+export type { CreateCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
 export type { DeleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
 export type { DeleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
 export type { DeleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
+export type { DeleteCwlSeasonMutationKey } from "./hooks/createDeleteCwlSeason.ts";
 export type { DeleteJoinApplicationMutationKey } from "./hooks/createDeleteJoinApplication.ts";
 export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
 export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
@@ -18,7 +20,7 @@ export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts
 export type { GetAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export type { GetBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
-export type { GetBonusHistoryQueryKey } from "./hooks/createGetBonusHistory.ts";
+export type { GetBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
 export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
 export type { GetCOCClanCWLGroupQueryKey } from "./hooks/createGetCOCClanCWLGroup.ts";
@@ -27,6 +29,8 @@ export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.
 export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export type { GetCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
+export type { GetCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
+export type { GetCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
@@ -39,10 +43,9 @@ export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCo
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
-export type { RemoveBonusMonthMutationKey } from "./hooks/createRemoveBonusMonth.ts";
-export type { SetAccountMonthSelectionMutationKey } from "./hooks/createSetAccountMonthSelection.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
+export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
@@ -51,6 +54,7 @@ export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSe
 export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
+export type { UpdateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type {
     ApplyCwl200,
@@ -119,6 +123,14 @@ export type {
     CreateAdminCwlClanMutationResponse,
 } from "./models/CreateAdminCwlClan.ts";
 export type {
+    CreateCwlSeason200,
+    CreateCwlSeason401,
+    CreateCwlSeason500,
+    CreateCwlSeasonMutation,
+    CreateCwlSeasonMutationRequest,
+    CreateCwlSeasonMutationResponse,
+} from "./models/CreateCwlSeason.ts";
+export type {
     DeleteAdminClan200,
     DeleteAdminClan401,
     DeleteAdminClan404,
@@ -161,6 +173,15 @@ export type {
     DeleteCwlApplicationsBulkMutationRequest,
     DeleteCwlApplicationsBulkMutationResponse,
 } from "./models/DeleteCwlApplicationsBulk.ts";
+export type {
+    DeleteCwlSeason200,
+    DeleteCwlSeason401,
+    DeleteCwlSeason404,
+    DeleteCwlSeason500,
+    DeleteCwlSeasonMutation,
+    DeleteCwlSeasonMutationResponse,
+    DeleteCwlSeasonPathParams,
+} from "./models/DeleteCwlSeason.ts";
 export type {
     ApplicationStatusEnum2Key,
     DeleteJoinApplication200,
@@ -217,14 +238,21 @@ export type {
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./models/GetAuditLog.ts";
-export type { GetBonusData200, GetBonusData401, GetBonusData500, GetBonusDataQuery, GetBonusDataQueryResponse } from "./models/GetBonusData.ts";
 export type {
-    GetBonusHistory200,
-    GetBonusHistory401,
-    GetBonusHistory500,
-    GetBonusHistoryQuery,
-    GetBonusHistoryQueryResponse,
-} from "./models/GetBonusHistory.ts";
+    GetBonusData200,
+    GetBonusData401,
+    GetBonusData500,
+    GetBonusDataQuery,
+    GetBonusDataQueryParams,
+    GetBonusDataQueryResponse,
+} from "./models/GetBonusData.ts";
+export type {
+    GetBonusLedger200,
+    GetBonusLedger401,
+    GetBonusLedger500,
+    GetBonusLedgerQuery,
+    GetBonusLedgerQueryResponse,
+} from "./models/GetBonusLedger.ts";
 export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
@@ -299,6 +327,15 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./models/GetCwlApplications.ts";
+export type { GetCwlSeasons200, GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQuery, GetCwlSeasonsQueryResponse } from "./models/GetCwlSeasons.ts";
+export type {
+    GetCwlStats200,
+    GetCwlStats401,
+    GetCwlStats500,
+    GetCwlStatsQuery,
+    GetCwlStatsQueryParams,
+    GetCwlStatsQueryResponse,
+} from "./models/GetCwlStats.ts";
 export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
@@ -358,25 +395,6 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./models/PostCOCPlayerVerify.ts";
-export type {
-    RemoveBonusMonth200,
-    RemoveBonusMonth401,
-    RemoveBonusMonth500,
-    RemoveBonusMonthMutation,
-    RemoveBonusMonthMutationResponse,
-    RemoveBonusMonthPathParams,
-    RemoveBonusMonthPathParamsMonthEnumKey,
-} from "./models/RemoveBonusMonth.ts";
-export type {
-    SetAccountMonthSelection200,
-    SetAccountMonthSelection400,
-    SetAccountMonthSelection401,
-    SetAccountMonthSelection500,
-    SetAccountMonthSelectionMutation,
-    SetAccountMonthSelectionMutationRequest,
-    SetAccountMonthSelectionMutationRequestMonthEnumKey,
-    SetAccountMonthSelectionMutationResponse,
-} from "./models/SetAccountMonthSelection.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -387,6 +405,15 @@ export type {
     SetUserAccountExternalMutationResponse,
     SetUserAccountExternalPathParams,
 } from "./models/SetUserAccountExternal.ts";
+export type {
+    SetUserSeasonBonus200,
+    SetUserSeasonBonus400,
+    SetUserSeasonBonus401,
+    SetUserSeasonBonus500,
+    SetUserSeasonBonusMutation,
+    SetUserSeasonBonusMutationRequest,
+    SetUserSeasonBonusMutationResponse,
+} from "./models/SetUserSeasonBonus.ts";
 export type {
     SyncAdminCwlClanLeagues200,
     SyncAdminCwlClanLeagues401,
@@ -463,6 +490,16 @@ export type {
     UpdateCocAccountWarWeightPathParams,
 } from "./models/UpdateCocAccountWarWeight.ts";
 export type {
+    UpdateCwlApplicationNotes200,
+    UpdateCwlApplicationNotes401,
+    UpdateCwlApplicationNotes404,
+    UpdateCwlApplicationNotes500,
+    UpdateCwlApplicationNotesMutation,
+    UpdateCwlApplicationNotesMutationRequest,
+    UpdateCwlApplicationNotesMutationResponse,
+    UpdateCwlApplicationNotesPathParams,
+} from "./models/UpdateCwlApplicationNotes.ts";
+export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,
     UpdateJoinApplicationStatus401,
@@ -481,11 +518,13 @@ export { assignCwlApplicationsBulk } from "./clients/assignCwlApplicationsBulk.t
 export { clearAcceptedJoinApplications } from "./clients/clearAcceptedJoinApplications.ts";
 export { createAdminClan } from "./clients/createAdminClan.ts";
 export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
+export { createCwlSeason } from "./clients/createCwlSeason.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
 export { deleteCocAccount } from "./clients/deleteCocAccount.ts";
 export { deleteCocAccountsBulk } from "./clients/deleteCocAccountsBulk.ts";
 export { deleteCwlApplicationsBulk } from "./clients/deleteCwlApplicationsBulk.ts";
+export { deleteCwlSeason } from "./clients/deleteCwlSeason.ts";
 export { deleteJoinApplication } from "./clients/deleteJoinApplication.ts";
 export { getAdminClans } from "./clients/getAdminClans.ts";
 export { getAdminCocAccounts } from "./clients/getAdminCocAccounts.ts";
@@ -494,7 +533,7 @@ export { getAdminSettings } from "./clients/getAdminSettings.ts";
 export { getAdminUsers } from "./clients/getAdminUsers.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
 export { getBonusData } from "./clients/getBonusData.ts";
-export { getBonusHistory } from "./clients/getBonusHistory.ts";
+export { getBonusLedger } from "./clients/getBonusLedger.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
 export { getCOCClan } from "./clients/getCOCClan.ts";
 export { getCOCClanCWLGroup } from "./clients/getCOCClanCWLGroup.ts";
@@ -503,6 +542,8 @@ export { getCOCClanMembers } from "./clients/getCOCClanMembers.ts";
 export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
 export { getCwlApplications } from "./clients/getCwlApplications.ts";
+export { getCwlSeasons } from "./clients/getCwlSeasons.ts";
+export { getCwlStats } from "./clients/getCwlStats.ts";
 export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
@@ -515,10 +556,9 @@ export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
-export { removeBonusMonth } from "./clients/removeBonusMonth.ts";
-export { setAccountMonthSelection } from "./clients/setAccountMonthSelection.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
+export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
 export { syncCocAccounts } from "./clients/syncCocAccounts.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
@@ -527,6 +567,7 @@ export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
+export { updateCwlApplicationNotes } from "./clients/updateCwlApplicationNotes.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
 export { createApplyCwl } from "./hooks/createApplyCwl.ts";
@@ -542,6 +583,8 @@ export { createAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./hooks/createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
 export { createCreateAdminCwlClan } from "./hooks/createCreateAdminCwlClan.ts";
+export { createCreateCwlSeason } from "./hooks/createCreateCwlSeason.ts";
+export { createCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
 export { createDeleteAdminClan } from "./hooks/createDeleteAdminClan.ts";
 export { deleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export { createDeleteAdminCwlClan } from "./hooks/createDeleteAdminCwlClan.ts";
@@ -552,6 +595,8 @@ export { createDeleteCocAccountsBulk } from "./hooks/createDeleteCocAccountsBulk
 export { deleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
 export { createDeleteCwlApplicationsBulk } from "./hooks/createDeleteCwlApplicationsBulk.ts";
 export { deleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
+export { createDeleteCwlSeason } from "./hooks/createDeleteCwlSeason.ts";
+export { deleteCwlSeasonMutationKey } from "./hooks/createDeleteCwlSeason.ts";
 export { createDeleteJoinApplication } from "./hooks/createDeleteJoinApplication.ts";
 export { deleteJoinApplicationMutationKey } from "./hooks/createDeleteJoinApplication.ts";
 export { createGetAdminClans } from "./hooks/createGetAdminClans.ts";
@@ -575,9 +620,9 @@ export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
 export { createGetBonusData } from "./hooks/createGetBonusData.ts";
 export { getBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
 export { getBonusDataQueryOptions } from "./hooks/createGetBonusData.ts";
-export { createGetBonusHistory } from "./hooks/createGetBonusHistory.ts";
-export { getBonusHistoryQueryKey } from "./hooks/createGetBonusHistory.ts";
-export { getBonusHistoryQueryOptions } from "./hooks/createGetBonusHistory.ts";
+export { createGetBonusLedger } from "./hooks/createGetBonusLedger.ts";
+export { getBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
+export { getBonusLedgerQueryOptions } from "./hooks/createGetBonusLedger.ts";
 export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
 export { getCOCCWLWarQueryOptions } from "./hooks/createGetCOCCWLWar.ts";
@@ -602,6 +647,12 @@ export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBat
 export { createGetCwlApplications } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryOptions } from "./hooks/createGetCwlApplications.ts";
+export { createGetCwlSeasons } from "./hooks/createGetCwlSeasons.ts";
+export { getCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
+export { getCwlSeasonsQueryOptions } from "./hooks/createGetCwlSeasons.ts";
+export { createGetCwlStats } from "./hooks/createGetCwlStats.ts";
+export { getCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
+export { getCwlStatsQueryOptions } from "./hooks/createGetCwlStats.ts";
 export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
@@ -636,14 +687,12 @@ export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
-export { createRemoveBonusMonth } from "./hooks/createRemoveBonusMonth.ts";
-export { removeBonusMonthMutationKey } from "./hooks/createRemoveBonusMonth.ts";
-export { createSetAccountMonthSelection } from "./hooks/createSetAccountMonthSelection.ts";
-export { setAccountMonthSelectionMutationKey } from "./hooks/createSetAccountMonthSelection.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
 export { setUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
+export { createSetUserSeasonBonus } from "./hooks/createSetUserSeasonBonus.ts";
+export { setUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export { createSyncAdminCwlClanLeagues } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export { syncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export { createSyncCocAccounts } from "./hooks/createSyncCocAccounts.ts";
@@ -660,6 +709,8 @@ export { createUpdateCocAccountStats } from "./hooks/createUpdateCocAccountStats
 export { updateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
+export { createUpdateCwlApplicationNotes } from "./hooks/createUpdateCwlApplicationNotes.ts";
+export { updateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { applicationStatusEnum2 } from "./models/DeleteJoinApplication.ts";
@@ -690,8 +741,6 @@ export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
 export { applicationsStatusEnum } from "./models/GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./models/GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
-export { removeBonusMonthPathParamsMonthEnum } from "./models/RemoveBonusMonth.ts";
-export { setAccountMonthSelectionMutationRequestMonthEnum } from "./models/SetAccountMonthSelection.ts";
 export { applicationStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
 export {
@@ -754,6 +803,13 @@ export {
     createAdminCwlClanMutationResponseSchema,
 } from "./zod/createAdminCwlClanSchema.ts";
 export {
+    createCwlSeason200Schema,
+    createCwlSeason401Schema,
+    createCwlSeason500Schema,
+    createCwlSeasonMutationRequestSchema,
+    createCwlSeasonMutationResponseSchema,
+} from "./zod/createCwlSeasonSchema.ts";
+export {
     deleteAdminClan200Schema,
     deleteAdminClan401Schema,
     deleteAdminClan404Schema,
@@ -791,6 +847,14 @@ export {
     deleteCwlApplicationsBulkMutationRequestSchema,
     deleteCwlApplicationsBulkMutationResponseSchema,
 } from "./zod/deleteCwlApplicationsBulkSchema.ts";
+export {
+    deleteCwlSeason200Schema,
+    deleteCwlSeason401Schema,
+    deleteCwlSeason404Schema,
+    deleteCwlSeason500Schema,
+    deleteCwlSeasonMutationResponseSchema,
+    deleteCwlSeasonPathParamsSchema,
+} from "./zod/deleteCwlSeasonSchema.ts";
 export {
     deleteJoinApplication200Schema,
     deleteJoinApplication401Schema,
@@ -838,13 +902,19 @@ export {
     getAuditLogQueryParamsSchema,
     getAuditLogQueryResponseSchema,
 } from "./zod/getAuditLogSchema.ts";
-export { getBonusData200Schema, getBonusData401Schema, getBonusData500Schema, getBonusDataQueryResponseSchema } from "./zod/getBonusDataSchema.ts";
 export {
-    getBonusHistory200Schema,
-    getBonusHistory401Schema,
-    getBonusHistory500Schema,
-    getBonusHistoryQueryResponseSchema,
-} from "./zod/getBonusHistorySchema.ts";
+    getBonusData200Schema,
+    getBonusData401Schema,
+    getBonusData500Schema,
+    getBonusDataQueryParamsSchema,
+    getBonusDataQueryResponseSchema,
+} from "./zod/getBonusDataSchema.ts";
+export {
+    getBonusLedger200Schema,
+    getBonusLedger401Schema,
+    getBonusLedger500Schema,
+    getBonusLedgerQueryResponseSchema,
+} from "./zod/getBonusLedgerSchema.ts";
 export {
     getCOCCWLWar200Schema,
     getCOCCWLWar500Schema,
@@ -889,6 +959,19 @@ export {
     getCwlApplicationsQueryParamsSchema,
     getCwlApplicationsQueryResponseSchema,
 } from "./zod/getCwlApplicationsSchema.ts";
+export {
+    getCwlSeasons200Schema,
+    getCwlSeasons401Schema,
+    getCwlSeasons500Schema,
+    getCwlSeasonsQueryResponseSchema,
+} from "./zod/getCwlSeasonsSchema.ts";
+export {
+    getCwlStats200Schema,
+    getCwlStats401Schema,
+    getCwlStats500Schema,
+    getCwlStatsQueryParamsSchema,
+    getCwlStatsQueryResponseSchema,
+} from "./zod/getCwlStatsSchema.ts";
 export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,
@@ -938,21 +1021,6 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./zod/postCOCPlayerVerifySchema.ts";
-export {
-    removeBonusMonth200Schema,
-    removeBonusMonth401Schema,
-    removeBonusMonth500Schema,
-    removeBonusMonthMutationResponseSchema,
-    removeBonusMonthPathParamsSchema,
-} from "./zod/removeBonusMonthSchema.ts";
-export {
-    setAccountMonthSelection200Schema,
-    setAccountMonthSelection400Schema,
-    setAccountMonthSelection401Schema,
-    setAccountMonthSelection500Schema,
-    setAccountMonthSelectionMutationRequestSchema,
-    setAccountMonthSelectionMutationResponseSchema,
-} from "./zod/setAccountMonthSelectionSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,
@@ -962,6 +1030,14 @@ export {
     setUserAccountExternalMutationResponseSchema,
     setUserAccountExternalPathParamsSchema,
 } from "./zod/setUserAccountExternalSchema.ts";
+export {
+    setUserSeasonBonus200Schema,
+    setUserSeasonBonus400Schema,
+    setUserSeasonBonus401Schema,
+    setUserSeasonBonus500Schema,
+    setUserSeasonBonusMutationRequestSchema,
+    setUserSeasonBonusMutationResponseSchema,
+} from "./zod/setUserSeasonBonusSchema.ts";
 export {
     syncAdminCwlClanLeagues200Schema,
     syncAdminCwlClanLeagues401Schema,
@@ -1029,6 +1105,15 @@ export {
     updateCocAccountWarWeightMutationResponseSchema,
     updateCocAccountWarWeightPathParamsSchema,
 } from "./zod/updateCocAccountWarWeightSchema.ts";
+export {
+    updateCwlApplicationNotes200Schema,
+    updateCwlApplicationNotes401Schema,
+    updateCwlApplicationNotes404Schema,
+    updateCwlApplicationNotes500Schema,
+    updateCwlApplicationNotesMutationRequestSchema,
+    updateCwlApplicationNotesMutationResponseSchema,
+    updateCwlApplicationNotesPathParamsSchema,
+} from "./zod/updateCwlApplicationNotesSchema.ts";
 export {
     updateJoinApplicationStatus200Schema,
     updateJoinApplicationStatus401Schema,

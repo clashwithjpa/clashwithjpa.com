@@ -21,19 +21,23 @@ import {
     getAllCwlClans,
     getAuditLog,
     getBonusData,
-    getBonusHistory,
+    getBonusLedger,
     getClanApplications,
     getCocAccountsForUser,
+    getCwlSeasons,
+    getCwlStats,
+    createCwlSeason,
+    deleteCwlSeason,
     getSettings,
     MissingDiscordAccountError,
-    removeBonusMonth,
-    setAccountMonthSelection,
+    setUserSeasonBonus,
     syncCocAccountStats,
     updateClan,
     updateClanApplicationStatus,
     updateCocAccountExternal,
     updateCocAccountStats,
     updateCocAccountWarWeight,
+    updateCwlApplicationNotes,
     updateCwlClan,
     updateSettings,
 } from "@/lib/db/functions";
@@ -319,16 +323,17 @@ const cwlApplicationSchema = z4.object({
     cocAccountWeight: z4.number(),
     isExternal: z4.boolean(),
     image: z4.string().nullable(),
-    month: z4.string(),
-    year: z4.number(),
+    seasonId: z4.number(),
+    seasonName: z4.string().nullable(),
+    month: z4.string().nullable(),
+    year: z4.number().nullable(),
     preferenceNum: z4.number(),
     appliedAt: z4.date(),
     assignedTo: z4.string().nullable(),
 });
 
 const getCwlApplicationsQuerySchema = z4.object({
-    month: z4.string().optional(),
-    year: z4.coerce.number().int().optional(),
+    seasonId: z4.coerce.number().int().optional(),
     assignedTo: z4.string().optional(),
     unassigned: z4.coerce.boolean().optional(),
     // Optional: when omitted, the whole (filtered) season is returned.
@@ -339,13 +344,15 @@ const cwlApplicationWithAccountSchema = cwlApplicationSchema.extend({ cocAccount
 const getCwlApplicationsData = z4.object({
     applications: z4.array(cwlApplicationWithAccountSchema),
     total: z4.number(),
+    seasonId: z4.number().nullable(),
 });
 app.get(
     "/cwl-applications",
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getCwlApplications",
-        description: "[Manager] Lists CWL applications. Filter by month/year/assignedTo or unassigned=true.",
+        description:
+            "[Manager] Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.",
         tags: ["admin"],
         responses: {
             200: {
@@ -359,10 +366,9 @@ app.get(
     zValidator("query", getCwlApplicationsQuerySchema),
     async (c) => {
         try {
-            const { month, year, assignedTo, unassigned, limit, offset } = c.req.valid("query");
+            const { seasonId, assignedTo, unassigned, limit, offset } = c.req.valid("query");
             const result = await getAllCwlApplications({
-                month,
-                year,
+                seasonId,
                 assignedTo: unassigned ? null : assignedTo,
                 limit,
                 offset,
@@ -424,6 +430,43 @@ app.put(
             if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to assign CWL application" }, 500);
+        }
+    },
+);
+
+const updateCwlNotesBodySchema = z4.object({ notes: z4.string().max(500).nullable() });
+const updateCwlNotesData = z4.object({ application: z4.object({ id: z4.number(), notes: z4.string().nullable() }) });
+app.put(
+    "/cwl-applications/:id/notes",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "updateCwlApplicationNotes",
+        description: "[Manager] Updates the free-text notes/remarks on a CWL application.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated application.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCwlNotesData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", assignCwlApplicationPathSchema),
+    zValidator("json", updateCwlNotesBodySchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const { notes } = c.req.valid("json");
+            const trimmed = notes?.trim() ? notes.trim() : null;
+            const application = await updateCwlApplicationNotes(id, trimmed);
+            if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            logAction(c, { action: "cwl_application.update_notes", targetType: "cwl_application", targetId: id, metadata: {} });
+            return c.json({ success: true, data: { application } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update notes" }, 500);
         }
     },
 );
@@ -518,6 +561,7 @@ app.post(
 const bonusRowSchema = z4.object({
     id: z4.number(),
     cocAccountId: z4.number(),
+    seasonId: z4.number(),
     discordUserId: z4.string(),
     discordUsername: z4.string(),
     image: z4.string().nullable(),
@@ -526,6 +570,7 @@ const bonusRowSchema = z4.object({
     cocAccountClan: z4.string().nullable(),
     preferenceNum: z4.number(),
     assignedTo: z4.string().nullable(),
+    notes: z4.string().nullable(),
     isExternal: z4.boolean(),
     warWeight: z4.number(),
     currentClan: z4.string().nullable(),
@@ -540,9 +585,13 @@ const bonusRowSchema = z4.object({
     ownerImage: z4.string().nullable(),
     ownerRole: z4.string().nullable(),
 });
+const getBonusDataQuerySchema = z4.object({
+    seasonId: z4.coerce.number().int().optional(),
+});
 const getBonusDataResponse = z4.object({
     rows: z4.array(bonusRowSchema),
     total: z4.number(),
+    seasonId: z4.number().nullable(),
 });
 app.get(
     "/bonus",
@@ -550,7 +599,7 @@ app.get(
     describeRoute({
         operationId: "getBonusData",
         description:
-            "[Manager] Lists CWL applications joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity) for the bonus assignment table.",
+            "[Manager] Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.",
         tags: ["admin"],
         responses: {
             200: {
@@ -561,9 +610,11 @@ app.get(
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
+    zValidator("query", getBonusDataQuerySchema),
     async (c) => {
         try {
-            const result = await getBonusData();
+            const { seasonId } = c.req.valid("query");
+            const result = await getBonusData(seasonId);
             return c.json({ success: true, data: result });
         } catch (error) {
             Sentry.captureException(error);
@@ -572,25 +623,124 @@ app.get(
     },
 );
 
-// CWL bonus ledger (one row per CoC account: ticked months) - manager perm
+// CWL seasons - read for managers, create/delete for admins
 
-const BONUS_MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"] as const;
-const bonusMonthSchema = z4.enum(BONUS_MONTHS);
-
-const getBonusHistoryResponse = z4.object({
-    bonuses: z4.array(z4.object({ cocAccountTag: z4.string(), discordUserId: z4.string(), months: z4.array(z4.string()) })),
+const cwlSeasonSchema = z4.object({
+    id: z4.number(),
+    name: z4.string(),
+    month: z4.string(),
+    year: z4.number(),
+    createdAt: z4.date().nullable(),
 });
+const getCwlSeasonsData = z4.object({ seasons: z4.array(cwlSeasonSchema) });
 app.get(
-    "/bonus-history",
+    "/cwl-seasons",
     hasAccessAuthMiddleware(isManager),
     describeRoute({
-        operationId: "getBonusHistory",
-        description: "[Manager] Lists every per-account bonus row (ticked months) for the bonus table.",
+        operationId: "getCwlSeasons",
+        description: "[Manager] Lists all CWL seasons (newest first).",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Seasons.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlSeasonsData)) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const result = await getCwlSeasons();
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch CWL seasons" }, 500);
+        }
+    },
+);
+
+const createCwlSeasonBodySchema = z4.object({
+    name: z4.string().min(1),
+    month: z4.string().min(1),
+    year: z4.number().int(),
+});
+const createCwlSeasonData = z4.object({ season: cwlSeasonSchema });
+app.post(
+    "/cwl-seasons",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "createCwlSeason",
+        description: "[Admin] Creates a new CWL season.",
         tags: ["admin"],
         responses: {
             200: {
-                description: "Bonus rows.",
-                content: { "application/json": { schema: resolver(SuccessResponseSchema(getBonusHistoryResponse)) } },
+                description: "Created season.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(createCwlSeasonData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", createCwlSeasonBodySchema),
+    async (c) => {
+        try {
+            const season = await createCwlSeason(c.req.valid("json"));
+            logAction(c, { action: "cwl_season.create", targetType: "cwl_season", targetId: season.id, metadata: { name: season.name } });
+            return c.json({ success: true, data: { season } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to create CWL season" }, 500);
+        }
+    },
+);
+
+const deleteCwlSeasonPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
+app.delete(
+    "/cwl-seasons/:id",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "deleteCwlSeason",
+        description: "[Admin] Deletes a CWL season; cascades to its applications and bonuses.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Deleted season.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(z4.object({ id: z4.number() }))) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", deleteCwlSeasonPathSchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const season = await deleteCwlSeason(id);
+            if (!season) return c.json({ success: false, error: "Season not found." }, 404);
+            logAction(c, { action: "cwl_season.delete", targetType: "cwl_season", targetId: id, metadata: { name: season.name } });
+            return c.json({ success: true, data: { id } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to delete CWL season" }, 500);
+        }
+    },
+);
+
+// CWL bonus ledger (one row per user per season) - manager perm
+
+const getBonusLedgerResponse = z4.object({
+    bonuses: z4.array(z4.object({ discordUserId: z4.string(), seasonId: z4.number(), cocAccountTag: z4.string().nullable() })),
+});
+app.get(
+    "/bonus-ledger",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getBonusLedger",
+        description: "[Manager] Lists every awarded bonus (one row per user per season).",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Bonus ledger.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getBonusLedgerResponse)) } },
             },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
@@ -598,87 +748,105 @@ app.get(
     }),
     async (c) => {
         try {
-            const result = await getBonusHistory();
+            const result = await getBonusLedger();
             return c.json({ success: true, data: result });
         } catch (error) {
             Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to fetch bonus history" }, 500);
+            return c.json({ success: false, error: "Failed to fetch bonus ledger" }, 500);
         }
     },
 );
 
-const bonusRowData = z4.object({
-    bonus: z4.object({ cocAccountTag: z4.string(), discordUserId: z4.string(), months: z4.array(z4.string()) }),
+const bonusData = z4.object({
+    bonus: z4.object({ discordUserId: z4.string(), seasonId: z4.number(), cocAccountTag: z4.string().nullable() }).nullable(),
 });
-
-const setBonusMonthBodySchema = z4.object({
-    cocAccountTag: z4.string().min(1),
+const setBonusBodySchema = z4.object({
     discordUserId: z4.string().min(1),
-    month: bonusMonthSchema,
+    seasonId: z4.number().int(),
+    cocAccountTag: z4.string().min(1).nullable(),
     selected: z4.boolean(),
 });
 app.put(
-    "/bonus-history/month",
+    "/bonus",
     hasAccessAuthMiddleware(isManager),
     describeRoute({
-        operationId: "setAccountMonthSelection",
-        description: "[Manager] Ticks or unticks a month for a CoC account.",
+        operationId: "setUserSeasonBonus",
+        description: "[Manager] Awards or removes a user's bonus for a season.",
         tags: ["admin"],
         responses: {
-            200: { description: "Updated bonus.", content: { "application/json": { schema: resolver(SuccessResponseSchema(bonusRowData)) } } },
+            200: { description: "Updated bonus.", content: { "application/json": { schema: resolver(SuccessResponseSchema(bonusData)) } } },
             400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("json", setBonusMonthBodySchema),
+    zValidator("json", setBonusBodySchema),
     async (c) => {
         try {
-            const { cocAccountTag, discordUserId, month, selected } = c.req.valid("json");
-            const bonus = await setAccountMonthSelection(cocAccountTag, discordUserId, month, selected);
+            const { discordUserId, seasonId, cocAccountTag, selected } = c.req.valid("json");
+            const bonus = await setUserSeasonBonus({ discordUserId, seasonId, cocAccountTag, selected });
             logAction(c, {
-                action: selected ? "cwl_bonus.month_tick" : "cwl_bonus.month_untick",
+                action: selected ? "cwl_bonus.tick" : "cwl_bonus.untick",
                 targetType: "cwl_bonus",
-                targetId: cocAccountTag,
-                metadata: { cocAccountTag, month },
+                targetId: discordUserId,
+                metadata: { seasonId, cocAccountTag },
             });
             return c.json({ success: true, data: { bonus } });
         } catch (error: any) {
             const { code } = getDbErrorMessage(error);
-            if (code === "23503") return c.json({ success: false, error: "Unknown account." }, 400);
+            if (code === "23503") return c.json({ success: false, error: "Unknown user, account, or season." }, 400);
             Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to update month" }, 500);
+            return c.json({ success: false, error: "Failed to update bonus" }, 500);
         }
     },
 );
 
-const removeBonusMonthPathSchema = z4.object({ month: bonusMonthSchema });
-app.delete(
-    "/bonus-history/months/:month",
+// CWL stats - live fetch from the CoC API for the season's assigned clans
+
+const cwlAttackDetailSchema = z4.object({
+    round: z4.number(),
+    stars: z4.number(),
+    destruction: z4.number(),
+    position: z4.number(),
+    defenderName: z4.string(),
+    defenderTh: z4.number(),
+    defenderPosition: z4.number(),
+});
+const getCwlStatsQuerySchema = z4.object({ seasonId: z4.coerce.number().int().optional() });
+const getCwlStatsResponse = z4.object({
+    stats: z4.array(
+        z4.object({
+            tag: z4.string(),
+            name: z4.string(),
+            attacks: z4.number(),
+            stars: z4.number(),
+            details: z4.array(cwlAttackDetailSchema),
+        }),
+    ),
+});
+app.get(
+    "/cwl-stats",
     hasAccessAuthMiddleware(isManager),
     describeRoute({
-        operationId: "removeBonusMonth",
-        description: "[Manager] Removes a month column by unticking it for every account.",
+        operationId: "getCwlStats",
+        description:
+            "[Manager] Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.",
         tags: ["admin"],
         responses: {
-            200: {
-                description: "Removed month.",
-                content: { "application/json": { schema: resolver(SuccessResponseSchema(z4.object({ month: z4.string() }))) } },
-            },
+            200: { description: "CWL stats.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlStatsResponse)) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("param", removeBonusMonthPathSchema),
+    zValidator("query", getCwlStatsQuerySchema),
     async (c) => {
         try {
-            const { month } = c.req.valid("param");
-            await removeBonusMonth(month);
-            logAction(c, { action: "cwl_bonus.month_remove", targetType: "cwl_bonus", targetId: month, metadata: { month } });
-            return c.json({ success: true, data: { month } });
+            const { seasonId } = c.req.valid("query");
+            const result = await getCwlStats(seasonId);
+            return c.json({ success: true, data: result });
         } catch (error) {
             Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to remove month" }, 500);
+            return c.json({ success: false, error: "Failed to fetch CWL stats" }, 500);
         }
     },
 );
@@ -692,6 +860,7 @@ const settingsSchema = z4.object({
     siteMaintenanceMode: z4.boolean(),
     rulesContent: z4.string().nullable(),
     guildId: z4.string().nullable(),
+    currentCwlSeasonId: z4.number().nullable(),
     updatedAt: z4.date().nullable(),
 });
 
@@ -731,6 +900,7 @@ const updateSettingsBodySchema = z4.object({
     cwlEnabled: z4.boolean().optional(),
     siteMaintenanceMode: z4.boolean().optional(),
     guildId: z4.string().nullable().optional(),
+    currentCwlSeasonId: z4.number().int().nullable().optional(),
 });
 const updateSettingsData = z4.object({
     settings: settingsSchema,

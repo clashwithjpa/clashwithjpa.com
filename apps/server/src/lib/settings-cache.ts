@@ -13,6 +13,7 @@ type CachedSettings = {
     siteMaintenanceMode: boolean;
     rulesContent: string | null;
     guildId: string | null;
+    currentCwlSeasonId: number | null;
     updatedAt: Date | null;
 } | null;
 

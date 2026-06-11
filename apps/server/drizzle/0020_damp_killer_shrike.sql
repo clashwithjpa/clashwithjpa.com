@@ -1,0 +1,1 @@
+ALTER TABLE "cwl_application_table" ADD COLUMN "notes" text;

@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
-import type { GetBonusDataQueryResponse, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
+import type { GetBonusDataQueryResponse, GetBonusDataQueryParams, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
 import { getBonusData } from "../clients/getBonusData.ts";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
-export const getBonusDataQueryKey = () => [{ url: "/admin/bonus" }] as const;
+export const getBonusDataQueryKey = (params?: GetBonusDataQueryParams) => [{ url: "/admin/bonus" }, ...(params ? [params] : [])] as const;
 
 export type GetBonusDataQueryKey = ReturnType<typeof getBonusDataQueryKey>;
 
-export function getBonusDataQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const queryKey = getBonusDataQueryKey();
+export function getBonusDataQueryOptions(params?: GetBonusDataQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
+    const queryKey = getBonusDataQueryKey(params);
     return queryOptions<
         GetBonusDataQueryResponse,
         ResponseErrorConfig<GetBonusData401 | GetBonusData500>,
@@ -23,13 +23,13 @@ export function getBonusDataQueryOptions(config: Partial<RequestConfig> & { clie
     >({
         queryKey,
         queryFn: async ({ signal }) => {
-            return getBonusData({ ...config, signal: config.signal ?? signal });
+            return getBonusData(params, { ...config, signal: config.signal ?? signal });
         },
     });
 }
 
 /**
- * @description [Manager] Lists CWL applications joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity) for the bonus assignment table.
+ * @description [Manager] Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.
  * {@link /admin/bonus}
  */
 export function createGetBonusData<
@@ -37,6 +37,7 @@ export function createGetBonusData<
     TQueryData = GetBonusDataQueryResponse,
     TQueryKey extends QueryKey = GetBonusDataQueryKey,
 >(
+    params?: GetBonusDataQueryParams,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<GetBonusDataQueryResponse, ResponseErrorConfig<GetBonusData401 | GetBonusData500>, TData, TQueryData, TQueryKey>
@@ -46,11 +47,11 @@ export function createGetBonusData<
 ) {
     const { query: queryConfig = {}, client: config = {} } = options ?? {};
     const { client: queryClient, ...resolvedOptions } = queryConfig;
-    const queryKey = resolvedOptions?.queryKey ?? getBonusDataQueryKey();
+    const queryKey = resolvedOptions?.queryKey ?? getBonusDataQueryKey(params);
 
     const query = createQuery(
         {
-            ...getBonusDataQueryOptions(config),
+            ...getBonusDataQueryOptions(params, config),
             ...resolvedOptions,
             queryKey,
         } as unknown as CreateBaseQueryOptions,

@@ -4,9 +4,9 @@
  */
 
 /**
- * @description Bonus rows.
+ * @description Seasons.
  */
-export type GetBonusHistory200 = {
+export type GetCwlSeasons200 = {
     /**
      * @type boolean
      */
@@ -18,19 +18,24 @@ export type GetBonusHistory200 = {
         /**
          * @type array
          */
-        bonuses: {
+        seasons: {
+            /**
+             * @type number
+             */
+            id: number;
             /**
              * @type string
              */
-            cocAccountTag: string;
+            name: string;
             /**
              * @type string
              */
-            discordUserId: string;
+            month: string;
             /**
-             * @type array
+             * @type number
              */
-            months: string[];
+            year: number;
+            createdAt: string | null;
         }[];
     };
 };
@@ -38,7 +43,7 @@ export type GetBonusHistory200 = {
 /**
  * @description Unauthorized.
  */
-export type GetBonusHistory401 = {
+export type GetCwlSeasons401 = {
     /**
      * @type boolean
      */
@@ -53,7 +58,7 @@ export type GetBonusHistory401 = {
 /**
  * @description Server error.
  */
-export type GetBonusHistory500 = {
+export type GetCwlSeasons500 = {
     /**
      * @type boolean
      */
@@ -65,9 +70,9 @@ export type GetBonusHistory500 = {
           };
 };
 
-export type GetBonusHistoryQueryResponse = GetBonusHistory200;
+export type GetCwlSeasonsQueryResponse = GetCwlSeasons200;
 
-export type GetBonusHistoryQuery = {
-    Response: GetBonusHistory200;
-    Errors: GetBonusHistory401 | GetBonusHistory500;
+export type GetCwlSeasonsQuery = {
+    Response: GetCwlSeasons200;
+    Errors: GetCwlSeasons401 | GetCwlSeasons500;
 };

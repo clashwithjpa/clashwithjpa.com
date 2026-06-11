@@ -18,6 +18,7 @@ export const updateAdminSettings200Schema = z.object({
             siteMaintenanceMode: z.boolean(),
             rulesContent: z.union([z.string(), z.null()]),
             guildId: z.union([z.string(), z.null()]),
+            currentCwlSeasonId: z.union([z.number(), z.null()]),
             updatedAt: z.union([z.iso.datetime(), z.null()]),
         }),
     }),
@@ -44,6 +45,7 @@ export const updateAdminSettingsMutationRequestSchema = z.object({
     cwlEnabled: z.optional(z.boolean()),
     siteMaintenanceMode: z.optional(z.boolean()),
     guildId: z.optional(z.union([z.string(), z.null()])),
+    currentCwlSeasonId: z.optional(z.union([z.int(), z.null()])),
 });
 
 export const updateAdminSettingsMutationResponseSchema = z.lazy(() => updateAdminSettings200Schema);

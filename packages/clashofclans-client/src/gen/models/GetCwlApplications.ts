@@ -5,15 +5,11 @@
 
 export type GetCwlApplicationsQueryParams = {
     /**
-     * @type string | undefined
-     */
-    month?: string;
-    /**
      * @minLength -9007199254740991
      * @maxLength 9007199254740991
      * @type integer | undefined
      */
-    year?: number;
+    seasonId?: number;
     /**
      * @type string | undefined
      */
@@ -83,13 +79,12 @@ export type GetCwlApplications200 = {
             isExternal: boolean;
             image: string | null;
             /**
-             * @type string
-             */
-            month: string;
-            /**
              * @type number
              */
-            year: number;
+            seasonId: number;
+            seasonName: string | null;
+            month: string | null;
+            year: number | null;
             /**
              * @type number
              */
@@ -108,6 +103,7 @@ export type GetCwlApplications200 = {
          * @type number
          */
         total: number;
+        seasonId: number | null;
     };
 };
 

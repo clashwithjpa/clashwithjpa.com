@@ -7,8 +7,7 @@ import { z } from "zod/v4";
 
 export const getCwlApplicationsQueryParamsSchema = z
     .object({
-        month: z.optional(z.string()),
-        year: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
+        seasonId: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
         assignedTo: z.optional(z.string()),
         unassigned: z.optional(z.boolean()),
         limit: z.optional(z.coerce.number().int().min(1).max(9007199254740991)),
@@ -33,8 +32,10 @@ export const getCwlApplications200Schema = z.object({
                 cocAccountWeight: z.number(),
                 isExternal: z.boolean(),
                 image: z.union([z.string(), z.null()]),
-                month: z.string(),
-                year: z.number(),
+                seasonId: z.number(),
+                seasonName: z.union([z.string(), z.null()]),
+                month: z.union([z.string(), z.null()]),
+                year: z.union([z.number(), z.null()]),
                 preferenceNum: z.number(),
                 appliedAt: z.iso.datetime(),
                 assignedTo: z.union([z.string(), z.null()]),
@@ -42,6 +43,7 @@ export const getCwlApplications200Schema = z.object({
             }),
         ),
         total: z.number(),
+        seasonId: z.union([z.number(), z.null()]),
     }),
 });
 

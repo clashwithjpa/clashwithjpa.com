@@ -5,6 +5,12 @@
 
 import { z } from "zod/v4";
 
+export const getBonusDataQueryParamsSchema = z
+    .object({
+        seasonId: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
+    })
+    .optional();
+
 /**
  * @description Bonus rows.
  */
@@ -15,6 +21,7 @@ export const getBonusData200Schema = z.object({
             z.object({
                 id: z.number(),
                 cocAccountId: z.number(),
+                seasonId: z.number(),
                 discordUserId: z.string(),
                 discordUsername: z.string(),
                 image: z.union([z.string(), z.null()]),
@@ -23,6 +30,7 @@ export const getBonusData200Schema = z.object({
                 cocAccountClan: z.union([z.string(), z.null()]),
                 preferenceNum: z.number(),
                 assignedTo: z.union([z.string(), z.null()]),
+                notes: z.union([z.string(), z.null()]),
                 isExternal: z.boolean(),
                 warWeight: z.number(),
                 currentClan: z.union([z.string(), z.null()]),
@@ -39,6 +47,7 @@ export const getBonusData200Schema = z.object({
             }),
         ),
         total: z.number(),
+        seasonId: z.union([z.number(), z.null()]),
     }),
 });
 

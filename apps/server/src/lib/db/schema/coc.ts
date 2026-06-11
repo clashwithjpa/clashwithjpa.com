@@ -1,6 +1,14 @@
 import { relations, sql } from "drizzle-orm";
-import { boolean, check, index, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
+import { boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
 import { account, user } from "./ba-auth";
+
+export const cwlSeasonTable = pgTable("cwl_season_table", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    month: text("month").notNull(),
+    year: integer("year").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 export const settingsTable = pgTable(
     "settings_table",
@@ -11,6 +19,7 @@ export const settingsTable = pgTable(
         siteMaintenanceMode: boolean("site_maintenance_mode").notNull().default(false),
         rulesContent: text("rules_content"),
         guildId: text("guild_id"),
+        currentCwlSeasonId: integer("current_cwl_season_id").references(() => cwlSeasonTable.id, { onDelete: "set null" }),
         updatedAt: timestamp("updated_at").defaultNow(),
     },
     (t) => [check("settings_table_single_row", sql`${t.id} = 1`)],
@@ -123,34 +132,40 @@ export const cwlApplicationTable = pgTable(
             .notNull()
             .references(() => cocAccountTable.cocAccountTag, { onDelete: "cascade" }),
         cocAccountClan: text("coc_account_clan"),
-        month: text("month").notNull(),
-        year: integer("year").notNull(),
+        seasonId: integer("season_id")
+            .notNull()
+            .references(() => cwlSeasonTable.id, { onDelete: "cascade" }),
         preferenceNum: integer("preference_num").notNull(),
+        notes: text("notes"),
         appliedAt: timestamp("applied_at").notNull().defaultNow(),
         assignedTo: text("assigned_to").references(() => cwlClanInfoTable.cocClanTag, {
             onDelete: "cascade",
         }),
     },
     (t) => [
-        unique("cwl_table_accountTag_preferenceNum_month_year_unique").on(t.cocAccountTag, t.preferenceNum, t.month, t.year),
-        unique("cwl_table_userId_preferenceNum_month_year_unique").on(t.discordUserId, t.preferenceNum, t.month, t.year),
-        // One CWL application per account per season, regardless of preference slot.
-        unique("cwl_table_accountTag_month_year_unique").on(t.cocAccountTag, t.month, t.year),
+        unique("cwl_table_accountTag_preferenceNum_season_unique").on(t.cocAccountTag, t.preferenceNum, t.seasonId),
+        unique("cwl_table_userId_preferenceNum_season_unique").on(t.discordUserId, t.preferenceNum, t.seasonId),
+        unique("cwl_table_accountTag_season_unique").on(t.cocAccountTag, t.seasonId),
         index("cwl_application_discord_user_id_idx").on(t.discordUserId),
         index("cwl_application_assigned_to_idx").on(t.assignedTo),
+        index("cwl_application_season_id_idx").on(t.seasonId),
     ],
 );
 
-export const cwlBonusTable = pgTable("cwl_bonus_table", {
-    cocAccountTag: text("coc_account_tag")
-        .notNull()
-        .primaryKey()
-        .references(() => cocAccountTable.cocAccountTag, { onDelete: "cascade" }),
-    discordUserId: text("discord_user_id")
-        .notNull()
-        .references(() => account.accountId, { onDelete: "cascade" }),
-    months: text("months").array().notNull().default([]),
-});
+export const cwlBonusTable = pgTable(
+    "cwl_bonus_table",
+    {
+        discordUserId: text("discord_user_id")
+            .notNull()
+            .references(() => account.accountId, { onDelete: "no action" }),
+        seasonId: integer("season_id")
+            .notNull()
+            .references(() => cwlSeasonTable.id, { onDelete: "cascade" }),
+        cocAccountTag: text("coc_account_tag").references(() => cocAccountTable.cocAccountTag, { onDelete: "no action" }),
+        awardedAt: timestamp("awarded_at").notNull().defaultNow(),
+    },
+    (t) => [primaryKey({ columns: [t.discordUserId, t.seasonId] }), index("cwl_bonus_season_id_idx").on(t.seasonId)],
+);
 
 export const cwlRelations = relations(cwlApplicationTable, ({ one }) => ({
     assignedClan: one(cwlClanInfoTable, {

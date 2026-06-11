@@ -18,7 +18,7 @@ function getGetCwlApplicationsUrl() {
 }
 
 /**
- * @description [Manager] Lists CWL applications. Filter by month/year/assignedTo or unassigned=true.
+ * @description [Manager] Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.
  * {@link /admin/cwl-applications}
  */
 export async function getCwlApplications(params?: GetCwlApplicationsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

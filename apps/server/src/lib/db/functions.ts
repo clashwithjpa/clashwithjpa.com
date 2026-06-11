@@ -1,3 +1,4 @@
+import { cocClient } from "@/lib/coc";
 import { db } from "@/lib/db";
 import {
     account,
@@ -9,6 +10,7 @@ import {
     cwlApplicationTable,
     cwlBonusTable,
     cwlClanInfoTable,
+    cwlSeasonTable,
     settingsTable,
     user,
 } from "@/lib/db/schema";
@@ -133,20 +135,9 @@ export async function addCwlApplication(data: {
     cocAccountTag: string;
     cocAccountClan: string | null;
     preferenceNum: number;
+    seasonId: number;
 }) {
-    const now = new Date();
-    const month = now.toLocaleString("en-US", { month: "long" });
-    const year = now.getFullYear();
-
-    const result = await db
-        .insert(cwlApplicationTable)
-        .values({
-            ...data,
-            month,
-            year,
-        })
-        .returning();
-
+    const result = await db.insert(cwlApplicationTable).values(data).returning();
     return result[0]!;
 }
 
@@ -162,8 +153,10 @@ const cwlApplicationColumns = {
     cocAccountClan: cwlApplicationTable.cocAccountClan,
     cocAccountWeight: sql<number>`coalesce(${cocAccountTable.warWeight}, 0)`,
     isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
-    month: cwlApplicationTable.month,
-    year: cwlApplicationTable.year,
+    seasonId: cwlApplicationTable.seasonId,
+    seasonName: cwlSeasonTable.name,
+    month: cwlSeasonTable.month,
+    year: cwlSeasonTable.year,
     preferenceNum: cwlApplicationTable.preferenceNum,
     appliedAt: cwlApplicationTable.appliedAt,
     assignedTo: cwlApplicationTable.assignedTo,
@@ -174,6 +167,7 @@ export async function getUserCwlApplications(discordUserId: string) {
         .select(cwlApplicationColumns)
         .from(cwlApplicationTable)
         .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+        .leftJoin(cwlSeasonTable, eq(cwlSeasonTable.id, cwlApplicationTable.seasonId))
         .where(eq(cwlApplicationTable.discordUserId, discordUserId));
 
     return applications;
@@ -305,18 +299,21 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
     });
 }
 
-export async function getAllCwlApplications(
-    opts: { month?: string; year?: number; assignedTo?: string | null; limit?: number; offset?: number } = {},
-) {
-    const { month, year, assignedTo, limit, offset } = opts;
+export async function getAllCwlApplications(opts: { seasonId?: number; assignedTo?: string | null; limit?: number; offset?: number } = {}) {
+    let { seasonId } = opts;
+    const { assignedTo, limit, offset } = opts;
 
-    const conditions = [];
-    if (month) conditions.push(eq(cwlApplicationTable.month, month));
-    if (year !== undefined) conditions.push(eq(cwlApplicationTable.year, year));
+    if (seasonId === undefined) {
+        const settings = await getSettings();
+        seasonId = settings?.currentCwlSeasonId ?? undefined;
+    }
+    if (seasonId === undefined) return { applications: [], total: 0, seasonId: null };
+
+    const conditions = [eq(cwlApplicationTable.seasonId, seasonId)];
     if (assignedTo === null) conditions.push(sql`${cwlApplicationTable.assignedTo} IS NULL`);
     else if (assignedTo) conditions.push(eq(cwlApplicationTable.assignedTo, assignedTo));
 
-    const whereClause = conditions.length ? and(...conditions) : undefined;
+    const whereClause = and(...conditions);
 
     // Without an explicit limit we return the whole result set (the admin grid
     // loads a full CWL season client-side); paginate only when limit is given.
@@ -324,6 +321,7 @@ export async function getAllCwlApplications(
         .select({ ...cwlApplicationColumns, image: user.image, cocAccountId: sql<number>`${cocAccountTable.id}` })
         .from(cwlApplicationTable)
         .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+        .leftJoin(cwlSeasonTable, eq(cwlSeasonTable.id, cwlApplicationTable.seasonId))
         .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
         .leftJoin(user, eq(user.id, account.userId))
         .where(whereClause)
@@ -340,26 +338,30 @@ export async function getAllCwlApplications(
             .where(whereClause),
     ]);
 
-    return { applications: rows, total: countResult[0]?.count ?? 0 };
+    return { applications: rows, total: countResult[0]?.count ?? 0, seasonId };
 }
 
-export async function getBonusData() {
+export async function getBonusData(seasonId?: number) {
+    if (seasonId === undefined) {
+        const settings = await getSettings();
+        seasonId = settings?.currentCwlSeasonId ?? undefined;
+    }
+    if (seasonId === undefined) return { rows: [], total: 0, seasonId: null };
+
     const rows = await db
         .select({
-            // CWL application identity (used for assigning the bonus clan)
             id: cwlApplicationTable.id,
-            // Linked account id (used for war weight / stat edits)
             cocAccountId: sql<number>`${cocAccountTable.id}`,
+            seasonId: cwlApplicationTable.seasonId,
             discordUserId: cwlApplicationTable.discordUserId,
             discordUsername: cwlApplicationTable.discordUsername,
             image: user.image,
             cocAccountName: cwlApplicationTable.cocAccountName,
             cocAccountTag: cwlApplicationTable.cocAccountTag,
-            // Clan the account applied with (from the CWL application)
             cocAccountClan: cwlApplicationTable.cocAccountClan,
             preferenceNum: cwlApplicationTable.preferenceNum,
             assignedTo: cwlApplicationTable.assignedTo,
-            // Account-level fields (coalesced so a missing join never yields null)
+            notes: cwlApplicationTable.notes,
             isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
             warWeight: sql<number>`coalesce(${cocAccountTable.warWeight}, 0)`,
             currentClan: cocAccountTable.currentClan,
@@ -370,7 +372,6 @@ export async function getBonusData() {
             capitalGoldLooted: sql<number>`coalesce(${cocAccountTable.capitalGoldLooted}, 0)`,
             capitalGoldContributed: sql<number>`coalesce(${cocAccountTable.capitalGoldContributed}, 0)`,
             activityScore: sql<number>`coalesce(${cocAccountTable.activityScore}, 0)`,
-            // Owning Discord user (for the COC account detail sidebar)
             ownerName: user.name,
             ownerImage: user.image,
             ownerRole: user.role,
@@ -379,48 +380,158 @@ export async function getBonusData() {
         .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
         .leftJoin(account, eq(account.accountId, cwlApplicationTable.discordUserId))
         .leftJoin(user, eq(user.id, account.userId))
+        .where(and(eq(cwlApplicationTable.seasonId, seasonId), eq(cocAccountTable.isExternal, false)))
         .orderBy(desc(cocAccountTable.warWeight), asc(cocAccountTable.id));
 
-    return { rows, total: rows.length };
+    return { rows, total: rows.length, seasonId };
 }
 
-export async function getBonusHistory() {
+export async function getCwlSeasons() {
+    const seasons = await db.select().from(cwlSeasonTable).orderBy(desc(cwlSeasonTable.year), desc(cwlSeasonTable.id));
+    return { seasons };
+}
+
+export async function createCwlSeason(data: { name: string; month: string; year: number }) {
+    const result = await db.insert(cwlSeasonTable).values(data).returning();
+    return result[0]!;
+}
+
+export async function deleteCwlSeason(id: number) {
+    const result = await db.delete(cwlSeasonTable).where(eq(cwlSeasonTable.id, id)).returning();
+    return result[0] ?? null;
+}
+
+export async function getBonusLedger() {
     const bonuses = await db
         .select({
-            cocAccountTag: cwlBonusTable.cocAccountTag,
             discordUserId: cwlBonusTable.discordUserId,
-            months: cwlBonusTable.months,
+            seasonId: cwlBonusTable.seasonId,
+            cocAccountTag: cwlBonusTable.cocAccountTag,
         })
         .from(cwlBonusTable);
     return { bonuses };
 }
 
-// Ticks or unticks a month for a CoC account (toggles it within the months array).
-export async function setAccountMonthSelection(cocAccountTag: string, discordUserId: string, month: string, selected: boolean) {
+export async function setUserSeasonBonus(data: { discordUserId: string; seasonId: number; cocAccountTag: string | null; selected: boolean }) {
+    const { discordUserId, seasonId, cocAccountTag, selected } = data;
     if (selected) {
         const result = await db
             .insert(cwlBonusTable)
-            .values({ cocAccountTag, discordUserId, months: [month] })
+            .values({ discordUserId, seasonId, cocAccountTag })
             .onConflictDoUpdate({
-                target: cwlBonusTable.cocAccountTag,
-                // array_append(array_remove(...)) keeps the months array de-duplicated.
-                set: { months: sql`array_append(array_remove(${cwlBonusTable.months}, ${month}), ${month})`, discordUserId },
+                target: [cwlBonusTable.discordUserId, cwlBonusTable.seasonId],
+                set: { cocAccountTag },
             })
             .returning();
         return result[0] ?? null;
     }
     const result = await db
-        .update(cwlBonusTable)
-        .set({ months: sql`array_remove(${cwlBonusTable.months}, ${month})` })
-        .where(eq(cwlBonusTable.cocAccountTag, cocAccountTag))
+        .delete(cwlBonusTable)
+        .where(and(eq(cwlBonusTable.discordUserId, discordUserId), eq(cwlBonusTable.seasonId, seasonId)))
         .returning();
-    return result[0] ?? { cocAccountTag, discordUserId, months: [] };
+    return result[0] ?? null;
 }
 
-// Removes a month column entirely by stripping it from every account's months.
-export async function removeBonusMonth(month: string) {
-    await db.update(cwlBonusTable).set({ months: sql`array_remove(${cwlBonusTable.months}, ${month})` });
-    return { month };
+export type CwlAttackDetail = {
+    round: number;
+    stars: number;
+    destruction: number;
+    position: number;
+    defenderName: string;
+    defenderTh: number;
+    defenderPosition: number;
+};
+
+// Live-fetches the current CWL for the season's assigned clans and tallies, per
+// player, how many of their (up to 7) attacks they used and the stars earned, plus
+// a per-attack breakdown (their position, who they hit). Matched to accounts by tag.
+export async function getCwlStats(seasonId?: number) {
+    if (seasonId === undefined) {
+        const settings = await getSettings();
+        seasonId = settings?.currentCwlSeasonId ?? undefined;
+    }
+
+    const byTag = new Map<string, { tag: string; name: string; attacks: number; stars: number; details: CwlAttackDetail[] }>();
+    const ensure = (tag: string, name: string) => {
+        const key = tag.toUpperCase();
+        let e = byTag.get(key);
+        if (!e) {
+            e = { tag: key, name, attacks: 0, stars: 0, details: [] };
+            byTag.set(key, e);
+        }
+        return e;
+    };
+
+    // Only fetch clans that have at least one applicant assigned to them this season.
+    const clanRows =
+        seasonId === undefined
+            ? []
+            : await db
+                  .selectDistinct({ tag: cwlApplicationTable.assignedTo })
+                  .from(cwlApplicationTable)
+                  .where(and(eq(cwlApplicationTable.seasonId, seasonId), sql`${cwlApplicationTable.assignedTo} IS NOT NULL`));
+    const clans = clanRows.map((c) => c.tag).filter((t): t is string => Boolean(t));
+
+    await Promise.all(
+        clans.map(async (tag) => {
+            const clanTag = tag.toUpperCase();
+            let group;
+            try {
+                group = await cocClient.getCWLGroup(tag);
+            } catch {
+                return; // clan not in CWL this season
+            }
+            await Promise.all(
+                group.rounds.map(async (round, roundIdx) => {
+                    for (const warTag of round.warTags) {
+                        if (!warTag || warTag === "#0") continue;
+                        let war;
+                        try {
+                            war = await cocClient.getCWLWar(warTag);
+                        } catch {
+                            continue;
+                        }
+                        const isClan = war.clan.tag.toUpperCase() === clanTag;
+                        const isOpponent = war.opponent.tag.toUpperCase() === clanTag;
+                        if (!isClan && !isOpponent) continue;
+                        const side = isClan ? war.clan : war.opponent;
+                        const enemy = isClan ? war.opponent : war.clan;
+                        const enemyByTag = new Map(enemy.members.map((m) => [m.tag.toUpperCase(), m]));
+                        for (const m of side.members) {
+                            const entry = ensure(m.tag, m.name);
+                            for (const atk of m.attacks ?? []) {
+                                const def = enemyByTag.get(atk.defenderTag.toUpperCase());
+                                entry.attacks += 1;
+                                entry.stars += atk.stars;
+                                entry.details.push({
+                                    round: roundIdx + 1,
+                                    stars: atk.stars,
+                                    destruction: atk.destructionPercentage,
+                                    position: m.mapPosition,
+                                    defenderName: def?.name ?? atk.defenderTag,
+                                    defenderTh: def?.townhallLevel ?? 0,
+                                    defenderPosition: def?.mapPosition ?? 0,
+                                });
+                            }
+                        }
+                        break; // our clan's war for this round was found
+                    }
+                }),
+            );
+        }),
+    );
+
+    const stats = [...byTag.values()].map((e) => ({ ...e, details: e.details.sort((a, b) => a.round - b.round) }));
+    return { stats };
+}
+
+export async function updateCwlApplicationNotes(id: number, notes: string | null) {
+    const result = await db
+        .update(cwlApplicationTable)
+        .set({ notes })
+        .where(eq(cwlApplicationTable.id, id))
+        .returning({ id: cwlApplicationTable.id, notes: cwlApplicationTable.notes });
+    return result[0] ?? null;
 }
 
 export async function assignCwlApplication(id: number, clanTag: string | null) {
@@ -467,6 +578,7 @@ export async function updateSettings(values: {
     cwlEnabled?: boolean;
     siteMaintenanceMode?: boolean;
     guildId?: string | null;
+    currentCwlSeasonId?: number | null;
 }) {
     const result = await db
         .insert(settingsTable)

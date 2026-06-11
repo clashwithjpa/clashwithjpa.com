@@ -65,6 +65,14 @@ export type {
     CreateAdminCwlClanMutationResponse,
 } from "./CreateAdminCwlClan.ts";
 export type {
+    CreateCwlSeason200,
+    CreateCwlSeason401,
+    CreateCwlSeason500,
+    CreateCwlSeasonMutation,
+    CreateCwlSeasonMutationRequest,
+    CreateCwlSeasonMutationResponse,
+} from "./CreateCwlSeason.ts";
+export type {
     DeleteAdminClan200,
     DeleteAdminClan401,
     DeleteAdminClan404,
@@ -107,6 +115,15 @@ export type {
     DeleteCwlApplicationsBulkMutationRequest,
     DeleteCwlApplicationsBulkMutationResponse,
 } from "./DeleteCwlApplicationsBulk.ts";
+export type {
+    DeleteCwlSeason200,
+    DeleteCwlSeason401,
+    DeleteCwlSeason404,
+    DeleteCwlSeason500,
+    DeleteCwlSeasonMutation,
+    DeleteCwlSeasonMutationResponse,
+    DeleteCwlSeasonPathParams,
+} from "./DeleteCwlSeason.ts";
 export type {
     ApplicationStatusEnum2Key,
     DeleteJoinApplication200,
@@ -163,14 +180,15 @@ export type {
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./GetAuditLog.ts";
-export type { GetBonusData200, GetBonusData401, GetBonusData500, GetBonusDataQuery, GetBonusDataQueryResponse } from "./GetBonusData.ts";
 export type {
-    GetBonusHistory200,
-    GetBonusHistory401,
-    GetBonusHistory500,
-    GetBonusHistoryQuery,
-    GetBonusHistoryQueryResponse,
-} from "./GetBonusHistory.ts";
+    GetBonusData200,
+    GetBonusData401,
+    GetBonusData500,
+    GetBonusDataQuery,
+    GetBonusDataQueryParams,
+    GetBonusDataQueryResponse,
+} from "./GetBonusData.ts";
+export type { GetBonusLedger200, GetBonusLedger401, GetBonusLedger500, GetBonusLedgerQuery, GetBonusLedgerQueryResponse } from "./GetBonusLedger.ts";
 export type {
     GetCOCCWLWar200,
     GetCOCCWLWar500,
@@ -245,6 +263,15 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./GetCwlApplications.ts";
+export type { GetCwlSeasons200, GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQuery, GetCwlSeasonsQueryResponse } from "./GetCwlSeasons.ts";
+export type {
+    GetCwlStats200,
+    GetCwlStats401,
+    GetCwlStats500,
+    GetCwlStatsQuery,
+    GetCwlStatsQueryParams,
+    GetCwlStatsQueryResponse,
+} from "./GetCwlStats.ts";
 export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
@@ -304,25 +331,6 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
-export type {
-    RemoveBonusMonth200,
-    RemoveBonusMonth401,
-    RemoveBonusMonth500,
-    RemoveBonusMonthMutation,
-    RemoveBonusMonthMutationResponse,
-    RemoveBonusMonthPathParams,
-    RemoveBonusMonthPathParamsMonthEnumKey,
-} from "./RemoveBonusMonth.ts";
-export type {
-    SetAccountMonthSelection200,
-    SetAccountMonthSelection400,
-    SetAccountMonthSelection401,
-    SetAccountMonthSelection500,
-    SetAccountMonthSelectionMutation,
-    SetAccountMonthSelectionMutationRequest,
-    SetAccountMonthSelectionMutationRequestMonthEnumKey,
-    SetAccountMonthSelectionMutationResponse,
-} from "./SetAccountMonthSelection.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -333,6 +341,15 @@ export type {
     SetUserAccountExternalMutationResponse,
     SetUserAccountExternalPathParams,
 } from "./SetUserAccountExternal.ts";
+export type {
+    SetUserSeasonBonus200,
+    SetUserSeasonBonus400,
+    SetUserSeasonBonus401,
+    SetUserSeasonBonus500,
+    SetUserSeasonBonusMutation,
+    SetUserSeasonBonusMutationRequest,
+    SetUserSeasonBonusMutationResponse,
+} from "./SetUserSeasonBonus.ts";
 export type {
     SyncAdminCwlClanLeagues200,
     SyncAdminCwlClanLeagues401,
@@ -409,6 +426,16 @@ export type {
     UpdateCocAccountWarWeightPathParams,
 } from "./UpdateCocAccountWarWeight.ts";
 export type {
+    UpdateCwlApplicationNotes200,
+    UpdateCwlApplicationNotes401,
+    UpdateCwlApplicationNotes404,
+    UpdateCwlApplicationNotes500,
+    UpdateCwlApplicationNotesMutation,
+    UpdateCwlApplicationNotesMutationRequest,
+    UpdateCwlApplicationNotesMutationResponse,
+    UpdateCwlApplicationNotesPathParams,
+} from "./UpdateCwlApplicationNotes.ts";
+export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,
     UpdateJoinApplicationStatus401,
@@ -448,7 +475,5 @@ export { itemsBattleTypeEnum } from "./GetCOCPlayerBattleLog.ts";
 export { applicationsStatusEnum } from "./GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./PostCOCPlayerVerify.ts";
-export { removeBonusMonthPathParamsMonthEnum } from "./RemoveBonusMonth.ts";
-export { setAccountMonthSelectionMutationRequestMonthEnum } from "./SetAccountMonthSelection.ts";
 export { applicationStatusEnum } from "./UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./UpdateJoinApplicationStatus.ts";

@@ -3,6 +3,15 @@
  * Do not edit manually.
  */
 
+export type GetBonusDataQueryParams = {
+    /**
+     * @minLength -9007199254740991
+     * @maxLength 9007199254740991
+     * @type integer | undefined
+     */
+    seasonId?: number;
+};
+
 /**
  * @description Bonus rows.
  */
@@ -28,6 +37,10 @@ export type GetBonusData200 = {
              */
             cocAccountId: number;
             /**
+             * @type number
+             */
+            seasonId: number;
+            /**
              * @type string
              */
             discordUserId: string;
@@ -50,6 +63,7 @@ export type GetBonusData200 = {
              */
             preferenceNum: number;
             assignedTo: string | null;
+            notes: string | null;
             /**
              * @type boolean
              */
@@ -95,6 +109,7 @@ export type GetBonusData200 = {
          * @type number
          */
         total: number;
+        seasonId: number | null;
     };
 };
 
@@ -132,5 +147,6 @@ export type GetBonusDataQueryResponse = GetBonusData200;
 
 export type GetBonusDataQuery = {
     Response: GetBonusData200;
+    QueryParams: GetBonusDataQueryParams;
     Errors: GetBonusData401 | GetBonusData500;
 };

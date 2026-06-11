@@ -37,6 +37,7 @@ export type UpdateAdminSettings200 = {
             siteMaintenanceMode: boolean;
             rulesContent: string | null;
             guildId: string | null;
+            currentCwlSeasonId: number | null;
             updatedAt: string | null;
         };
     };
@@ -86,6 +87,7 @@ export type UpdateAdminSettingsMutationRequest = {
      */
     siteMaintenanceMode?: boolean;
     guildId?: string | null;
+    currentCwlSeasonId?: number | null;
 };
 
 export type UpdateAdminSettingsMutationResponse = UpdateAdminSettings200;

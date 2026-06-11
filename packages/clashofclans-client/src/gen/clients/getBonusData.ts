@@ -4,7 +4,7 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetBonusDataQueryResponse, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
+import type { GetBonusDataQueryResponse, GetBonusDataQueryParams, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetBonusDataUrl() {
@@ -13,15 +13,16 @@ function getGetBonusDataUrl() {
 }
 
 /**
- * @description [Manager] Lists CWL applications joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity) for the bonus assignment table.
+ * @description [Manager] Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.
  * {@link /admin/bonus}
  */
-export async function getBonusData(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getBonusData(params?: GetBonusDataQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = config;
 
     const res = await request<GetBonusDataQueryResponse, ResponseErrorConfig<GetBonusData401 | GetBonusData500>, unknown>({
         method: "GET",
         url: getGetBonusDataUrl().url.toString(),
+        params,
         ...requestConfig,
     });
     return res.data;
