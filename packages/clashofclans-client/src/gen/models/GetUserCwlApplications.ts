@@ -49,6 +49,14 @@ export type GetUserCwlApplications200 = {
              */
             isExternal: boolean;
             /**
+             * @type number
+             */
+            seasonId: number;
+            /**
+             * @type string
+             */
+            seasonName: string;
+            /**
              * @type string
              */
             month: string;

@@ -21,6 +21,8 @@ export const getUserCwlApplications200Schema = z.object({
                 cocAccountClan: z.union([z.string(), z.null()]),
                 cocAccountWeight: z.number(),
                 isExternal: z.boolean(),
+                seasonId: z.number(),
+                seasonName: z.string(),
                 month: z.string(),
                 year: z.number(),
                 preferenceNum: z.number(),

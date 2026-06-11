@@ -13,6 +13,7 @@
     import type { Role } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
+    import { slide } from "svelte/transition";
     import {
         getCOCPlayer,
         type GetCOCPlayer500,
@@ -29,6 +30,7 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
+    import TablerChevronDown from "~icons/tabler/chevron-down";
     import TablerDownload from "~icons/tabler/download";
     import TablerExternalLink from "~icons/tabler/external-link";
     import TablerFilePlus from "~icons/tabler/file-plus";
@@ -123,6 +125,38 @@
         } finally {
             isImporting = false;
         }
+    }
+
+    type CwlApplication = Awaited<ReturnType<typeof getUserCwlApplications>>["data"]["applications"][number];
+
+    type SeasonGroup = {
+        seasonId: number;
+        label: string;
+        year: number;
+        applications: CwlApplication[];
+    };
+
+    function groupApplicationsBySeason(applications: CwlApplication[]): SeasonGroup[] {
+        const groups = new Map<number, SeasonGroup>();
+        for (const app of applications) {
+            let group = groups.get(app.seasonId);
+            if (!group) {
+                const label = app.seasonName ?? (app.month && app.year ? `${app.month} ${app.year}` : "Unknown season");
+                group = { seasonId: app.seasonId, label, year: app.year ?? 0, applications: [] };
+                groups.set(app.seasonId, group);
+            }
+            group.applications.push(app);
+        }
+        return [...groups.values()].sort((a, b) => b.year - a.year || b.seasonId - a.seasonId);
+    }
+
+    let openSeasons = $state<Set<number>>(new Set());
+
+    function toggleSeason(seasonId: number) {
+        const next = new Set(openSeasons);
+        if (next.has(seasonId)) next.delete(seasonId);
+        else next.add(seasonId);
+        openSeasons = next;
     }
 </script>
 
@@ -333,93 +367,141 @@
             <div in:fadeIn>
                 <h1 class="text-2xl font-bold">CWL Applications</h1>
                 <br />
+                {#snippet applicationCard(application: CwlApplication)}
+                    <div
+                        in:fadeIn
+                        use:cardSlideIn
+                        class="flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
+                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex min-w-0 flex-col items-start justify-center gap-1">
+                                <Tooltip title={application.cocAccountName} placement="top" class="w-full text-left">
+                                    <span class="block w-full truncate text-xl font-bold text-stone-50">
+                                        {application.cocAccountName}
+                                    </span>
+                                </Tooltip>
+                                <span class="block w-full truncate font-mono text-xs text-stone-400">
+                                    {application.cocAccountTag}
+                                </span>
+                            </div>
+                            <div class="flex shrink-0 flex-col items-end gap-1">
+                                <Tooltip title={formatDateTime(application.appliedAt)} placement="top">
+                                    <span class="cursor-default text-sm text-stone-400">
+                                        {formatDate(application.appliedAt)}
+                                    </span>
+                                </Tooltip>
+                                {#if application.isExternal}
+                                    <Badge variant="red" content="External" class="mt-2" icon={TablerWorld} />
+                                {/if}
+                            </div>
+                        </div>
+
+                        <hr class="border-stone-700/50" />
+
+                        <div class="flex flex-col gap-2">
+                            {#if application.cocAccountClan}
+                                <div class="flex items-center justify-between gap-2 text-sm">
+                                    <span class="flex items-center gap-1 font-medium text-stone-400">
+                                        <TablerBuildingCastle class="size-4" />
+                                        Clan
+                                    </span>
+                                    <span class="text-stone-200">{jpaClansResp.data.clans[application.cocAccountClan]?.clanName}</span>
+                                </div>
+                            {/if}
+                            <div class="flex items-center justify-between gap-2 text-sm">
+                                <span class="flex items-center gap-1 font-medium text-stone-400">
+                                    <TablerListNumbers class="size-4" />
+                                    Pref. Number
+                                </span>
+                                <span class="font-mono text-stone-200">{application.preferenceNum.toString()}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-sm">
+                                <span class="flex items-center gap-1 font-medium text-stone-400">
+                                    <TablerScale class="size-4" />
+                                    Weight
+                                </span>
+                                <span class="font-mono text-stone-200">{application.cocAccountWeight.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-start justify-between gap-2">
+                            <span class="flex items-center gap-1 font-medium text-stone-400">
+                                <TablerMapPin class="size-4" />
+                                Assigned Clan
+                            </span>
+                            <Button
+                                href="https://link.clashofclans.com/en/?action=OpenClanProfile&tag={encodeURIComponent(application.assignedTo || '')}"
+                                target="_blank"
+                                class="w-full gap-2"
+                                variant={application.assignedTo ? "success" : "base"}
+                                disabled={!application.assignedTo}
+                            >
+                                {#if application.assignedTo}
+                                    {jpaCwlClansResp.data.clans[application.assignedTo]?.clanName || "View Assigned Clan"}
+                                    <TablerExternalLink class="size-5" />
+                                {:else}
+                                    Clan Not Assigned
+                                {/if}
+                            </Button>
+                        </div>
+                    </div>
+                {/snippet}
+
                 {#if resp.data.applications.length === 0}
                     <div class="flex items-center justify-start gap-1 text-stone-400">
                         <TablerX />
                         <span>No CWL applications found</span>
                     </div>
                 {:else}
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {#each resp.data.applications as application}
-                            <div
-                                in:fadeIn
-                                use:cardSlideIn
-                                class="flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
-                            >
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="flex min-w-0 flex-col items-start justify-center gap-1">
-                                        <Tooltip title={application.cocAccountName} placement="top" class="w-full text-left">
-                                            <span class="block w-full truncate text-xl font-bold text-stone-50">
-                                                {application.cocAccountName}
-                                            </span>
-                                        </Tooltip>
-                                        <span class="block w-full truncate font-mono text-xs text-stone-400">
-                                            {application.cocAccountTag}
+                    {@const groups = groupApplicationsBySeason(resp.data.applications)}
+                    <div class="flex flex-col gap-6">
+                        {#each groups as group, i (group.seasonId)}
+                            {#if i === 0}
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <TablerCalendarClock class="size-5 text-emerald-400" />
+                                        <span class="text-lg font-semibold text-stone-100">{group.label}</span>
+                                        <span class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-400">Latest</span>
+                                        <span class="ml-auto text-sm text-stone-400">
+                                            {group.applications.length}
+                                            {group.applications.length === 1 ? "account" : "accounts"}
                                         </span>
                                     </div>
-                                    <div class="flex shrink-0 flex-col items-end gap-1">
-                                        <Tooltip title={formatDateTime(application.appliedAt)} placement="top">
-                                            <span class="cursor-default text-sm text-stone-400">
-                                                {formatDate(application.appliedAt)}
-                                            </span>
-                                        </Tooltip>
-                                        {#if application.isExternal}
-                                            <Badge variant="red" content="External" class="mt-2" icon={TablerWorld} />
-                                        {/if}
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                        {#each group.applications as application (application.id)}
+                                            {@render applicationCard(application)}
+                                        {/each}
                                     </div>
                                 </div>
-
-                                <hr class="border-stone-700/50" />
-
-                                <div class="flex flex-col gap-2">
-                                    {#if application.cocAccountClan}
-                                        <div class="flex items-center justify-between gap-2 text-sm">
-                                            <span class="flex items-center gap-1 font-medium text-stone-400">
-                                                <TablerBuildingCastle class="size-4" />
-                                                Clan
-                                            </span>
-                                            <span class="text-stone-200">{jpaClansResp.data.clans[application.cocAccountClan]?.clanName}</span>
+                            {:else}
+                                {@const isOpen = openSeasons.has(group.seasonId)}
+                                <div class="overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900/40">
+                                    <button
+                                        type="button"
+                                        class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-800/40"
+                                        onclick={() => toggleSeason(group.seasonId)}
+                                        aria-expanded={isOpen}
+                                    >
+                                        <TablerChevronDown
+                                            class="size-4 shrink-0 text-stone-400 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
+                                        />
+                                        <span class="font-medium text-stone-200">{group.label}</span>
+                                        <span class="ml-auto text-sm text-stone-400">
+                                            {group.applications.length}
+                                            {group.applications.length === 1 ? "account" : "accounts"}
+                                        </span>
+                                    </button>
+                                    {#if isOpen}
+                                        <div transition:slide={{ duration: 200 }} class="border-t-2 border-stone-700/50 p-4">
+                                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                                {#each group.applications as application (application.id)}
+                                                    {@render applicationCard(application)}
+                                                {/each}
+                                            </div>
                                         </div>
                                     {/if}
-                                    <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 font-medium text-stone-400">
-                                            <TablerListNumbers class="size-4" />
-                                            Pref. Number
-                                        </span>
-                                        <span class="font-mono text-stone-200">{application.preferenceNum.toString()}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-2 text-sm">
-                                        <span class="flex items-center gap-1 font-medium text-stone-400">
-                                            <TablerScale class="size-4" />
-                                            Weight
-                                        </span>
-                                        <span class="font-mono text-stone-200">{application.cocAccountWeight.toLocaleString()}</span>
-                                    </div>
                                 </div>
-
-                                <div class="flex flex-col items-start justify-between gap-2">
-                                    <span class="flex items-center gap-1 font-medium text-stone-400">
-                                        <TablerMapPin class="size-4" />
-                                        Assigned Clan
-                                    </span>
-                                    <Button
-                                        href="https://link.clashofclans.com/en/?action=OpenClanProfile&tag={encodeURIComponent(
-                                            application.assignedTo || '',
-                                        )}"
-                                        target="_blank"
-                                        class="w-full gap-2"
-                                        variant={application.assignedTo ? "success" : "base"}
-                                        disabled={!application.assignedTo}
-                                    >
-                                        {#if application.assignedTo}
-                                            {jpaCwlClansResp.data.clans[application.assignedTo]?.clanName || "View Assigned Clan"}
-                                            <TablerExternalLink class="size-5" />
-                                        {:else}
-                                            Clan Not Assigned
-                                        {/if}
-                                    </Button>
-                                </div>
-                            </div>
+                            {/if}
                         {/each}
                     </div>
                 {/if}

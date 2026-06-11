@@ -535,6 +535,8 @@ const getCwlApplicationsData = z4.object({
             cocAccountClan: z4.string().nullable(),
             cocAccountWeight: z4.number(),
             isExternal: z4.boolean(),
+            seasonId: z4.number(),
+            seasonName: z4.string(),
             month: z4.string(),
             year: z4.number(),
             preferenceNum: z4.number(),
