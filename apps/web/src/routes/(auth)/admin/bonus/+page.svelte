@@ -4,9 +4,8 @@
     import BonusAccountCell from "$lib/components/grid/BonusAccountCell.svelte";
     import BonusSeasonsCell from "$lib/components/grid/BonusSeasonsCell.svelte";
     import ClanCell from "$lib/components/grid/ClanCell.svelte";
-    import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
+    import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
@@ -32,14 +31,11 @@
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
     import type { GridApi, ICellRendererParams } from "ag-grid-community";
-    import type { Component } from "svelte";
     import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDownload from "~icons/tabler/download";
     import TablerSearch from "~icons/tabler/search";
-    import TablerStar from "~icons/tabler/star";
     import TablerSwords from "~icons/tabler/swords";
-    import TablerX from "~icons/tabler/x";
 
     type BonusRow = GetBonusData200["data"]["rows"][number];
     type Season = GetCwlSeasons200["data"]["seasons"][number];
@@ -97,27 +93,7 @@
         gridApi?.setGridOption("quickFilterText", searchText);
     }
 
-    // Filter/sort presets, toggled via the badge buttons.
-    type PresetKey = "priority1" | "fullAttacks";
-    const PRESETS: { key: PresetKey; label: string; icon: Component; variant: "green" | "yellow" }[] = [
-        { key: "priority1", label: "Preference 1", icon: TablerStar, variant: "yellow" },
-        { key: "fullAttacks", label: "7/7 attacks", icon: TablerSwords, variant: "green" },
-    ];
-    let presets = $state<Record<PresetKey, boolean>>({ priority1: false, fullAttacks: false });
     let displayedCount = $state(0);
-
-    function rowPassesPresets(d: Row): boolean {
-        if (presets.priority1 && d.preferenceNum !== 1) return false;
-        if (presets.fullAttacks && d.cwlAttacks !== 7) return false;
-        return true;
-    }
-
-    // Re-run the grid's external filter whenever a filter preset toggles.
-    $effect(() => {
-        presets.priority1;
-        presets.fullAttacks;
-        gridApi?.onFilterChanged();
-    });
 
     // Rows are grouped by assigned clan; alternate a subtle background band per
     // contiguous clan group so neighbouring clans are easy to tell apart. The
@@ -134,8 +110,8 @@
         });
 
         // Only band when rows are grouped by clan (each tag forms one contiguous
-        // run). When sorted some other way (e.g. the "most donated" preset), the
-        // banding would just be noise, so we leave it off.
+        // run). When sorted some other way (e.g. by most donated), the banding
+        // would just be noise, so we leave it off.
         const seen = new Set<string>();
         let grouped = true;
         let prev: string | null = null;
@@ -386,13 +362,11 @@
                 {:else}
                     {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
                     {/if}
-                    {#if presets.priority1 || presets.fullAttacks || searchText.trim()}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1
-                        ? "y"
-                        : "ies"}
+                    {#if searchText.trim()}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
                 {/if}
             </p>
         </div>
-        <div class="flex w-full items-center gap-2 lg:w-auto">
+        <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
             {#if seasonOptions.length > 0}
                 <Select
                     options={seasonOptions}
@@ -400,66 +374,44 @@
                     onValueChange={(v) => load(Number(v))}
                     placeholder="Season"
                     disabled={loading}
-                    class="w-40 shrink-0"
+                    class="w-full shrink-0 sm:w-40"
                 />
             {/if}
-            <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="min-w-0 flex-1 lg:w-80 lg:flex-none" />
-            <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="bottom">
-                <TablerSearch class="size-5" />
-            </Button>
-            <Button
-                variant="base"
-                class="shrink-0"
-                disabled={fetchingCwl || loading || rows.length === 0}
-                onclick={fetchCwlStats}
-                tooltip="Fetch live CWL attacks & stars"
-                tooltipPlacement="bottom"
-            >
-                {#if fetchingCwl}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerSwords class="size-5" />
-                {/if}
-            </Button>
-            <Button
-                variant="base"
-                class="shrink-0"
-                disabled={downloading || rows.length === 0}
-                onclick={downloadCsv}
-                tooltip="Download as CSV"
-                tooltipPlacement="bottom"
-            >
-                {#if downloading}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerDownload class="size-5" />
-                {/if}
-            </Button>
+            <div class="flex flex-1 items-center gap-2">
+                <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="min-w-0 flex-1 lg:w-80 lg:flex-none" />
+                <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="bottom">
+                    <TablerSearch class="size-5" />
+                </Button>
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    disabled={fetchingCwl || loading || rows.length === 0}
+                    onclick={fetchCwlStats}
+                    tooltip="Fetch live CWL attacks & stars"
+                    tooltipPlacement="bottom"
+                >
+                    {#if fetchingCwl}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerSwords class="size-5" />
+                    {/if}
+                </Button>
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    disabled={downloading || rows.length === 0}
+                    onclick={downloadCsv}
+                    tooltip="Download as CSV"
+                    tooltipPlacement="bottom"
+                >
+                    {#if downloading}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerDownload class="size-5" />
+                    {/if}
+                </Button>
+            </div>
         </div>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-2 px-4">
-        <span class="mr-1 text-xs font-medium text-stone-400">Presets</span>
-        {#each PRESETS as preset (preset.key)}
-            <Badge
-                icon={preset.icon}
-                content={preset.label}
-                variant={presets[preset.key] ? preset.variant : "ghost"}
-                iconSize="size-4"
-                onclick={() => (presets[preset.key] = !presets[preset.key])}
-                class="px-2 py-1 font-medium {presets[preset.key] ? '' : 'opacity-60 hover:opacity-100'}"
-            />
-        {/each}
-        {#if presets.priority1 || presets.fullAttacks}
-            <Badge
-                icon={TablerX}
-                content="Clear"
-                variant="ghost"
-                iconSize="size-4"
-                onclick={() => (presets = { priority1: false, fullAttacks: false })}
-                class="px-2 py-1 font-medium"
-            />
-        {/if}
     </div>
 
     {#if !loading && seasons.length === 0}
@@ -484,9 +436,6 @@
                     if (dividerRowIds.has(id)) classes.push("clan-divider");
                     return classes.length ? classes : undefined;
                 },
-                // Preset filters run as a grid external filter, composing with the search box.
-                isExternalFilterPresent: () => presets.priority1 || presets.fullAttacks,
-                doesExternalFilterPass: (node) => !node.data || rowPassesPresets(node.data),
                 // Always cluster rows by assigned CWL clan (groups A→Z, unassigned last);
                 // the active sort orders rows within each clan.
                 postSortRows: (params) => {
@@ -607,8 +556,6 @@
                     field: "discordUsername",
                     sortable: true,
                     filter: false,
-                    flex: 2,
-                    minWidth: 200,
                     cellRenderer: svelteRenderer(CwlDiscordCell),
                     getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
                 },
@@ -617,8 +564,6 @@
                     field: "cocAccountName",
                     sortable: true,
                     filter: false,
-                    flex: 2,
-                    minWidth: 240,
                     cellRenderer: svelteRenderer(BonusAccountCell),
                     getQuickFilterText: (p) => `${p.data.cocAccountName} ${p.data.cocAccountTag}`,
                 },
@@ -627,20 +572,16 @@
                     field: "cocAccountClan",
                     sortable: true,
                     filter: false,
-                    flex: 2,
-                    minWidth: 180,
                     cellRenderer: svelteRenderer(ClanCell),
                     cellRendererParams: (p: ICellRendererParams) => ({ clanName: clanNameByTag[normalizeTag(p.value)] ?? null }),
                     getQuickFilterText: (p) => `${clanNameByTag[normalizeTag(p.value)] ?? ""} ${p.value ?? ""}`.trim(),
                 },
-                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: false, width: 90 },
+                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: "agNumberColumnFilter" },
                 {
                     headerName: "War Weight",
                     field: "warWeight",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 120,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -652,8 +593,6 @@
                     field: "assignedTo",
                     sortable: true,
                     filter: false,
-                    flex: 2,
-                    minWidth: 180,
                     editable: true,
                     cellEditorPopup: true,
                     cellEditor: "uiSelectEditor",
@@ -669,9 +608,7 @@
                     headerName: "Total Donated",
                     field: "totalDonated",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 130,
+                    filter: "agNumberColumnFilter",
                     sort: "desc",
                     editable: true,
                     cellEditor: "uiInputEditor",
@@ -683,9 +620,7 @@
                     headerName: "Total Received",
                     field: "totalReceived",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 130,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -696,9 +631,7 @@
                     headerName: "Clan Games",
                     field: "clanGames",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 120,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -709,9 +642,7 @@
                     headerName: "Capital Looted",
                     field: "capitalGoldLooted",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 140,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -722,9 +653,7 @@
                     headerName: "Capital Contributed",
                     field: "capitalGoldContributed",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 160,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -735,9 +664,7 @@
                     headerName: "Activity Score",
                     field: "activityScore",
                     sortable: true,
-                    filter: false,
-                    flex: 1,
-                    minWidth: 130,
+                    filter: "agNumberColumnFilter",
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -749,8 +676,7 @@
                     colId: "cwlAttacks",
                     field: "cwlAttacks",
                     sortable: true,
-                    filter: false,
-                    width: 130,
+                    filter: "agNumberColumnFilter",
                     valueFormatter: (p) => (p.value == null ? "" : `${p.value}/7`),
                 },
                 {
@@ -759,7 +685,6 @@
                     field: "cwlStars",
                     sortable: true,
                     filter: false,
-                    width: 120,
                     cellRenderer: svelteRenderer(CwlStarsCell),
                 },
                 {
@@ -767,7 +692,6 @@
                     colId: "thisSeasonBonus",
                     sortable: false,
                     filter: false,
-                    width: 150,
                     cellRenderer: svelteRenderer(BonusSeasonsCell),
                     cellRendererParams: () => ({ seasons: currentSeasonList, toggle: toggleBonus }),
                 },
@@ -776,8 +700,6 @@
                     colId: "pastBonuses",
                     sortable: false,
                     filter: false,
-                    flex: 3,
-                    minWidth: 260,
                     cellRenderer: svelteRenderer(BonusSeasonsCell),
                     cellRendererParams: () => ({ seasons: pastSeasons, toggle: toggleBonus }),
                 },
@@ -785,10 +707,7 @@
                     headerName: "Notes",
                     colId: "notes",
                     field: "notes",
-                    sortable: false,
                     filter: false,
-                    flex: 2,
-                    minWidth: 200,
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "text" },

@@ -4,11 +4,11 @@ import { redirect } from "@sveltejs/kit";
 import type { Component } from "svelte";
 import type { LayoutLoad } from "./$types";
 
+import TablerAward from "~icons/tabler/award";
 import TablerBook2 from "~icons/tabler/book-2";
 import TablerFileDescription from "~icons/tabler/file-description";
 import TablerHistory from "~icons/tabler/history";
 import TablerHome from "~icons/tabler/home";
-import TablerMedal from "~icons/tabler/medal";
 import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerScale from "~icons/tabler/scale";
 import TablerSettings from "~icons/tabler/settings";
@@ -64,7 +64,7 @@ export const load: LayoutLoad = async ({ url }) => {
         },
         {
             name: "Bonus",
-            icon: TablerMedal,
+            icon: TablerAward,
             href: "/admin/bonus",
             description: "Assign CWL bonuses and review account stats",
             requiredPerm: "manage",

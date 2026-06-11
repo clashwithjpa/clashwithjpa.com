@@ -458,8 +458,9 @@
                         icon={TablerAlertTriangle}
                         content="Couldn't check {erroredClans} clan{erroredClans === 1 ? '' : 's'}"
                         variant="red"
+                        size="button"
                         iconSize="size-4"
-                        class="shrink-0 px-2 py-1"
+                        class="shrink-0"
                     />
                 {/if}
                 {#if wrongClanCount > 0}
@@ -470,7 +471,8 @@
                         variant="blue"
                         iconSize="size-4"
                         onclick={() => (clanFilter = isWrongClanActive ? "all" : "wrong-clan")}
-                        class="shrink-0 px-2 py-1 {isWrongClanActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
+                        size="button"
+                        class="shrink-0 {isWrongClanActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
                     />
                 {/if}
                 <div class="h-4 w-px shrink-0 bg-stone-700"></div>
@@ -488,10 +490,11 @@
                             {variant}
                             iconSize="size-4"
                             onclick={() => (clanFilter = isActive ? "all" : stat.clanTag)}
-                            class="px-2 py-1 font-medium {isActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
+                            size="button"
+                            class="font-medium {isActive ? '' : clanFilter !== 'all' ? 'opacity-50 hover:opacity-100' : ''}"
                         />
                         {#if stat.state !== "ok" && stat.state !== "loading"}
-                            <Badge icon={TablerRefresh} variant="red" onclick={() => retryRoster(stat.clanTag)} class="px-2 py-1" iconSize="size-4" />
+                            <Badge icon={TablerRefresh} variant="red" size="button" onclick={() => retryRoster(stat.clanTag)} iconSize="size-4" />
                         {/if}
                     </div>
                 {/each}
@@ -553,7 +556,6 @@
                     field: "discordUsername",
                     sortable: true,
                     filter: false,
-                    flex: 2,
                     cellRenderer: svelteRenderer(CwlDiscordCell),
                     getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
                 },
@@ -562,7 +564,6 @@
                     field: "cocAccountName",
                     sortable: true,
                     filter: false,
-                    flex: 2,
                     cellRenderer: svelteRenderer(CwlAccountCell),
                     getQuickFilterText: (p) => `${p.data.cocAccountName} ${p.data.cocAccountTag}`,
                 },
@@ -571,16 +572,14 @@
                     field: "cocAccountClan",
                     sortable: true,
                     filter: false,
-                    flex: 1,
                     valueFormatter: (p) => p.value || "—",
                 },
-                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: false, width: 90 },
+                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: false },
                 {
                     headerName: "Weight",
                     field: "cocAccountWeight",
                     sortable: true,
                     filter: false,
-                    flex: 1,
                     editable: true,
                     cellEditor: "uiInputEditor",
                     cellEditorParams: { type: "number" },
@@ -593,7 +592,6 @@
                     sortable: true,
                     sort: "desc",
                     filter: false,
-                    flex: 1,
                     valueFormatter: (p) => (p.value ? formatDate(p.value) : ""),
                     tooltipValueGetter: (p) => (p.value ? formatDateTime(p.value) : ""),
                 },
@@ -602,7 +600,6 @@
                     field: "assignedTo",
                     sortable: true,
                     filter: false,
-                    flex: 2,
                     editable: true,
                     cellEditorPopup: true,
                     cellEditor: "uiSelectEditor",
@@ -616,7 +613,6 @@
                     colId: "joinedStatus",
                     sortable: true,
                     filter: false,
-                    width: 180,
                     cellRenderer: svelteRenderer(CwlStatusCell),
                     cellRendererParams: (p: ICellRendererParams) => ({ wrongClan: joinedInfo(p.data).wrongClan }),
                     valueGetter: (p) => joinedInfo(p.data).status,

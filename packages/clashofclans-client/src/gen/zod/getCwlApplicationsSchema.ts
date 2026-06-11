@@ -40,6 +40,7 @@ export const getCwlApplications200Schema = z.object({
                 appliedAt: z.iso.datetime(),
                 assignedTo: z.union([z.string(), z.null()]),
                 cocAccountId: z.number(),
+                ownerRole: z.union([z.string(), z.null()]),
             }),
         ),
         total: z.number(),

@@ -334,8 +334,6 @@
         {:then [resp, jpaClansResp, jpaCwlClansResp]}
             {@const currentApplications = resp.data.applications.filter((application) => application.seasonId === resp.data.currentSeasonId)}
             <div in:fadeIn>
-                <h1 class="text-2xl font-bold">CWL Applications</h1>
-                <br />
                 {#snippet applicationCard(application: CwlApplication)}
                     <div
                         in:fadeIn
@@ -416,26 +414,23 @@
                     </div>
                 {/snippet}
 
+                <div class="flex items-center gap-3 pb-4">
+                    <h1 class="text-2xl font-bold">CWL Applications</h1>
+                    {#if currentApplications.length > 0}
+                        <Badge variant="green" content={currentApplications[0].seasonName} icon={TablerCalendarClock} />
+                    {/if}
+                </div>
+
                 {#if currentApplications.length === 0}
                     <div class="flex items-center justify-start gap-1 text-stone-400">
                         <TablerX />
                         <span>No CWL applications for the current season</span>
                     </div>
                 {:else}
-                    <div class="flex flex-col gap-4">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <TablerCalendarClock class="size-5 text-emerald-400" />
-                            <span class="text-lg font-semibold text-stone-100">{currentApplications[0].seasonName}</span>
-                            <span class="ml-auto text-sm text-stone-400">
-                                {currentApplications.length}
-                                {currentApplications.length === 1 ? "account" : "accounts"}
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {#each currentApplications as application (application.id)}
-                                {@render applicationCard(application)}
-                            {/each}
-                        </div>
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {#each currentApplications as application (application.id)}
+                            {@render applicationCard(application)}
+                        {/each}
                     </div>
                 {/if}
             </div>

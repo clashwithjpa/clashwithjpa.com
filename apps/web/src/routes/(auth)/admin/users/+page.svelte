@@ -236,6 +236,7 @@
 
 <div class="relative flex size-full flex-col overflow-hidden" in:fadeIn>
     <Grid
+        fitToWidth
         gridOptions={{
             context: gridContext,
             rowHeight: 56,
@@ -257,7 +258,7 @@
             },
         }}
         columnDefs={[
-            { headerName: "User", field: "name", sortable: true, filter: false, flex: 2, cellRenderer: svelteRenderer(UserCell) },
+            { headerName: "User", field: "name", sortable: true, filter: false, cellRenderer: svelteRenderer(UserCell) },
             {
                 headerName: "Role",
                 field: "role",
@@ -284,7 +285,7 @@
                 sortable: false,
                 filter: false,
                 lockPosition: "right",
-                width: 0,
+                suppressSizeToFit: true,
             },
         ]}
     />

@@ -318,7 +318,7 @@ export async function getAllCwlApplications(opts: { seasonId?: number; assignedT
     // Without an explicit limit we return the whole result set (the admin grid
     // loads a full CWL season client-side); paginate only when limit is given.
     let rowsQuery = db
-        .select({ ...cwlApplicationColumns, image: user.image, cocAccountId: sql<number>`${cocAccountTable.id}` })
+        .select({ ...cwlApplicationColumns, image: user.image, ownerRole: user.role, cocAccountId: sql<number>`${cocAccountTable.id}` })
         .from(cwlApplicationTable)
         .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
         .leftJoin(cwlSeasonTable, eq(cwlSeasonTable.id, cwlApplicationTable.seasonId))

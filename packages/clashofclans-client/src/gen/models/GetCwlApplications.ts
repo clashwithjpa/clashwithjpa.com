@@ -98,6 +98,7 @@ export type GetCwlApplications200 = {
              * @type number
              */
             cocAccountId: number;
+            ownerRole: string | null;
         }[];
         /**
          * @type number

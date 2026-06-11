@@ -2,16 +2,24 @@
     import { cn } from "$lib/utils";
     import { bounceDown, bounceUp } from "$lib/utils/animations";
     import type { Component } from "svelte";
+    import TablerCheck from "~icons/tabler/check";
     import Icon from "./Icon.svelte";
 
     let props: {
         icon?: Component | string;
         content?: string;
-        variant?: "blue" | "green" | "red" | "yellow" | "ghost";
+        variant?: "blue" | "green" | "red" | "yellow" | "ghost" | "checkbox";
+        size?: "base" | "button";
+        checked?: boolean;
         class?: string;
         iconSize?: string;
         onclick?: (e: MouseEvent) => void;
     } = $props();
+
+    const sizes = {
+        base: "px-1.5 py-0.5",
+        button: "px-2 py-1",
+    };
 
     const colors = {
         blue: "border-blue-700/50 bg-blue-900 text-blue-200",
@@ -29,11 +37,17 @@
         ghost: "hover:bg-stone-700 hover:text-stone-50",
     };
 
+    let variantClass = $derived(props.variant === "checkbox" ? (props.checked ? colors.green : colors.ghost) : colors[props.variant ?? "blue"]);
+
+    let hoverClass = $derived(
+        props.variant === "checkbox" ? (props.checked ? hoverColors.green : hoverColors.ghost) : hoverColors[props.variant ?? "blue"],
+    );
+
     let iconSize = $derived(props.iconSize ?? "size-3");
     let isClickable = $derived(!!props.onclick);
 
     let baseClass = $derived(
-        cn("flex w-fit shrink-0 items-center justify-center gap-1 rounded border px-1.5 py-0.5", colors[props.variant ?? "blue"], props.class),
+        cn("flex w-fit shrink-0 items-center justify-center gap-1 rounded border", sizes[props.size ?? "base"], variantClass, props.class),
     );
 
     let isPressed = false;
@@ -52,7 +66,18 @@
 </script>
 
 {#snippet inner()}
-    {#if props.icon}
+    {#if props.variant === "checkbox"}
+        <span
+            class="grid size-3.5 shrink-0 place-items-center rounded-sm border transition-all duration-200 {props.checked
+                ? 'border-green-600 bg-green-600'
+                : 'border-stone-600'}"
+        >
+            <TablerCheck
+                stroke-width="3"
+                class="size-3 text-white transition-all duration-200 {props.checked ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}"
+            />
+        </span>
+    {:else if props.icon}
         {#if typeof props.icon === "string"}
             {#if props.icon.includes("http")}
                 <div class="{iconSize} bg-cover bg-center" style="background-image: url({props.icon})"></div>
@@ -75,7 +100,7 @@
         onpointerdown={handlePointerDown}
         onpointerup={handlePointerUp}
         onpointerleave={handlePointerUp}
-        class={cn(baseClass, "cursor-pointer transition-colors duration-200", hoverColors[props.variant ?? "blue"])}
+        class={cn(baseClass, "cursor-pointer transition-colors duration-200", hoverClass)}
     >
         {@render inner()}
     </button>
