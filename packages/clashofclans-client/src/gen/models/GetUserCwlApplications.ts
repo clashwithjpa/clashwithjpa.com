@@ -74,6 +74,7 @@ export type GetUserCwlApplications200 = {
             appliedAt: string;
             assignedTo: string | null;
         }[];
+        currentSeasonId: number | null;
     };
 };
 

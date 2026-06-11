@@ -30,6 +30,7 @@ export const getUserCwlApplications200Schema = z.object({
                 assignedTo: z.union([z.string(), z.null()]),
             }),
         ),
+        currentSeasonId: z.union([z.number(), z.null()]),
     }),
 });
 

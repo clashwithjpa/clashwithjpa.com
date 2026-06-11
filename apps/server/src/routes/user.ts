@@ -544,6 +544,7 @@ const getCwlApplicationsData = z4.object({
             assignedTo: z4.string().nullable(),
         }),
     ),
+    currentSeasonId: z4.number().nullable(),
 });
 app.get(
     "/cwl",
@@ -592,10 +593,10 @@ app.get(
         }
 
         try {
-            const applications = await getUserCwlApplications(discordId);
+            const [applications, settings] = await Promise.all([getUserCwlApplications(discordId), getCachedSettings()]);
             return c.json({
                 success: true,
-                data: { applications },
+                data: { applications, currentSeasonId: settings?.currentCwlSeasonId ?? null },
             });
         } catch (error) {
             Sentry.captureException(error);
