@@ -1,8 +1,9 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Chart from "$lib/components/ui/Chart.svelte";
+    import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
-    import { getAuditLog, getCwlApplications, getJoinApplications } from "@repo/clashofclans-client";
+    import { getAuditLog, getCwlApplications, getCwlSeasons, getJoinApplications } from "@repo/clashofclans-client";
     import type { AgCartesianChartOptions, AgPolarChartOptions } from "ag-charts-community";
     import { onMount } from "svelte";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -27,6 +28,12 @@
     let totalUsers = $state<number | null>(null);
     let loading = $state(true);
 
+    let seasons = $state<{ id: number; name: string }[]>([]);
+    let selectedSeasonValue = $state<string>("");
+    let seasonOptions = $derived<Option[]>(seasons.map((s) => ({ label: s.name, value: String(s.id) })));
+    let cwlLoading = $state(false);
+    let selectedSeasonName = $derived(seasons.find((s) => String(s.id) === selectedSeasonValue)?.name ?? null);
+
     const DAYS = 14;
 
     function bucketByDay(items: { createdAt: string }[]) {
@@ -48,21 +55,37 @@
         }));
     }
 
+    async function fetchCwlApps(seasonId?: number) {
+        cwlLoading = true;
+        try {
+            const resp = await getCwlApplications({ limit: 200, seasonId }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                cwlApps = resp.data.applications;
+                if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
+            }
+        } catch {
+            // leave the previously rendered CWL charts in place on failure
+        } finally {
+            cwlLoading = false;
+        }
+    }
+
     onMount(async () => {
         const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
-        const [joinResp, cwlResp, auditResp, usersResp] = await Promise.allSettled([
+        const [joinResp, auditResp, usersResp, seasonsResp] = await Promise.allSettled([
             canReview ? getJoinApplications({ limit: 200 }, opts) : Promise.resolve(null),
-            canManage ? getCwlApplications({ limit: 200 }, opts) : Promise.resolve(null),
             canManage ? getAuditLog({ limit: 200 }, opts) : Promise.resolve(null),
             canManage
                 ? fetch(`${PUBLIC_SERVER_URL}/admin/users?limit=1&offset=0`, { credentials: "include" }).then((r) => r.json())
                 : Promise.resolve(null),
+            canManage ? getCwlSeasons(opts) : Promise.resolve(null),
         ]);
 
         if (joinResp.status === "fulfilled" && joinResp.value?.success) joinApps = joinResp.value.data.applications;
-        if (cwlResp.status === "fulfilled" && cwlResp.value?.success) cwlApps = cwlResp.value.data.applications;
         if (auditResp.status === "fulfilled" && auditResp.value?.success) auditEntries = auditResp.value.data.entries;
         if (usersResp.status === "fulfilled" && usersResp.value?.success) totalUsers = usersResp.value.data.total;
+        if (seasonsResp.status === "fulfilled" && seasonsResp.value?.success) seasons = seasonsResp.value.data.seasons;
+        if (canManage) await fetchCwlApps();
         loading = false;
     });
 
@@ -111,6 +134,7 @@
         for (const app of cwlApps) app.assignedTo ? assigned++ : unassigned++;
         return {
             title: { text: "CWL Applications Assignment" },
+            subtitle: selectedSeasonName ? { text: selectedSeasonName } : undefined,
             data: [
                 { state: "Assigned", count: assigned },
                 { state: "Unassigned", count: unassigned },
@@ -136,6 +160,7 @@
         const nonParticipatedCount = Math.max(0, totalUsers - participatedCount);
         return {
             title: { text: "CWL Participation Overview" },
+            subtitle: selectedSeasonName ? { text: selectedSeasonName } : undefined,
             data: [
                 { state: "Participated", count: participatedCount },
                 { state: "Not Participated", count: nonParticipatedCount },
@@ -187,14 +212,9 @@
     });
 
     const charts = $derived(
-        [
-            joinStatusOptions,
-            joinTrendOptions,
-            cwlAssignmentOptions,
-            cwlParticipationOptions, // Added here to render side-by-side with CWL Assignment
-            auditTrendOptions,
-            auditCategoryOptions,
-        ].filter((option): option is AgCartesianChartOptions | AgPolarChartOptions => option !== null),
+        [joinStatusOptions, joinTrendOptions, cwlAssignmentOptions, cwlParticipationOptions, auditTrendOptions, auditCategoryOptions].filter(
+            (option): option is AgCartesianChartOptions | AgPolarChartOptions => option !== null,
+        ),
     );
 </script>
 
@@ -206,7 +226,23 @@
         </div>
     {:else}
         <div in:fadeIn class="flex flex-col gap-3">
-            <h2 class="text-2xl font-bold">Analytics</h2>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-2xl font-bold">Analytics</h2>
+                {#if canManage && seasonOptions.length > 0}
+                    <div class="flex items-center gap-2">
+                        <span class="shrink-0 text-xs font-medium text-stone-400">CWL season</span>
+                        <div class="w-full sm:w-44">
+                            <Select
+                                options={seasonOptions}
+                                bind:value={selectedSeasonValue}
+                                onValueChange={(v) => fetchCwlApps(v ? Number(v) : undefined)}
+                                placeholder="Season"
+                                disabled={cwlLoading}
+                            />
+                        </div>
+                    </div>
+                {/if}
+            </div>
             {#if charts.length === 0}
                 <div class="flex items-center justify-start gap-2 text-stone-400">
                     <TablerChartBarPopular class="size-5 text-stone-300" />

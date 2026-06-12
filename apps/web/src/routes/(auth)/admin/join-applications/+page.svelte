@@ -11,7 +11,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
-    import { formatDate, formatDateTime } from "$lib/utils";
+    import { formatDateTime, formatRelativeTime } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import {
         clearAcceptedJoinApplications,
@@ -27,6 +27,7 @@
     import TablerCheck from "~icons/tabler/check";
     import TablerClock from "~icons/tabler/clock";
     import TablerHammer from "~icons/tabler/hammer";
+    import TablerMoneybag from "~icons/tabler/moneybag";
     import TablerStar from "~icons/tabler/star";
     import TablerTrash from "~icons/tabler/trash";
     import TablerTrophy from "~icons/tabler/trophy";
@@ -159,11 +160,20 @@
             trophies: p?.trophies ?? null,
             warStars: p?.warStars ?? null,
             expLevel: p?.expLevel ?? null,
+            donations: p?.achievements?.find((a: any) => a.name === "Friend in Need")?.value ?? null,
             clan: p?.clan?.name as string | undefined,
             clanBadge: p?.clan?.badgeUrls?.small as string | undefined,
             league: p?.leagueTier?.name as string | undefined,
             leagueIcon: p?.leagueTier?.iconUrls?.small as string | undefined,
         };
+    }
+
+    // The stat tiles sit in a 3-column grid; stretch the final tile to fill
+    // whatever columns are left in its row so the block is always flush right
+    // (4 → 3 + 1 full-width, 5 → 3 + [1, 2], 6 → 3 + 3).
+    function lastTileSpan(count: number): string {
+        const fill = 3 - ((count - 1) % 3);
+        return fill === 3 ? "col-span-3" : fill === 2 ? "col-span-2" : "";
     }
 
     const statusVariant: Record<Status, "yellow" | "green" | "red"> = {
@@ -175,9 +185,9 @@
 
 <Seo title="Join Applications" description="Review pending clan join applications" />
 
-{#snippet statTile(icon: typeof TablerTrophy, label: string, value: string)}
+{#snippet statTile(icon: typeof TablerTrophy, label: string, value: string, spanClass = "")}
     {@const Cmp = icon}
-    <div class="flex flex-col gap-0.5 rounded-lg bg-stone-800 px-3 py-2">
+    <div class="flex min-w-0 flex-col gap-0.5 rounded-lg bg-stone-800 px-3 py-2 {spanClass}">
         <div class="flex items-center gap-1 text-xs text-stone-400">
             <Cmp class="size-3.5 shrink-0" />
             <span class="truncate">{label}</span>
@@ -233,7 +243,17 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {#each applications as app (app.id)}
                     {@const p = getPlayer(app)}
-                    <div class="flex h-full min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    {@const stats = [
+                        { icon: TablerTrophy, label: "Trophies", value: p.trophies != null ? p.trophies.toLocaleString() : "—" },
+                        { icon: TablerStar, label: "War stars", value: p.warStars != null ? p.warStars.toLocaleString() : "—" },
+                        { icon: TablerBolt, label: "Level", value: p.expLevel != null ? String(p.expLevel) : "—" },
+                        { icon: TablerMoneybag, label: "FN (Donations)", value: p.donations != null ? p.donations.toLocaleString() : "—" },
+                    ]}
+                    <!-- content-visibility skips layout/paint (and pauses animations) for
+                         off-screen cards, so scrolling stays smooth as the list grows. -->
+                    <div
+                        class="flex h-full min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 [contain-intrinsic-size:auto_360px] [content-visibility:auto]"
+                    >
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex min-w-0 items-start gap-3">
                                 {#if p.townHall}
@@ -300,17 +320,17 @@
                             </div>
                         </div>
 
-                        <!-- Extra stats, evenly sized -->
+                        <!-- Extra stats: last tile fills its row so the block stays flush -->
                         <div class="grid grid-cols-3 gap-2">
-                            {@render statTile(TablerTrophy, "Trophies", p.trophies != null ? p.trophies.toLocaleString() : "—")}
-                            {@render statTile(TablerStar, "War stars", p.warStars != null ? p.warStars.toLocaleString() : "—")}
-                            {@render statTile(TablerBolt, "Level", p.expLevel != null ? String(p.expLevel) : "—")}
+                            {#each stats as stat, i (stat.label)}
+                                {@render statTile(stat.icon, stat.label, stat.value, i === stats.length - 1 ? lastTileSpan(stats.length) : "")}
+                            {/each}
                         </div>
 
                         <Tooltip title={formatDateTime(app.createdAt)} placement="top">
                             <div class="flex items-center gap-1 text-xs text-stone-400">
                                 <TablerClock class="size-3.5 shrink-0" />
-                                <span>Applied {formatDate(app.createdAt)}</span>
+                                <span>Applied {formatRelativeTime(app.createdAt)}</span>
                             </div>
                         </Tooltip>
 

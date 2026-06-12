@@ -1,6 +1,6 @@
 import type { Role } from "@repo/auth-shared";
 
-export { ROLE_LEVELS, ROLES, roleLevel, type Role } from "@repo/auth-shared";
+export { ROLE_LEVELS, roleLevel, ROLES, type Role } from "@repo/auth-shared";
 
 export interface RoleDecoration {
     gradient: string;
@@ -30,7 +30,7 @@ export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     reviewer: {
         label: "Reviewer",
         decoration: {
-            gradient: "linear-gradient(135deg, #78350f, #d97706)",
+            gradient: "linear-gradient(135deg, #5b21b6, #a78bfa)",
             animated: false,
         },
     },

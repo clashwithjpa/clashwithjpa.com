@@ -422,10 +422,17 @@
     <Toolbar onDragStart={() => (selectOpen = false)}>
         <input type="file" accept="image/*" class="hidden" bind:this={fileInputRef} onchange={handleFileInputChange} />
         <Select options={themeOptions} bind:value={currentTheme} bind:open={selectOpen} placeholder="Select theme" class="w-52 shrink-0 " />
-        <Button onclick={handleManualUploadClick} class="shrink-0" disabled={isSaving}>
+        <Button onclick={handleManualUploadClick} class="shrink-0" disabled={isSaving} tooltip="Upload Image" tooltipPlacement="top">
             <TablerUpload class="size-5" />
         </Button>
-        <Button variant={hasChanges ? "waiting" : "success"} onclick={handleSave} class="shrink-0" disabled={isSaving}>
+        <Button
+            variant={hasChanges ? "waiting" : "success"}
+            onclick={handleSave}
+            class="shrink-0"
+            disabled={isSaving}
+            tooltip="Save Changes"
+            tooltipPlacement="top"
+        >
             {#if isSaving}
                 <SvgSpinnersRingResize class="size-5" />
             {:else}

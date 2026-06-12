@@ -8,7 +8,7 @@
     let props: {
         icon?: Component | string;
         content?: string;
-        variant?: "blue" | "green" | "red" | "yellow" | "ghost" | "checkbox";
+        variant?: "blue" | "green" | "red" | "yellow" | "purple" | "ghost" | "checkbox";
         size?: "base" | "button";
         checked?: boolean;
         class?: string;
@@ -26,6 +26,7 @@
         green: "border-green-700/50 bg-green-900 text-green-200",
         red: "border-red-700/50 bg-red-900 text-red-200",
         yellow: "border-yellow-700/50 bg-yellow-900 text-yellow-200",
+        purple: "border-purple-700/50 bg-purple-900 text-purple-200",
         ghost: "border-stone-700/50 bg-stone-900 text-stone-200",
     };
 
@@ -34,6 +35,7 @@
         green: "hover:bg-green-700 hover:text-green-50",
         red: "hover:bg-red-700 hover:text-red-50",
         yellow: "hover:bg-yellow-700 hover:text-yellow-50",
+        purple: "hover:bg-purple-700 hover:text-purple-50",
         ghost: "hover:bg-stone-700 hover:text-stone-50",
     };
 

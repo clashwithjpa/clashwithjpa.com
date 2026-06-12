@@ -9,9 +9,9 @@
     export const ROLE_DETAILS = {
         unverified: { label: "Unverified", variant: "ghost", icon: TablerQuestionMark },
         verified: { label: "Verified", variant: "green", icon: TablerRosetteDiscountCheck },
-        reviewer: { label: "Reviewer", variant: "yellow", icon: TablerFileText },
+        reviewer: { label: "Reviewer", variant: "purple", icon: TablerFileText },
         manager: { label: "Manager", variant: "blue", icon: TablerTool },
-        admin: { label: "Admin", variant: "red", icon: TablerCrown },
+        admin: { label: "Admin", variant: "yellow", icon: TablerCrown },
         superadmin: { label: "Superadmin", variant: "red", icon: TablerCrownFilled },
     } as const;
 
