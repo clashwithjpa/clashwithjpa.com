@@ -36,10 +36,7 @@
         onOpenChange?: (details: Popover.OpenChangeDetails) => void;
     } = $props();
 
-    // When rendered inside a Dialog (which sets this context), portaling to <body>
-    // would place the popover at z-60, below the dialog's z-9999 backdrop. Render
-    // inline instead so the popover lives inside the dialog's stacking context.
-    const renderInline = getContext<boolean>("tooltip-render-inline") ?? false;
+    const renderInline = getContext<boolean>("render-inline") ?? false;
 </script>
 
 <Popover.Root

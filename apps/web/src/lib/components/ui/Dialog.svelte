@@ -8,7 +8,7 @@
     import { onMount, setContext, type Snippet } from "svelte";
     import TablerX from "~icons/tabler/x";
 
-    setContext("tooltip-render-inline", true);
+    setContext("render-inline", true);
 
     let {
         open = $bindable(false),

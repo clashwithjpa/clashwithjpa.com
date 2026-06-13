@@ -36,7 +36,7 @@
         if (onclick) onclick(e);
     }
 
-    const renderInline = getContext<boolean>("tooltip-render-inline") ?? false;
+    const renderInline = getContext<boolean>("render-inline") ?? false;
 
     let activated = $state(false);
     let open = $state(false);

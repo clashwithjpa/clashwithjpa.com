@@ -94,6 +94,6 @@ A fixed z-index scale prevents stacking conflicts. Do not invent values outside 
 >
 > Raising the z-index on `Tooltip.Content` alone won't fix this: the parent `Tooltip.Positioner` already establishes a stacking context at `z-60`, so any child z-index is resolved inside that context.
 >
-> **Solution:** `<Dialog>` sets a `tooltip-render-inline` Svelte context. `<Tooltip>` reads it and passes `disabled` to its `<Portal>`, rendering inline inside the dialog's `z-9999` stacking context instead of portaling to `<body>`. This is automatic — no per-button changes needed.
+> **Solution:** `<Dialog>` sets a `render-inline` Svelte context. `<Tooltip>` reads it and passes `disabled` to its `<Portal>`, rendering inline inside the dialog's `z-9999` stacking context instead of portaling to `<body>`. This is automatic — no per-button changes needed.
 >
 > Apply the same pattern (set a context → disable the portal) whenever a `z-60` overlay must appear above a `z-9999` container.
