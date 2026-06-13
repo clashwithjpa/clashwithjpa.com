@@ -2,7 +2,7 @@
     import { cn } from "$lib/utils";
     import { Popover } from "@ark-ui/svelte/popover";
     import { Portal } from "@ark-ui/svelte/portal";
-    import type { Snippet } from "svelte";
+    import { getContext, type Snippet } from "svelte";
 
     let {
         trigger,
@@ -35,6 +35,11 @@
         maxWidth?: string;
         onOpenChange?: (details: Popover.OpenChangeDetails) => void;
     } = $props();
+
+    // When rendered inside a Dialog (which sets this context), portaling to <body>
+    // would place the popover at z-60, below the dialog's z-9999 backdrop. Render
+    // inline instead so the popover lives inside the dialog's stacking context.
+    const renderInline = getContext<boolean>("tooltip-render-inline") ?? false;
 </script>
 
 <Popover.Root
@@ -51,8 +56,8 @@
         {@render trigger()}
     </Popover.Trigger>
 
-    <Portal>
-        <Popover.Positioner class="z-60">
+    <Portal disabled={renderInline}>
+        <Popover.Positioner class={cn(renderInline ? "z-9999" : "z-60")}>
             <Popover.Content
                 class={cn(
                     "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",

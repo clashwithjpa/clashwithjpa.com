@@ -3,7 +3,6 @@
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
@@ -14,6 +13,7 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { formatDate, formatDateTime } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import {
@@ -23,6 +23,7 @@
         deleteCwlApplicationsBulk,
         getAdminUsers,
         getCOCClanMembers,
+        getCOCPlayer,
         getCwlApplications,
         getCwlSeasons,
         getJPACwlClans,
@@ -163,14 +164,10 @@
     }
 
     // --- Manual registration (latecomers after signups close) ---
-    type AdminUser = { id: string; name: string; discordId: string | null; image: string | null };
-    type LinkedCocAccount = { cocAccountTag: string; isExternal: boolean };
+    type LinkedCocAccount = { cocAccountTag: string; isExternal: boolean; name?: string; icon?: string };
 
     let registerOpen = $state(false);
-    let userSearch = $state("");
-    let userResults = $state<AdminUser[]>([]);
-    let searchingUsers = $state(false);
-    let selectedUser = $state<AdminUser | null>(null);
+    let selectedUser = $state<ComboboxUser | null>(null);
     let linkedAccounts = $state<LinkedCocAccount[]>([]);
     let loadingAccounts = $state(false);
     let registerCocTag = $state<string>("");
@@ -179,13 +176,15 @@
     let registerSubmitting = $state(false);
 
     let registerAccountOptions = $derived<Option[]>(
-        linkedAccounts.map((a) => ({ label: `${a.cocAccountTag}${a.isExternal ? " · external" : ""}`, value: a.cocAccountTag })),
+        linkedAccounts.map((a) => ({
+            label: `${a.cocAccountTag}${a.name ? ` - ${a.name}` : ""}${a.isExternal ? " (External)" : ""}`,
+            value: a.cocAccountTag,
+            icon: a.icon,
+        })),
     );
 
     function openRegister() {
         selectedUser = null;
-        userSearch = "";
-        userResults = [];
         linkedAccounts = [];
         registerCocTag = "";
         registerPreference = 1;
@@ -193,51 +192,52 @@
         registerOpen = true;
     }
 
-    // Debounced user search; paused once a user is picked or the dialog is closed.
+    async function searchUsers(query: string): Promise<ComboboxUser[]> {
+        try {
+            const resp = await getAdminUsers({ search: query, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) return resp.data.users as ComboboxUser[];
+        } catch {
+            // return empty on failure
+        }
+        return [];
+    }
+
     $effect(() => {
-        const q = userSearch.trim();
-        if (!registerOpen || selectedUser) return;
-        if (!q) {
-            userResults = [];
+        const user = selectedUser;
+        if (!user) {
+            linkedAccounts = [];
+            registerCocTag = "";
+            loadingAccounts = false;
             return;
         }
-        const handle = setTimeout(async () => {
-            searchingUsers = true;
-            try {
-                const resp = await getAdminUsers({ search: q, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (resp.success) userResults = resp.data.users as AdminUser[];
-            } catch {
-                // keep prior results on transient failure
-            } finally {
-                searchingUsers = false;
-            }
-        }, 250);
-        return () => clearTimeout(handle);
-    });
-
-    async function selectUser(u: AdminUser) {
-        selectedUser = u;
-        userSearch = u.name;
-        userResults = [];
         registerCocTag = "";
         linkedAccounts = [];
         loadingAccounts = true;
-        try {
-            const resp = await getUserCocAccountsByUserId(u.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) linkedAccounts = resp.data.accounts;
-        } catch (e: any) {
-            toast.error("Failed to load linked accounts", { description: e?.message });
-        } finally {
-            loadingAccounts = false;
-        }
-    }
-
-    function clearSelectedUser() {
-        selectedUser = null;
-        userSearch = "";
-        linkedAccounts = [];
-        registerCocTag = "";
-    }
+        getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })
+            .then(async (resp) => {
+                if (!resp.success) return;
+                linkedAccounts = await Promise.all(
+                    resp.data.accounts.map(async (acc) => {
+                        try {
+                            const playerData = await getCOCPlayer(encodeURIComponent(acc.cocAccountTag), {
+                                baseURL: PUBLIC_SERVER_URL,
+                                credentials: "include",
+                            });
+                            return {
+                                cocAccountTag: acc.cocAccountTag,
+                                isExternal: acc.isExternal,
+                                name: playerData.data.player.name,
+                                icon: `th/${playerData.data.player.townHallLevel}`,
+                            };
+                        } catch {
+                            return { cocAccountTag: acc.cocAccountTag, isExternal: acc.isExternal };
+                        }
+                    }),
+                );
+            })
+            .catch((e: any) => toast.error("Failed to load linked accounts", { description: e?.message }))
+            .finally(() => (loadingAccounts = false));
+    });
 
     async function submitRegister() {
         if (!selectedUser) {
@@ -766,48 +766,7 @@
     <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1">
             <p class="text-sm font-medium">Member</p>
-            {#if selectedUser}
-                <div class="flex items-center justify-between gap-2 rounded-md border border-stone-700/50 bg-stone-950/40 px-3 py-2">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <Avatar src={selectedUser.image} name={selectedUser.name} size="xs" />
-                        <div class="flex min-w-0 flex-col">
-                            <span class="truncate text-sm text-stone-100">{selectedUser.name}</span>
-                            {#if selectedUser.discordId}
-                                <span class="truncate font-mono text-xs text-stone-400">{selectedUser.discordId}</span>
-                            {/if}
-                        </div>
-                    </div>
-                    <Button variant="ghost" size="icon" onclick={clearSelectedUser} tooltip="Change member" tooltipPlacement="top">
-                        <TablerX class="size-4" />
-                    </Button>
-                </div>
-            {:else}
-                <Input placeholder="Search by name or Discord id..." bind:value={userSearch} />
-                {#if searchingUsers || userResults.length > 0}
-                    <div class="mt-1 max-h-44 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
-                        {#if searchingUsers && userResults.length === 0}
-                            <div class="flex items-center justify-center gap-2 px-3 py-3 text-xs text-stone-400">
-                                <SvgSpinnersRingResize class="size-4" /> Searching…
-                            </div>
-                        {/if}
-                        {#each userResults as u (u.id)}
-                            <button
-                                type="button"
-                                class="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-stone-800/60"
-                                onclick={() => selectUser(u)}
-                            >
-                                <Avatar src={u.image} name={u.name} size="xs" />
-                                <div class="flex min-w-0 flex-col">
-                                    <span class="truncate text-sm text-stone-100">{u.name}</span>
-                                    {#if u.discordId}
-                                        <span class="truncate font-mono text-xs text-stone-400">{u.discordId}</span>
-                                    {/if}
-                                </div>
-                            </button>
-                        {/each}
-                    </div>
-                {/if}
-            {/if}
+            <UserCombobox bind:value={selectedUser} search={searchUsers} placeholder="Search by name or Discord id…" />
         </div>
 
         <div class="flex flex-col gap-1">
