@@ -50,7 +50,9 @@ export type {
     CreateAdminClan200,
     CreateAdminClan401,
     CreateAdminClan409,
+    CreateAdminClan422,
     CreateAdminClan500,
+    CreateAdminClan503,
     CreateAdminClanMutation,
     CreateAdminClanMutationRequest,
     CreateAdminClanMutationResponse,
@@ -381,7 +383,9 @@ export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,
+    UpdateAdminClan422,
     UpdateAdminClan500,
+    UpdateAdminClan503,
     UpdateAdminClanMutation,
     UpdateAdminClanMutationRequest,
     UpdateAdminClanMutationResponse,
@@ -458,6 +462,15 @@ export type {
     UpdateJoinApplicationStatusMutationResponse,
     UpdateJoinApplicationStatusPathParams,
 } from "./UpdateJoinApplicationStatus.ts";
+export type {
+    VerifyAdminClanDiscord200,
+    VerifyAdminClanDiscord401,
+    VerifyAdminClanDiscord500,
+    VerifyAdminClanDiscord503,
+    VerifyAdminClanDiscordMutation,
+    VerifyAdminClanDiscordMutationRequest,
+    VerifyAdminClanDiscordMutationResponse,
+} from "./VerifyAdminClanDiscord.ts";
 export { applicationStatusEnum2 } from "./DeleteJoinApplication.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./GetAdminCocAccounts.ts";
 export { getAdminUsersQueryParamsSortDirectionEnum } from "./GetAdminUsers.ts";

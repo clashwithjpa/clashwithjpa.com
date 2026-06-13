@@ -12,6 +12,7 @@ import TablerHome from "~icons/tabler/home";
 import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerScale from "~icons/tabler/scale";
 import TablerSettings from "~icons/tabler/settings";
+import TablerFlag from "~icons/tabler/flag";
 import TablerShield from "~icons/tabler/shield";
 import TablerSwords from "~icons/tabler/swords";
 import TablerUser from "~icons/tabler/user";
@@ -54,6 +55,13 @@ export const load: LayoutLoad = async ({ url }) => {
             href: "/admin/cwl-applications",
             description: "Manage CWL applications and assignments",
             requiredPerm: "manage",
+        },
+        {
+            name: "Clans",
+            icon: TablerFlag,
+            href: "/admin/clans",
+            description: "Manage JPA clans, Discord links and requirements",
+            requiredPerm: "sudo",
         },
         {
             name: "CWL Clans",

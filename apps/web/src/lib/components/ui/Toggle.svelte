@@ -37,6 +37,7 @@
     }
 </script>
 
+<!-- svelte-ignore a11y_consider_explicit_label -->
 <button
     type="button"
     role="switch"
@@ -55,7 +56,7 @@
     <span
         class={cn(
             "inline-block size-4 rounded-full transition-transform duration-200 ease-in-out",
-            checked ? "translate-x-[1.375rem] bg-green-200" : "translate-x-0.5 bg-red-200",
+            checked ? "translate-x-5.5 bg-green-200" : "translate-x-0.5 bg-red-200",
         )}
     ></span>
 </button>

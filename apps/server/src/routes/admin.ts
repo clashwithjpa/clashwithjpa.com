@@ -2,6 +2,7 @@ import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
 import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
+import { assertClanDiscordIds, DiscordRateLimitError, DiscordUnavailableError, verifyClanDiscordIds } from "@/lib/discord";
 import {
     addCwlApplication,
     assignCwlApplication,
@@ -1131,13 +1132,26 @@ app.post(
             200: { description: "Created clan.", content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertClanData)) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             409: { description: "Duplicate.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            422: { description: "Invalid Discord IDs.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord verification unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
     zValidator("json", clanInputSchema),
     async (c) => {
         try {
-            const clan = await createClan(c.req.valid("json"));
+            const body = c.req.valid("json");
+            // Re-verify server-side so bad IDs can't be stored even if the UI is bypassed.
+            try {
+                const invalidMsg = await assertClanDiscordIds(body);
+                if (invalidMsg) return c.json({ success: false, error: invalidMsg }, 422);
+            } catch (error) {
+                if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                    return c.json({ success: false, error: error.message }, 503);
+                }
+                throw error;
+            }
+            const clan = await createClan(body);
             logAction(c, {
                 action: "clan.create",
                 targetType: "clan",
@@ -1166,6 +1180,8 @@ app.put(
             200: { description: "Updated clan.", content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertClanData)) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            422: { description: "Invalid Discord IDs.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord verification unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
@@ -1175,6 +1191,16 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const body = c.req.valid("json");
+            // Re-verify any Discord IDs present in this (partial) update.
+            try {
+                const invalidMsg = await assertClanDiscordIds(body);
+                if (invalidMsg) return c.json({ success: false, error: invalidMsg }, 422);
+            } catch (error) {
+                if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                    return c.json({ success: false, error: error.message }, 503);
+                }
+                throw error;
+            }
             const clan = await updateClan(id, body);
             if (!clan) return c.json({ success: false, error: "Clan not found" }, 404);
             const fields = Object.keys(body).filter((k) => (body as Record<string, unknown>)[k] !== undefined);
@@ -1222,6 +1248,57 @@ app.delete(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete clan" }, 500);
+        }
+    },
+);
+
+// Verify clan Discord IDs against the configured guild.
+const verifyClanDiscordSchema = z4.object({
+    discordClanRoleId: z4.string().optional(),
+    discordMemberRoleId: z4.string().optional(),
+    discordElderRoleId: z4.string().optional(),
+    discordColeaderRoleId: z4.string().optional(),
+    discordLeaderRoleId: z4.string().optional(),
+    discordClanChannelId: z4.string().optional(),
+    discordLeaderId: z4.string().optional(),
+});
+const discordFieldResultSchema = z4.object({
+    valid: z4.boolean(),
+    name: z4.string().optional(),
+    reason: z4.string().optional(),
+});
+const verifyClanDiscordData = z4.object({
+    ok: z4.boolean(),
+    results: z4.record(z4.string(), discordFieldResultSchema),
+});
+app.post(
+    "/clans/verify-discord",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "verifyAdminClanDiscord",
+        description: "[Admin/sudo] Verifies that the provided Discord role/channel/user IDs exist in the configured guild.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Per-field verification result.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(verifyClanDiscordData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord verification unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", verifyClanDiscordSchema),
+    async (c) => {
+        try {
+            const result = await verifyClanDiscordIds(c.req.valid("json"));
+            return c.json({ success: true, data: result });
+        } catch (error) {
+            if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                return c.json({ success: false, error: error.message }, 503);
+            }
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to verify Discord IDs" }, 500);
         }
     },
 );

@@ -57,3 +57,4 @@ export { updateCocAccountStats } from "./updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./updateCocAccountWarWeight.ts";
 export { updateCwlApplicationNotes } from "./updateCwlApplicationNotes.ts";
 export { updateJoinApplicationStatus } from "./updateJoinApplicationStatus.ts";
+export { verifyAdminClanDiscord } from "./verifyAdminClanDiscord.ts";

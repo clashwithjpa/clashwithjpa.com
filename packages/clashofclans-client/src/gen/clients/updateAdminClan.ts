@@ -10,7 +10,9 @@ import type {
     UpdateAdminClanPathParams,
     UpdateAdminClan401,
     UpdateAdminClan404,
+    UpdateAdminClan422,
     UpdateAdminClan500,
+    UpdateAdminClan503,
 } from "../models/UpdateAdminClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
@@ -34,7 +36,7 @@ export async function updateAdminClan(
 
     const res = await request<
         UpdateAdminClanMutationResponse,
-        ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan500>,
+        ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503>,
         UpdateAdminClanMutationRequest
     >({ method: "PUT", url: getUpdateAdminClanUrl(id).url.toString(), data: requestData, ...requestConfig });
     return res.data;

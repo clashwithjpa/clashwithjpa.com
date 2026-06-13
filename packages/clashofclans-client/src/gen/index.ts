@@ -57,6 +57,7 @@ export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAc
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export type { UpdateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
+export type { VerifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
 export type {
     ApplyCwl200,
     ApplyCwl400,
@@ -109,7 +110,9 @@ export type {
     CreateAdminClan200,
     CreateAdminClan401,
     CreateAdminClan409,
+    CreateAdminClan422,
     CreateAdminClan500,
+    CreateAdminClan503,
     CreateAdminClanMutation,
     CreateAdminClanMutationRequest,
     CreateAdminClanMutationResponse,
@@ -446,7 +449,9 @@ export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
     UpdateAdminClan404,
+    UpdateAdminClan422,
     UpdateAdminClan500,
+    UpdateAdminClan503,
     UpdateAdminClanMutation,
     UpdateAdminClanMutationRequest,
     UpdateAdminClanMutationResponse,
@@ -523,6 +528,15 @@ export type {
     UpdateJoinApplicationStatusMutationResponse,
     UpdateJoinApplicationStatusPathParams,
 } from "./models/UpdateJoinApplicationStatus.ts";
+export type {
+    VerifyAdminClanDiscord200,
+    VerifyAdminClanDiscord401,
+    VerifyAdminClanDiscord500,
+    VerifyAdminClanDiscord503,
+    VerifyAdminClanDiscordMutation,
+    VerifyAdminClanDiscordMutationRequest,
+    VerifyAdminClanDiscordMutationResponse,
+} from "./models/VerifyAdminClanDiscord.ts";
 export { applyCwl } from "./clients/applyCwl.ts";
 export { applyUserAccount } from "./clients/applyUserAccount.ts";
 export { assignCwlApplication } from "./clients/assignCwlApplication.ts";
@@ -582,6 +596,7 @@ export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
 export { updateCwlApplicationNotes } from "./clients/updateCwlApplicationNotes.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
+export { verifyAdminClanDiscord } from "./clients/verifyAdminClanDiscord.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
 export { createApplyCwl } from "./hooks/createApplyCwl.ts";
 export { applyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
@@ -728,6 +743,8 @@ export { createUpdateCwlApplicationNotes } from "./hooks/createUpdateCwlApplicat
 export { updateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
+export { createVerifyAdminClanDiscord } from "./hooks/createVerifyAdminClanDiscord.ts";
+export { verifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
 export { applicationStatusEnum2 } from "./models/DeleteJoinApplication.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
 export { getAdminUsersQueryParamsSortDirectionEnum } from "./models/GetAdminUsers.ts";
@@ -805,7 +822,9 @@ export {
     createAdminClan200Schema,
     createAdminClan401Schema,
     createAdminClan409Schema,
+    createAdminClan422Schema,
     createAdminClan500Schema,
+    createAdminClan503Schema,
     createAdminClanMutationRequestSchema,
     createAdminClanMutationResponseSchema,
 } from "./zod/createAdminClanSchema.ts";
@@ -1081,7 +1100,9 @@ export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,
+    updateAdminClan422Schema,
     updateAdminClan500Schema,
+    updateAdminClan503Schema,
     updateAdminClanMutationRequestSchema,
     updateAdminClanMutationResponseSchema,
     updateAdminClanPathParamsSchema,
@@ -1148,3 +1169,11 @@ export {
     updateJoinApplicationStatusMutationResponseSchema,
     updateJoinApplicationStatusPathParamsSchema,
 } from "./zod/updateJoinApplicationStatusSchema.ts";
+export {
+    verifyAdminClanDiscord200Schema,
+    verifyAdminClanDiscord401Schema,
+    verifyAdminClanDiscord500Schema,
+    verifyAdminClanDiscord503Schema,
+    verifyAdminClanDiscordMutationRequestSchema,
+    verifyAdminClanDiscordMutationResponseSchema,
+} from "./zod/verifyAdminClanDiscordSchema.ts";

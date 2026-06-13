@@ -57,6 +57,7 @@ export type { UpdateCocAccountStatsMutationKey } from "./createUpdateCocAccountS
 export type { UpdateCocAccountWarWeightMutationKey } from "./createUpdateCocAccountWarWeight.ts";
 export type { UpdateCwlApplicationNotesMutationKey } from "./createUpdateCwlApplicationNotes.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./createUpdateJoinApplicationStatus.ts";
+export type { VerifyAdminClanDiscordMutationKey } from "./createVerifyAdminClanDiscord.ts";
 export { applyCwlMutationKey } from "./createApplyCwl.ts";
 export { createApplyCwl } from "./createApplyCwl.ts";
 export { applyUserAccountMutationKey } from "./createApplyUserAccount.ts";
@@ -203,3 +204,5 @@ export { createUpdateCwlApplicationNotes } from "./createUpdateCwlApplicationNot
 export { updateCwlApplicationNotesMutationKey } from "./createUpdateCwlApplicationNotes.ts";
 export { createUpdateJoinApplicationStatus } from "./createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./createUpdateJoinApplicationStatus.ts";
+export { createVerifyAdminClanDiscord } from "./createVerifyAdminClanDiscord.ts";
+export { verifyAdminClanDiscordMutationKey } from "./createVerifyAdminClanDiscord.ts";

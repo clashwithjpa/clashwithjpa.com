@@ -8,7 +8,9 @@ import type {
     CreateAdminClanMutationResponse,
     CreateAdminClan401,
     CreateAdminClan409,
+    CreateAdminClan422,
     CreateAdminClan500,
+    CreateAdminClan503,
 } from "../models/CreateAdminClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
@@ -27,7 +29,7 @@ export function createCreateAdminClan<TContext>(
     options: {
         mutation?: CreateMutationOptions<
             CreateAdminClanMutationResponse,
-            ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan500>,
+            ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan422 | CreateAdminClan500 | CreateAdminClan503>,
             { data: CreateAdminClanMutationRequest },
             TContext
         > & { client?: QueryClient };
@@ -40,7 +42,7 @@ export function createCreateAdminClan<TContext>(
 
     return createMutation<
         CreateAdminClanMutationResponse,
-        ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan500>,
+        ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan422 | CreateAdminClan500 | CreateAdminClan503>,
         { data: CreateAdminClanMutationRequest },
         TContext
     >(

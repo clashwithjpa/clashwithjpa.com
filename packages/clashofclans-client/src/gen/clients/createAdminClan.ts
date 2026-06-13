@@ -9,7 +9,9 @@ import type {
     CreateAdminClanMutationResponse,
     CreateAdminClan401,
     CreateAdminClan409,
+    CreateAdminClan422,
     CreateAdminClan500,
+    CreateAdminClan503,
 } from "../models/CreateAdminClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
@@ -32,7 +34,7 @@ export async function createAdminClan(
 
     const res = await request<
         CreateAdminClanMutationResponse,
-        ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan500>,
+        ResponseErrorConfig<CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan422 | CreateAdminClan500 | CreateAdminClan503>,
         CreateAdminClanMutationRequest
     >({ method: "POST", url: getCreateAdminClanUrl().url.toString(), data: requestData, ...requestConfig });
     return res.data;

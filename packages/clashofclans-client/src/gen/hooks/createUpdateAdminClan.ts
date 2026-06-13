@@ -9,7 +9,9 @@ import type {
     UpdateAdminClanPathParams,
     UpdateAdminClan401,
     UpdateAdminClan404,
+    UpdateAdminClan422,
     UpdateAdminClan500,
+    UpdateAdminClan503,
 } from "../models/UpdateAdminClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
@@ -28,7 +30,7 @@ export function createUpdateAdminClan<TContext>(
     options: {
         mutation?: CreateMutationOptions<
             UpdateAdminClanMutationResponse,
-            ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan500>,
+            ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503>,
             { id: UpdateAdminClanPathParams["id"]; data: UpdateAdminClanMutationRequest },
             TContext
         > & { client?: QueryClient };
@@ -41,7 +43,7 @@ export function createUpdateAdminClan<TContext>(
 
     return createMutation<
         UpdateAdminClanMutationResponse,
-        ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan500>,
+        ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503>,
         { id: UpdateAdminClanPathParams["id"]; data: UpdateAdminClanMutationRequest },
         TContext
     >(

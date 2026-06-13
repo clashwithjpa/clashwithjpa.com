@@ -117,9 +117,39 @@ export type UpdateAdminClan404 = {
 };
 
 /**
+ * @description Invalid Discord IDs.
+ */
+export type UpdateAdminClan422 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
  * @description Server error.
  */
 export type UpdateAdminClan500 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
+ * @description Discord verification unavailable.
+ */
+export type UpdateAdminClan503 = {
     /**
      * @type boolean
      */
@@ -206,5 +236,5 @@ export type UpdateAdminClanMutation = {
     Response: UpdateAdminClan200;
     Request: UpdateAdminClanMutationRequest;
     PathParams: UpdateAdminClanPathParams;
-    Errors: UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan500;
+    Errors: UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503;
 };

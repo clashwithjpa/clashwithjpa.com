@@ -236,25 +236,32 @@
 <Seo title="CWL Clans" description="Add or remove CWL clans" />
 
 <div in:fadeIn class="flex size-full flex-col gap-4">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0">
             <h1 class="text-2xl font-bold">CWL Clans</h1>
             <p class="text-sm text-stone-400">Add or remove the clans available for Clan War League assignments.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <Button variant="ghost" onclick={syncLeagues} disabled={loading || syncing || clans.length === 0}>
-                <span class="flex items-center gap-2">
-                    {#if syncing}
-                        <SvgSpinnersRingResize class="size-4" /> Syncing...
-                    {:else}
-                        <TablerRefresh class="size-4" /> Sync leagues
-                    {/if}
-                </span>
-            </Button>
-            <Button onclick={openAdd} disabled={loading}>
-                <span class="flex items-center gap-2"><TablerPlus class="size-4" /> Add CWL Clan</span>
-            </Button>
-        </div>
+        {#if !loading}
+            <div class="flex items-center gap-2">
+                {#if clans.length > 0}
+                    <Input placeholder="Search by clan name, tag, or leader..." bind:value={searchText} class="min-w-0 flex-1 sm:w-64 sm:flex-none" />
+                {/if}
+                <Button variant="ghost" onclick={syncLeagues} disabled={syncing || clans.length === 0} class="shrink-0">
+                    <span class="flex items-center gap-2">
+                        {#if syncing}
+                            <SvgSpinnersRingResize class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Syncing...</span>
+                        {:else}
+                            <TablerRefresh class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Sync leagues</span>
+                        {/if}
+                    </span>
+                </Button>
+                <Button onclick={openAdd} class="shrink-0">
+                    <span class="flex items-center gap-2"
+                        ><TablerPlus class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Add CWL Clan</span></span
+                    >
+                </Button>
+            </div>
+        {/if}
     </div>
 
     {#if loading}
@@ -266,60 +273,64 @@
             <TablerShield class="size-12 lg:size-16" />
             <p class="text-sm">No CWL clans yet. Add one to get started.</p>
         </div>
-    {:else}
-        <div class="flex w-full gap-2">
-            <Input placeholder="Search by clan name, tag, or leader..." bind:value={searchText} class="flex-1" />
+    {:else if filteredClans.length === 0}
+        <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
+            <TablerX class="size-12 lg:size-16" />
+            <p class="text-sm">No clans match your search.</p>
         </div>
-
-        {#if filteredClans.length === 0}
-            <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
-                <TablerX class="size-12 lg:size-16" />
-                <p class="text-sm">No clans match your search.</p>
-            </div>
-        {:else}
-            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {#each filteredClans as clan (clan.cocClanTag)}
-                    <div use:cardSlideIn class="flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
-                        <div class="flex min-w-0 gap-3">
-                            <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />
-                            <div class="min-w-0 flex-1">
-                                <h3 class="truncate font-semibold text-stone-50">
-                                    {clan.cocClanName}
-                                </h3>
-                                <p class="truncate text-xs text-stone-400">{clan.cocClanTag}</p>
-                                <p class="mt-1 text-xs text-stone-400">{clan.cocClanLeague}</p>
-                                <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" class="flex-1" onclick={() => openEdit(clan)} disabled={removing === clan.cocClanTag}>
-                                <span class="flex items-center gap-2">
-                                    <TablerPencil class="size-4" /> Edit
-                                </span>
-                            </Button>
-                            <ConfirmationDialog
-                                title="Remove CWL Clan"
-                                description={`Remove ${clan.cocClanName} (${clan.cocClanTag}) from CWL clans? This cannot be undone.`}
-                                confirmText="Remove"
-                                onConfirm={() => removeClan(clan.cocClanTag)}
-                            >
-                                <Button variant="danger" size="sm" class="flex-1" disabled={removing === clan.cocClanTag}>
-                                    {#if removing === clan.cocClanTag}
-                                        <span class="flex items-center gap-2">
-                                            <SvgSpinnersRingResize class="size-4" /> Removing
-                                        </span>
-                                    {:else}
-                                        <span class="flex items-center gap-2">
-                                            <TablerTrash class="size-4" /> Remove
-                                        </span>
-                                    {/if}
-                                </Button>
-                            </ConfirmationDialog>
+    {:else}
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {#each filteredClans as clan (clan.cocClanTag)}
+                <div
+                    use:cardSlideIn
+                    class="@container flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
+                >
+                    <div class="flex min-w-0 gap-3">
+                        <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />
+                        <div class="min-w-0 flex-1">
+                            <h3 class="truncate font-semibold text-stone-50">
+                                {clan.cocClanName}
+                            </h3>
+                            <p class="truncate text-xs text-stone-400">{clan.cocClanTag}</p>
+                            <p class="mt-1 text-xs text-stone-400">{clan.cocClanLeague}</p>
+                            <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
                         </div>
                     </div>
-                {/each}
-            </div>
-        {/if}
+                    <div class="flex flex-col gap-2 @[14rem]:flex-row @[14rem]:items-center">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
+                            onclick={() => openEdit(clan)}
+                            disabled={removing === clan.cocClanTag}
+                        >
+                            <span class="flex items-center justify-center gap-2">
+                                <TablerPencil class="size-4 shrink-0" /> Edit
+                            </span>
+                        </Button>
+                        <ConfirmationDialog
+                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
+                            title="Remove CWL Clan"
+                            description={`Remove ${clan.cocClanName} (${clan.cocClanTag}) from CWL clans? This cannot be undone.`}
+                            confirmText="Remove"
+                            onConfirm={() => removeClan(clan.cocClanTag)}
+                        >
+                            <Button variant="danger" size="sm" class="w-full min-w-0" disabled={removing === clan.cocClanTag}>
+                                {#if removing === clan.cocClanTag}
+                                    <span class="flex items-center justify-center gap-2">
+                                        <SvgSpinnersRingResize class="size-4 shrink-0" /> Removing
+                                    </span>
+                                {:else}
+                                    <span class="flex items-center justify-center gap-2">
+                                        <TablerTrash class="size-4 shrink-0" /> Remove
+                                    </span>
+                                {/if}
+                            </Button>
+                        </ConfirmationDialog>
+                    </div>
+                </div>
+            {/each}
+        </div>
     {/if}
 </div>
 

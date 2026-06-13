@@ -48,9 +48,25 @@ export const createAdminClan409Schema = z.object({
 });
 
 /**
+ * @description Invalid Discord IDs.
+ */
+export const createAdminClan422Schema = z.object({
+    success: z.literal(false),
+    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+});
+
+/**
  * @description Server error.
  */
 export const createAdminClan500Schema = z.object({
+    success: z.literal(false),
+    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+});
+
+/**
+ * @description Discord verification unavailable.
+ */
+export const createAdminClan503Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });

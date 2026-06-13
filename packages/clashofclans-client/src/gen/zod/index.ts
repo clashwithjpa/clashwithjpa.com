@@ -45,7 +45,9 @@ export {
     createAdminClan200Schema,
     createAdminClan401Schema,
     createAdminClan409Schema,
+    createAdminClan422Schema,
     createAdminClan500Schema,
+    createAdminClan503Schema,
     createAdminClanMutationRequestSchema,
     createAdminClanMutationResponseSchema,
 } from "./createAdminClanSchema.ts";
@@ -301,7 +303,9 @@ export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
     updateAdminClan404Schema,
+    updateAdminClan422Schema,
     updateAdminClan500Schema,
+    updateAdminClan503Schema,
     updateAdminClanMutationRequestSchema,
     updateAdminClanMutationResponseSchema,
     updateAdminClanPathParamsSchema,
@@ -368,3 +372,11 @@ export {
     updateJoinApplicationStatusMutationResponseSchema,
     updateJoinApplicationStatusPathParamsSchema,
 } from "./updateJoinApplicationStatusSchema.ts";
+export {
+    verifyAdminClanDiscord200Schema,
+    verifyAdminClanDiscord401Schema,
+    verifyAdminClanDiscord500Schema,
+    verifyAdminClanDiscord503Schema,
+    verifyAdminClanDiscordMutationRequestSchema,
+    verifyAdminClanDiscordMutationResponseSchema,
+} from "./verifyAdminClanDiscordSchema.ts";

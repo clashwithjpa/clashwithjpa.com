@@ -108,9 +108,39 @@ export type CreateAdminClan409 = {
 };
 
 /**
+ * @description Invalid Discord IDs.
+ */
+export type CreateAdminClan422 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
  * @description Server error.
  */
 export type CreateAdminClan500 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
+ * @description Discord verification unavailable.
+ */
+export type CreateAdminClan503 = {
     /**
      * @type boolean
      */
@@ -196,5 +226,5 @@ export type CreateAdminClanMutationResponse = CreateAdminClan200;
 export type CreateAdminClanMutation = {
     Response: CreateAdminClan200;
     Request: CreateAdminClanMutationRequest;
-    Errors: CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan500;
+    Errors: CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan422 | CreateAdminClan500 | CreateAdminClan503;
 };
