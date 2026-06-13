@@ -5,6 +5,7 @@ export type { AssignCwlApplicationsBulkMutationKey } from "./hooks/createAssignC
 export type { ClearAcceptedJoinApplicationsMutationKey } from "./hooks/createClearAcceptedJoinApplications.ts";
 export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
+export type { CreateCwlApplicationMutationKey } from "./hooks/createCreateCwlApplication.ts";
 export type { CreateCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
 export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
 export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
@@ -122,6 +123,17 @@ export type {
     CreateAdminCwlClanMutationRequest,
     CreateAdminCwlClanMutationResponse,
 } from "./models/CreateAdminCwlClan.ts";
+export type {
+    CreateCwlApplication200,
+    CreateCwlApplication400,
+    CreateCwlApplication401,
+    CreateCwlApplication404,
+    CreateCwlApplication409,
+    CreateCwlApplication500,
+    CreateCwlApplicationMutation,
+    CreateCwlApplicationMutationRequest,
+    CreateCwlApplicationMutationResponse,
+} from "./models/CreateCwlApplication.ts";
 export type {
     CreateCwlSeason200,
     CreateCwlSeason401,
@@ -518,6 +530,7 @@ export { assignCwlApplicationsBulk } from "./clients/assignCwlApplicationsBulk.t
 export { clearAcceptedJoinApplications } from "./clients/clearAcceptedJoinApplications.ts";
 export { createAdminClan } from "./clients/createAdminClan.ts";
 export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
+export { createCwlApplication } from "./clients/createCwlApplication.ts";
 export { createCwlSeason } from "./clients/createCwlSeason.ts";
 export { deleteAdminClan } from "./clients/deleteAdminClan.ts";
 export { deleteAdminCwlClan } from "./clients/deleteAdminCwlClan.ts";
@@ -583,6 +596,8 @@ export { createAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./hooks/createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
 export { createCreateAdminCwlClan } from "./hooks/createCreateAdminCwlClan.ts";
+export { createCreateCwlApplication } from "./hooks/createCreateCwlApplication.ts";
+export { createCwlApplicationMutationKey } from "./hooks/createCreateCwlApplication.ts";
 export { createCreateCwlSeason } from "./hooks/createCreateCwlSeason.ts";
 export { createCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
 export { createDeleteAdminClan } from "./hooks/createDeleteAdminClan.ts";
@@ -802,6 +817,16 @@ export {
     createAdminCwlClanMutationRequestSchema,
     createAdminCwlClanMutationResponseSchema,
 } from "./zod/createAdminCwlClanSchema.ts";
+export {
+    createCwlApplication200Schema,
+    createCwlApplication400Schema,
+    createCwlApplication401Schema,
+    createCwlApplication404Schema,
+    createCwlApplication409Schema,
+    createCwlApplication500Schema,
+    createCwlApplicationMutationRequestSchema,
+    createCwlApplicationMutationResponseSchema,
+} from "./zod/createCwlApplicationSchema.ts";
 export {
     createCwlSeason200Schema,
     createCwlSeason401Schema,

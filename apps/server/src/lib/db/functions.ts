@@ -42,6 +42,11 @@ export async function getDiscordAccountId(userId: string): Promise<string | null
     return result[0]?.accountId ?? null;
 }
 
+export async function getUserNameById(userId: string): Promise<string | null> {
+    const result = await db.select({ name: user.name }).from(user).where(eq(user.id, userId)).limit(1);
+    return result[0]?.name ?? null;
+}
+
 export async function addCocAccount(discordUserId: string, cocAccountTag: string, opts: { warWeight?: number; isExternal?: boolean } = {}) {
     const result = await db
         .insert(cocAccountTable)

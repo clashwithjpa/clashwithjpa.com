@@ -244,7 +244,7 @@
                     {/if}
                 </div>
             {:else}
-                <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                     {#each accounts as account (account.id)}
                         <div
                             class="flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
@@ -316,6 +316,14 @@
                             {/if}
                         </div>
                     {/each}
+                    <a
+                        href="/dashboard/apply"
+                        use:cardSlideIn
+                        class="group flex min-h-20 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-amber-700/50 bg-stone-900/50 p-2 text-center text-amber-300 transition-colors hover:border-amber-600/70 hover:bg-amber-950/20 hover:text-amber-200"
+                    >
+                        <TablerExternalLink class="size-6 transition-transform group-hover:scale-110" />
+                        <span class="text-sm font-semibold">Add an account</span>
+                    </a>
                 </div>
             {/if}
         </div>

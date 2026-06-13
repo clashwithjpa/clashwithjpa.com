@@ -3,6 +3,7 @@ import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
+    addCwlApplication,
     assignCwlApplication,
     assignCwlApplicationsBulk,
     createClan,
@@ -25,6 +26,7 @@ import {
     getClanApplications,
     getCocAccountsForUser,
     getCwlSeasons,
+    getUserNameById,
     getCwlStats,
     createCwlSeason,
     deleteCwlSeason,
@@ -377,6 +379,105 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch CWL applications" }, 500);
+        }
+    },
+);
+
+const createCwlApplicationBodySchema = z4.object({
+    userId: z4.string().min(1, "userId is required"),
+    tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
+    preferenceNum: z4.coerce.number().int().min(1).max(99).default(1),
+    seasonId: z4.coerce.number().int().min(1).optional(),
+});
+const createCwlApplicationData = z4.object({
+    application: z4.object({
+        id: z4.number(),
+        cocAccountTag: z4.string(),
+        cocAccountName: z4.string(),
+        cocAccountClan: z4.string().nullable(),
+        preferenceNum: z4.number(),
+        seasonId: z4.number(),
+        appliedAt: z4.date(),
+        assignedTo: z4.string().nullable(),
+    }),
+});
+app.post(
+    "/cwl-applications",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "createCwlApplication",
+        description:
+            "[Manager] Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Created application.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(createCwlApplicationData)) } },
+            },
+            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            409: { description: "Duplicate application.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", createCwlApplicationBodySchema),
+    async (c) => {
+        try {
+            const { userId, tag, preferenceNum, seasonId: bodySeasonId } = c.req.valid("json");
+
+            let seasonId = bodySeasonId;
+            if (seasonId === undefined) {
+                const settings = await getSettings();
+                seasonId = settings?.currentCwlSeasonId ?? undefined;
+            }
+            if (seasonId === undefined) return c.json({ success: false, error: "No active CWL season is set." }, 400);
+
+            // Both accounts must already be linked: the CoC account has to belong to
+            // the selected user (which also resolves their Discord account id).
+            const accounts = await getCocAccountsForUser(userId);
+            const matched = accounts.find((a) => a.cocAccountTag === tag);
+            if (!matched) return c.json({ success: false, error: "This account is not linked to the selected user." }, 400);
+
+            const discordUsername = await getUserNameById(userId);
+            if (!discordUsername) return c.json({ success: false, error: "Selected user not found." }, 404);
+
+            let playerData;
+            try {
+                playerData = await cocClient.getPlayer(tag);
+            } catch (error) {
+                Sentry.captureException(error);
+                return c.json({ success: false, error: "Invalid account tag or failed to fetch player data." }, 400);
+            }
+
+            const application = await addCwlApplication({
+                discordUserId: matched.discordUserId,
+                discordUsername,
+                cocAccountName: playerData.name,
+                cocAccountTag: tag,
+                // External accounts don't pick a clan; mains take their live clan.
+                cocAccountClan: matched.isExternal ? null : (playerData.clan?.name ?? matched.currentClan ?? null),
+                preferenceNum,
+                seasonId,
+            });
+            logAction(c, {
+                action: "cwl_application.create",
+                targetType: "cwl_application",
+                targetId: application.id,
+                metadata: { cocAccountTag: tag, seasonId, preferenceNum, manual: true },
+            });
+            return c.json({ success: true, data: { application } });
+        } catch (error: any) {
+            const { constraint, code } = getDbErrorMessage(error);
+            if (code === "23505") {
+                const errorMessage =
+                    constraint === "cwl_table_accountTag_season_unique"
+                        ? "This account already has a CWL application this season."
+                        : "This preference number is already in use for this account or user this season.";
+                return c.json({ success: false, error: errorMessage }, 409);
+            }
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to create CWL application" }, 500);
         }
     },
 );

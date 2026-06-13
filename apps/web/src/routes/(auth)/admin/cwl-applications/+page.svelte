@@ -3,9 +3,11 @@
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
+    import Avatar from "$lib/components/ui/Avatar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
+    import Dialog from "$lib/components/ui/Dialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
     import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
@@ -17,11 +19,14 @@
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,
+        createCwlApplication,
         deleteCwlApplicationsBulk,
+        getAdminUsers,
         getCOCClanMembers,
         getCwlApplications,
         getCwlSeasons,
         getJPACwlClans,
+        getUserCocAccountsByUserId,
         updateCocAccountWarWeight,
         type GetCwlApplications200,
     } from "@repo/clashofclans-client";
@@ -35,6 +40,7 @@
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
+    import TablerUserPlus from "~icons/tabler/user-plus";
     import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number];
@@ -153,6 +159,120 @@
             if (resp.success) seasons = resp.data.seasons;
         } catch {
             // season selector falls back to empty
+        }
+    }
+
+    // --- Manual registration (latecomers after signups close) ---
+    type AdminUser = { id: string; name: string; discordId: string | null; image: string | null };
+    type LinkedCocAccount = { cocAccountTag: string; isExternal: boolean };
+
+    let registerOpen = $state(false);
+    let userSearch = $state("");
+    let userResults = $state<AdminUser[]>([]);
+    let searchingUsers = $state(false);
+    let selectedUser = $state<AdminUser | null>(null);
+    let linkedAccounts = $state<LinkedCocAccount[]>([]);
+    let loadingAccounts = $state(false);
+    let registerCocTag = $state<string>("");
+    let registerPreference = $state(1);
+    let registerSeasonValue = $state<string>("");
+    let registerSubmitting = $state(false);
+
+    let registerAccountOptions = $derived<Option[]>(
+        linkedAccounts.map((a) => ({ label: `${a.cocAccountTag}${a.isExternal ? " · external" : ""}`, value: a.cocAccountTag })),
+    );
+
+    function openRegister() {
+        selectedUser = null;
+        userSearch = "";
+        userResults = [];
+        linkedAccounts = [];
+        registerCocTag = "";
+        registerPreference = 1;
+        registerSeasonValue = selectedSeasonValue || (seasons[0] ? String(seasons[0].id) : "");
+        registerOpen = true;
+    }
+
+    // Debounced user search; paused once a user is picked or the dialog is closed.
+    $effect(() => {
+        const q = userSearch.trim();
+        if (!registerOpen || selectedUser) return;
+        if (!q) {
+            userResults = [];
+            return;
+        }
+        const handle = setTimeout(async () => {
+            searchingUsers = true;
+            try {
+                const resp = await getAdminUsers({ search: q, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (resp.success) userResults = resp.data.users as AdminUser[];
+            } catch {
+                // keep prior results on transient failure
+            } finally {
+                searchingUsers = false;
+            }
+        }, 250);
+        return () => clearTimeout(handle);
+    });
+
+    async function selectUser(u: AdminUser) {
+        selectedUser = u;
+        userSearch = u.name;
+        userResults = [];
+        registerCocTag = "";
+        linkedAccounts = [];
+        loadingAccounts = true;
+        try {
+            const resp = await getUserCocAccountsByUserId(u.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) linkedAccounts = resp.data.accounts;
+        } catch (e: any) {
+            toast.error("Failed to load linked accounts", { description: e?.message });
+        } finally {
+            loadingAccounts = false;
+        }
+    }
+
+    function clearSelectedUser() {
+        selectedUser = null;
+        userSearch = "";
+        linkedAccounts = [];
+        registerCocTag = "";
+    }
+
+    async function submitRegister() {
+        if (!selectedUser) {
+            toast.error("Select a member first");
+            registerOpen = true;
+            return;
+        }
+        if (!registerCocTag) {
+            toast.error("Select a Clash of Clans account");
+            registerOpen = true;
+            return;
+        }
+        const seasonId = registerSeasonValue ? Number(registerSeasonValue) : undefined;
+        registerSubmitting = true;
+        try {
+            const resp = await createCwlApplication(
+                { userId: selectedUser.id, tag: registerCocTag, preferenceNum: registerPreference || 1, seasonId },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (resp.success) {
+                toast.success("CWL application registered");
+                // Jump to the season we registered into (the effect reloads the roster),
+                // or just reload if we're already viewing it.
+                if (seasonId != null && String(seasonId) !== selectedSeasonValue) selectedSeasonValue = String(seasonId);
+                else load();
+            } else {
+                const err = (resp as { error?: unknown }).error;
+                toast.error(typeof err === "string" ? err : "Failed to register application");
+                registerOpen = true;
+            }
+        } catch (e: any) {
+            toast.error("Failed to register application", { description: e?.message });
+            registerOpen = true;
+        } finally {
+            registerSubmitting = false;
         }
     }
 
@@ -388,6 +508,16 @@
                         <Select options={seasonOptions} bind:value={selectedSeasonValue} placeholder="Season" />
                     </div>
                 {/if}
+                <Button
+                    variant="base"
+                    onclick={openRegister}
+                    class="w-full shrink-0 gap-2 lg:w-fit"
+                    tooltip="Register a member for CWL"
+                    tooltipPlacement="bottom"
+                >
+                    <TablerUserPlus class="size-5" />
+                    Register
+                </Button>
                 <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
                 {#if selectedIds.length > 0}
                     <div class="hidden h-8 w-px bg-stone-700 lg:block"></div>
@@ -625,3 +755,85 @@
         />
     </div>
 </div>
+
+<Dialog
+    bind:open={registerOpen}
+    title="Register for CWL"
+    description="Manually add a CWL application for a member joining after signups closed. Their Discord and Clash of Clans accounts must already be linked."
+    confirmText={registerSubmitting ? "Registering…" : "Register"}
+    onConfirm={submitRegister}
+>
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+            <p class="text-sm font-medium">Member</p>
+            {#if selectedUser}
+                <div class="flex items-center justify-between gap-2 rounded-md border border-stone-700/50 bg-stone-950/40 px-3 py-2">
+                    <div class="flex min-w-0 items-center gap-2">
+                        <Avatar src={selectedUser.image} name={selectedUser.name} size="xs" />
+                        <div class="flex min-w-0 flex-col">
+                            <span class="truncate text-sm text-stone-100">{selectedUser.name}</span>
+                            {#if selectedUser.discordId}
+                                <span class="truncate font-mono text-xs text-stone-400">{selectedUser.discordId}</span>
+                            {/if}
+                        </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onclick={clearSelectedUser} tooltip="Change member" tooltipPlacement="top">
+                        <TablerX class="size-4" />
+                    </Button>
+                </div>
+            {:else}
+                <Input placeholder="Search by name or Discord id..." bind:value={userSearch} />
+                {#if searchingUsers || userResults.length > 0}
+                    <div class="mt-1 max-h-44 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
+                        {#if searchingUsers && userResults.length === 0}
+                            <div class="flex items-center justify-center gap-2 px-3 py-3 text-xs text-stone-400">
+                                <SvgSpinnersRingResize class="size-4" /> Searching…
+                            </div>
+                        {/if}
+                        {#each userResults as u (u.id)}
+                            <button
+                                type="button"
+                                class="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-stone-800/60"
+                                onclick={() => selectUser(u)}
+                            >
+                                <Avatar src={u.image} name={u.name} size="xs" />
+                                <div class="flex min-w-0 flex-col">
+                                    <span class="truncate text-sm text-stone-100">{u.name}</span>
+                                    {#if u.discordId}
+                                        <span class="truncate font-mono text-xs text-stone-400">{u.discordId}</span>
+                                    {/if}
+                                </div>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+            {/if}
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <p class="text-sm font-medium">Clash of Clans account</p>
+            {#if !selectedUser}
+                <p class="text-xs text-stone-500">Select a member first.</p>
+            {:else if loadingAccounts}
+                <div class="flex items-center gap-2 text-xs text-stone-400">
+                    <SvgSpinnersRingResize class="size-4" /> Loading linked accounts…
+                </div>
+            {:else if linkedAccounts.length === 0}
+                <p class="text-xs text-amber-400">This member has no linked Clash of Clans accounts.</p>
+            {:else}
+                <Select options={registerAccountOptions} bind:value={registerCocTag} placeholder="Select account" />
+            {/if}
+        </div>
+
+        <div class="flex gap-3">
+            <div class="flex w-24 shrink-0 flex-col gap-1">
+                <p class="text-sm font-medium">Preference</p>
+                <Input type="number" min={1} max={99} bind:value={registerPreference} />
+            </div>
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+                <p class="text-sm font-medium">Season</p>
+                <Select options={seasonOptions} bind:value={registerSeasonValue} placeholder="Season" />
+            </div>
+        </div>
+    </div>
+</Dialog>

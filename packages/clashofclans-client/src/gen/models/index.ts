@@ -65,6 +65,17 @@ export type {
     CreateAdminCwlClanMutationResponse,
 } from "./CreateAdminCwlClan.ts";
 export type {
+    CreateCwlApplication200,
+    CreateCwlApplication400,
+    CreateCwlApplication401,
+    CreateCwlApplication404,
+    CreateCwlApplication409,
+    CreateCwlApplication500,
+    CreateCwlApplicationMutation,
+    CreateCwlApplicationMutationRequest,
+    CreateCwlApplicationMutationResponse,
+} from "./CreateCwlApplication.ts";
+export type {
     CreateCwlSeason200,
     CreateCwlSeason401,
     CreateCwlSeason500,

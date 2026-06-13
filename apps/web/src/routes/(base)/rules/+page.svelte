@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { replaceState } from "$app/navigation";
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import H1 from "$lib/components/ui/coc/H1.svelte";
@@ -14,7 +15,7 @@
     let activeId = $state("");
 
     function setHash(id: string) {
-        if (typeof history !== "undefined") history.replaceState(null, "", `#${id}`);
+        if (typeof history !== "undefined") replaceState(`#${id}`, {});
     }
 
     function navigate(event: MouseEvent, id: string) {
