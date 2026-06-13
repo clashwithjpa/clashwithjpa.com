@@ -30,7 +30,15 @@
 
     let search = $state("");
     let searchRef = $state<HTMLInputElement | null>(null);
+    let listRef = $state<HTMLDivElement | null>(null);
+    let highlightedIndex = $state(-1);
     let filteredOptions = $derived(search.trim() ? options.filter((o) => o.label.toLowerCase().includes(search.trim().toLowerCase())) : options);
+
+    // Reset highlight when filtered options change
+    $effect(() => {
+        filteredOptions;
+        highlightedIndex = -1;
+    });
 
     function selectOption(val: string) {
         value = val;
@@ -38,9 +46,17 @@
         onValueChange?.(val);
     }
 
+    function scrollHighlightedIntoView(index: number) {
+        requestAnimationFrame(() => {
+            const item = listRef?.children[index] as HTMLElement | undefined;
+            item?.scrollIntoView({ block: "nearest" });
+        });
+    }
+
     // Clear the query when the dropdown closes; focus the trigger input when it opens.
     $effect(() => {
         if (open) {
+            highlightedIndex = -1;
             requestAnimationFrame(() => searchRef?.select());
         } else {
             search = "";
@@ -48,9 +64,21 @@
     });
 
     function onSearchKeydown(e: KeyboardEvent) {
-        if (e.key === "Enter" && filteredOptions.length > 0) {
+        if (!open) return;
+        if (e.key === "ArrowDown") {
             e.preventDefault();
-            selectOption(filteredOptions[0].value);
+            highlightedIndex = Math.min(highlightedIndex + 1, filteredOptions.length - 1);
+            scrollHighlightedIntoView(highlightedIndex);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            highlightedIndex = Math.max(highlightedIndex - 1, 0);
+            scrollHighlightedIntoView(highlightedIndex);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            const target = highlightedIndex >= 0 ? filteredOptions[highlightedIndex] : filteredOptions[0];
+            if (target) selectOption(target.value);
+        } else if (e.key === "Escape") {
+            open = false;
         }
     }
 </script>
@@ -106,14 +134,17 @@
         </div>
     {/snippet}
 
-    <div class="flex flex-col gap-1">
-        {#each filteredOptions as option}
+    <div bind:this={listRef} class="flex flex-col gap-1">
+        {#each filteredOptions as option, i}
             <button
                 type="button"
                 class={cn(
                     "flex w-full cursor-pointer items-center rounded-lg px-2 py-2 text-sm text-stone-200 transition-colors duration-200 ease-in-out outline-none hover:bg-stone-700/50 hover:text-stone-50",
                     value === option.value && "bg-stone-800 text-stone-50",
+                    highlightedIndex === i && "bg-stone-700/50 text-stone-50",
                 )}
+                onmouseenter={() => (highlightedIndex = i)}
+                onmouseleave={() => (highlightedIndex = -1)}
                 onclick={() => selectOption(option.value)}
             >
                 <div class="flex min-w-0 items-center gap-2 text-left">
