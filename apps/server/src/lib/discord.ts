@@ -107,6 +107,49 @@ async function getGuildMemberName(guildId: string, userId: string): Promise<stri
     return name;
 }
 
+type GuildMember = { nick?: string | null; user?: { id?: string; username?: string } };
+
+// Paginates the full guild member list. Requires the privileged GUILD_MEMBERS intent.
+async function fetchAllGuildMembers(): Promise<GuildMember[]> {
+    const settings = await getCachedSettings();
+    const guildId = settings?.guildId;
+    if (!guildId) throw new DiscordUnavailableError("Discord guild is not configured. Set the Guild ID in admin settings first.");
+
+    const members: GuildMember[] = [];
+    let after = "0";
+    for (;;) {
+        const res = await discordRequest(`/guilds/${guildId}/members?limit=1000&after=${after}`);
+        if (!res.ok) throw new DiscordUnavailableError(`Failed to fetch guild members (HTTP ${res.status})`);
+
+        const page = (await res.json()) as GuildMember[];
+        members.push(...page);
+
+        if (page.length < 1000) break;
+        after = page[page.length - 1]!.user!.id!;
+    }
+    return members;
+}
+
+// Discord id -> username. Non-members are simply absent from the map.
+export async function getGuildUsernames(): Promise<Map<string, string>> {
+    const usernames = new Map<string, string>();
+    for (const m of await fetchAllGuildMembers()) if (m.user?.id && m.user.username) usernames.set(m.user.id, m.user.username);
+    return usernames;
+}
+
+// Discord id -> guild nickname (only members who set one). Cached for display.
+export async function getGuildNicknames(): Promise<Record<string, string>> {
+    const cacheKey = "discord:guild:nicknames";
+    const cached = await redis.get(cacheKey).catch(() => null);
+    if (cached) return JSON.parse(cached) as Record<string, string>;
+
+    const nicknames: Record<string, string> = {};
+    for (const m of await fetchAllGuildMembers()) if (m.user?.id && m.nick) nicknames[m.user.id] = m.nick;
+
+    await redis.set(cacheKey, JSON.stringify(nicknames), "EX", 300).catch(() => {});
+    return nicknames;
+}
+
 export type DiscordIdInput = {
     discordClanRoleId?: string | null;
     discordMemberRoleId?: string | null;

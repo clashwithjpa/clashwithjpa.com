@@ -47,6 +47,17 @@ export async function getUserNameById(userId: string): Promise<string | null> {
     return result[0]?.name ?? null;
 }
 
+export async function getUsersWithDiscordAccounts(): Promise<{ userId: string; discordId: string; discordUsername: string | null }[]> {
+    return db
+        .select({ userId: user.id, discordId: account.accountId, discordUsername: user.discordUsername })
+        .from(user)
+        .innerJoin(account, eq(account.userId, user.id));
+}
+
+export async function setUserDiscordUsername(userId: string, discordUsername: string): Promise<void> {
+    await db.update(user).set({ discordUsername }).where(eq(user.id, userId));
+}
+
 export async function addCocAccount(discordUserId: string, cocAccountTag: string, opts: { warWeight?: number; isExternal?: boolean } = {}) {
     const result = await db
         .insert(cocAccountTable)

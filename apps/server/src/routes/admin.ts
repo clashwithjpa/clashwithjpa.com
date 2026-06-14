@@ -1,8 +1,15 @@
 import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
-import { isAdmin, isManager, isReviewer } from "@/lib/auth/functions";
+import { isAdmin, isManager, isReviewer, isSuperadmin } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
-import { assertClanDiscordIds, DiscordRateLimitError, DiscordUnavailableError, verifyClanDiscordIds } from "@/lib/discord";
+import {
+    assertClanDiscordIds,
+    DiscordRateLimitError,
+    DiscordUnavailableError,
+    getGuildNicknames,
+    getGuildUsernames,
+    verifyClanDiscordIds,
+} from "@/lib/discord";
 import {
     addCocAccount,
     addCwlApplication,
@@ -30,6 +37,8 @@ import {
     getDiscordAccountId,
     getCwlSeasons,
     getUserNameById,
+    getUsersWithDiscordAccounts,
+    setUserDiscordUsername,
     getCwlStats,
     createCwlSeason,
     deleteCwlSeason,
@@ -2038,6 +2047,86 @@ app.post(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete COC accounts" }, 500);
+        }
+    },
+);
+
+const getGuildNicknamesData = z4.object({
+    nicknames: z4.record(z4.string(), z4.string()),
+});
+app.get(
+    "/guild-nicknames",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getGuildNicknames",
+        description: "[Manager] Live Discord id -> guild nickname map for the configured guild.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Nickname map.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getGuildNicknamesData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const nicknames = await getGuildNicknames();
+            return c.json({ success: true, data: { nicknames } });
+        } catch (error) {
+            if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                return c.json({ success: true, data: { nicknames: {} } });
+            }
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch guild nicknames" }, 500);
+        }
+    },
+);
+
+const refreshDiscordUsernamesData = z4.object({
+    total: z4.number(),
+    matched: z4.number(),
+    updated: z4.number(),
+});
+app.post(
+    "/refresh-discord-usernames",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "refreshDiscordUsernames",
+        description: "[Superadmin/root] Re-fetches Discord usernames from the guild member list and updates stored values.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Backfill result.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(refreshDiscordUsernamesData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            const [usernames, users] = await Promise.all([getGuildUsernames(), getUsersWithDiscordAccounts()]);
+            let matched = 0;
+            let updated = 0;
+            for (const u of users) {
+                const username = usernames.get(u.discordId);
+                if (!username) continue;
+                matched++;
+                if (username !== u.discordUsername) {
+                    await setUserDiscordUsername(u.userId, username);
+                    updated++;
+                }
+            }
+            return c.json({ success: true, data: { total: users.length, matched, updated } });
+        } catch (error) {
+            if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                return c.json({ success: false, error: error.message }, 503);
+            }
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to refresh Discord usernames" }, 500);
         }
     },
 );

@@ -231,6 +231,12 @@ export {
     getCwlStatsQueryResponseSchema,
 } from "./getCwlStatsSchema.ts";
 export {
+    getGuildNicknames200Schema,
+    getGuildNicknames401Schema,
+    getGuildNicknames500Schema,
+    getGuildNicknamesQueryResponseSchema,
+} from "./getGuildNicknamesSchema.ts";
+export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,
     getJPAClanRequirementsQueryResponseSchema,
@@ -279,6 +285,13 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./postCOCPlayerVerifySchema.ts";
+export {
+    refreshDiscordUsernames200Schema,
+    refreshDiscordUsernames401Schema,
+    refreshDiscordUsernames500Schema,
+    refreshDiscordUsernames503Schema,
+    refreshDiscordUsernamesMutationResponseSchema,
+} from "./refreshDiscordUsernamesSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

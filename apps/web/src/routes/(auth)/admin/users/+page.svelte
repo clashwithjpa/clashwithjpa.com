@@ -15,6 +15,7 @@
     import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
+    import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import type { CellValueChangedEvent, GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
@@ -29,6 +30,7 @@
     let pendingRoleChange = $state<{ event: CellValueChangedEvent; oldValue: string; newValue: string } | null>(null);
     let lastRevert: { id: string; value: string } | null = null;
     let gridApi: GridApi | null = $state(null);
+    let guildNicknames: Record<string, string> = {};
     let userSidebar: Sidebar | null = $state(null);
     let selectedSidebarUser: (UserWithRole & { discordId?: string }) | null = $state(null);
 
@@ -103,7 +105,13 @@
                         return;
                     }
 
-                    params.successCallback(json.data.users, json.data.total);
+                    params.successCallback(
+                        json.data.users.map((u: { discordId?: string | null }) => ({
+                            ...u,
+                            discordNickname: u.discordId ? guildNicknames[u.discordId] : undefined,
+                        })),
+                        json.data.total,
+                    );
                 } catch (error) {
                     toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
                     params.failCallback();
@@ -243,8 +251,9 @@
             rowModelType: "infinite",
             cacheBlockSize: 50,
             blockLoadDebounceMillis: 300,
-            onGridReady: (params) => {
+            onGridReady: async (params) => {
                 gridApi = params.api;
+                guildNicknames = await loadGuildNicknames();
                 gridApi.setGridOption("datasource", createDatasource());
             },
             onCellValueChanged: (event) => {
@@ -259,6 +268,13 @@
         }}
         columnDefs={[
             { headerName: "User", field: "name", sortable: true, filter: false, cellRenderer: svelteRenderer(UserCell) },
+            {
+                headerName: "Nickname",
+                field: "discordNickname",
+                sortable: false,
+                filter: false,
+                valueFormatter: (p) => p.value ?? "—",
+            },
             {
                 headerName: "Role",
                 field: "role",

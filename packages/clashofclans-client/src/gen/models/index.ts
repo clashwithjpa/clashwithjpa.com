@@ -298,6 +298,13 @@ export type {
     GetCwlStatsQueryResponse,
 } from "./GetCwlStats.ts";
 export type {
+    GetGuildNicknames200,
+    GetGuildNicknames401,
+    GetGuildNicknames500,
+    GetGuildNicknamesQuery,
+    GetGuildNicknamesQueryResponse,
+} from "./GetGuildNicknames.ts";
+export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
     GetJPAClanRequirementsQuery,
@@ -356,6 +363,14 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
+export type {
+    RefreshDiscordUsernames200,
+    RefreshDiscordUsernames401,
+    RefreshDiscordUsernames500,
+    RefreshDiscordUsernames503,
+    RefreshDiscordUsernamesMutation,
+    RefreshDiscordUsernamesMutationResponse,
+} from "./RefreshDiscordUsernames.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,

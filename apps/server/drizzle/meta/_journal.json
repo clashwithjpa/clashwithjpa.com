@@ -148,6 +148,13 @@
             "when": 1781157583354,
             "tag": "0020_damp_killer_shrike",
             "breakpoints": true
+        },
+        {
+            "idx": 21,
+            "version": "7",
+            "when": 1781429964996,
+            "tag": "0021_giant_riptide",
+            "breakpoints": true
         }
     ]
 }

@@ -14,6 +14,7 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
+    import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate, formatDateTime } from "$lib/utils";
     import { fadeIn } from "$lib/utils/animations";
     import {
@@ -45,7 +46,7 @@
     import TablerUserPlus from "~icons/tabler/user-plus";
     import TablerX from "~icons/tabler/x";
 
-    type Application = GetCwlApplications200["data"]["applications"][number];
+    type Application = GetCwlApplications200["data"]["applications"][number] & { discordNickname?: string };
 
     let { data }: { data: { canDelete: boolean } } = $props();
 
@@ -288,6 +289,7 @@
 
     const CSV_COLUMNS: { header: string; value: (a: Application) => unknown }[] = [
         { header: "Discord", value: (a) => a.discordUsername },
+        { header: "Nickname", value: (a) => a.discordNickname ?? "" },
         { header: "Discord ID", value: (a) => a.discordUserId },
         { header: "Account", value: (a) => a.cocAccountName },
         { header: "Tag", value: (a) => a.cocAccountTag },
@@ -332,17 +334,20 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getCwlApplications(
-                {
-                    seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
-                    unassigned: filterMode === "unassigned" ? true : undefined,
-                },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            );
+            const [resp, nicknames] = await Promise.all([
+                getCwlApplications(
+                    {
+                        seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
+                        unassigned: filterMode === "unassigned" ? true : undefined,
+                    },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
+                ),
+                loadGuildNicknames(),
+            ]);
             if (resp.success) {
                 let list = resp.data.applications;
                 if (filterMode === "assigned") list = list.filter((a) => a.assignedTo);
-                applications = list;
+                applications = list.map((a) => ({ ...a, discordNickname: nicknames[a.discordUserId] }));
                 total = resp.data.total;
                 if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
             } else {
@@ -756,6 +761,13 @@
                     filter: false,
                     cellRenderer: svelteRenderer(CwlDiscordCell),
                     getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
+                },
+                {
+                    headerName: "Nickname",
+                    field: "discordNickname",
+                    sortable: true,
+                    filter: false,
+                    valueFormatter: (p) => p.value ?? "—",
                 },
                 {
                     headerName: "Account",

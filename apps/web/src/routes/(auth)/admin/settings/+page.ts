@@ -10,5 +10,7 @@ export const load: PageLoad = async () => {
         throw error(401, "Unauthorized");
     }
 
-    return { session };
+    const isSuperadmin = await hasPermission(session.data?.user?.id, "root");
+
+    return { session, isSuperadmin };
 };

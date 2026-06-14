@@ -33,6 +33,7 @@ export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBa
 export type { GetCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
 export type { GetCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
 export type { GetCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
+export type { GetGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
@@ -45,6 +46,7 @@ export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCo
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
@@ -364,6 +366,13 @@ export type {
     GetCwlStatsQueryResponse,
 } from "./models/GetCwlStats.ts";
 export type {
+    GetGuildNicknames200,
+    GetGuildNicknames401,
+    GetGuildNicknames500,
+    GetGuildNicknamesQuery,
+    GetGuildNicknamesQueryResponse,
+} from "./models/GetGuildNicknames.ts";
+export type {
     GetJPAClanRequirements200,
     GetJPAClanRequirements500,
     GetJPAClanRequirementsQuery,
@@ -422,6 +431,14 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./models/PostCOCPlayerVerify.ts";
+export type {
+    RefreshDiscordUsernames200,
+    RefreshDiscordUsernames401,
+    RefreshDiscordUsernames500,
+    RefreshDiscordUsernames503,
+    RefreshDiscordUsernamesMutation,
+    RefreshDiscordUsernamesMutationResponse,
+} from "./models/RefreshDiscordUsernames.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -574,6 +591,7 @@ export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
 export { getCwlApplications } from "./clients/getCwlApplications.ts";
 export { getCwlSeasons } from "./clients/getCwlSeasons.ts";
 export { getCwlStats } from "./clients/getCwlStats.ts";
+export { getGuildNicknames } from "./clients/getGuildNicknames.ts";
 export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
@@ -586,6 +604,7 @@ export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
+export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
@@ -687,6 +706,9 @@ export { getCwlSeasonsQueryOptions } from "./hooks/createGetCwlSeasons.ts";
 export { createGetCwlStats } from "./hooks/createGetCwlStats.ts";
 export { getCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
 export { getCwlStatsQueryOptions } from "./hooks/createGetCwlStats.ts";
+export { createGetGuildNicknames } from "./hooks/createGetGuildNicknames.ts";
+export { getGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
+export { getGuildNicknamesQueryOptions } from "./hooks/createGetGuildNicknames.ts";
 export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
@@ -721,6 +743,8 @@ export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
+export { createRefreshDiscordUsernames } from "./hooks/createRefreshDiscordUsernames.ts";
+export { refreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
@@ -1030,6 +1054,12 @@ export {
     getCwlStatsQueryResponseSchema,
 } from "./zod/getCwlStatsSchema.ts";
 export {
+    getGuildNicknames200Schema,
+    getGuildNicknames401Schema,
+    getGuildNicknames500Schema,
+    getGuildNicknamesQueryResponseSchema,
+} from "./zod/getGuildNicknamesSchema.ts";
+export {
     getJPAClanRequirements200Schema,
     getJPAClanRequirements500Schema,
     getJPAClanRequirementsQueryResponseSchema,
@@ -1078,6 +1108,13 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./zod/postCOCPlayerVerifySchema.ts";
+export {
+    refreshDiscordUsernames200Schema,
+    refreshDiscordUsernames401Schema,
+    refreshDiscordUsernames500Schema,
+    refreshDiscordUsernames503Schema,
+    refreshDiscordUsernamesMutationResponseSchema,
+} from "./zod/refreshDiscordUsernamesSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

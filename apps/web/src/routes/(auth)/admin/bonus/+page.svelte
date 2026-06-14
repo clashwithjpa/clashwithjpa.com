@@ -13,6 +13,7 @@
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import { loadGuildNicknames } from "$lib/discordNicknames";
     import { fadeIn } from "$lib/utils/animations";
     import {
         assignCwlApplication,
@@ -37,7 +38,7 @@
     import TablerSearch from "~icons/tabler/search";
     import TablerSwords from "~icons/tabler/swords";
 
-    type BonusRow = GetBonusData200["data"]["rows"][number];
+    type BonusRow = GetBonusData200["data"]["rows"][number] & { discordNickname?: string };
     type Season = GetCwlSeasons200["data"]["seasons"][number];
     type CwlStat = GetCwlStats200["data"]["stats"][number];
     // A bonus is per Discord user per season; each row carries the set of season
@@ -180,10 +181,11 @@
     async function load(seasonId?: number) {
         loading = true;
         try {
-            const [bd, bl, ss] = await Promise.all([
+            const [bd, bl, ss, nicknames] = await Promise.all([
                 getBonusData({ seasonId }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
                 getBonusLedger({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
                 getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
+                loadGuildNicknames(),
             ]);
             if (!bd.success) {
                 toast.error("Failed to load bonus data");
@@ -200,7 +202,11 @@
                     seasonsByUser.set(b.discordUserId, list);
                 }
             }
-            rows = bd.data.rows.map((r) => ({ ...r, bonusSeasonIds: seasonsByUser.get(r.discordUserId) ?? [] }));
+            rows = bd.data.rows.map((r) => ({
+                ...r,
+                bonusSeasonIds: seasonsByUser.get(r.discordUserId) ?? [],
+                discordNickname: nicknames[r.discordUserId],
+            }));
             total = bd.data.total;
             currentSeasonId = bd.data.seasonId;
             selectedSeasonValue = currentSeasonId != null ? String(currentSeasonId) : "";
@@ -260,6 +266,7 @@
 
     const CSV_COLUMNS: { header: string; field: keyof BonusRow }[] = [
         { header: "Discord", field: "discordUsername" },
+        { header: "Nickname", field: "discordNickname" },
         { header: "Discord ID", field: "discordUserId" },
         { header: "Account", field: "cocAccountName" },
         { header: "Tag", field: "cocAccountTag" },
@@ -558,6 +565,13 @@
                     filter: false,
                     cellRenderer: svelteRenderer(CwlDiscordCell),
                     getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
+                },
+                {
+                    headerName: "Nickname",
+                    field: "discordNickname",
+                    sortable: true,
+                    filter: false,
+                    valueFormatter: (p) => p.value ?? "—",
                 },
                 {
                     headerName: "COC Account",

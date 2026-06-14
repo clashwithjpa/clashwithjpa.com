@@ -14,6 +14,7 @@
         deleteCwlSeason,
         getAdminSettings,
         getCwlSeasons,
+        refreshDiscordUsernames,
         updateAdminSettings,
         type GetAdminSettings200,
         type GetCwlSeasons200,
@@ -26,9 +27,13 @@
     import TablerCalendarEvent from "~icons/tabler/calendar-event";
     import TablerFileDescription from "~icons/tabler/file-description";
     import TablerPlus from "~icons/tabler/plus";
+    import TablerRefresh from "~icons/tabler/refresh";
     import TablerSwords from "~icons/tabler/swords";
     import TablerTool from "~icons/tabler/tool";
     import TablerTrash from "~icons/tabler/trash";
+    import type { PageProps } from "./$types";
+
+    let { data }: PageProps = $props();
 
     type Settings = GetAdminSettings200["data"]["settings"];
     type Season = GetCwlSeasons200["data"]["seasons"][number];
@@ -36,6 +41,7 @@
     let settings = $state<Settings>(null);
     let loading = $state(true);
     let saving = $state(false);
+    let refreshingUsernames = $state(false);
 
     let applicationsEnabled = $state(false);
     let cwlEnabled = $state(false);
@@ -156,6 +162,22 @@
             toast.error("Failed to update settings", { description: e?.message });
         } finally {
             saving = false;
+        }
+    }
+
+    async function refreshUsernames() {
+        refreshingUsernames = true;
+        try {
+            const resp = await refreshDiscordUsernames({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                toast.success(`Updated ${resp.data.updated} of ${resp.data.matched} guild members`);
+            } else {
+                toast.error("Failed to refresh usernames");
+            }
+        } catch (e: any) {
+            toast.error("Failed to refresh usernames", { description: e?.message });
+        } finally {
+            refreshingUsernames = false;
         }
     }
 
@@ -297,6 +319,27 @@
                         </div>
                         <Input bind:value={guildId} placeholder="Discord guild snowflake" disabled={saving} />
                     </div>
+
+                    {#if data.isSuperadmin}
+                        <div class="flex items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            <div class="flex min-w-0 items-start gap-3">
+                                <div class="shrink-0 rounded-lg border-2 border-stone-700/50 bg-stone-800 p-2">
+                                    <SimpleIconsDiscord class="size-5 text-stone-300" />
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="font-semibold text-stone-50">Refresh Discord usernames</h3>
+                                    <p class="text-xs text-stone-400">Pulls current usernames from the guild member list. Requires root.</p>
+                                </div>
+                            </div>
+                            <Button onclick={refreshUsernames} disabled={refreshingUsernames} class="shrink-0">
+                                {#if refreshingUsernames}
+                                    <SvgSpinnersRingResize class="size-4" />
+                                {:else}
+                                    <span class="flex items-center gap-1"><TablerRefresh class="size-4" /> Refresh</span>
+                                {/if}
+                            </Button>
+                        </div>
+                    {/if}
                 </section>
 
                 <div class="flex items-center justify-end gap-3">

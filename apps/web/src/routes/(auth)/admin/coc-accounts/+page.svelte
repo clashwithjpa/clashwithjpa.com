@@ -14,6 +14,7 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
+    import { loadGuildNicknames } from "$lib/discordNicknames";
     import { fadeIn } from "$lib/utils/animations";
     import {
         createCocAccount,
@@ -47,6 +48,7 @@
     let { data }: { data: { canDelete: boolean } } = $props();
 
     let gridApi: GridApi | null = $state(null);
+    let guildNicknames: Record<string, string> = {};
     let searchText = $state("");
     let selectedIds = $state<number[]>([]);
     let bulkProcessing = $state(false);
@@ -152,7 +154,10 @@
                         return;
                     }
 
-                    params.successCallback(resp.data.accounts, resp.data.total);
+                    params.successCallback(
+                        resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
+                        resp.data.total,
+                    );
                 } catch (error) {
                     toast.error("Failed to load COC accounts", { description: error instanceof Error ? error.message : "An unknown error occurred" });
                     params.failCallback();
@@ -267,6 +272,7 @@
         { header: "Capital Gold Looted", field: "capitalGoldLooted" },
         { header: "Capital Gold Contributed", field: "capitalGoldContributed" },
         { header: "Activity Score", field: "activityScore" },
+        { header: "Nickname", field: "discordNickname" },
     ];
 
     async function downloadCsv() {
@@ -281,7 +287,9 @@
                     { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
                 );
                 if (!resp.success) throw new Error("Failed to load accounts");
-                rows.push(...resp.data.accounts);
+                rows.push(
+                    ...resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
+                );
                 if (rows.length >= resp.data.total || resp.data.accounts.length === 0) break;
             }
 
@@ -321,8 +329,9 @@
             cacheBlockSize: 50,
             blockLoadDebounceMillis: 300,
             rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
-            onGridReady: (params) => {
+            onGridReady: async (params) => {
                 gridApi = params.api;
+                guildNicknames = await loadGuildNicknames();
                 gridApi.setGridOption("datasource", createDatasource());
             },
             onSelectionChanged: (event) => {
@@ -434,6 +443,13 @@
                 sortable: true,
                 filter: false,
                 cellRenderer: svelteRenderer(CocOwnerCell),
+            },
+            {
+                headerName: "Nickname",
+                field: "discordNickname",
+                sortable: false,
+                filter: false,
+                valueFormatter: (p) => p.value ?? "—",
             },
             {
                 headerName: "Account",

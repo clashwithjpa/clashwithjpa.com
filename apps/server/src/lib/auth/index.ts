@@ -162,6 +162,15 @@ export const auth = betterAuth({
             updateUserInfoOnLink: true,
         },
     },
+    user: {
+        additionalFields: {
+            discordUsername: {
+                type: "string",
+                required: false,
+                input: false,
+            },
+        },
+    },
     emailAndPassword: {
         enabled: false,
         disableSignUp: true,
@@ -173,6 +182,9 @@ export const auth = betterAuth({
             overrideUserInfoOnSignIn: true,
             disableDefaultScope: true,
             scope: ["identify", "email", "guilds", "guilds.members.read"],
+            mapProfileToUser: (profile) => ({
+                discordUsername: profile.username,
+            }),
         },
     },
     plugins: [
