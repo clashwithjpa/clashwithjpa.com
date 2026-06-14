@@ -4,6 +4,7 @@ import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
 import { assertClanDiscordIds, DiscordRateLimitError, DiscordUnavailableError, verifyClanDiscordIds } from "@/lib/discord";
 import {
+    addCocAccount,
     addCwlApplication,
     assignCwlApplication,
     assignCwlApplicationsBulk,
@@ -26,6 +27,7 @@ import {
     getBonusLedger,
     getClanApplications,
     getCocAccountsForUser,
+    getDiscordAccountId,
     getCwlSeasons,
     getUserNameById,
     getCwlStats,
@@ -1649,6 +1651,70 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch COC accounts" }, 500);
+        }
+    },
+);
+
+const createCocAccountBodySchema = z4.object({
+    userId: z4.string().min(1, "userId is required"),
+    tag: z4.string().min(1, "Account tag is required").max(20).startsWith("#", "Account tag must start with #"),
+    warWeight: z4.coerce.number().int().min(0).default(0),
+    isExternal: z4.boolean().default(false),
+});
+const createCocAccountData = z4.object({
+    account: cocAccountSchema,
+});
+app.post(
+    "/coc-accounts",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "createCocAccount",
+        description:
+            "[Admin] Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Skips the API-token ownership check, so it's an admin-only (sudo) power.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Linked COC account.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(createCocAccountData)) } },
+            },
+            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Member not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            409: { description: "Account already linked.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", createCocAccountBodySchema),
+    async (c) => {
+        try {
+            const { userId, tag, warWeight, isExternal } = c.req.valid("json");
+
+            const discordId = await getDiscordAccountId(userId);
+            if (!discordId) return c.json({ success: false, error: "Selected member has no linked Discord account." }, 404);
+
+            // No API-token verification here (admin-only power); still validate the tag
+            // against the CoC API and store the canonical tag it returns.
+            let playerData;
+            try {
+                playerData = await cocClient.getPlayer(tag);
+            } catch (error) {
+                Sentry.captureException(error);
+                return c.json({ success: false, error: "Invalid account tag or failed to fetch player data." }, 400);
+            }
+
+            const account = await addCocAccount(discordId, playerData.tag, { warWeight, isExternal });
+            logAction(c, {
+                action: "coc_account.create",
+                targetType: "coc_account",
+                targetId: account!.id,
+                metadata: { cocAccountTag: account!.cocAccountTag, warWeight, isExternal, manual: true },
+            });
+            return c.json({ success: true, data: { account } });
+        } catch (error: any) {
+            const { message, constraint, code } = getDbErrorMessage(error);
+            if (code === "23505") return c.json({ success: false, error: "This account is already linked." }, 409);
+            Sentry.captureException(error, { extra: { message, constraint, code } });
+            return c.json({ success: false, error: "Failed to add account." }, 500);
         }
     },
 );

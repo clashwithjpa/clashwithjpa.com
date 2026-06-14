@@ -67,6 +67,17 @@ export type {
     CreateAdminCwlClanMutationResponse,
 } from "./CreateAdminCwlClan.ts";
 export type {
+    CreateCocAccount200,
+    CreateCocAccount400,
+    CreateCocAccount401,
+    CreateCocAccount404,
+    CreateCocAccount409,
+    CreateCocAccount500,
+    CreateCocAccountMutation,
+    CreateCocAccountMutationRequest,
+    CreateCocAccountMutationResponse,
+} from "./CreateCocAccount.ts";
+export type {
     CreateCwlApplication200,
     CreateCwlApplication400,
     CreateCwlApplication401,

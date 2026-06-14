@@ -5,6 +5,7 @@ export { assignCwlApplicationsBulk } from "./assignCwlApplicationsBulk.ts";
 export { clearAcceptedJoinApplications } from "./clearAcceptedJoinApplications.ts";
 export { createAdminClan } from "./createAdminClan.ts";
 export { createAdminCwlClan } from "./createAdminCwlClan.ts";
+export { createCocAccount } from "./createCocAccount.ts";
 export { createCwlApplication } from "./createCwlApplication.ts";
 export { createCwlSeason } from "./createCwlSeason.ts";
 export { deleteAdminClan } from "./deleteAdminClan.ts";

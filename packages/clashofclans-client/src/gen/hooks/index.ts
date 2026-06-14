@@ -5,6 +5,7 @@ export type { AssignCwlApplicationsBulkMutationKey } from "./createAssignCwlAppl
 export type { ClearAcceptedJoinApplicationsMutationKey } from "./createClearAcceptedJoinApplications.ts";
 export type { CreateAdminClanMutationKey } from "./createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./createCreateAdminCwlClan.ts";
+export type { CreateCocAccountMutationKey } from "./createCreateCocAccount.ts";
 export type { CreateCwlApplicationMutationKey } from "./createCreateCwlApplication.ts";
 export type { CreateCwlSeasonMutationKey } from "./createCreateCwlSeason.ts";
 export type { DeleteAdminClanMutationKey } from "./createDeleteAdminClan.ts";
@@ -72,6 +73,8 @@ export { createAdminClanMutationKey } from "./createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./createCreateAdminCwlClan.ts";
 export { createCreateAdminCwlClan } from "./createCreateAdminCwlClan.ts";
+export { createCocAccountMutationKey } from "./createCreateCocAccount.ts";
+export { createCreateCocAccount } from "./createCreateCocAccount.ts";
 export { createCreateCwlApplication } from "./createCreateCwlApplication.ts";
 export { createCwlApplicationMutationKey } from "./createCreateCwlApplication.ts";
 export { createCreateCwlSeason } from "./createCreateCwlSeason.ts";

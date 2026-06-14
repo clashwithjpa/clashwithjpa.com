@@ -12,10 +12,14 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Toggle from "$lib/components/ui/Toggle.svelte";
+    import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { fadeIn } from "$lib/utils/animations";
     import {
+        createCocAccount,
         deleteCocAccountsBulk,
         getAdminCocAccounts,
+        getAdminUsers,
         syncCocAccounts,
         updateCocAccountExternal,
         updateCocAccountStats,
@@ -30,6 +34,7 @@
     import TablerSearch from "~icons/tabler/search";
     import TablerTableDashed from "~icons/tabler/table-dashed";
     import TablerTrash from "~icons/tabler/trash";
+    import TablerUserPlus from "~icons/tabler/user-plus";
     import TablerX from "~icons/tabler/x";
 
     type SyncResult = {
@@ -53,6 +58,72 @@
     let accountSidebar: Sidebar | null = $state(null);
     let selectedAccount = $state<Record<string, unknown> | null>(null);
     let copied: Record<string, boolean> = $state({});
+
+    // --- Manual add (admin-only): link a CoC account by tag, no API token required ---
+    let addOpen = $state(false);
+    let addSelectedUser = $state<ComboboxUser | null>(null);
+    let addTag = $state("");
+    let addWarWeight = $state(0);
+    let addExternal = $state(false);
+    let addSubmitting = $state(false);
+
+    function openAdd() {
+        addSelectedUser = null;
+        addTag = "";
+        addWarWeight = 0;
+        addExternal = false;
+        addOpen = true;
+    }
+
+    async function searchUsers(query: string): Promise<ComboboxUser[]> {
+        try {
+            const resp = await getAdminUsers({ search: query, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) return resp.data.users as ComboboxUser[];
+        } catch {
+            // return empty on failure
+        }
+        return [];
+    }
+
+    async function submitAdd() {
+        if (!addSelectedUser) {
+            toast.error("Select a member first");
+            addOpen = true;
+            return;
+        }
+        const tag = addTag.trim();
+        if (!tag) {
+            toast.error("Enter a Clash of Clans account tag");
+            addOpen = true;
+            return;
+        }
+        const warWeight = Number(addWarWeight);
+        if (!Number.isInteger(warWeight) || warWeight < 0) {
+            toast.error("War weight must be a non-negative whole number");
+            addOpen = true;
+            return;
+        }
+        addSubmitting = true;
+        try {
+            const resp = (await createCocAccount(
+                { userId: addSelectedUser.id, tag: tag.startsWith("#") ? tag : `#${tag}`, warWeight, isExternal: addExternal },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            )) as { success: true; data: { account: { cocAccountTag: string } } } | { success: false; error: string | Record<string, unknown> };
+            if (resp.success) {
+                toast.success(`Linked ${resp.data.account.cocAccountTag} to ${addSelectedUser.name}`);
+                // Refresh the loaded blocks in place so the new account appears.
+                gridApi?.refreshInfiniteCache();
+            } else {
+                toast.error(typeof resp.error === "string" ? resp.error : "Failed to add account");
+                addOpen = true;
+            }
+        } catch (error) {
+            toast.error("Failed to add account", { description: error instanceof Error ? error.message : undefined });
+            addOpen = true;
+        } finally {
+            addSubmitting = false;
+        }
+    }
 
     // Account data is fetched lazily in the sidebar (one CoC API call on demand)
     // rather than enriching every row on load.
@@ -516,6 +587,11 @@
             <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
                 <TablerSearch class="size-5" />
             </Button>
+            {#if data.canDelete}
+                <Button variant="base" class="shrink-0" onclick={openAdd} tooltip="Add an account" tooltipPlacement="top">
+                    <TablerUserPlus class="size-5" />
+                </Button>
+            {/if}
             <Button variant="base" class="shrink-0" onclick={() => (syncDialogOpen = true)} tooltip="Sync from Google Sheet" tooltipPlacement="top">
                 <TablerTableDashed class="size-5" />
             </Button>
@@ -639,4 +715,37 @@
             </div>
         </div>
     {/if}
+</Dialog>
+
+<Dialog
+    bind:open={addOpen}
+    title="Add an account"
+    description="Manually link a Clash of Clans account to a member. No API token is required — staff use only."
+    confirmText={addSubmitting ? "Adding…" : "Add account"}
+    onConfirm={submitAdd}
+>
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+            <p class="text-sm font-medium">Member</p>
+            <UserCombobox bind:value={addSelectedUser} search={searchUsers} placeholder="Search by name or Discord id…" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <p class="text-sm font-medium">Account tag</p>
+            <Input placeholder="#ABC123XYZ" bind:value={addTag} />
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <p class="text-sm font-medium">War weight</p>
+            <Input type="number" min={0} bind:value={addWarWeight} />
+        </div>
+
+        <div class="flex items-center justify-between gap-3 border-t border-stone-800 pt-3">
+            <div class="flex min-w-0 flex-col">
+                <p class="text-sm font-medium">External</p>
+                <p class="text-xs text-stone-400">Account only brought for CWL.</p>
+            </div>
+            <Toggle bind:checked={addExternal} />
+        </div>
+    </div>
 </Dialog>

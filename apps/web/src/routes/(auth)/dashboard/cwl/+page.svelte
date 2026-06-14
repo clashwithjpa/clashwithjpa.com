@@ -215,7 +215,9 @@
                     {#if fieldErrors.preferenceNum}
                         <Field.ErrorText class="text-xs text-red-400">{fieldErrors.preferenceNum}</Field.ErrorText>
                     {:else}
-                        <Field.HelperText class="text-xs text-stone-400">Lower number means higher preference</Field.HelperText>
+                        <Field.HelperText class="text-xs text-stone-400"
+                            >Lower number means higher preference for CWL bonus if signing up with multiple accounts</Field.HelperText
+                        >
                     {/if}
                 </Field.Root>
 

@@ -38,6 +38,7 @@
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
+    import TablerDownload from "~icons/tabler/download";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
@@ -273,6 +274,58 @@
             registerOpen = true;
         } finally {
             registerSubmitting = false;
+        }
+    }
+
+    // --- CSV export (mirrors the bonus page) ---
+    let downloading = $state(false);
+
+    // Wraps a CSV cell so commas, quotes and newlines survive a round-trip.
+    function csvCell(value: unknown): string {
+        const s = value == null ? "" : String(value);
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    const CSV_COLUMNS: { header: string; value: (a: Application) => unknown }[] = [
+        { header: "Discord", value: (a) => a.discordUsername },
+        { header: "Discord ID", value: (a) => a.discordUserId },
+        { header: "Account", value: (a) => a.cocAccountName },
+        { header: "Tag", value: (a) => a.cocAccountTag },
+        { header: "Clan", value: (a) => a.cocAccountClan ?? "" },
+        { header: "Preference", value: (a) => a.preferenceNum },
+        { header: "Weight", value: (a) => a.cocAccountWeight },
+        { header: "Applied", value: (a) => (a.appliedAt ? formatDateTime(a.appliedAt) : "") },
+        { header: "Assigned Clan", value: (a) => (a.assignedTo ? (clanNameByTag[normalizeTag(a.assignedTo)] ?? a.assignedTo) : "") },
+        {
+            header: "Status",
+            value: (a) => {
+                const info = joinedInfo(a);
+                return info.status === "wrong-clan" ? `wrong-clan: ${info.wrongClan}` : info.status;
+            },
+        },
+    ];
+
+    function downloadCsv() {
+        downloading = true;
+        try {
+            const list = displayedApplications;
+            const lines = [
+                CSV_COLUMNS.map((c) => csvCell(c.header)).join(","),
+                ...list.map((a) => CSV_COLUMNS.map((c) => csvCell(c.value(a))).join(",")),
+            ];
+            const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const seasonName = seasons.find((s) => String(s.id) === selectedSeasonValue)?.name;
+            link.download = `cwl-applications${seasonName ? `-${seasonName.replace(/\s+/g, "-")}` : ""}-${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            toast.success(`Exported ${list.length} application${list.length === 1 ? "" : "s"}`);
+        } catch (error) {
+            toast.error("Failed to export CSV", { description: error instanceof Error ? error.message : undefined });
+        } finally {
+            downloading = false;
         }
     }
 
@@ -517,6 +570,21 @@
                 >
                     <TablerUserPlus class="size-5" />
                     Register
+                </Button>
+                <Button
+                    variant="base"
+                    disabled={downloading || displayedApplications.length === 0}
+                    onclick={downloadCsv}
+                    class="w-full shrink-0 gap-2 lg:w-fit"
+                    tooltip="Export applications as CSV"
+                    tooltipPlacement="bottom"
+                >
+                    {#if downloading}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerDownload class="size-5" />
+                    {/if}
+                    Export
                 </Button>
                 <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
                 {#if selectedIds.length > 0}
