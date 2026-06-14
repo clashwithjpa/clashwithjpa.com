@@ -53,6 +53,7 @@ export {
 } from "./createAdminClanSchema.ts";
 export {
     createAdminCwlClan200Schema,
+    createAdminCwlClan400Schema,
     createAdminCwlClan401Schema,
     createAdminCwlClan409Schema,
     createAdminCwlClan500Schema,
@@ -320,15 +321,6 @@ export {
     updateAdminClanMutationResponseSchema,
     updateAdminClanPathParamsSchema,
 } from "./updateAdminClanSchema.ts";
-export {
-    updateAdminCwlClan200Schema,
-    updateAdminCwlClan401Schema,
-    updateAdminCwlClan404Schema,
-    updateAdminCwlClan500Schema,
-    updateAdminCwlClanMutationRequestSchema,
-    updateAdminCwlClanMutationResponseSchema,
-    updateAdminCwlClanPathParamsSchema,
-} from "./updateAdminCwlClanSchema.ts";
 export {
     updateAdminSettings200Schema,
     updateAdminSettings401Schema,

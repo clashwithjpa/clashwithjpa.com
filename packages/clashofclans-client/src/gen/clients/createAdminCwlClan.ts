@@ -7,6 +7,7 @@ import fetch from "@kubb/plugin-client/clients/fetch";
 import type {
     CreateAdminCwlClanMutationRequest,
     CreateAdminCwlClanMutationResponse,
+    CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
@@ -19,7 +20,7 @@ function getCreateAdminCwlClanUrl() {
 }
 
 /**
- * @description [Admin/sudo] Creates a new CWL clan.
+ * @description [Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
  * {@link /admin/cwl-clans}
  */
 export async function createAdminCwlClan(
@@ -32,7 +33,7 @@ export async function createAdminCwlClan(
 
     const res = await request<
         CreateAdminCwlClanMutationResponse,
-        ResponseErrorConfig<CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
+        ResponseErrorConfig<CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
         CreateAdminCwlClanMutationRequest
     >({ method: "POST", url: getCreateAdminCwlClanUrl().url.toString(), data: requestData, ...requestConfig });
     return res.data;

@@ -12,7 +12,7 @@
         deleteAdminCwlClan,
         getAdminCwlClans,
         syncAdminCwlClanLeagues,
-        updateAdminCwlClan,
+        type CreateAdminCwlClan400,
         type CreateAdminCwlClan401,
         type CreateAdminCwlClan409,
         type CreateAdminCwlClan500,
@@ -22,15 +22,10 @@
         type GetAdminCwlClans200,
         type SyncAdminCwlClanLeagues401,
         type SyncAdminCwlClanLeagues500,
-        type UpdateAdminCwlClan401,
-        type UpdateAdminCwlClan404,
-        type UpdateAdminCwlClan500,
-        type UpdateAdminCwlClanMutationRequest,
     } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
-    import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
@@ -47,9 +42,9 @@
     let searchText = $state("");
 
     let clanSidebar: Sidebar | null = $state(null);
-    // null = adding a new clan; otherwise the (immutable) tag of the clan being edited.
-    let editingTag = $state<string | null>(null);
-    let form = $state({ cocClanTag: "", cocClanName: "", cocClanLeague: "", cocClanLeader: "" });
+    // Name, league and leader are auto-managed (fetched on add, refreshed on sync),
+    // so the only thing a manager enters is the tag.
+    let form = $state({ cocClanTag: "" });
 
     function errMsg(error: unknown, fallback: string) {
         return typeof error === "string" ? error : fallback;
@@ -102,56 +97,41 @@
     }
 
     function resetForm() {
-        form = { cocClanTag: "", cocClanName: "", cocClanLeague: "", cocClanLeader: "" };
+        form = { cocClanTag: "" };
     }
 
     function openAdd() {
-        editingTag = null;
         resetForm();
         clanSidebar?.open("add");
     }
 
-    function openEdit(clan: CwlClan) {
-        editingTag = clan.cocClanTag;
-        form = {
-            cocClanTag: clan.cocClanTag,
-            cocClanName: clan.cocClanName,
-            cocClanLeague: clan.cocClanLeague,
-            cocClanLeader: clan.cocClanLeader,
-        };
-        clanSidebar?.open(clan.cocClanTag);
-    }
-
     function closeSidebar() {
         clanSidebar?.close();
-        editingTag = null;
         resetForm();
-    }
-
-    function submit() {
-        if (editingTag === null) createClan();
-        else updateClan(editingTag);
     }
 
     async function createClan() {
         let tag = form.cocClanTag.trim().toUpperCase();
         if (tag && !tag.startsWith("#")) tag = `#${tag}`;
-        const name = form.cocClanName.trim();
-        const league = form.cocClanLeague.trim();
-        const leader = form.cocClanLeader.trim();
 
-        if (!tag || tag === "#" || !name || !league || !leader) {
-            toast.error("All fields are required");
+        if (!tag || tag === "#") {
+            toast.error("Clan tag is required");
             return;
         }
 
         saving = true;
         try {
-            // Widen to the error variants so we can read the server's message (e.g. duplicate tag).
+            // Name, league and leader are fetched server-side from the CoC API.
+            // Widen to the error variants so we can read the server's message (e.g. invalid/duplicate tag).
             const resp = (await createAdminCwlClan(
-                { cocClanTag: tag, cocClanName: name, cocClanLeague: league, cocClanLeader: leader },
+                { cocClanTag: tag },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as Awaited<ReturnType<typeof createAdminCwlClan>> | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500;
+            )) as
+                | Awaited<ReturnType<typeof createAdminCwlClan>>
+                | CreateAdminCwlClan400
+                | CreateAdminCwlClan401
+                | CreateAdminCwlClan409
+                | CreateAdminCwlClan500;
             if (resp.success) {
                 clans = [...clans, resp.data.clan].sort((a, b) => a.cocClanTag.localeCompare(b.cocClanTag));
                 toast.success(`Added ${resp.data.clan.cocClanName}`);
@@ -161,49 +141,6 @@
             }
         } catch (e: any) {
             toast.error("Failed to add CWL clan", { description: e?.message });
-        } finally {
-            saving = false;
-        }
-    }
-
-    async function updateClan(tag: string) {
-        const name = form.cocClanName.trim();
-        const league = form.cocClanLeague.trim();
-        const leader = form.cocClanLeader.trim();
-
-        if (!name || !league || !leader) {
-            toast.error("All fields are required");
-            return;
-        }
-
-        // Send only changed fields so the audit log records what actually changed.
-        const original = clans.find((c) => c.cocClanTag === tag);
-        const payload: UpdateAdminCwlClanMutationRequest = {};
-        if (!original || original.cocClanName !== name) payload.cocClanName = name;
-        if (!original || original.cocClanLeague !== league) payload.cocClanLeague = league;
-        if (!original || original.cocClanLeader !== leader) payload.cocClanLeader = leader;
-
-        if (Object.keys(payload).length === 0) {
-            toast("No changes to save");
-            return;
-        }
-
-        saving = true;
-        try {
-            const resp = (await updateAdminCwlClan(encodeURIComponent(tag), payload, {
-                baseURL: PUBLIC_SERVER_URL,
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            })) as Awaited<ReturnType<typeof updateAdminCwlClan>> | UpdateAdminCwlClan401 | UpdateAdminCwlClan404 | UpdateAdminCwlClan500;
-            if (resp.success) {
-                clans = clans.map((c) => (c.cocClanTag === tag ? resp.data.clan : c));
-                toast.success(`Updated ${resp.data.clan.cocClanName}`);
-                closeSidebar();
-            } else {
-                toast.error(errMsg(resp.error, "Failed to update CWL clan"));
-            }
-        } catch (e: any) {
-            toast.error("Failed to update CWL clan", { description: e?.message });
         } finally {
             saving = false;
         }
@@ -296,22 +233,11 @@
                             <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-2 @[14rem]:flex-row @[14rem]:items-center">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
-                            onclick={() => openEdit(clan)}
-                            disabled={removing === clan.cocClanTag}
-                        >
-                            <span class="flex items-center justify-center gap-2">
-                                <TablerPencil class="size-4 shrink-0" /> Edit
-                            </span>
-                        </Button>
+                    <div class="flex flex-col gap-2">
                         <ConfirmationDialog
-                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
+                            class="w-full min-w-0"
                             title="Remove CWL Clan"
-                            description={`Remove ${clan.cocClanName} (${clan.cocClanTag}) from CWL clans? This cannot be undone.`}
+                            description={`Removing ${clan.cocClanName} (${clan.cocClanTag}) will also delete any CWL applications assigned to it for the season. This cannot be undone.`}
                             confirmText="Remove"
                             onConfirm={() => removeClan(clan.cocClanTag)}
                         >
@@ -335,5 +261,5 @@
 </div>
 
 <Sidebar bind:this={clanSidebar}>
-    <CwlClanFormSidebar {editingTag} bind:form {saving} onSubmit={submit} onCancel={closeSidebar} />
+    <CwlClanFormSidebar bind:form {saving} onSubmit={createClan} onCancel={closeSidebar} />
 </Sidebar>

@@ -21,6 +21,14 @@ export const createAdminCwlClan200Schema = z.object({
 });
 
 /**
+ * @description Invalid clan tag.
+ */
+export const createAdminCwlClan400Schema = z.object({
+    success: z.literal(false),
+    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+});
+
+/**
  * @description Unauthorized.
  */
 export const createAdminCwlClan401Schema = z.object({
@@ -46,9 +54,6 @@ export const createAdminCwlClan500Schema = z.object({
 
 export const createAdminCwlClanMutationRequestSchema = z.object({
     cocClanTag: z.string().min(1).regex(/^#.*/),
-    cocClanName: z.string().min(1),
-    cocClanLeague: z.string().min(1),
-    cocClanLeader: z.string().min(1),
 });
 
 export const createAdminCwlClanMutationResponseSchema = z.lazy(() => createAdminCwlClan200Schema);

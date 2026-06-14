@@ -6,6 +6,7 @@
 import type {
     CreateAdminCwlClanMutationRequest,
     CreateAdminCwlClanMutationResponse,
+    CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
@@ -20,14 +21,14 @@ export const createAdminCwlClanMutationKey = () => [{ url: "/admin/cwl-clans" }]
 export type CreateAdminCwlClanMutationKey = ReturnType<typeof createAdminCwlClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Creates a new CWL clan.
+ * @description [Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
  * {@link /admin/cwl-clans}
  */
 export function createCreateAdminCwlClan<TContext>(
     options: {
         mutation?: CreateMutationOptions<
             CreateAdminCwlClanMutationResponse,
-            ResponseErrorConfig<CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
+            ResponseErrorConfig<CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
             { data: CreateAdminCwlClanMutationRequest },
             TContext
         > & { client?: QueryClient };
@@ -40,7 +41,7 @@ export function createCreateAdminCwlClan<TContext>(
 
     return createMutation<
         CreateAdminCwlClanMutationResponse,
-        ResponseErrorConfig<CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
+        ResponseErrorConfig<CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
         { data: CreateAdminCwlClanMutationRequest },
         TContext
     >(

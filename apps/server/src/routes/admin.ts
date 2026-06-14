@@ -1341,11 +1341,9 @@ app.get(
     },
 );
 
-const cwlClanInputSchema = z4.object({
+// Creating only needs the tag — name, league and leader are pulled from the CoC API.
+const createCwlClanSchema = z4.object({
     cocClanTag: z4.string().min(1).startsWith("#"),
-    cocClanName: z4.string().min(1),
-    cocClanLeague: z4.string().min(1),
-    cocClanLeader: z4.string().min(1),
 });
 const upsertCwlClanData = z4.object({
     clan: cwlClanSchema,
@@ -1355,22 +1353,38 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "createAdminCwlClan",
-        description: "[Admin/sudo] Creates a new CWL clan.",
+        description: "[Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.",
         tags: ["admin"],
         responses: {
             200: {
                 description: "Created CWL clan.",
                 content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertCwlClanData)) } },
             },
+            400: { description: "Invalid clan tag.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             409: { description: "Duplicate.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("json", cwlClanInputSchema),
+    zValidator("json", createCwlClanSchema),
     async (c) => {
         try {
-            const clan = await createCwlClan(c.req.valid("json"));
+            const { cocClanTag } = c.req.valid("json");
+
+            let data;
+            try {
+                data = await cocClient.getClan(cocClanTag);
+            } catch (error) {
+                Sentry.captureException(error);
+                return c.json({ success: false, error: "Invalid clan tag or failed to fetch clan data." }, 400);
+            }
+
+            const clan = await createCwlClan({
+                cocClanTag: data.tag,
+                cocClanName: data.name,
+                cocClanLeague: data.warLeague?.name ?? "Unranked",
+                cocClanLeader: data.memberList.find((m) => m.role === "leader")?.name ?? "Unknown",
+            });
             logAction(c, {
                 action: "cwl_clan.create",
                 targetType: "cwl_clan",
@@ -1388,46 +1402,6 @@ app.post(
 );
 
 const cwlClanPathSchema = z4.object({ tag: z4.string().min(1) });
-app.put(
-    "/cwl-clans/:tag",
-    hasAccessAuthMiddleware(isAdmin),
-    describeRoute({
-        operationId: "updateAdminCwlClan",
-        description: "[Admin/sudo] Updates a CWL clan identified by URL-encoded clan tag.",
-        tags: ["admin"],
-        responses: {
-            200: {
-                description: "Updated CWL clan.",
-                content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertCwlClanData)) } },
-            },
-            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-        },
-    }),
-    zValidator("param", cwlClanPathSchema),
-    zValidator("json", cwlClanInputSchema.partial()),
-    async (c) => {
-        try {
-            const { tag } = c.req.valid("param");
-            const body = c.req.valid("json");
-            const clan = await updateCwlClan(tag, body);
-            if (!clan) return c.json({ success: false, error: "CWL clan not found" }, 404);
-            const fields = Object.keys(body).filter((k) => (body as Record<string, unknown>)[k] !== undefined);
-            logAction(c, {
-                action: "cwl_clan.update",
-                targetType: "cwl_clan",
-                targetId: clan.cocClanTag,
-                metadata: { cocClanTag: clan.cocClanTag, ...(fields.length ? { fields } : {}) },
-            });
-            return c.json({ success: true, data: { clan } });
-        } catch (error) {
-            Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to update CWL clan" }, 500);
-        }
-    },
-);
-
 app.delete(
     "/cwl-clans/:tag",
     hasAccessAuthMiddleware(isAdmin),
@@ -1465,8 +1439,8 @@ app.delete(
     },
 );
 
-// Refresh each CWL clan's league from the Clash of Clans API (mirrors
-// scripts/update-cwl-leagues.ts). Unranked clans omit warLeague.
+// Refresh each CWL clan's name, league and leader from the Clash of Clans API
+// (mirrors scripts/update-cwl-leagues.ts). Unranked clans omit warLeague.
 const SYNC_CWL_LEAGUES_CONCURRENCY = 10;
 const syncCwlLeaguesData = z4.object({
     updated: z4.number(),
@@ -1503,12 +1477,20 @@ app.post(
                     batch.map(async (clan) => {
                         try {
                             const data = await cocClient.getClan(clan.cocClanTag);
+                            const name = data.name;
                             const league = data.warLeague?.name ?? "Unranked";
-                            if (league === clan.cocClanLeague) {
+                            const leader = data.memberList.find((m) => m.role === "leader")?.name ?? "Unknown";
+
+                            const changes: Partial<{ cocClanName: string; cocClanLeague: string; cocClanLeader: string }> = {};
+                            if (name !== clan.cocClanName) changes.cocClanName = name;
+                            if (league !== clan.cocClanLeague) changes.cocClanLeague = league;
+                            if (leader !== clan.cocClanLeader) changes.cocClanLeader = leader;
+
+                            if (Object.keys(changes).length === 0) {
                                 unchanged++;
                                 return;
                             }
-                            await updateCwlClan(clan.cocClanTag, { cocClanLeague: league });
+                            await updateCwlClan(clan.cocClanTag, changes);
                             updated++;
                         } catch (error) {
                             failed++;

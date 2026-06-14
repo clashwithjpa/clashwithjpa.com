@@ -51,7 +51,6 @@ export type { SetUserSeasonBonusMutationKey } from "./createSetUserSeasonBonus.t
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountsMutationKey } from "./createSyncCocAccounts.ts";
 export type { UpdateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
-export type { UpdateAdminCwlClanMutationKey } from "./createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./createUpdateAdminSettings.ts";
 export type { UpdateCocAccountExternalMutationKey } from "./createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./createUpdateCocAccountStats.ts";
@@ -193,8 +192,6 @@ export { createSyncCocAccounts } from "./createSyncCocAccounts.ts";
 export { syncCocAccountsMutationKey } from "./createSyncCocAccounts.ts";
 export { createUpdateAdminClan } from "./createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
-export { createUpdateAdminCwlClan } from "./createUpdateAdminCwlClan.ts";
-export { updateAdminCwlClanMutationKey } from "./createUpdateAdminCwlClan.ts";
 export { createUpdateAdminSettings } from "./createUpdateAdminSettings.ts";
 export { updateAdminSettingsMutationKey } from "./createUpdateAdminSettings.ts";
 export { createUpdateCocAccountExternal } from "./createUpdateCocAccountExternal.ts";

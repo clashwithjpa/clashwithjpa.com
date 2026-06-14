@@ -40,6 +40,21 @@ export type CreateAdminCwlClan200 = {
 };
 
 /**
+ * @description Invalid clan tag.
+ */
+export type CreateAdminCwlClan400 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
+/**
  * @description Unauthorized.
  */
 export type CreateAdminCwlClan401 = {
@@ -91,21 +106,6 @@ export type CreateAdminCwlClanMutationRequest = {
      * @type string
      */
     cocClanTag: string;
-    /**
-     * @minLength 1
-     * @type string
-     */
-    cocClanName: string;
-    /**
-     * @minLength 1
-     * @type string
-     */
-    cocClanLeague: string;
-    /**
-     * @minLength 1
-     * @type string
-     */
-    cocClanLeader: string;
 };
 
 export type CreateAdminCwlClanMutationResponse = CreateAdminCwlClan200;
@@ -113,5 +113,5 @@ export type CreateAdminCwlClanMutationResponse = CreateAdminCwlClan200;
 export type CreateAdminCwlClanMutation = {
     Response: CreateAdminCwlClan200;
     Request: CreateAdminCwlClanMutationRequest;
-    Errors: CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500;
+    Errors: CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500;
 };

@@ -59,6 +59,7 @@ export type {
 } from "./CreateAdminClan.ts";
 export type {
     CreateAdminCwlClan200,
+    CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
@@ -402,16 +403,6 @@ export type {
     UpdateAdminClanMutationResponse,
     UpdateAdminClanPathParams,
 } from "./UpdateAdminClan.ts";
-export type {
-    UpdateAdminCwlClan200,
-    UpdateAdminCwlClan401,
-    UpdateAdminCwlClan404,
-    UpdateAdminCwlClan500,
-    UpdateAdminCwlClanMutation,
-    UpdateAdminCwlClanMutationRequest,
-    UpdateAdminCwlClanMutationResponse,
-    UpdateAdminCwlClanPathParams,
-} from "./UpdateAdminCwlClan.ts";
 export type {
     UpdateAdminSettings200,
     UpdateAdminSettings401,

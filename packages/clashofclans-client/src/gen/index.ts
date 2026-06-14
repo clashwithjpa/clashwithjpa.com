@@ -51,7 +51,6 @@ export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonB
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
-export type { UpdateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
 export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
@@ -120,6 +119,7 @@ export type {
 } from "./models/CreateAdminClan.ts";
 export type {
     CreateAdminCwlClan200,
+    CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
@@ -470,16 +470,6 @@ export type {
     UpdateAdminClanPathParams,
 } from "./models/UpdateAdminClan.ts";
 export type {
-    UpdateAdminCwlClan200,
-    UpdateAdminCwlClan401,
-    UpdateAdminCwlClan404,
-    UpdateAdminCwlClan500,
-    UpdateAdminCwlClanMutation,
-    UpdateAdminCwlClanMutationRequest,
-    UpdateAdminCwlClanMutationResponse,
-    UpdateAdminCwlClanPathParams,
-} from "./models/UpdateAdminCwlClan.ts";
-export type {
     UpdateAdminSettings200,
     UpdateAdminSettings401,
     UpdateAdminSettings500,
@@ -602,7 +592,6 @@ export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
 export { syncCocAccounts } from "./clients/syncCocAccounts.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
-export { updateAdminCwlClan } from "./clients/updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
@@ -744,8 +733,6 @@ export { createSyncCocAccounts } from "./hooks/createSyncCocAccounts.ts";
 export { syncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
 export { createUpdateAdminClan } from "./hooks/createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
-export { createUpdateAdminCwlClan } from "./hooks/createUpdateAdminCwlClan.ts";
-export { updateAdminCwlClanMutationKey } from "./hooks/createUpdateAdminCwlClan.ts";
 export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts";
 export { updateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
 export { createUpdateCocAccountExternal } from "./hooks/createUpdateCocAccountExternal.ts";
@@ -845,6 +832,7 @@ export {
 } from "./zod/createAdminClanSchema.ts";
 export {
     createAdminCwlClan200Schema,
+    createAdminCwlClan400Schema,
     createAdminCwlClan401Schema,
     createAdminCwlClan409Schema,
     createAdminCwlClan500Schema,
@@ -1132,15 +1120,6 @@ export {
     updateAdminClanMutationResponseSchema,
     updateAdminClanPathParamsSchema,
 } from "./zod/updateAdminClanSchema.ts";
-export {
-    updateAdminCwlClan200Schema,
-    updateAdminCwlClan401Schema,
-    updateAdminCwlClan404Schema,
-    updateAdminCwlClan500Schema,
-    updateAdminCwlClanMutationRequestSchema,
-    updateAdminCwlClanMutationResponseSchema,
-    updateAdminCwlClanPathParamsSchema,
-} from "./zod/updateAdminCwlClanSchema.ts";
 export {
     updateAdminSettings200Schema,
     updateAdminSettings401Schema,

@@ -51,7 +51,6 @@ export { setUserSeasonBonus } from "./setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./syncAdminCwlClanLeagues.ts";
 export { syncCocAccounts } from "./syncCocAccounts.ts";
 export { updateAdminClan } from "./updateAdminClan.ts";
-export { updateAdminCwlClan } from "./updateAdminCwlClan.ts";
 export { updateAdminSettings } from "./updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./updateCocAccountStats.ts";
