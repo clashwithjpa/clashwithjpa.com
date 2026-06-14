@@ -32,7 +32,7 @@ export const deleteCwlApplicationsBulk500Schema = z.object({
 });
 
 export const deleteCwlApplicationsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(200),
+    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(10000),
 });
 
 export const deleteCwlApplicationsBulkMutationResponseSchema = z.lazy(() => deleteCwlApplicationsBulk200Schema);

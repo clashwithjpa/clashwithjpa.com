@@ -2,6 +2,7 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
+    import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
@@ -32,13 +33,14 @@
         updateCocAccountWarWeight,
         type GetCwlApplications200,
     } from "@repo/clashofclans-client";
-    import type { GridApi, ICellRendererParams } from "ag-grid-community";
+    import type { GridApi, ICellRendererParams, IRowNode } from "ag-grid-community";
     import { untrack } from "svelte";
     import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
+    import TablerListCheck from "~icons/tabler/list-check";
     import TablerDownload from "~icons/tabler/download";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
@@ -55,6 +57,8 @@
     let clanNameByTag = $state<Record<string, string>>({});
     let total = $state(0);
     let loading = $state(true);
+    let nicknamesLoading = $state(false);
+    let nicknameLoadId = 0;
     let filterMode = $state<string>("all");
     let clanFilter = $state<string>("all");
     let seasons = $state<{ id: number; name: string }[]>([]);
@@ -139,6 +143,7 @@
               ? applications.filter((a) => joinedInfo(a).status === "wrong-clan")
               : applications.filter((a) => a.assignedTo === clanFilter),
     );
+    let unassignedCount = $derived(displayedApplications.filter((a) => !a.assignedTo).length);
 
     async function loadClans() {
         try {
@@ -147,7 +152,7 @@
                 const clans = Object.values(resp.data.clans);
                 clanOptions = [
                     { label: "Unassigned", value: "" },
-                    ...clans.map((c) => ({ label: `${c.clanName} (${c.clanTag})`, value: c.clanTag })),
+                    ...clans.map((c) => ({ label: `${c.clanName} - ${c.clanLeague} (${c.clanTag})`, value: c.clanTag })),
                 ];
                 clanNameByTag = Object.fromEntries(clans.map((c) => [normalizeTag(c.clanTag), c.clanName]));
             }
@@ -334,20 +339,17 @@
     async function load() {
         loading = true;
         try {
-            const [resp, nicknames] = await Promise.all([
-                getCwlApplications(
-                    {
-                        seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
-                        unassigned: filterMode === "unassigned" ? true : undefined,
-                    },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-                ),
-                loadGuildNicknames(),
-            ]);
+            const resp = await getCwlApplications(
+                {
+                    seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
+                    unassigned: filterMode === "unassigned" ? true : undefined,
+                },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
+            );
             if (resp.success) {
                 let list = resp.data.applications;
                 if (filterMode === "assigned") list = list.filter((a) => a.assignedTo);
-                applications = list.map((a) => ({ ...a, discordNickname: nicknames[a.discordUserId] }));
+                applications = list.map((a) => ({ ...a }));
                 total = resp.data.total;
                 if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
             } else {
@@ -357,6 +359,21 @@
             toast.error("Failed to load CWL applications", { description: e?.message });
         } finally {
             loading = false;
+        }
+        // Nicknames are fetched separately so the grid isn't blocked on the Discord
+        // guild-member walk; the Nickname column shows a skeleton until they arrive.
+        void loadNicknames();
+    }
+
+    async function loadNicknames() {
+        const id = ++nicknameLoadId;
+        nicknamesLoading = true;
+        try {
+            const nicknames = await loadGuildNicknames();
+            if (id !== nicknameLoadId) return; // superseded by a newer load()
+            applications = applications.map((a) => ({ ...a, discordNickname: nicknames[a.discordUserId] }));
+        } finally {
+            if (id === nicknameLoadId) nicknamesLoading = false;
         }
     }
 
@@ -378,37 +395,23 @@
         return null;
     }
 
-    // The bulk endpoints cap each request at 200 ids, so split larger selections
-    // (e.g. "select all" across a full season) into sequential batches.
-    const BULK_BATCH_SIZE = 200;
-    function chunk<T>(items: T[], size: number): T[][] {
-        const batches: T[][] = [];
-        for (let i = 0; i < items.length; i += size) batches.push(items.slice(i, i + size));
-        return batches;
-    }
-
     async function bulkAssign() {
         if (selectedIds.length === 0 || !bulkClan) return;
         bulkProcessing = true;
         const ids = selectedIds;
         try {
-            let count = 0;
-            for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
-                const resp = await assignCwlApplicationsBulk(
-                    { ids: batch, clanTag: bulkClan },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                );
-                if (!resp.success) throw new Error("Failed to assign applications");
-                count += resp.data.count;
-            }
+            const resp = await assignCwlApplicationsBulk(
+                { ids, clanTag: bulkClan },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error("Failed to assign applications");
             const idSet = new Set(ids);
             applications = applications.map((a) => (idSet.has(a.id) ? { ...a, assignedTo: bulkClan } : a));
-            toast.success(`${count} application${count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
+            toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
             clearSelection();
             bulkClan = "";
         } catch (e: any) {
             toast.error("Failed to assign applications", { description: e?.message });
-            // A later batch may have failed after earlier ones succeeded; resync.
             load();
         } finally {
             bulkProcessing = false;
@@ -420,23 +423,18 @@
         bulkProcessing = true;
         const ids = selectedIds;
         try {
-            let count = 0;
-            for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
-                const resp = await deleteCwlApplicationsBulk(
-                    { ids: batch },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                );
-                if (!resp.success) throw new Error("Failed to delete applications");
-                count += resp.data.count;
-            }
+            const resp = await deleteCwlApplicationsBulk(
+                { ids },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error("Failed to delete applications");
             const idSet = new Set(ids);
             applications = applications.filter((a) => !idSet.has(a.id));
-            total = Math.max(0, total - count);
-            toast.success(`${count} application${count === 1 ? "" : "s"} deleted`);
+            total = Math.max(0, total - resp.data.count);
+            toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} deleted`);
             clearSelection();
         } catch (e: any) {
             toast.error("Failed to delete applications", { description: e?.message });
-            // A later batch may have failed after earlier ones succeeded; resync.
             load();
         } finally {
             bulkProcessing = false;
@@ -446,6 +444,23 @@
     function clearSelection() {
         gridApi?.deselectAll();
         selectedIds = [];
+    }
+
+    const AUTO_SELECT_COUNT = 30;
+    function selectFirstUnassigned(count = AUTO_SELECT_COUNT) {
+        if (!gridApi) return;
+        const nodes: IRowNode<Application>[] = [];
+        gridApi.forEachNodeAfterFilterAndSort((node) => {
+            if (nodes.length >= count) return;
+            if (node.data && !node.data.assignedTo) nodes.push(node);
+        });
+        gridApi.deselectAll();
+        if (nodes.length === 0) {
+            toast.info("No unassigned applications to select");
+            return;
+        }
+        gridApi.setNodesSelected({ nodes, newValue: true });
+        toast.success(`Selected ${nodes.length} unassigned application${nodes.length === 1 ? "" : "s"}`);
     }
 
     function clanLabel(clanTag: string | null | undefined): string {
@@ -543,6 +558,10 @@
         clanRosters; // track
         gridApi?.refreshCells({ force: true, columns: ["joinedStatus"] });
     });
+    $effect(() => {
+        nicknamesLoading; // track
+        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
+    });
 </script>
 
 <Seo title="CWL Applications" description="Manage CWL applications and assign players to clans" />
@@ -590,6 +609,17 @@
                         <TablerDownload class="size-5" />
                     {/if}
                     Export
+                </Button>
+                <Button
+                    variant="base"
+                    disabled={unassignedCount === 0}
+                    onclick={() => selectFirstUnassigned()}
+                    class="w-full shrink-0 gap-2 lg:w-fit"
+                    tooltip="Select the first {AUTO_SELECT_COUNT} unassigned applications in the current order (sort by Weight first)"
+                    tooltipPlacement="bottom"
+                >
+                    <TablerListCheck class="size-5" />
+                    Select {AUTO_SELECT_COUNT}
                 </Button>
                 <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
                 {#if selectedIds.length > 0}
@@ -767,7 +797,8 @@
                     field: "discordNickname",
                     sortable: true,
                     filter: false,
-                    valueFormatter: (p) => p.value ?? "—",
+                    cellRenderer: svelteRenderer(CwlNicknameCell),
+                    cellRendererParams: () => ({ loading: nicknamesLoading }),
                 },
                 {
                     headerName: "Account",

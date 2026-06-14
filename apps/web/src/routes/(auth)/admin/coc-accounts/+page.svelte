@@ -3,6 +3,7 @@
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
     import CocAccountCell from "$lib/components/grid/CocAccountCell.svelte";
     import CocOwnerCell from "$lib/components/grid/CocOwnerCell.svelte";
+    import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
@@ -49,6 +50,7 @@
 
     let gridApi: GridApi | null = $state(null);
     let guildNicknames: Record<string, string> = {};
+    let nicknamesLoading = $state(false);
     let searchText = $state("");
     let selectedIds = $state<number[]>([]);
     let bulkProcessing = $state(false);
@@ -168,6 +170,20 @@
 
     function handleSearchChange() {
         gridApi?.setGridOption("datasource", createDatasource());
+    }
+
+    // Nicknames are fetched separately from the row datasource so the grid isn't
+    // blocked on the Discord guild-member walk. Rows already fetched are backfilled.
+    async function loadNicknames() {
+        nicknamesLoading = true;
+        try {
+            guildNicknames = await loadGuildNicknames();
+            gridApi?.forEachNode((node) => {
+                if (node.data?.discordUserId) node.data.discordNickname = guildNicknames[node.data.discordUserId];
+            });
+        } finally {
+            nicknamesLoading = false;
+        }
     }
 
     async function handleSync() {
@@ -316,6 +332,11 @@
 
     // Sheet-synced columns that are manually editable in the grid (see updateCocAccountStats).
     const STAT_FIELDS = ["currentClan", "totalDonated", "totalReceived", "clanGames", "capitalGoldLooted", "capitalGoldContributed", "activityScore"];
+
+    $effect(() => {
+        nicknamesLoading; // track
+        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
+    });
 </script>
 
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
@@ -329,10 +350,12 @@
             cacheBlockSize: 50,
             blockLoadDebounceMillis: 300,
             rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
-            onGridReady: async (params) => {
+            onGridReady: (params) => {
                 gridApi = params.api;
-                guildNicknames = await loadGuildNicknames();
+                // Load rows immediately; nicknames fill in afterwards so the grid
+                // isn't blocked on the Discord guild-member walk.
                 gridApi.setGridOption("datasource", createDatasource());
+                loadNicknames();
             },
             onSelectionChanged: (event) => {
                 selectedIds = event.api.getSelectedRows().map((r) => r.id);
@@ -449,7 +472,8 @@
                 field: "discordNickname",
                 sortable: false,
                 filter: false,
-                valueFormatter: (p) => p.value ?? "—",
+                cellRenderer: svelteRenderer(CwlNicknameCell),
+                cellRendererParams: () => ({ loading: nicknamesLoading }),
             },
             {
                 headerName: "Account",

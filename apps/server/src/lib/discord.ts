@@ -146,7 +146,7 @@ export async function getGuildNicknames(): Promise<Record<string, string>> {
     const nicknames: Record<string, string> = {};
     for (const m of await fetchAllGuildMembers()) if (m.user?.id && m.nick) nicknames[m.user.id] = m.nick;
 
-    await redis.set(cacheKey, JSON.stringify(nicknames), "EX", 300).catch(() => {});
+    await redis.set(cacheKey, JSON.stringify(nicknames), "EX", 3600).catch(() => {});
     return nicknames;
 }
 

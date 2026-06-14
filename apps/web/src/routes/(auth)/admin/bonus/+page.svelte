@@ -5,6 +5,7 @@
     import BonusSeasonsCell from "$lib/components/grid/BonusSeasonsCell.svelte";
     import ClanCell from "$lib/components/grid/ClanCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
+    import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
@@ -57,6 +58,8 @@
     let seasonOptions = $derived<Option[]>(seasons.map((s) => ({ label: s.name, value: String(s.id) })));
     let total = $state(0);
     let loading = $state(true);
+    let nicknamesLoading = $state(false);
+    let nicknameLoadId = 0;
     let downloading = $state(false);
     let fetchingCwl = $state(false);
     let searchText = $state("");
@@ -181,11 +184,10 @@
     async function load(seasonId?: number) {
         loading = true;
         try {
-            const [bd, bl, ss, nicknames] = await Promise.all([
+            const [bd, bl, ss] = await Promise.all([
                 getBonusData({ seasonId }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
                 getBonusLedger({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
                 getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-                loadGuildNicknames(),
             ]);
             if (!bd.success) {
                 toast.error("Failed to load bonus data");
@@ -205,7 +207,6 @@
             rows = bd.data.rows.map((r) => ({
                 ...r,
                 bonusSeasonIds: seasonsByUser.get(r.discordUserId) ?? [],
-                discordNickname: nicknames[r.discordUserId],
             }));
             total = bd.data.total;
             currentSeasonId = bd.data.seasonId;
@@ -214,6 +215,21 @@
             toast.error("Failed to load bonus data", { description: error instanceof Error ? error.message : undefined });
         } finally {
             loading = false;
+        }
+        // Nicknames load separately so the grid isn't blocked on the Discord
+        // guild-member walk; the Nickname column shows a skeleton until they arrive.
+        void loadNicknames();
+    }
+
+    async function loadNicknames() {
+        const id = ++nicknameLoadId;
+        nicknamesLoading = true;
+        try {
+            const nicknames = await loadGuildNicknames();
+            if (id !== nicknameLoadId) return; // superseded by a newer load()
+            rows = rows.map((r) => ({ ...r, discordNickname: nicknames[r.discordUserId] }));
+        } finally {
+            if (id === nicknameLoadId) nicknamesLoading = false;
         }
     }
 
@@ -354,6 +370,10 @@
         clanNameByTag;
         cwlClanNameByTag;
         gridApi?.refreshCells({ force: true, columns: ["cocAccountClan", "assignedTo"] });
+    });
+    $effect(() => {
+        nicknamesLoading; // track
+        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
     });
 </script>
 
@@ -571,7 +591,8 @@
                     field: "discordNickname",
                     sortable: true,
                     filter: false,
-                    valueFormatter: (p) => p.value ?? "—",
+                    cellRenderer: svelteRenderer(CwlNicknameCell),
+                    cellRendererParams: () => ({ loading: nicknamesLoading }),
                 },
                 {
                     headerName: "COC Account",

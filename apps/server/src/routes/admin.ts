@@ -585,7 +585,7 @@ app.put(
 );
 
 const bulkAssignCwlBodySchema = z4.object({
-    ids: z4.array(z4.number().int().min(1)).min(1).max(200),
+    ids: z4.array(z4.number().int().min(1)).min(1).max(10000),
     clanTag: z4.string().nullable(),
 });
 const bulkAssignCwlData = z4.object({
@@ -630,7 +630,7 @@ app.post(
 );
 
 const bulkDeleteCwlBodySchema = z4.object({
-    ids: z4.array(z4.number().int().min(1)).min(1).max(200),
+    ids: z4.array(z4.number().int().min(1)).min(1).max(10000),
 });
 const bulkDeleteCwlData = z4.object({
     count: z4.number(),

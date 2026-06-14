@@ -2,6 +2,7 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
     import ActionCell from "$lib/components/grid/ActionCell.svelte";
+    import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
     import UserCell from "$lib/components/grid/UserCell.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
@@ -31,6 +32,7 @@
     let lastRevert: { id: string; value: string } | null = null;
     let gridApi: GridApi | null = $state(null);
     let guildNicknames: Record<string, string> = {};
+    let nicknamesLoading = $state(false);
     let userSidebar: Sidebar | null = $state(null);
     let selectedSidebarUser: (UserWithRole & { discordId?: string }) | null = $state(null);
 
@@ -230,6 +232,25 @@
         gridApi?.setGridOption("datasource", createDatasource());
     }
 
+    // Nicknames are fetched separately from the row datasource so the grid isn't
+    // blocked on the Discord guild-member walk. Rows already fetched are backfilled.
+    async function loadNicknames() {
+        nicknamesLoading = true;
+        try {
+            guildNicknames = await loadGuildNicknames();
+            gridApi?.forEachNode((node) => {
+                if (node.data?.discordId) node.data.discordNickname = guildNicknames[node.data.discordId];
+            });
+        } finally {
+            nicknamesLoading = false;
+        }
+    }
+
+    $effect(() => {
+        nicknamesLoading; // track
+        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
+    });
+
     function getMinDate(): string {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -251,10 +272,12 @@
             rowModelType: "infinite",
             cacheBlockSize: 50,
             blockLoadDebounceMillis: 300,
-            onGridReady: async (params) => {
+            onGridReady: (params) => {
                 gridApi = params.api;
-                guildNicknames = await loadGuildNicknames();
+                // Load rows immediately; nicknames fill in afterwards so the grid
+                // isn't blocked on the Discord guild-member walk.
                 gridApi.setGridOption("datasource", createDatasource());
+                loadNicknames();
             },
             onCellValueChanged: (event) => {
                 if (event.colDef.field !== "role" || event.oldValue === event.newValue) return;
@@ -273,7 +296,8 @@
                 field: "discordNickname",
                 sortable: false,
                 filter: false,
-                valueFormatter: (p) => p.value ?? "—",
+                cellRenderer: svelteRenderer(CwlNicknameCell),
+                cellRendererParams: () => ({ loading: nicknamesLoading }),
             },
             {
                 headerName: "Role",

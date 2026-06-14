@@ -41,7 +41,7 @@ export const assignCwlApplicationsBulk500Schema = z.object({
 });
 
 export const assignCwlApplicationsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(200),
+    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(10000),
     clanTag: z.union([z.string(), z.null()]),
 });
 
