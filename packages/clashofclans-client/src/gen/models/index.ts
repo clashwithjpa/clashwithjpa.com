@@ -193,6 +193,60 @@ export type {
     GetAdminUsersQueryResponse,
 } from "./GetAdminUsers.ts";
 export type {
+    GetAnalyticsAdminActivity200,
+    GetAnalyticsAdminActivity401,
+    GetAnalyticsAdminActivity500,
+    GetAnalyticsAdminActivityQuery,
+    GetAnalyticsAdminActivityQueryParams,
+    GetAnalyticsAdminActivityQueryResponse,
+} from "./GetAnalyticsAdminActivity.ts";
+export type {
+    GetAnalyticsAuditCategories200,
+    GetAnalyticsAuditCategories401,
+    GetAnalyticsAuditCategories500,
+    GetAnalyticsAuditCategoriesQuery,
+    GetAnalyticsAuditCategoriesQueryResponse,
+} from "./GetAnalyticsAuditCategories.ts";
+export type {
+    GetAnalyticsAuditTrend200,
+    GetAnalyticsAuditTrend401,
+    GetAnalyticsAuditTrend500,
+    GetAnalyticsAuditTrendQuery,
+    GetAnalyticsAuditTrendQueryParams,
+    GetAnalyticsAuditTrendQueryResponse,
+} from "./GetAnalyticsAuditTrend.ts";
+export type {
+    GetAnalyticsCwlAssignment200,
+    GetAnalyticsCwlAssignment401,
+    GetAnalyticsCwlAssignment500,
+    GetAnalyticsCwlAssignmentQuery,
+    GetAnalyticsCwlAssignmentQueryParams,
+    GetAnalyticsCwlAssignmentQueryResponse,
+} from "./GetAnalyticsCwlAssignment.ts";
+export type {
+    GetAnalyticsCwlParticipation200,
+    GetAnalyticsCwlParticipation401,
+    GetAnalyticsCwlParticipation500,
+    GetAnalyticsCwlParticipationQuery,
+    GetAnalyticsCwlParticipationQueryParams,
+    GetAnalyticsCwlParticipationQueryResponse,
+} from "./GetAnalyticsCwlParticipation.ts";
+export type {
+    GetAnalyticsCwlSeasons200,
+    GetAnalyticsCwlSeasons401,
+    GetAnalyticsCwlSeasons500,
+    GetAnalyticsCwlSeasonsQuery,
+    GetAnalyticsCwlSeasonsQueryResponse,
+} from "./GetAnalyticsCwlSeasons.ts";
+export type {
+    GetAnalyticsUserJoins200,
+    GetAnalyticsUserJoins401,
+    GetAnalyticsUserJoins500,
+    GetAnalyticsUserJoinsQuery,
+    GetAnalyticsUserJoinsQueryParams,
+    GetAnalyticsUserJoinsQueryResponse,
+} from "./GetAnalyticsUserJoins.ts";
+export type {
     EntriesActionEnumKey,
     EntriesActorCurrentRoleEnumKey,
     EntriesTargetTypeEnumKey,

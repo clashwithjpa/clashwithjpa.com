@@ -17,6 +17,10 @@ export type GetAdminUsersQueryParams = {
      */
     search?: string;
     /**
+     * @type string | undefined
+     */
+    role?: string;
+    /**
      * @minLength 1
      * @maxLength 200
      * @default 50
@@ -60,6 +64,12 @@ export type GetAdminUsers200 = {
          * @type number
          */
         total: number;
+        /**
+         * @type object
+         */
+        roleCounts: {
+            [key: string]: number;
+        };
     };
 };
 

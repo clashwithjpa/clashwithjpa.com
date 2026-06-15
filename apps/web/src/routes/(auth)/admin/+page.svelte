@@ -90,5 +90,5 @@
         </a>
     </div>
 
-    <AdminAnalytics permissions={data.permissions} />
+    <AdminAnalytics />
 </div>

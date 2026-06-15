@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { cn } from "$lib/utils";
     import { Portal } from "@ark-ui/svelte/portal";
     import { Tooltip } from "@ark-ui/svelte/tooltip";
     import { getContext, type Snippet } from "svelte";
@@ -37,36 +38,21 @@
     }
 
     const renderInline = getContext<boolean>("render-inline") ?? false;
-
-    let activated = $state(false);
-    let open = $state(false);
-
-    function activate() {
-        if (disabled || !title) return;
-        activated = true;
-        requestAnimationFrame(() => {
-            if (activated) open = true;
-        });
-    }
 </script>
 
-{#if activated}
-    <Tooltip.Root
-        {open}
-        onOpenChange={(e) => (open = e.open)}
-        openDelay={200}
-        interactive={false}
-        closeOnPointerDown={true}
-        positioning={{ placement, gutter: 12 }}
-    >
-        <Tooltip.Trigger {disabled} aria-label={title} class={className} onclick={handleClick}>
-            {@render children()}
-        </Tooltip.Trigger>
+<Tooltip.Root openDelay={200} closeDelay={0} interactive={false} closeOnPointerDown={true} positioning={{ placement, gutter: 12 }}>
+    <Tooltip.Trigger {disabled} aria-label={title} class={className} onclick={handleClick}>
+        {@render children()}
+    </Tooltip.Trigger>
+    {#if title && !disabled}
         <Portal disabled={renderInline}>
-            <Tooltip.Positioner class="z-60">
+            <Tooltip.Positioner class={cn(renderInline ? "z-9999" : "z-60")}>
                 <Tooltip.Content
                     style="--arrow-background: var(--color-stone-900); --arrow-size: 12px;"
-                    class="rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] data-[state=closed]:animate-[tooltip-fade-out_150ms_ease] data-[state=open]:animate-[tooltip-fade-in_150ms_ease]"
+                    class={cn(
+                        "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+                        "rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-200 shadow-2xl",
+                    )}
                 >
                     <Tooltip.Arrow>
                         <Tooltip.ArrowTip class="border-t-2 border-l-2 border-stone-700/50" />
@@ -75,24 +61,5 @@
                 </Tooltip.Content>
             </Tooltip.Positioner>
         </Portal>
-    </Tooltip.Root>
-{:else}
-    <button type="button" {disabled} aria-label={title} class={className} onclick={handleClick} onpointerenter={activate}>
-        {@render children()}
-    </button>
-{/if}
-
-<style>
-    :global {
-        @keyframes tooltip-fade-in {
-            from {
-                opacity: 0;
-            }
-        }
-        @keyframes tooltip-fade-out {
-            to {
-                opacity: 0;
-            }
-        }
-    }
-</style>
+    {/if}
+</Tooltip.Root>

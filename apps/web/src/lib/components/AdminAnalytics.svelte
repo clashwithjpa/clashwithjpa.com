@@ -1,68 +1,82 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import Avatar from "$lib/components/ui/Avatar.svelte";
     import Chart from "$lib/components/ui/Chart.svelte";
+    import HoverCard from "$lib/components/ui/HoverCard.svelte";
+    import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
+    import { actionConfig } from "$lib/config/auditLog";
+    import type { Role } from "$lib/config/roles";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
-    import { getAuditLog, getCwlApplications, getCwlSeasons, getJoinApplications } from "@repo/clashofclans-client";
+    import {
+        getAnalyticsAdminActivity,
+        getAnalyticsAuditCategories,
+        getAnalyticsAuditTrend,
+        getAnalyticsCwlAssignment,
+        getAnalyticsCwlParticipation,
+        getAnalyticsCwlSeasons,
+        getAnalyticsUserJoins,
+    } from "@repo/clashofclans-client";
     import type { AgCartesianChartOptions, AgPolarChartOptions } from "ag-charts-community";
     import { onMount } from "svelte";
+    import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import TablerActivity from "~icons/tabler/activity";
     import TablerChartBarPopular from "~icons/tabler/chart-bar-popular";
+    import TablerListNumbers from "~icons/tabler/list-numbers";
 
-    interface Props {
-        permissions?: Record<string, boolean>;
-    }
+    type DailyPoint = { date: string; count: number };
+    type CategoryPoint = { category: string; count: number };
+    type CwlAssignment = { assigned: number; unassigned: number; seasonName: string | null };
+    type CwlParticipation = { participated: number; totalUsers: number; seasonName: string | null };
+    type AdminActivity = {
+        actorId: string;
+        name: string;
+        image: string | null;
+        role: string | null;
+        discordId: string | null;
+        count: number;
+        topActions: { action: string; count: number }[];
+    };
 
-    let { permissions = {} }: Props = $props();
-
-    const canReview = $derived(!!permissions.review);
-    const canManage = $derived(!!permissions.manage);
-
-    type JoinApp = { status: string; createdAt: string };
-    type CwlApp = { discordUserId: string; assignedTo: string | null; isExternal: boolean };
-    type AuditEntry = { action: string; targetType: string | null; createdAt: string };
-
-    let joinApps = $state<JoinApp[] | null>(null);
-    let cwlApps = $state<CwlApp[] | null>(null);
-    let auditEntries = $state<AuditEntry[] | null>(null);
-    let totalUsers = $state<number | null>(null);
+    let userJoins = $state<DailyPoint[] | null>(null);
+    let auditTrend = $state<DailyPoint[] | null>(null);
+    let auditCategories = $state<CategoryPoint[] | null>(null);
+    let adminActivity = $state<AdminActivity[] | null>(null);
+    let cwlAssignment = $state<CwlAssignment | null>(null);
+    let cwlParticipation = $state<CwlParticipation | null>(null);
     let loading = $state(true);
 
     let seasons = $state<{ id: number; name: string }[]>([]);
     let selectedSeasonValue = $state<string>("");
     let seasonOptions = $derived<Option[]>(seasons.map((s) => ({ label: s.name, value: String(s.id) })));
     let cwlLoading = $state(false);
-    let selectedSeasonName = $derived(seasons.find((s) => String(s.id) === selectedSeasonValue)?.name ?? null);
 
-    const DAYS = 14;
+    const USER_JOIN_DAYS = 30;
+    const AUDIT_DAYS = 14;
+    const ADMIN_ACTIVITY_LIMIT = 8;
+    const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
 
-    function bucketByDay(items: { createdAt: string }[]) {
-        const map = new Map<string, number>();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        for (let i = DAYS - 1; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            map.set(d.toISOString().slice(0, 10), 0);
-        }
-        for (const item of items) {
-            const key = new Date(item.createdAt).toISOString().slice(0, 10);
-            if (map.has(key)) map.set(key, map.get(key)! + 1);
-        }
-        return [...map.entries()].map(([date, count]) => ({
-            label: new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-            count,
+    function dailySeries(points: DailyPoint[]) {
+        return points.map((p) => ({
+            label: new Date(p.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+            count: p.count,
         }));
     }
 
-    async function fetchCwlApps(seasonId?: number) {
+    async function fetchCwl(seasonId?: number) {
         cwlLoading = true;
         try {
-            const resp = await getCwlApplications({ limit: 200, seasonId }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                cwlApps = resp.data.applications;
-                if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
+            const params = seasonId !== undefined ? { seasonId } : undefined;
+            const [assignResp, participationResp] = await Promise.all([
+                getAnalyticsCwlAssignment(params, opts),
+                getAnalyticsCwlParticipation(params, opts),
+            ]);
+            if (assignResp.success) {
+                cwlAssignment = assignResp.data;
+                if (!selectedSeasonValue && assignResp.data.seasonId != null) selectedSeasonValue = String(assignResp.data.seasonId);
             }
+            if (participationResp.success) cwlParticipation = participationResp.data;
         } catch {
             // leave the previously rendered CWL charts in place on failure
         } finally {
@@ -71,55 +85,41 @@
     }
 
     onMount(async () => {
-        const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
-        const [joinResp, auditResp, usersResp, seasonsResp] = await Promise.allSettled([
-            canReview ? getJoinApplications({ limit: 200 }, opts) : Promise.resolve(null),
-            canManage ? getAuditLog({ limit: 200 }, opts) : Promise.resolve(null),
-            canManage
-                ? fetch(`${PUBLIC_SERVER_URL}/admin/users?limit=1&offset=0`, { credentials: "include" }).then((r) => r.json())
-                : Promise.resolve(null),
-            canManage ? getCwlSeasons(opts) : Promise.resolve(null),
+        const [joinsResp, auditTrendResp, auditCategoriesResp, adminActivityResp, seasonsResp] = await Promise.allSettled([
+            getAnalyticsUserJoins({ days: USER_JOIN_DAYS }, opts),
+            getAnalyticsAuditTrend({ days: AUDIT_DAYS }, opts),
+            getAnalyticsAuditCategories(opts),
+            getAnalyticsAdminActivity({ limit: ADMIN_ACTIVITY_LIMIT }, opts),
+            getAnalyticsCwlSeasons(opts),
         ]);
 
-        if (joinResp.status === "fulfilled" && joinResp.value?.success) joinApps = joinResp.value.data.applications;
-        if (auditResp.status === "fulfilled" && auditResp.value?.success) auditEntries = auditResp.value.data.entries;
-        if (usersResp.status === "fulfilled" && usersResp.value?.success) totalUsers = usersResp.value.data.total;
-        if (seasonsResp.status === "fulfilled" && seasonsResp.value?.success) seasons = seasonsResp.value.data.seasons;
-        if (canManage) await fetchCwlApps();
+        if (joinsResp.status === "fulfilled" && joinsResp.value.success) userJoins = joinsResp.value.data.data;
+        if (auditTrendResp.status === "fulfilled" && auditTrendResp.value.success) auditTrend = auditTrendResp.value.data.data;
+        if (auditCategoriesResp.status === "fulfilled" && auditCategoriesResp.value.success) auditCategories = auditCategoriesResp.value.data.data;
+        if (adminActivityResp.status === "fulfilled" && adminActivityResp.value.success) adminActivity = adminActivityResp.value.data.data;
+        if (seasonsResp.status === "fulfilled" && seasonsResp.value.success) seasons = seasonsResp.value.data.seasons;
+        await fetchCwl();
         loading = false;
     });
 
-    const joinStatusOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!joinApps) return null;
-        const counts = { pending: 0, accepted: 0, rejected: 0 };
-        for (const app of joinApps) if (app.status in counts) counts[app.status as keyof typeof counts]++;
+    const userJoinTrendOptions = $derived.by<AgCartesianChartOptions | null>(() => {
+        if (!userJoins) return null;
         return {
-            title: { text: "Join Applications by Status" },
-            data: [
-                { status: "Pending", count: counts.pending },
-                { status: "Accepted", count: counts.accepted },
-                { status: "Rejected", count: counts.rejected },
-            ],
+            title: { text: "Users Joined (Last 30 Days)" },
+            data: dailySeries(userJoins),
             series: [
                 {
-                    type: "donut",
-                    angleKey: "count",
-                    legendItemKey: "status",
-                    innerRadiusRatio: 0.6,
-                    fills: ["#eab308", "#22c55e", "#ef4444"],
-                    strokes: ["#eab308", "#22c55e", "#ef4444"],
-                    calloutLabel: { enabled: false },
+                    type: "area",
+                    xKey: "label",
+                    yKey: "count",
+                    yName: "Users",
+                    fill: "#22c55e",
+                    stroke: "#22c55e",
+                    fillOpacity: 0.4,
+                    interpolation: { type: "smooth" },
+                    marker: { enabled: false },
                 },
             ],
-        };
-    });
-
-    const joinTrendOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!joinApps) return null;
-        return {
-            title: { text: "Join Applications (Last 14 Days)" },
-            data: bucketByDay(joinApps),
-            series: [{ type: "area", xKey: "label", yKey: "count", yName: "Applications", fillOpacity: 0.4, interpolation: { type: "smooth" } }],
             axes: {
                 x: { type: "category" },
                 y: { type: "number", nice: true },
@@ -128,16 +128,13 @@
     });
 
     const cwlAssignmentOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!cwlApps) return null;
-        let assigned = 0;
-        let unassigned = 0;
-        for (const app of cwlApps) app.assignedTo ? assigned++ : unassigned++;
+        if (!cwlAssignment) return null;
         return {
             title: { text: "CWL Applications Assignment" },
-            subtitle: selectedSeasonName ? { text: selectedSeasonName } : undefined,
+            subtitle: cwlAssignment.seasonName ? { text: cwlAssignment.seasonName } : undefined,
             data: [
-                { state: "Assigned", count: assigned },
-                { state: "Unassigned", count: unassigned },
+                { state: "Assigned", count: cwlAssignment.assigned },
+                { state: "Unassigned", count: cwlAssignment.unassigned },
             ],
             series: [
                 {
@@ -154,15 +151,13 @@
     });
 
     const cwlParticipationOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!cwlApps || totalUsers === null) return null;
-        const participantIds = new Set(cwlApps.map((app) => app.discordUserId));
-        const participatedCount = participantIds.size;
-        const nonParticipatedCount = Math.max(0, totalUsers - participatedCount);
+        if (!cwlParticipation) return null;
+        const nonParticipatedCount = Math.max(0, cwlParticipation.totalUsers - cwlParticipation.participated);
         return {
             title: { text: "CWL Participation Overview" },
-            subtitle: selectedSeasonName ? { text: selectedSeasonName } : undefined,
+            subtitle: cwlParticipation.seasonName ? { text: cwlParticipation.seasonName } : undefined,
             data: [
-                { state: "Participated", count: participatedCount },
+                { state: "Participated", count: cwlParticipation.participated },
                 { state: "Not Participated", count: nonParticipatedCount },
             ],
             series: [
@@ -180,10 +175,10 @@
     });
 
     const auditTrendOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!auditEntries) return null;
+        if (!auditTrend) return null;
         return {
             title: { text: "Server Activity (Last 14 Days)" },
-            data: bucketByDay(auditEntries),
+            data: dailySeries(auditTrend),
             series: [{ type: "line", xKey: "label", yKey: "count", yName: "Actions", marker: { enabled: true }, interpolation: { type: "smooth" } }],
             axes: {
                 x: { type: "category" },
@@ -193,16 +188,10 @@
     });
 
     const auditCategoryOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!auditEntries) return null;
-        const counts = new Map<string, number>();
-        for (const entry of auditEntries) {
-            const key = (entry.targetType ?? "other").replace(/_/g, " ");
-            counts.set(key, (counts.get(key) ?? 0) + 1);
-        }
-        const data = [...counts.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
+        if (!auditCategories) return null;
         return {
             title: { text: "Activity by Category" },
-            data,
+            data: auditCategories,
             series: [{ type: "bar", xKey: "category", yKey: "count", yName: "Actions", cornerRadius: 4 }],
             axes: {
                 x: { type: "category" },
@@ -211,52 +200,141 @@
         };
     });
 
+    type ChartCard = { options: AgCartesianChartOptions | AgPolarChartOptions };
     const charts = $derived(
-        [joinStatusOptions, joinTrendOptions, cwlAssignmentOptions, cwlParticipationOptions, auditTrendOptions, auditCategoryOptions].filter(
-            (option): option is AgCartesianChartOptions | AgPolarChartOptions => option !== null,
-        ),
+        (
+            [
+                { options: cwlAssignmentOptions },
+                { options: cwlParticipationOptions },
+                { options: auditTrendOptions },
+                { options: auditCategoryOptions },
+            ] as { options: AgCartesianChartOptions | AgPolarChartOptions | null }[]
+        ).filter((c): c is ChartCard => c.options !== null),
     );
+
+    const maxActivity = $derived(adminActivity?.length ? Math.max(...adminActivity.map((a) => a.count)) : 0);
+    const BAR_MAX_PX = 130;
+    function barHeight(count: number) {
+        return maxActivity > 0 ? Math.max(6, Math.round((count / maxActivity) * BAR_MAX_PX)) : 6;
+    }
+    const hasContent = $derived(!!userJoinTrendOptions || (adminActivity?.length ?? 0) > 0 || charts.length > 0);
 </script>
 
-{#if canReview || canManage}
-    {#if loading}
-        <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-            <SvgSpinnersRingResize />
-            <span>Analytics</span>
-        </div>
-    {:else}
-        <div in:fadeIn class="flex flex-col gap-3">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 class="text-2xl font-bold">Analytics</h2>
-                {#if canManage && seasonOptions.length > 0}
-                    <div class="flex items-center gap-2">
-                        <span class="shrink-0 text-xs font-medium text-stone-400">CWL season</span>
-                        <div class="w-full sm:w-44">
-                            <Select
-                                options={seasonOptions}
-                                bind:value={selectedSeasonValue}
-                                onValueChange={(v) => fetchCwlApps(v ? Number(v) : undefined)}
-                                placeholder="Season"
-                                disabled={cwlLoading}
-                            />
-                        </div>
+{#if loading}
+    <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
+        <SvgSpinnersRingResize />
+        <span>Analytics</span>
+    </div>
+{:else}
+    <div in:fadeIn class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="text-2xl font-bold">Analytics</h2>
+            {#if seasonOptions.length > 0}
+                <div class="flex items-center gap-2">
+                    <span class="shrink-0 text-xs font-medium text-stone-400">CWL season</span>
+                    <div class="w-full sm:w-44">
+                        <Select
+                            options={seasonOptions}
+                            bind:value={selectedSeasonValue}
+                            onValueChange={(v) => fetchCwl(v ? Number(v) : undefined)}
+                            placeholder="Season"
+                            disabled={cwlLoading}
+                        />
                     </div>
-                {/if}
-            </div>
-            {#if charts.length === 0}
-                <div class="flex items-center justify-start gap-2 text-stone-400">
-                    <TablerChartBarPopular class="size-5 text-stone-300" />
-                    <span>No analytics data available</span>
-                </div>
-            {:else}
-                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    {#each charts as options (options.title?.text)}
-                        <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
-                            <Chart {options} />
-                        </div>
-                    {/each}
                 </div>
             {/if}
         </div>
-    {/if}
+        {#if !hasContent}
+            <div class="flex items-center justify-start gap-2 text-stone-400">
+                <TablerChartBarPopular class="size-5 text-stone-300" />
+                <span>No analytics data available</span>
+            </div>
+        {:else}
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {#if userJoinTrendOptions}
+                    <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                        <Chart options={userJoinTrendOptions} />
+                    </div>
+                {/if}
+                {#if adminActivity && adminActivity.length > 0}
+                    <div use:cardSlideIn class="flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                        <h3 class="text-center text-sm font-bold text-stone-200">Top Admin Activity</h3>
+                        <div class="edge-fade flex items-end justify-around gap-2 overflow-x-auto pt-2 sm:gap-4">
+                            {#each adminActivity as actor (actor.actorId)}
+                                <div class="flex min-w-14 flex-1 flex-col items-center">
+                                    <div class="flex flex-col items-center justify-end gap-1.5" style="height: {BAR_MAX_PX + 64}px">
+                                        <span class="text-sm font-bold text-stone-100 tabular-nums">{actor.count}</span>
+                                        <HoverCard maxWidth="max-w-sm">
+                                            {#snippet trigger()}
+                                                <Avatar src={actor.image} name={actor.name} role={actor.role as Role | null} size="sm" />
+                                            {/snippet}
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center justify-start gap-2">
+                                                    <Avatar src={actor.image} name={actor.name} role={actor.role as Role | null} size="lg" />
+                                                    <div class="flex min-w-0 flex-col">
+                                                        <span class="truncate text-lg font-semibold text-stone-50">{actor.name}</span>
+                                                        {#if actor.role}
+                                                            <RoleBadge role={actor.role} class="w-fit" />
+                                                        {/if}
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col gap-1 border-t-2 border-stone-700/50 pt-2">
+                                                    {#if actor.discordId}
+                                                        <div class="flex items-center justify-between gap-4">
+                                                            <span class="flex items-center gap-2 text-sm font-medium text-stone-400">
+                                                                <SimpleIconsDiscord class="size-4 shrink-0" />
+                                                                Discord ID
+                                                            </span>
+                                                            <span class="truncate font-mono text-xs text-stone-200">{actor.discordId}</span>
+                                                        </div>
+                                                    {/if}
+                                                    <div class="flex items-center justify-between gap-4">
+                                                        <span class="flex items-center gap-2 text-sm font-medium text-stone-400">
+                                                            <TablerActivity class="size-4 shrink-0" />
+                                                            Total actions
+                                                        </span>
+                                                        <span class="font-mono text-xs text-stone-50 tabular-nums">{actor.count}</span>
+                                                    </div>
+                                                </div>
+                                                {#if actor.topActions.length > 0}
+                                                    <div class="flex flex-col gap-2 border-t-2 border-stone-700/50 pt-2">
+                                                        <span class="flex items-center gap-2 text-sm font-medium text-stone-400">
+                                                            <TablerListNumbers class="size-4 shrink-0" />
+                                                            Top actions
+                                                        </span>
+                                                        {#each actor.topActions as a (a.action)}
+                                                            {@const Icon = actionConfig(a.action).icon}
+                                                            <div
+                                                                class="flex items-center justify-between gap-2 rounded-md bg-stone-800 px-2 py-1 text-xs"
+                                                            >
+                                                                <span class="flex min-w-0 items-center gap-1.5">
+                                                                    <Icon class="size-4 shrink-0 text-stone-400" />
+                                                                    <span class="truncate font-mono text-stone-200">{a.action}</span>
+                                                                </span>
+                                                                <span class="font-mono text-stone-400 tabular-nums">{a.count}</span>
+                                                            </div>
+                                                        {/each}
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                        </HoverCard>
+                                        <div
+                                            class="w-9 rounded-t-md bg-linear-to-t from-green-500/30 to-green-500"
+                                            style="height: {barHeight(actor.count)}px"
+                                        ></div>
+                                    </div>
+                                    <span class="mt-2 w-full truncate text-center text-xs font-medium text-stone-300">{actor.name}</span>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+                {#each charts as chart (chart.options.title?.text)}
+                    <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                        <Chart options={chart.options} />
+                    </div>
+                {/each}
+            </div>
+        {/if}
+    </div>
 {/if}

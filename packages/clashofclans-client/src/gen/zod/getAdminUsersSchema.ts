@@ -7,6 +7,7 @@ import { z } from "zod/v4";
 
 export const getAdminUsersQueryParamsSchema = z.object({
     search: z.optional(z.string()),
+    role: z.optional(z.string()),
     limit: z.coerce.number().int().min(1).max(200).default(50),
     offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
     sortBy: z.optional(z.string()),
@@ -21,6 +22,7 @@ export const getAdminUsers200Schema = z.object({
     data: z.object({
         users: z.array(z.any()),
         total: z.number(),
+        roleCounts: z.object({}).catchall(z.number()),
     }),
 });
 

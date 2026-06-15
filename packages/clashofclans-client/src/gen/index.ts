@@ -20,6 +20,13 @@ export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccou
 export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
 export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
 export type { GetAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
+export type { GetAnalyticsAdminActivityQueryKey } from "./hooks/createGetAnalyticsAdminActivity.ts";
+export type { GetAnalyticsAuditCategoriesQueryKey } from "./hooks/createGetAnalyticsAuditCategories.ts";
+export type { GetAnalyticsAuditTrendQueryKey } from "./hooks/createGetAnalyticsAuditTrend.ts";
+export type { GetAnalyticsCwlAssignmentQueryKey } from "./hooks/createGetAnalyticsCwlAssignment.ts";
+export type { GetAnalyticsCwlParticipationQueryKey } from "./hooks/createGetAnalyticsCwlParticipation.ts";
+export type { GetAnalyticsCwlSeasonsQueryKey } from "./hooks/createGetAnalyticsCwlSeasons.ts";
+export type { GetAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export type { GetBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
 export type { GetBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
@@ -254,6 +261,60 @@ export type {
     GetAdminUsersQueryParamsSortDirectionEnumKey,
     GetAdminUsersQueryResponse,
 } from "./models/GetAdminUsers.ts";
+export type {
+    GetAnalyticsAdminActivity200,
+    GetAnalyticsAdminActivity401,
+    GetAnalyticsAdminActivity500,
+    GetAnalyticsAdminActivityQuery,
+    GetAnalyticsAdminActivityQueryParams,
+    GetAnalyticsAdminActivityQueryResponse,
+} from "./models/GetAnalyticsAdminActivity.ts";
+export type {
+    GetAnalyticsAuditCategories200,
+    GetAnalyticsAuditCategories401,
+    GetAnalyticsAuditCategories500,
+    GetAnalyticsAuditCategoriesQuery,
+    GetAnalyticsAuditCategoriesQueryResponse,
+} from "./models/GetAnalyticsAuditCategories.ts";
+export type {
+    GetAnalyticsAuditTrend200,
+    GetAnalyticsAuditTrend401,
+    GetAnalyticsAuditTrend500,
+    GetAnalyticsAuditTrendQuery,
+    GetAnalyticsAuditTrendQueryParams,
+    GetAnalyticsAuditTrendQueryResponse,
+} from "./models/GetAnalyticsAuditTrend.ts";
+export type {
+    GetAnalyticsCwlAssignment200,
+    GetAnalyticsCwlAssignment401,
+    GetAnalyticsCwlAssignment500,
+    GetAnalyticsCwlAssignmentQuery,
+    GetAnalyticsCwlAssignmentQueryParams,
+    GetAnalyticsCwlAssignmentQueryResponse,
+} from "./models/GetAnalyticsCwlAssignment.ts";
+export type {
+    GetAnalyticsCwlParticipation200,
+    GetAnalyticsCwlParticipation401,
+    GetAnalyticsCwlParticipation500,
+    GetAnalyticsCwlParticipationQuery,
+    GetAnalyticsCwlParticipationQueryParams,
+    GetAnalyticsCwlParticipationQueryResponse,
+} from "./models/GetAnalyticsCwlParticipation.ts";
+export type {
+    GetAnalyticsCwlSeasons200,
+    GetAnalyticsCwlSeasons401,
+    GetAnalyticsCwlSeasons500,
+    GetAnalyticsCwlSeasonsQuery,
+    GetAnalyticsCwlSeasonsQueryResponse,
+} from "./models/GetAnalyticsCwlSeasons.ts";
+export type {
+    GetAnalyticsUserJoins200,
+    GetAnalyticsUserJoins401,
+    GetAnalyticsUserJoins500,
+    GetAnalyticsUserJoinsQuery,
+    GetAnalyticsUserJoinsQueryParams,
+    GetAnalyticsUserJoinsQueryResponse,
+} from "./models/GetAnalyticsUserJoins.ts";
 export type {
     EntriesActionEnumKey,
     EntriesActorCurrentRoleEnumKey,
@@ -578,6 +639,13 @@ export { getAdminCocAccounts } from "./clients/getAdminCocAccounts.ts";
 export { getAdminCwlClans } from "./clients/getAdminCwlClans.ts";
 export { getAdminSettings } from "./clients/getAdminSettings.ts";
 export { getAdminUsers } from "./clients/getAdminUsers.ts";
+export { getAnalyticsAdminActivity } from "./clients/getAnalyticsAdminActivity.ts";
+export { getAnalyticsAuditCategories } from "./clients/getAnalyticsAuditCategories.ts";
+export { getAnalyticsAuditTrend } from "./clients/getAnalyticsAuditTrend.ts";
+export { getAnalyticsCwlAssignment } from "./clients/getAnalyticsCwlAssignment.ts";
+export { getAnalyticsCwlParticipation } from "./clients/getAnalyticsCwlParticipation.ts";
+export { getAnalyticsCwlSeasons } from "./clients/getAnalyticsCwlSeasons.ts";
+export { getAnalyticsUserJoins } from "./clients/getAnalyticsUserJoins.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
 export { getBonusData } from "./clients/getBonusData.ts";
 export { getBonusLedger } from "./clients/getBonusLedger.ts";
@@ -667,6 +735,27 @@ export { getAdminSettingsQueryOptions } from "./hooks/createGetAdminSettings.ts"
 export { createGetAdminUsers } from "./hooks/createGetAdminUsers.ts";
 export { getAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
 export { getAdminUsersQueryOptions } from "./hooks/createGetAdminUsers.ts";
+export { createGetAnalyticsAdminActivity } from "./hooks/createGetAnalyticsAdminActivity.ts";
+export { getAnalyticsAdminActivityQueryKey } from "./hooks/createGetAnalyticsAdminActivity.ts";
+export { getAnalyticsAdminActivityQueryOptions } from "./hooks/createGetAnalyticsAdminActivity.ts";
+export { createGetAnalyticsAuditCategories } from "./hooks/createGetAnalyticsAuditCategories.ts";
+export { getAnalyticsAuditCategoriesQueryKey } from "./hooks/createGetAnalyticsAuditCategories.ts";
+export { getAnalyticsAuditCategoriesQueryOptions } from "./hooks/createGetAnalyticsAuditCategories.ts";
+export { createGetAnalyticsAuditTrend } from "./hooks/createGetAnalyticsAuditTrend.ts";
+export { getAnalyticsAuditTrendQueryKey } from "./hooks/createGetAnalyticsAuditTrend.ts";
+export { getAnalyticsAuditTrendQueryOptions } from "./hooks/createGetAnalyticsAuditTrend.ts";
+export { createGetAnalyticsCwlAssignment } from "./hooks/createGetAnalyticsCwlAssignment.ts";
+export { getAnalyticsCwlAssignmentQueryKey } from "./hooks/createGetAnalyticsCwlAssignment.ts";
+export { getAnalyticsCwlAssignmentQueryOptions } from "./hooks/createGetAnalyticsCwlAssignment.ts";
+export { createGetAnalyticsCwlParticipation } from "./hooks/createGetAnalyticsCwlParticipation.ts";
+export { getAnalyticsCwlParticipationQueryKey } from "./hooks/createGetAnalyticsCwlParticipation.ts";
+export { getAnalyticsCwlParticipationQueryOptions } from "./hooks/createGetAnalyticsCwlParticipation.ts";
+export { createGetAnalyticsCwlSeasons } from "./hooks/createGetAnalyticsCwlSeasons.ts";
+export { getAnalyticsCwlSeasonsQueryKey } from "./hooks/createGetAnalyticsCwlSeasons.ts";
+export { getAnalyticsCwlSeasonsQueryOptions } from "./hooks/createGetAnalyticsCwlSeasons.ts";
+export { createGetAnalyticsUserJoins } from "./hooks/createGetAnalyticsUserJoins.ts";
+export { getAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
+export { getAnalyticsUserJoinsQueryOptions } from "./hooks/createGetAnalyticsUserJoins.ts";
 export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
@@ -976,6 +1065,53 @@ export {
     getAdminUsersQueryParamsSchema,
     getAdminUsersQueryResponseSchema,
 } from "./zod/getAdminUsersSchema.ts";
+export {
+    getAnalyticsAdminActivity200Schema,
+    getAnalyticsAdminActivity401Schema,
+    getAnalyticsAdminActivity500Schema,
+    getAnalyticsAdminActivityQueryParamsSchema,
+    getAnalyticsAdminActivityQueryResponseSchema,
+} from "./zod/getAnalyticsAdminActivitySchema.ts";
+export {
+    getAnalyticsAuditCategories200Schema,
+    getAnalyticsAuditCategories401Schema,
+    getAnalyticsAuditCategories500Schema,
+    getAnalyticsAuditCategoriesQueryResponseSchema,
+} from "./zod/getAnalyticsAuditCategoriesSchema.ts";
+export {
+    getAnalyticsAuditTrend200Schema,
+    getAnalyticsAuditTrend401Schema,
+    getAnalyticsAuditTrend500Schema,
+    getAnalyticsAuditTrendQueryParamsSchema,
+    getAnalyticsAuditTrendQueryResponseSchema,
+} from "./zod/getAnalyticsAuditTrendSchema.ts";
+export {
+    getAnalyticsCwlAssignment200Schema,
+    getAnalyticsCwlAssignment401Schema,
+    getAnalyticsCwlAssignment500Schema,
+    getAnalyticsCwlAssignmentQueryParamsSchema,
+    getAnalyticsCwlAssignmentQueryResponseSchema,
+} from "./zod/getAnalyticsCwlAssignmentSchema.ts";
+export {
+    getAnalyticsCwlParticipation200Schema,
+    getAnalyticsCwlParticipation401Schema,
+    getAnalyticsCwlParticipation500Schema,
+    getAnalyticsCwlParticipationQueryParamsSchema,
+    getAnalyticsCwlParticipationQueryResponseSchema,
+} from "./zod/getAnalyticsCwlParticipationSchema.ts";
+export {
+    getAnalyticsCwlSeasons200Schema,
+    getAnalyticsCwlSeasons401Schema,
+    getAnalyticsCwlSeasons500Schema,
+    getAnalyticsCwlSeasonsQueryResponseSchema,
+} from "./zod/getAnalyticsCwlSeasonsSchema.ts";
+export {
+    getAnalyticsUserJoins200Schema,
+    getAnalyticsUserJoins401Schema,
+    getAnalyticsUserJoins500Schema,
+    getAnalyticsUserJoinsQueryParamsSchema,
+    getAnalyticsUserJoinsQueryResponseSchema,
+} from "./zod/getAnalyticsUserJoinsSchema.ts";
 export {
     getAuditLog200Schema,
     getAuditLog401Schema,

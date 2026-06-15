@@ -983,3 +983,152 @@ export async function importCocAccountsForUser(userId: string, discordUserId: st
         return inserted;
     });
 }
+
+// Analytics aggregations for the admin dashboard. Aggregated in-DB so the client
+// only receives chart-ready numbers; trends are bucketed by UTC day.
+
+// Inclusive UTC start-of-day `days - 1` days ago (today included).
+function utcWindowStart(days: number): Date {
+    const start = new Date();
+    start.setUTCHours(0, 0, 0, 0);
+    start.setUTCDate(start.getUTCDate() - (days - 1));
+    return start;
+}
+
+// Fills missing days with zero for a continuous series.
+function fillDailySeries(rows: { date: string; count: number }[], days: number): { date: string; count: number }[] {
+    const counts = new Map(rows.map((r) => [r.date, Number(r.count)]));
+    const out: { date: string; count: number }[] = [];
+    const cursor = utcWindowStart(days);
+    for (let i = 0; i < days; i++) {
+        const key = cursor.toISOString().slice(0, 10);
+        out.push({ date: key, count: counts.get(key) ?? 0 });
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+    return out;
+}
+
+export async function getUserJoinTrend(days: number) {
+    const rows = await db
+        .select({
+            date: sql<string>`to_char(date_trunc('day', ${user.createdAt}), 'YYYY-MM-DD')`,
+            count: sql<number>`count(*)::int`,
+        })
+        .from(user)
+        .where(gte(user.createdAt, utcWindowStart(days)))
+        .groupBy(sql`date_trunc('day', ${user.createdAt})`);
+    return { data: fillDailySeries(rows, days) };
+}
+
+export async function getAuditTrend(days: number) {
+    const rows = await db
+        .select({
+            date: sql<string>`to_char(date_trunc('day', ${auditLogTable.createdAt}), 'YYYY-MM-DD')`,
+            count: sql<number>`count(*)::int`,
+        })
+        .from(auditLogTable)
+        .where(gte(auditLogTable.createdAt, utcWindowStart(days)))
+        .groupBy(sql`date_trunc('day', ${auditLogTable.createdAt})`);
+    return { data: fillDailySeries(rows, days) };
+}
+
+export async function getAuditCategories() {
+    const categoryExpr = sql<string>`replace(coalesce(${auditLogTable.targetType}, 'other'), '_', ' ')`;
+    const rows = await db
+        .select({ category: categoryExpr, count: sql<number>`count(*)::int` })
+        .from(auditLogTable)
+        .groupBy(categoryExpr)
+        .orderBy(desc(sql`count(*)`));
+    return { data: rows };
+}
+
+// Admins (reviewer role and above) ranked by audit action count, with current
+// profile info and each actor's top action types for the hover card.
+export async function getTopAdminActivity(limit: number) {
+    const discordJoin = and(eq(account.userId, auditLogTable.actorId), eq(account.providerId, "discord"));
+    const actors = await db
+        .select({
+            actorId: auditLogTable.actorId,
+            name: sql<string>`coalesce(${user.name}, ${auditLogTable.actorName})`,
+            image: user.image,
+            role: user.role,
+            discordId: account.accountId,
+            count: sql<number>`count(*)::int`,
+        })
+        .from(auditLogTable)
+        .innerJoin(user, eq(auditLogTable.actorId, user.id))
+        .leftJoin(account, discordJoin)
+        .where(inArray(user.role, ["reviewer", "manager", "admin", "superadmin"]))
+        .groupBy(auditLogTable.actorId, user.name, auditLogTable.actorName, user.image, user.role, account.accountId)
+        .orderBy(desc(sql`count(*)`))
+        .limit(limit);
+
+    if (actors.length === 0) return { data: [] };
+
+    const actorIds = actors.map((a) => a.actorId).filter((id): id is string => id !== null);
+    const actionRows = await db
+        .select({
+            actorId: auditLogTable.actorId,
+            action: auditLogTable.action,
+            count: sql<number>`count(*)::int`,
+        })
+        .from(auditLogTable)
+        .where(inArray(auditLogTable.actorId, actorIds))
+        .groupBy(auditLogTable.actorId, auditLogTable.action)
+        .orderBy(desc(sql`count(*)`));
+
+    const topActions = new Map<string, { action: string; count: number }[]>();
+    for (const row of actionRows) {
+        if (!row.actorId) continue;
+        const list = topActions.get(row.actorId) ?? [];
+        if (list.length < 3) list.push({ action: row.action, count: row.count });
+        topActions.set(row.actorId, list);
+    }
+
+    return { data: actors.map((a) => ({ ...a, topActions: a.actorId ? (topActions.get(a.actorId) ?? []) : [] })) };
+}
+
+// Resolves the requested season (or the configured current one) to id + name.
+async function resolveSeason(seasonId?: number): Promise<{ id: number; name: string } | null> {
+    if (seasonId === undefined) {
+        const settings = await getSettings();
+        seasonId = settings?.currentCwlSeasonId ?? undefined;
+    }
+    if (seasonId === undefined) return null;
+    const [season] = await db
+        .select({ id: cwlSeasonTable.id, name: cwlSeasonTable.name })
+        .from(cwlSeasonTable)
+        .where(eq(cwlSeasonTable.id, seasonId));
+    return season ?? null;
+}
+
+export async function getCwlAssignmentStats(seasonId?: number) {
+    const season = await resolveSeason(seasonId);
+    if (!season) return { assigned: 0, unassigned: 0, seasonId: null, seasonName: null };
+    const [row] = await db
+        .select({
+            assigned: sql<number>`(count(*) filter (where ${cwlApplicationTable.assignedTo} is not null))::int`,
+            unassigned: sql<number>`(count(*) filter (where ${cwlApplicationTable.assignedTo} is null))::int`,
+        })
+        .from(cwlApplicationTable)
+        .where(eq(cwlApplicationTable.seasonId, season.id));
+    return { assigned: row?.assigned ?? 0, unassigned: row?.unassigned ?? 0, seasonId: season.id, seasonName: season.name };
+}
+
+export async function getCwlParticipationStats(seasonId?: number) {
+    const season = await resolveSeason(seasonId);
+    if (!season) return { participated: 0, totalUsers: 0, seasonId: null, seasonName: null };
+    const [[participation], [totals]] = await Promise.all([
+        db
+            .select({ participated: sql<number>`count(distinct ${cwlApplicationTable.discordUserId})::int` })
+            .from(cwlApplicationTable)
+            .where(eq(cwlApplicationTable.seasonId, season.id)),
+        db.select({ total: sql<number>`count(*)::int` }).from(user),
+    ]);
+    return {
+        participated: participation?.participated ?? 0,
+        totalUsers: totals?.total ?? 0,
+        seasonId: season.id,
+        seasonName: season.name,
+    };
+}

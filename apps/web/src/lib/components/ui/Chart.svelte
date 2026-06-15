@@ -14,6 +14,8 @@
     let chartContainer: HTMLDivElement;
     let chart: AgChartInstance | undefined = $state();
 
+    const fontFamily = "Rubik, sans-serif";
+
     const theme: AgChartOptions["theme"] = {
         baseTheme: "ag-default-dark",
         palette: {
@@ -23,25 +25,25 @@
         overrides: {
             common: {
                 background: { visible: false },
-                title: { color: "#e7e5e4", fontSize: 14, fontWeight: "bold" },
-                subtitle: { color: "#a8a29e", fontSize: 12 },
+                title: { color: "#e7e5e4", fontSize: 14, fontWeight: "bold", fontFamily },
+                subtitle: { color: "#a8a29e", fontSize: 12, fontFamily },
                 padding: { top: 8, right: 8, bottom: 8, left: 8 },
-                legend: { item: { label: { color: "#a8a29e", fontSize: 12 }, marker: { size: 10 } } },
+                legend: { item: { label: { color: "#a8a29e", fontSize: 12, fontFamily }, marker: { size: 10 } } },
                 axes: {
                     number: {
-                        label: { color: "#a8a29e" },
+                        label: { color: "#a8a29e", fontFamily },
                         line: { stroke: "rgba(68,64,60,0.5)" },
                         tick: { stroke: "rgba(68,64,60,0.5)" },
                         gridLine: { style: [{ stroke: "rgba(68,64,60,0.35)" }] },
                     },
                     category: {
-                        label: { color: "#a8a29e" },
+                        label: { color: "#a8a29e", fontFamily },
                         line: { stroke: "rgba(68,64,60,0.5)" },
                         tick: { stroke: "rgba(68,64,60,0.5)" },
                         gridLine: { style: [{ stroke: "rgba(68,64,60,0.35)" }] },
                     },
                     time: {
-                        label: { color: "#a8a29e" },
+                        label: { color: "#a8a29e", fontFamily },
                         line: { stroke: "rgba(68,64,60,0.5)" },
                         tick: { stroke: "rgba(68,64,60,0.5)" },
                     },
