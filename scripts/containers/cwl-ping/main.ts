@@ -1,18 +1,12 @@
 #!/usr/bin/env bun
 /**
- * CWL Ping — standalone container.
- *
- * Pings (via a Discord webhook) every CWL applicant who has been assigned to a
- * clan but has NOT yet joined that clan in-game. Runs on a schedule: one ping
- * pass immediately, then repeats every `CWL_PING_INTERVAL_MINUTES` until
- * `CWL_PING_DURATION_HOURS` have elapsed, then exits.
- *
- * Zero runtime dependencies: uses Bun's built-in SQL (Postgres) and `fetch`.
  *
  * Tables (see apps/server/src/lib/db/schema/coc.ts):
+ *   settings_table        — current_cwl_season_id (active CWL season pointer).
+ *   cwl_season_table      — id (PK); newest id is used if settings has none.
  *   cwl_clan_info_table   — coc_clan_tag (PK), coc_clan_name, ...
- *   cwl_application_table — discord_user_id, coc_account_tag, assigned_to (FK
- *                           -> cwl_clan_info_table.coc_clan_tag)
+ *   cwl_application_table — discord_user_id, coc_account_tag, season_id,
+ *                           assigned_to (FK -> cwl_clan_info_table.coc_clan_tag)
  *
  * Required env:
  *   JPA_DATABASE_URL          Postgres connection string.
@@ -21,15 +15,11 @@
  *
  * Optional env:
  *   PUBLIC_COC_API_BASE_URI   CoC API base (default https://cocproxy.royaleapi.dev).
- *   CWL_PING_DURATION_HOURS   How long to keep pinging (default 12).
- *   CWL_PING_INTERVAL_MINUTES Gap between ping passes (default 60).
+ *   CWL_PING_COUNT            Number of ping passes before exiting (default 15).
+ *   CWL_PING_INTERVAL_MINUTES Gap between ping passes (default 30).
  *   CWL_PING_DRY_RUN          "1"/"true" to skip the Discord post (logs only).
  */
 import { SQL } from "bun";
-
-// ---------------------------------------------------------------------------
-// Config
-// ---------------------------------------------------------------------------
 
 function requireEnv(name: string): string {
     const value = process.env[name];
@@ -56,14 +46,10 @@ const config = {
     cocApiToken: requireEnv("JPA_COC_API_TOKEN"),
     webhookUrl: requireEnv("DISCORD_WEBHOOK_URL"),
     cocBaseUrl: (process.env.PUBLIC_COC_API_BASE_URI || "https://cocproxy.royaleapi.dev").replace(/\/+$/, ""),
-    durationHours: numEnv("CWL_PING_DURATION_HOURS", 12),
-    intervalMinutes: numEnv("CWL_PING_INTERVAL_MINUTES", 60),
+    pingCount: Math.floor(numEnv("CWL_PING_COUNT", 15)),
+    intervalMinutes: numEnv("CWL_PING_INTERVAL_MINUTES", 30),
     dryRun: /^(1|true|yes)$/i.test(process.env.CWL_PING_DRY_RUN || ""),
 };
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -71,15 +57,10 @@ function log(...args: unknown[]) {
     console.log(`[${new Date().toISOString()}]`, ...args);
 }
 
-/** Normalize a player/clan tag for comparison: uppercase, single leading `#`. */
 function normalizeTag(tag: string): string {
     const t = tag.trim().toUpperCase().replace(/^#+/, "");
     return `#${t}`;
 }
-
-// ---------------------------------------------------------------------------
-// Clash of Clans API
-// ---------------------------------------------------------------------------
 
 interface ClanMember {
     tag: string;
@@ -115,13 +96,8 @@ async function fetchClanMemberTags(clanTag: string, retries = 3): Promise<Set<st
     return new Set();
 }
 
-// ---------------------------------------------------------------------------
-// Discord notifier
-// ---------------------------------------------------------------------------
-
 const MAX_CONTENT_LENGTH = 1900;
 
-/** Split mentions into chunks that each fit under Discord's content limit. */
 function chunkMentions(userIds: string[]): string[] {
     const mentions = userIds.map((id) => `<@${id}>`);
     const chunks: string[] = [];
@@ -167,7 +143,6 @@ async function sendNotification(userIds: string[], clanName: string, clanTag: st
         return;
     }
 
-    // First message carries the embed + the first mention chunk.
     const firstPayload: Record<string, unknown> = { username: "Chief Pinger", embeds: [embed] };
     if (chunks.length > 0) firstPayload.content = chunks[0];
 
@@ -181,7 +156,6 @@ async function sendNotification(userIds: string[], clanName: string, clanTag: st
         return;
     }
 
-    // Follow-up messages for any remaining mention chunks.
     for (const chunk of chunks.slice(1)) {
         const res = await fetch(config.webhookUrl, {
             method: "POST",
@@ -195,10 +169,6 @@ async function sendNotification(userIds: string[], clanName: string, clanTag: st
     }
 }
 
-// ---------------------------------------------------------------------------
-// One ping pass
-// ---------------------------------------------------------------------------
-
 interface ClanRow {
     coc_clan_tag: string;
     coc_clan_name: string;
@@ -210,32 +180,62 @@ interface AppRow {
     assigned_to: string;
 }
 
+async function resolveSeasonId(sql: SQL): Promise<number | null> {
+    const settings = (await sql`
+        SELECT current_cwl_season_id
+        FROM settings_table
+        WHERE id = 1
+    `) as { current_cwl_season_id: number | null }[];
+
+    const current = settings[0]?.current_cwl_season_id;
+    if (current != null) return current;
+
+    const latest = (await sql`
+        SELECT MAX(id) AS id
+        FROM cwl_season_table
+    `) as { id: number | null }[];
+
+    return latest[0]?.id ?? null;
+}
+
 async function runOnce(sql: SQL) {
+    const seasonId = await resolveSeasonId(sql);
+    if (seasonId == null) {
+        log("No current CWL season configured and no seasons exist. Nothing to do.");
+        return;
+    }
+    log(`Pinging for CWL season ${seasonId}.`);
+
     const clans = (await sql`
         SELECT coc_clan_tag, coc_clan_name
         FROM cwl_clan_info_table
+        WHERE coc_clan_tag IN (
+            SELECT DISTINCT assigned_to
+            FROM cwl_application_table
+            WHERE assigned_to IS NOT NULL
+              AND season_id = ${seasonId}
+        )
     `) as ClanRow[];
 
     if (clans.length === 0) {
-        log("No CWL clans found in cwl_clan_info_table. Nothing to do.");
+        log(`No CWL clans have assigned applicants for season ${seasonId}. Nothing to do.`);
         return;
     }
 
-    // Only assigned applications are relevant.
     const apps = (await sql`
         SELECT discord_user_id, coc_account_tag, assigned_to
         FROM cwl_application_table
         WHERE assigned_to IS NOT NULL
+          AND season_id = ${seasonId}
     `) as AppRow[];
 
     if (apps.length === 0) {
-        log("No assigned CWL applications. Nothing to check.");
+        log(`No assigned CWL applications for season ${seasonId}. Nothing to check.`);
         return;
     }
 
     const clanByTag = new Map(clans.map((c) => [normalizeTag(c.coc_clan_tag), c]));
 
-    // Live membership per clan.
     const membersByClan = new Map<string, Set<string>>();
     for (const clan of clans) {
         const tag = normalizeTag(clan.coc_clan_tag);
@@ -245,7 +245,6 @@ async function runOnce(sql: SQL) {
         await sleep(100);
     }
 
-    // Group not-yet-joined applicants by their assigned clan.
     const pendingByClan = new Map<string, Set<string>>();
     for (const app of apps) {
         const assigned = normalizeTag(app.assigned_to);
@@ -272,33 +271,27 @@ async function runOnce(sql: SQL) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Scheduler
-// ---------------------------------------------------------------------------
-
 async function main() {
     const intervalMs = config.intervalMinutes * 60 * 1000;
-    const deadline = Date.now() + config.durationHours * 60 * 60 * 1000;
 
-    log(`CWL Ping starting — pinging every ${config.intervalMinutes}m for ${config.durationHours}h` + `${config.dryRun ? " (DRY RUN)" : ""}.`);
+    log(`CWL Ping starting — ${config.pingCount} ping pass(es), ${config.intervalMinutes}m apart` + `${config.dryRun ? " (DRY RUN)" : ""}.`);
 
     const sql = new SQL(config.databaseUrl);
 
     try {
-        let run = 0;
-        while (true) {
-            run++;
-            log(`--- Run ${run} ---`);
+        for (let run = 1; run <= config.pingCount; run++) {
+            log(`--- Run ${run}/${config.pingCount} ---`);
             try {
                 await runOnce(sql);
             } catch (err) {
                 console.error(`Run ${run} failed:`, err);
             }
-            log(`--- Run ${run} finished ---`);
+            log(`--- Run ${run}/${config.pingCount} finished ---`);
 
-            if (Date.now() + intervalMs > deadline) break;
-            log(`Waiting ${config.intervalMinutes}m before the next run...`);
-            await sleep(intervalMs);
+            if (run < config.pingCount) {
+                log(`Waiting ${config.intervalMinutes}m before the next run...`);
+                await sleep(intervalMs);
+            }
         }
         log("Schedule complete. Exiting.");
     } finally {

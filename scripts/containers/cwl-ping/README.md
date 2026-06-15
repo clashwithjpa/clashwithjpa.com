@@ -4,7 +4,7 @@ Standalone container that pings — via a Discord webhook — every CWL applican
 who has been **assigned to a clan but hasn't joined it in-game yet**.
 
 It runs one ping pass immediately, then repeats on a fixed interval for a fixed
-window, then exits. Meant to be kicked off once at the start of a CWL season
+number of passes, then exits. Meant to be kicked off once at the start of a CWL season
 (e.g. `docker run` or a cron-triggered `docker compose run`).
 
 ## How it works
@@ -28,8 +28,8 @@ Copy `.env.example` to `.env` and fill it in.
 | `JPA_COC_API_TOKEN` | yes | — | Clash of Clans API token |
 | `DISCORD_WEBHOOK_URL` | yes | — | Discord webhook to post pings to |
 | `PUBLIC_COC_API_BASE_URI` | no | `https://cocproxy.royaleapi.dev` | CoC API base URL |
-| `CWL_PING_DURATION_HOURS` | no | `12` | How long to keep pinging |
-| `CWL_PING_INTERVAL_MINUTES` | no | `60` | Gap between ping passes |
+| `CWL_PING_COUNT` | no | `15` | Number of ping passes before exiting |
+| `CWL_PING_INTERVAL_MINUTES` | no | `30` | Gap between ping passes |
 | `CWL_PING_DRY_RUN` | no | `0` | `1` logs who'd be pinged, posts nothing |
 
 ## Run locally
