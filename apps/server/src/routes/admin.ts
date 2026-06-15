@@ -72,6 +72,7 @@ const app = new Hono<AppEnv>();
 
 const listUsersQuerySchema = z4.object({
     search: z4.string().optional(),
+    role: z4.string().optional(),
     limit: z4.coerce.number().int().min(1).max(200).default(50),
     offset: z4.coerce.number().int().min(0).default(0),
     sortBy: z4.string().optional(),
@@ -88,7 +89,13 @@ app.get(
             200: {
                 description: "Users.",
                 content: {
-                    "application/json": { schema: resolver(SuccessResponseSchema(z4.object({ users: z4.array(z4.unknown()), total: z4.number() }))) },
+                    "application/json": {
+                        schema: resolver(
+                            SuccessResponseSchema(
+                                z4.object({ users: z4.array(z4.unknown()), total: z4.number(), roleCounts: z4.record(z4.string(), z4.number()) }),
+                            ),
+                        ),
+                    },
                 },
             },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },

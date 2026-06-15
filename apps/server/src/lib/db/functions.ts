@@ -14,7 +14,7 @@ import {
     settingsTable,
     user,
 } from "@/lib/db/schema";
-import { and, asc, desc, eq, getTableColumns, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, gte, ilike, inArray, isNull, lte, or, sql } from "drizzle-orm";
 
 export async function getUserCocAccounts(discordUserId: string) {
     const cocAccounts = await db.select().from(cocAccountTable).where(eq(cocAccountTable.discordUserId, discordUserId));
@@ -792,9 +792,9 @@ export async function syncCocAccountStats(rows: CocAccountSheetStats[]) {
 }
 
 export async function getAdminUsers(
-    opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDirection?: "asc" | "desc" } = {},
+    opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDirection?: "asc" | "desc"; role?: string } = {},
 ) {
-    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc" } = opts;
+    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc", role } = opts;
 
     const sortColumns = {
         name: user.name,
@@ -807,9 +807,17 @@ export async function getAdminUsers(
 
     const discordJoin = and(eq(account.userId, user.id), eq(account.providerId, "discord"));
 
-    const whereClause = search ? or(ilike(user.name, `%${search}%`), ilike(account.accountId, `%${search}%`)) : undefined;
+    const searchClause = search ? or(ilike(user.name, `%${search}%`), ilike(account.accountId, `%${search}%`)) : undefined;
+    // A missing role is bucketed as "unverified" to match the UI's role badges,
+    // so filtering by "unverified" must also catch users with a null role.
+    const roleClause = role ? (role === "unverified" ? or(eq(user.role, "unverified"), isNull(user.role)) : eq(user.role, role)) : undefined;
+    const whereClause = and(searchClause, roleClause);
 
-    const [rows, countResult] = await Promise.all([
+    // Role counts ignore the role filter (but respect search) so the badge bar
+    // stays stable while a single role is selected.
+    const roleExpr = sql<string>`coalesce(${user.role}, 'unverified')`;
+
+    const [rows, countResult, roleCountRows] = await Promise.all([
         db
             .select({ ...getTableColumns(user), discordId: account.accountId })
             .from(user)
@@ -823,9 +831,16 @@ export async function getAdminUsers(
             .from(user)
             .leftJoin(account, discordJoin)
             .where(whereClause),
+        db
+            .select({ role: roleExpr, count: sql<number>`count(*)::int` })
+            .from(user)
+            .leftJoin(account, discordJoin)
+            .where(searchClause)
+            .groupBy(roleExpr),
     ]);
 
-    return { users: rows, total: countResult[0]?.count ?? 0 };
+    const roleCounts = Object.fromEntries(roleCountRows.map((r) => [r.role, r.count]));
+    return { users: rows, total: countResult[0]?.count ?? 0, roleCounts };
 }
 
 export async function updateCocAccountWarWeight(id: number, warWeight: number) {

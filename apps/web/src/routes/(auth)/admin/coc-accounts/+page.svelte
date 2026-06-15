@@ -52,6 +52,7 @@
     let guildNicknames: Record<string, string> = {};
     let nicknamesLoading = $state(false);
     let searchText = $state("");
+    let total = $state(0);
     let selectedIds = $state<number[]>([]);
     let bulkProcessing = $state(false);
     let downloading = $state(false);
@@ -156,6 +157,7 @@
                         return;
                     }
 
+                    total = resp.data.total;
                     params.successCallback(
                         resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
                         resp.data.total,
@@ -341,251 +343,303 @@
 
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
-<div class="relative flex size-full flex-col overflow-hidden" in:fadeIn>
-    <Grid
-        gridOptions={{
-            context: gridContext,
-            rowHeight: 56,
-            rowModelType: "infinite",
-            cacheBlockSize: 50,
-            blockLoadDebounceMillis: 300,
-            rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
-            onGridReady: (params) => {
-                gridApi = params.api;
-                // Load rows immediately; nicknames fill in afterwards so the grid
-                // isn't blocked on the Discord guild-member walk.
-                gridApi.setGridOption("datasource", createDatasource());
-                loadNicknames();
-            },
-            onSelectionChanged: (event) => {
-                selectedIds = event.api.getSelectedRows().map((r) => r.id);
-            },
-            onCellValueChanged: async (event) => {
-                if (event.oldValue === event.newValue) return;
+<div class="relative flex size-full flex-col gap-4 overflow-hidden" in:fadeIn>
+    <div class="flex flex-col gap-2 px-4 pt-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">COC Accounts</h1>
+            <p class="text-sm text-stone-400">{total} account{total === 1 ? "" : "s"}</p>
+        </div>
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <div class="flex items-center gap-2">
+                <Input
+                    placeholder="Search anything..."
+                    bind:value={searchText}
+                    onchange={handleSearchChange}
+                    class="min-w-0 flex-1 lg:w-80 lg:flex-none"
+                />
+                <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="bottom">
+                    <TablerSearch class="size-5" />
+                </Button>
+            </div>
+            <div class="flex items-center gap-2">
+                {#if data.canDelete}
+                    <Button variant="base" class="shrink-0" onclick={openAdd} tooltip="Add an account" tooltipPlacement="bottom">
+                        <TablerUserPlus class="size-5" />
+                    </Button>
+                {/if}
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    onclick={() => (syncDialogOpen = true)}
+                    tooltip="Sync from Google Sheet"
+                    tooltipPlacement="bottom"
+                >
+                    <TablerTableDashed class="size-5" />
+                </Button>
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    disabled={downloading}
+                    onclick={downloadCsv}
+                    tooltip="Download as CSV"
+                    tooltipPlacement="bottom"
+                >
+                    {#if downloading}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerDownload class="size-5" />
+                    {/if}
+                </Button>
+            </div>
+        </div>
+    </div>
 
-                if (event.colDef.field === "warWeight") {
-                    const warWeight = Number(event.newValue);
-                    if (!Number.isInteger(warWeight) || warWeight < 0) {
-                        toast.error("War weight must be a non-negative whole number");
-                        event.data.warWeight = event.oldValue;
-                        event.api.refreshCells({ rowNodes: [event.node], force: true });
-                        return;
-                    }
+    <div class="flex-1">
+        <Grid
+            gridOptions={{
+                context: gridContext,
+                rowHeight: 56,
+                rowModelType: "infinite",
+                cacheBlockSize: 50,
+                blockLoadDebounceMillis: 300,
+                rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
+                onGridReady: (params) => {
+                    gridApi = params.api;
+                    // Load rows immediately; nicknames fill in afterwards so the grid
+                    // isn't blocked on the Discord guild-member walk.
+                    gridApi.setGridOption("datasource", createDatasource());
+                    loadNicknames();
+                },
+                onSelectionChanged: (event) => {
+                    selectedIds = event.api.getSelectedRows().map((r) => r.id);
+                },
+                onCellValueChanged: async (event) => {
+                    if (event.oldValue === event.newValue) return;
 
-                    try {
-                        const resp = await updateCocAccountWarWeight(
-                            event.data.id,
-                            { warWeight },
-                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                        );
-                        if (resp.success) {
-                            event.data.warWeight = resp.data.account.warWeight;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                            toast.success(`War weight updated for ${event.data.cocAccountTag}`);
-                        } else {
-                            throw new Error();
-                        }
-                    } catch (error) {
-                        toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
-                        event.data.warWeight = event.oldValue;
-                        event.api.refreshCells({ rowNodes: [event.node], force: true });
-                    }
-                    return;
-                }
-
-                if (event.colDef.field === "isExternal") {
-                    const isExternal = Boolean(event.newValue);
-                    try {
-                        const resp = await updateCocAccountExternal(
-                            event.data.id,
-                            { isExternal },
-                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                        );
-                        if (resp.success) {
-                            event.data.isExternal = resp.data.account.isExternal;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                            toast.success(`${event.data.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
-                        } else {
-                            throw new Error();
-                        }
-                    } catch (error) {
-                        toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
-                        event.data.isExternal = event.oldValue;
-                        event.api.refreshCells({ rowNodes: [event.node], force: true });
-                    }
-                    return;
-                }
-
-                // Sheet-synced stat columns are edited one cell at a time and patched individually.
-                // A later Google Sheet sync will overwrite these manual edits.
-                const field = event.colDef.field;
-                if (field && STAT_FIELDS.includes(field)) {
-                    let value: string | number | null;
-                    if (field === "currentClan") {
-                        const text = String(event.newValue ?? "").trim();
-                        value = text === "" ? null : text;
-                    } else {
-                        const n = Number(event.newValue);
-                        if (!Number.isInteger(n) || n < 0) {
-                            toast.error(`${event.colDef.headerName} must be a non-negative whole number`);
-                            event.data[field] = event.oldValue;
+                    if (event.colDef.field === "warWeight") {
+                        const warWeight = Number(event.newValue);
+                        if (!Number.isInteger(warWeight) || warWeight < 0) {
+                            toast.error("War weight must be a non-negative whole number");
+                            event.data.warWeight = event.oldValue;
                             event.api.refreshCells({ rowNodes: [event.node], force: true });
                             return;
                         }
-                        value = n;
-                    }
 
-                    try {
-                        const resp = await updateCocAccountStats(
-                            event.data.id,
-                            { [field]: value },
-                            { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                        );
-                        if (resp.success) {
-                            event.data[field] = (resp.data.account as Record<string, unknown>)[field];
+                        try {
+                            const resp = await updateCocAccountWarWeight(
+                                event.data.id,
+                                { warWeight },
+                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                            );
+                            if (resp.success) {
+                                event.data.warWeight = resp.data.account.warWeight;
+                                event.api.refreshCells({ rowNodes: [event.node], force: true });
+                                toast.success(`War weight updated for ${event.data.cocAccountTag}`);
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (error) {
+                            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
+                            event.data.warWeight = event.oldValue;
                             event.api.refreshCells({ rowNodes: [event.node], force: true });
-                            toast.success(`${event.colDef.headerName} updated for ${event.data.cocAccountTag}`);
-                        } else {
-                            throw new Error();
                         }
-                    } catch (error) {
-                        toast.error(`Failed to update ${event.colDef.headerName?.toLowerCase()}`, {
-                            description: error instanceof Error ? error.message : undefined,
-                        });
-                        event.data[field] = event.oldValue;
-                        event.api.refreshCells({ rowNodes: [event.node], force: true });
+                        return;
                     }
-                    return;
-                }
-            },
-        }}
-        columnDefs={[
-            {
-                headerName: "User",
-                field: "ownerName",
-                sortable: true,
-                filter: false,
-                cellRenderer: svelteRenderer(CocOwnerCell),
-            },
-            {
-                headerName: "Nickname",
-                field: "discordNickname",
-                sortable: false,
-                filter: false,
-                cellRenderer: svelteRenderer(CwlNicknameCell),
-                cellRendererParams: () => ({ loading: nicknamesLoading }),
-            },
-            {
-                headerName: "Account",
-                field: "cocAccountTag",
-                sortable: true,
-                filter: false,
-                cellRenderer: svelteRenderer(CocAccountCell),
-            },
-            {
-                headerName: "Clan",
-                field: "currentClan",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                valueFormatter: (p) => p.value ?? "",
-            },
-            {
-                headerName: "War Weight",
-                field: "warWeight",
-                sortable: true,
-                filter: false,
-                editable: true,
-                sort: "desc",
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
-            },
-            {
-                headerName: "External",
-                field: "isExternal",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellRenderer: "agCheckboxCellRenderer",
-                cellEditor: "agCheckboxCellEditor",
-                valueGetter: (p) => Boolean(p.data?.isExternal),
-            },
-            {
-                headerName: "Total Donated",
-                field: "totalDonated",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-            {
-                headerName: "Total Received",
-                field: "totalReceived",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-            {
-                headerName: "Clan Games",
-                field: "clanGames",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-            {
-                headerName: "Capital Looted",
-                field: "capitalGoldLooted",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-            {
-                headerName: "Capital Contributed",
-                field: "capitalGoldContributed",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-            {
-                headerName: "Activity Score",
-                field: "activityScore",
-                sortable: true,
-                filter: false,
-                editable: true,
-                cellEditor: "uiInputEditor",
-                cellEditorParams: { type: "number" },
-                valueParser: (p) => Number(p.newValue),
-                valueFormatter: formatNumber,
-            },
-        ]}
-    />
 
-    <Toolbar class="w-full flex-wrap sm:w-auto sm:flex-nowrap">
-        {#if selectedIds.length > 0}
-            <div class="flex shrink-0 items-center gap-2">
-                <span class="px-2 text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
+                    if (event.colDef.field === "isExternal") {
+                        const isExternal = Boolean(event.newValue);
+                        try {
+                            const resp = await updateCocAccountExternal(
+                                event.data.id,
+                                { isExternal },
+                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                            );
+                            if (resp.success) {
+                                event.data.isExternal = resp.data.account.isExternal;
+                                event.api.refreshCells({ rowNodes: [event.node], force: true });
+                                toast.success(`${event.data.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (error) {
+                            toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
+                            event.data.isExternal = event.oldValue;
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                        }
+                        return;
+                    }
+
+                    // Sheet-synced stat columns are edited one cell at a time and patched individually.
+                    // A later Google Sheet sync will overwrite these manual edits.
+                    const field = event.colDef.field;
+                    if (field && STAT_FIELDS.includes(field)) {
+                        let value: string | number | null;
+                        if (field === "currentClan") {
+                            const text = String(event.newValue ?? "").trim();
+                            value = text === "" ? null : text;
+                        } else {
+                            const n = Number(event.newValue);
+                            if (!Number.isInteger(n) || n < 0) {
+                                toast.error(`${event.colDef.headerName} must be a non-negative whole number`);
+                                event.data[field] = event.oldValue;
+                                event.api.refreshCells({ rowNodes: [event.node], force: true });
+                                return;
+                            }
+                            value = n;
+                        }
+
+                        try {
+                            const resp = await updateCocAccountStats(
+                                event.data.id,
+                                { [field]: value },
+                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                            );
+                            if (resp.success) {
+                                event.data[field] = (resp.data.account as Record<string, unknown>)[field];
+                                event.api.refreshCells({ rowNodes: [event.node], force: true });
+                                toast.success(`${event.colDef.headerName} updated for ${event.data.cocAccountTag}`);
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (error) {
+                            toast.error(`Failed to update ${event.colDef.headerName?.toLowerCase()}`, {
+                                description: error instanceof Error ? error.message : undefined,
+                            });
+                            event.data[field] = event.oldValue;
+                            event.api.refreshCells({ rowNodes: [event.node], force: true });
+                        }
+                        return;
+                    }
+                },
+            }}
+            columnDefs={[
+                {
+                    headerName: "User",
+                    field: "ownerName",
+                    sortable: true,
+                    filter: false,
+                    cellRenderer: svelteRenderer(CocOwnerCell),
+                },
+                {
+                    headerName: "Nickname",
+                    field: "discordNickname",
+                    sortable: false,
+                    filter: false,
+                    cellRenderer: svelteRenderer(CwlNicknameCell),
+                    cellRendererParams: () => ({ loading: nicknamesLoading }),
+                },
+                {
+                    headerName: "Account",
+                    field: "cocAccountTag",
+                    sortable: true,
+                    filter: false,
+                    cellRenderer: svelteRenderer(CocAccountCell),
+                },
+                {
+                    headerName: "Clan",
+                    field: "currentClan",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    valueFormatter: (p) => p.value ?? "",
+                },
+                {
+                    headerName: "War Weight",
+                    field: "warWeight",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    sort: "desc",
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
+                },
+                {
+                    headerName: "External",
+                    field: "isExternal",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellRenderer: "agCheckboxCellRenderer",
+                    cellEditor: "agCheckboxCellEditor",
+                    valueGetter: (p) => Boolean(p.data?.isExternal),
+                },
+                {
+                    headerName: "Total Donated",
+                    field: "totalDonated",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+                {
+                    headerName: "Total Received",
+                    field: "totalReceived",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+                {
+                    headerName: "Clan Games",
+                    field: "clanGames",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+                {
+                    headerName: "Capital Looted",
+                    field: "capitalGoldLooted",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+                {
+                    headerName: "Capital Contributed",
+                    field: "capitalGoldContributed",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+                {
+                    headerName: "Activity Score",
+                    field: "activityScore",
+                    sortable: true,
+                    filter: false,
+                    editable: true,
+                    cellEditor: "uiInputEditor",
+                    cellEditorParams: { type: "number" },
+                    valueParser: (p) => Number(p.newValue),
+                    valueFormatter: formatNumber,
+                },
+            ]}
+        />
+    </div>
+
+    {#if selectedIds.length > 0}
+        <Toolbar class="flex-col items-start lg:flex-row lg:items-center">
+            <span class="text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
+            <div class="flex w-full gap-2">
                 {#if data.canDelete}
                     <ConfirmationDialog
                         title="Delete accounts?"
@@ -615,35 +669,8 @@
                     <TablerX class="size-5" />
                 </Button>
             </div>
-            <div class="hidden h-8 w-px shrink-0 bg-stone-700 sm:block"></div>
-        {/if}
-        <div class="flex w-full items-center gap-2 sm:w-auto">
-            <Input
-                placeholder="Search anything..."
-                bind:value={searchText}
-                onchange={handleSearchChange}
-                class="min-w-0 flex-1 sm:w-64 sm:flex-none lg:w-80"
-            />
-            <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
-                <TablerSearch class="size-5" />
-            </Button>
-            {#if data.canDelete}
-                <Button variant="base" class="shrink-0" onclick={openAdd} tooltip="Add an account" tooltipPlacement="top">
-                    <TablerUserPlus class="size-5" />
-                </Button>
-            {/if}
-            <Button variant="base" class="shrink-0" onclick={() => (syncDialogOpen = true)} tooltip="Sync from Google Sheet" tooltipPlacement="top">
-                <TablerTableDashed class="size-5" />
-            </Button>
-            <Button variant="base" class="shrink-0" disabled={downloading} onclick={downloadCsv} tooltip="Download as CSV" tooltipPlacement="top">
-                {#if downloading}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerDownload class="size-5" />
-                {/if}
-            </Button>
-        </div>
-    </Toolbar>
+        </Toolbar>
+    {/if}
 </div>
 
 <Sidebar bind:this={accountSidebar}>

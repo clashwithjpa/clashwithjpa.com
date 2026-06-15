@@ -5,7 +5,7 @@
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
     import UserCell from "$lib/components/grid/UserCell.svelte";
-    import Toolbar from "$lib/components/Toolbar.svelte";
+    import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Grid from "$lib/components/ui/Grid.svelte";
@@ -48,6 +48,74 @@
 
     const session = authClient.useSession();
     let searchText = $state("");
+    let total = $state(0);
+    let roleFilter = $state<string>("");
+    let roleCounts = $state<Record<string, number>>({});
+
+    // Highest roles first; only show roles that have members (or the active filter).
+    let roleBars = $derived(
+        [...roleOptions]
+            .reverse()
+            .map((o) => ({ ...o, count: roleCounts[o.value] ?? 0 }))
+            .filter((o) => o.count > 0 || roleFilter === o.value),
+    );
+
+    function handleRoleFilter(role: string) {
+        roleFilter = roleFilter === role ? "" : role;
+        gridApi?.setGridOption("datasource", createDatasource());
+    }
+
+    // Drag-to-scroll for the role badge bar (mirrors the CWL clan bar).
+    let scrollEl = $state<HTMLDivElement | null>(null);
+    let isDragging = $state(false);
+    let hasDragged = false;
+    let dragStartX = 0;
+    let dragScrollLeft = 0;
+    let dragCursorStyle: HTMLStyleElement | null = null;
+
+    // Suppress the click that fires at the end of a drag-scroll so badges don't toggle.
+    $effect(() => {
+        const el = scrollEl;
+        if (!el) return;
+        function suppressClick(e: MouseEvent) {
+            if (hasDragged) {
+                e.stopPropagation();
+                e.preventDefault();
+                hasDragged = false;
+            }
+        }
+        el.addEventListener("click", suppressClick, { capture: true });
+        return () => el.removeEventListener("click", suppressClick, { capture: true });
+    });
+
+    function onDragStart(e: MouseEvent) {
+        if (!scrollEl) return;
+        isDragging = true;
+        hasDragged = false;
+        dragStartX = e.pageX - scrollEl.offsetLeft;
+        dragScrollLeft = scrollEl.scrollLeft;
+        dragCursorStyle = document.createElement("style");
+        dragCursorStyle.textContent = "* { cursor: grabbing !important; }";
+        document.head.appendChild(dragCursorStyle);
+        document.addEventListener("mousemove", onDragMove);
+        document.addEventListener("mouseup", onDragEnd);
+    }
+
+    function onDragMove(e: MouseEvent) {
+        if (!isDragging || !scrollEl) return;
+        e.preventDefault();
+        const dx = e.pageX - scrollEl.offsetLeft - dragStartX;
+        if (Math.abs(dx) > 4) hasDragged = true;
+        scrollEl.scrollLeft = dragScrollLeft - dx;
+    }
+
+    function onDragEnd() {
+        isDragging = false;
+        dragCursorStyle?.remove();
+        dragCursorStyle = null;
+        document.removeEventListener("mousemove", onDragMove);
+        document.removeEventListener("mouseup", onDragEnd);
+    }
 
     function openUserSidebar(user: UserWithRole & { discordId?: string }) {
         selectedSidebarUser = user;
@@ -94,6 +162,7 @@
 
                     const query = new URLSearchParams({ limit: String(limit), offset: String(skip) });
                     if (searchText) query.set("search", searchText);
+                    if (roleFilter) query.set("role", roleFilter);
                     if (sort) {
                         query.set("sortBy", sort.colId);
                         query.set("sortDirection", sort.sort ?? "asc");
@@ -107,6 +176,8 @@
                         return;
                     }
 
+                    total = json.data.total;
+                    if (json.data.roleCounts) roleCounts = json.data.roleCounts;
                     params.successCallback(
                         json.data.users.map((u: { discordId?: string | null }) => ({
                             ...u,
@@ -263,79 +334,112 @@
     description="Manage users in your server. View user details, edit roles and permissions, and perform administrative actions etc."
 />
 
-<div class="relative flex size-full flex-col overflow-hidden" in:fadeIn>
-    <Grid
-        fitToWidth
-        gridOptions={{
-            context: gridContext,
-            rowHeight: 56,
-            rowModelType: "infinite",
-            cacheBlockSize: 50,
-            blockLoadDebounceMillis: 300,
-            onGridReady: (params) => {
-                gridApi = params.api;
-                // Load rows immediately; nicknames fill in afterwards so the grid
-                // isn't blocked on the Discord guild-member walk.
-                gridApi.setGridOption("datasource", createDatasource());
-                loadNicknames();
-            },
-            onCellValueChanged: (event) => {
-                if (event.colDef.field !== "role" || event.oldValue === event.newValue) return;
-                if (lastRevert && event.data.id === lastRevert.id && event.newValue === lastRevert.value) {
-                    lastRevert = null;
-                    return;
-                }
-                pendingRoleChange = { event, oldValue: event.oldValue, newValue: event.newValue };
-                roleDialogOpen = true;
-            },
-        }}
-        columnDefs={[
-            { headerName: "User", field: "name", sortable: true, filter: false, cellRenderer: svelteRenderer(UserCell) },
-            {
-                headerName: "Nickname",
-                field: "discordNickname",
-                sortable: false,
-                filter: false,
-                cellRenderer: svelteRenderer(CwlNicknameCell),
-                cellRendererParams: () => ({ loading: nicknamesLoading }),
-            },
-            {
-                headerName: "Role",
-                field: "role",
-                editable: (params) => {
-                    const me = $session.data?.user;
-                    if (!me || params.data.id === me.id) return false;
-                    return roleLevel(params.data.role) < roleLevel(me.role);
-                },
-                sortable: true,
-                filter: false,
-                cellRenderer: svelteRenderer(RoleCell),
-                cellEditorPopup: true,
-                cellEditor: "uiSelectEditor",
-                cellEditorParams: () => {
-                    const myLevel = roleLevel($session.data?.user?.role);
-                    return { options: roleOptions.filter((opt) => roleLevel(opt.value) < myLevel) };
-                },
-            },
-            {
-                headerName: " ",
-                field: "id",
-                cellRenderer: svelteRenderer(ActionCell),
-                cellStyle: { justifyContent: "center" },
-                sortable: false,
-                filter: false,
-                lockPosition: "right",
-                suppressSizeToFit: true,
-            },
-        ]}
-    />
+<div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
+    <div class="flex flex-col gap-4 px-4 pt-4">
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold">Users</h1>
+                <p class="text-sm text-stone-400">{total} user{total === 1 ? "" : "s"}</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="w-full lg:w-80" />
+                <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="bottom">
+                    <TablerSearch class="size-5" />
+                </Button>
+            </div>
+        </div>
 
-    <Toolbar>
-        <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="lg:w-80" />
-        <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="top">
-            <TablerSearch class="size-5" />
-        </Button>
-    </Toolbar>
+        {#if roleBars.length > 0}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+                bind:this={scrollEl}
+                onmousedown={onDragStart}
+                class="edge-fade flex cursor-grab items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden {isDragging ? 'select-none' : ''}"
+                style="scrollbar-width: none;"
+            >
+                {#each roleBars as r (r.value)}
+                    {@const isActive = roleFilter === r.value}
+                    <Badge
+                        icon={r.icon}
+                        content="{r.label} • {r.count}"
+                        variant={r.variant}
+                        size="button"
+                        iconSize="size-4"
+                        onclick={() => handleRoleFilter(r.value)}
+                        class="font-medium {isActive ? '' : roleFilter !== '' ? 'opacity-50 hover:opacity-100' : ''}"
+                    />
+                {/each}
+            </div>
+        {/if}
+    </div>
+
+    <div class="flex-1">
+        <Grid
+            fitToWidth
+            gridOptions={{
+                context: gridContext,
+                rowHeight: 56,
+                rowModelType: "infinite",
+                cacheBlockSize: 50,
+                blockLoadDebounceMillis: 300,
+                onGridReady: (params) => {
+                    gridApi = params.api;
+                    // Load rows immediately; nicknames fill in afterwards so the grid
+                    // isn't blocked on the Discord guild-member walk.
+                    gridApi.setGridOption("datasource", createDatasource());
+                    loadNicknames();
+                },
+                onCellValueChanged: (event) => {
+                    if (event.colDef.field !== "role" || event.oldValue === event.newValue) return;
+                    if (lastRevert && event.data.id === lastRevert.id && event.newValue === lastRevert.value) {
+                        lastRevert = null;
+                        return;
+                    }
+                    pendingRoleChange = { event, oldValue: event.oldValue, newValue: event.newValue };
+                    roleDialogOpen = true;
+                },
+            }}
+            columnDefs={[
+                { headerName: "User", field: "name", sortable: true, filter: false, cellRenderer: svelteRenderer(UserCell) },
+                {
+                    headerName: "Nickname",
+                    field: "discordNickname",
+                    sortable: false,
+                    filter: false,
+                    cellRenderer: svelteRenderer(CwlNicknameCell),
+                    cellRendererParams: () => ({ loading: nicknamesLoading }),
+                },
+                {
+                    headerName: "Role",
+                    field: "role",
+                    editable: (params) => {
+                        const me = $session.data?.user;
+                        if (!me || params.data.id === me.id) return false;
+                        return roleLevel(params.data.role) < roleLevel(me.role);
+                    },
+                    sortable: true,
+                    filter: false,
+                    cellRenderer: svelteRenderer(RoleCell),
+                    cellEditorPopup: true,
+                    cellEditor: "uiSelectEditor",
+                    cellEditorParams: () => {
+                        const myLevel = roleLevel($session.data?.user?.role);
+                        return { options: roleOptions.filter((opt) => roleLevel(opt.value) < myLevel) };
+                    },
+                },
+                {
+                    headerName: " ",
+                    field: "id",
+                    cellRenderer: svelteRenderer(ActionCell),
+                    cellStyle: { justifyContent: "center" },
+                    sortable: false,
+                    filter: false,
+                    lockPosition: "right",
+                    suppressSizeToFit: true,
+                },
+            ]}
+        />
+    </div>
 </div>
 
 <Sidebar bind:this={userSidebar}>
