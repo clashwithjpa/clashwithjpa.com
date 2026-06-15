@@ -7,6 +7,7 @@
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
+    import { num, str } from "$lib/utils";
     import { getCOCPlayer } from "@repo/clashofclans-client";
     import type { Component } from "svelte";
     import { toast } from "svelte-sonner";
@@ -37,14 +38,14 @@
         discordUserId: string;
         isExternal: boolean;
         warWeight: number;
-        currentClan: string | null;
-        townHall: number;
-        totalDonated: number;
-        totalReceived: number;
-        clanGames: number;
-        capitalGoldLooted: number;
-        capitalGoldContributed: number;
-        activityScore: number;
+        currentClan?: string | null;
+        townHall?: number | null;
+        totalDonated?: number | null;
+        totalReceived?: number | null;
+        clanGames?: number | null;
+        capitalGoldLooted?: number | null;
+        capitalGoldContributed?: number | null;
+        activityScore?: number | null;
         ownerName: string | null;
         ownerImage: string | null;
         ownerRole: string | null;
@@ -58,6 +59,40 @@
 
     // Fetched once per account; switching tabs re-awaits the same resolved promise (no refetch).
     let playerRequest = $derived(getCOCPlayer(encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }));
+
+    // Resolved live player, used to backfill any CoC field the caller didn't pass.
+    type PlayerData = Extract<Awaited<ReturnType<typeof getCOCPlayer>>, { success: true }>["data"]["player"];
+    let player = $state<PlayerData | null>(null);
+    let playerLoading = $state(false);
+    $effect(() => {
+        let active = true;
+        player = null;
+        playerLoading = true;
+        playerRequest
+            .then((res) => {
+                if (active && res.success) player = res.data.player;
+            })
+            .catch(() => {})
+            .finally(() => {
+                if (active) playerLoading = false;
+            });
+        return () => {
+            active = false;
+        };
+    });
+
+    const townHall = $derived(num(account.townHall, player?.townHallLevel));
+    const currentClan = $derived(str(account.currentClan, player?.clan?.name));
+    const totalDonated = $derived(num(account.totalDonated, player?.donations));
+    const totalReceived = $derived(num(account.totalReceived, player?.donationsReceived));
+    const capitalContributed = $derived(num(account.capitalGoldContributed, player?.clanCapitalContributions));
+    const hasSyncedStats = $derived(
+        totalDonated != null ||
+            totalReceived != null ||
+            num(account.clanGames) != null ||
+            num(account.capitalGoldLooted) != null ||
+            capitalContributed != null,
+    );
 
     const fmt = (n: number | null | undefined) => (n != null ? n.toLocaleString() : "—");
 
@@ -83,6 +118,17 @@
     </div>
 {/snippet}
 
+{#snippet tileSkeleton(icon: Component, label: string)}
+    {@const Cmp = icon}
+    <div class="flex flex-col gap-1 rounded-lg bg-stone-800 px-3 py-2">
+        <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
+            <Cmp class="size-3.5 shrink-0" />
+            <span class="truncate">{label}</span>
+        </div>
+        <div class="h-4 w-16 animate-pulse rounded bg-stone-700"></div>
+    </div>
+{/snippet}
+
 {#snippet sectionTitle(icon: Component, title: string)}
     {@const Cmp = icon}
     <div class="flex items-center gap-1.5 text-xs font-medium tracking-wide text-stone-400 uppercase">
@@ -103,10 +149,12 @@
     <!-- Header -->
     <div>
         <div class="mb-4 flex items-center gap-4">
-            {#if account.townHall}
-                <Tooltip title="Town Hall {account.townHall}" placement="bottom">
-                    <Icon name="th/{account.townHall}" class="size-14 shrink-0" />
+            {#if townHall}
+                <Tooltip title="Town Hall {townHall}" placement="bottom">
+                    <Icon name="th/{townHall}" class="size-14 shrink-0" />
                 </Tooltip>
+            {:else if playerLoading}
+                <div class="size-14 shrink-0 animate-pulse rounded-lg bg-stone-800"></div>
             {/if}
             <div class="min-w-0 flex-1">
                 <h3 class="truncate text-xl font-medium text-stone-50">
@@ -118,8 +166,15 @@
                         <span class="font-mono">{account.cocAccountTag}</span>
                     {/await}
                 </h3>
-                <span class="truncate text-xs text-stone-400">
-                    <span class="font-mono">{account.cocAccountTag}</span> · Town Hall {account.townHall || "—"}
+                <span class="flex items-center gap-1 truncate text-xs text-stone-400">
+                    <span class="font-mono">{account.cocAccountTag}</span> · Town Hall
+                    {#if townHall}
+                        {townHall}
+                    {:else if playerLoading}
+                        <span class="inline-block h-3 w-6 animate-pulse rounded bg-stone-700"></span>
+                    {:else}
+                        —
+                    {/if}
                 </span>
             </div>
         </div>
@@ -130,8 +185,10 @@
             {:else}
                 <Badge variant="green" content="Main" icon={TablerShieldCheck} class="rounded-lg" />
             {/if}
-            {#if account.currentClan}
-                <Badge variant="blue" content={account.currentClan} icon={TablerBuildingCastle} class="rounded-lg" />
+            {#if currentClan}
+                <Badge variant="blue" content={currentClan} icon={TablerBuildingCastle} class="rounded-lg" />
+            {:else if playerLoading}
+                <div class="h-8 w-24 animate-pulse rounded-lg bg-stone-700"></div>
             {/if}
             <Button
                 size="icon"
@@ -199,21 +256,36 @@
                     {@render sectionTitle(TablerWeight, "Management")}
                     <div class="grid grid-cols-2 gap-2">
                         {@render tile(TablerWeight, "War weight", account.warWeight ? fmt(account.warWeight) : "Not set")}
-                        {@render tile(TablerActivity, "Activity score", fmt(account.activityScore))}
+                        {#if account.activityScore != null}
+                            {@render tile(TablerActivity, "Activity score", fmt(account.activityScore))}
+                        {/if}
                     </div>
                 </div>
 
-                <!-- Synced stats -->
-                <div class="space-y-2">
-                    {@render sectionTitle(TablerStar, "Synced stats")}
-                    <div class="grid grid-cols-2 gap-2">
-                        {@render tile(TablerGift, "Total donated", fmt(account.totalDonated))}
-                        {@render tile(TablerGift, "Total received", fmt(account.totalReceived))}
-                        {@render tile(TablerDeviceGamepad2, "Clan games", fmt(account.clanGames))}
-                        {@render tile(TablerPick, "Capital looted", fmt(account.capitalGoldLooted))}
-                        {@render tile(TablerBuildingBank, "Capital contributed", fmt(account.capitalGoldContributed))}
+                {#if hasSyncedStats || playerLoading}
+                    <div class="space-y-2">
+                        {@render sectionTitle(TablerStar, "Synced stats")}
+                        <div class="grid grid-cols-2 gap-2">
+                            {#if playerLoading}
+                                {@render tileSkeleton(TablerGift, "Total donated")}
+                            {:else}
+                                {@render tile(TablerGift, "Total donated", fmt(totalDonated))}
+                            {/if}
+                            {#if playerLoading}
+                                {@render tileSkeleton(TablerGift, "Total received")}
+                            {:else}
+                                {@render tile(TablerGift, "Total received", fmt(totalReceived))}
+                            {/if}
+                            {@render tile(TablerDeviceGamepad2, "Clan games", fmt(account.clanGames))}
+                            {@render tile(TablerPick, "Capital looted", fmt(account.capitalGoldLooted))}
+                            {#if playerLoading}
+                                {@render tileSkeleton(TablerBuildingBank, "Capital contributed")}
+                            {:else}
+                                {@render tile(TablerBuildingBank, "Capital contributed", fmt(capitalContributed))}
+                            {/if}
+                        </div>
                     </div>
-                </div>
+                {/if}
             </div>
         {:else if activeTab === "profile"}
             {#await playerRequest}

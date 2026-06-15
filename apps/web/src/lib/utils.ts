@@ -14,6 +14,16 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & {
     ref?: U | null;
 };
 
+// Return the first value that isn't null/undefined/0; used to backfill numeric fields.
+export function num(...vals: (number | null | undefined)[]) {
+    return vals.find((v) => v != null && v !== 0) ?? null;
+}
+
+// Return the first value that isn't null/undefined/""; used to backfill string fields.
+export function str(...vals: (string | null | undefined)[]) {
+    return vals.find((v) => v != null && v !== "") ?? null;
+}
+
 export function getOrdinal(n: number) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;

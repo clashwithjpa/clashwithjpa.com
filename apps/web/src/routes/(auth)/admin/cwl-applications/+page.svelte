@@ -1,5 +1,6 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
@@ -15,6 +16,7 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { Sidebar } from "$lib/components/ui/sidebar";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate, formatDateTime } from "$lib/utils";
@@ -81,6 +83,24 @@
     let bulkProcessing = $state(false);
     let searchText = $state("");
     let scrollEl = $state<HTMLDivElement | null>(null);
+
+    let accountSidebar: Sidebar | null = $state(null);
+    let selectedAccount = $state<Record<string, unknown> | null>(null);
+    const gridContext = {
+        openAccountSidebar: (app: Application) => {
+            selectedAccount = {
+                id: app.cocAccountId,
+                cocAccountTag: app.cocAccountTag,
+                discordUserId: app.discordUserId,
+                isExternal: app.isExternal,
+                warWeight: app.cocAccountWeight,
+                ownerName: app.discordUsername,
+                ownerImage: app.image,
+                ownerRole: app.ownerRole,
+            };
+            accountSidebar?.open(String(app.cocAccountId));
+        },
+    };
 
     // Suppress the click that fires at the end of a drag-scroll so badges don't toggle.
     $effect(() => {
@@ -693,6 +713,7 @@
             rowData={displayedApplications}
             gridOptions={{
                 rowHeight: 56,
+                context: gridContext,
                 getRowId: (p) => String(p.data.id),
                 rowSelection: { mode: "multiRow", checkboxes: true, headerCheckbox: true, enableClickSelection: false },
                 onGridReady: (params) => {
@@ -899,3 +920,9 @@
         </div>
     </div>
 </Dialog>
+
+<Sidebar bind:this={accountSidebar}>
+    {#if selectedAccount}
+        <CocAccountSidebar account={selectedAccount as any} />
+    {/if}
+</Sidebar>
