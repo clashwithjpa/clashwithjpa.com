@@ -79,6 +79,13 @@
             if (target) selectOption(target.value);
         } else if (e.key === "Escape") {
             open = false;
+        } else if (e.key === " ") {
+            e.preventDefault();
+            const input = e.currentTarget as HTMLInputElement;
+            const start = input.selectionStart ?? search.length;
+            const end = input.selectionEnd ?? start;
+            search = search.slice(0, start) + " " + search.slice(end);
+            requestAnimationFrame(() => input.setSelectionRange(start + 1, start + 1));
         }
     }
 </script>

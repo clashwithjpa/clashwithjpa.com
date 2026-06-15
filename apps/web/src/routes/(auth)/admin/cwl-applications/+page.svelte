@@ -4,6 +4,7 @@
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
+    import Toolbar from "$lib/components/Toolbar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
@@ -40,8 +41,8 @@
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
-    import TablerListCheck from "~icons/tabler/list-check";
     import TablerDownload from "~icons/tabler/download";
+    import TablerListCheck from "~icons/tabler/list-check";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
@@ -585,90 +586,42 @@
                         <Select options={seasonOptions} bind:value={selectedSeasonValue} placeholder="Season" />
                     </div>
                 {/if}
-                <Button
-                    variant="base"
-                    onclick={openRegister}
-                    class="w-full shrink-0 gap-2 lg:w-fit"
-                    tooltip="Register a member for CWL"
-                    tooltipPlacement="bottom"
-                >
-                    <TablerUserPlus class="size-5" />
-                    Register
-                </Button>
-                <Button
-                    variant="base"
-                    disabled={downloading || displayedApplications.length === 0}
-                    onclick={downloadCsv}
-                    class="w-full shrink-0 gap-2 lg:w-fit"
-                    tooltip="Export applications as CSV"
-                    tooltipPlacement="bottom"
-                >
-                    {#if downloading}
-                        <SvgSpinnersRingResize class="size-5" />
-                    {:else}
-                        <TablerDownload class="size-5" />
-                    {/if}
-                    Export
-                </Button>
-                <Button
-                    variant="base"
-                    disabled={unassignedCount === 0}
-                    onclick={() => selectFirstUnassigned()}
-                    class="w-full shrink-0 gap-2 lg:w-fit"
-                    tooltip="Select the first {AUTO_SELECT_COUNT} unassigned applications in the current order (sort by Weight first)"
-                    tooltipPlacement="bottom"
-                >
-                    <TablerListCheck class="size-5" />
-                    Select {AUTO_SELECT_COUNT}
-                </Button>
-                <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
-                {#if selectedIds.length > 0}
-                    <div class="hidden h-8 w-px bg-stone-700 lg:block"></div>
-                    <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-                        <span class="text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
-                        <div class="flex w-full gap-2 lg:w-fit">
-                            <div class="w-full lg:w-44">
-                                <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
-                            </div>
-                            <Button
-                                variant="success"
-                                disabled={bulkProcessing || !bulkClan}
-                                onclick={bulkAssign}
-                                tooltip="Assign to clan"
-                                tooltipPlacement="bottom"
-                            >
-                                {#if bulkProcessing}
-                                    <SvgSpinnersRingResize class="size-5" />
-                                {:else}
-                                    <TablerCheck class="size-5" />
-                                {/if}
-                            </Button>
-                            {#if data.canDelete}
-                                <ConfirmationDialog
-                                    title="Delete applications?"
-                                    description="Permanently delete {selectedIds.length} selected CWL application{selectedIds.length === 1
-                                        ? ''
-                                        : 's'}. This cannot be undone."
-                                    confirmText="Delete"
-                                    onConfirm={bulkDelete}
-                                >
-                                    <Button variant="danger" disabled={bulkProcessing} tooltip="Delete selected" tooltipPlacement="bottom">
-                                        <TablerTrash class="size-5" />
-                                    </Button>
-                                </ConfirmationDialog>
-                            {/if}
-                            <Button
-                                variant="ghost"
-                                disabled={bulkProcessing}
-                                onclick={clearSelection}
-                                tooltip="Clear selection"
-                                tooltipPlacement="bottom"
-                            >
-                                <TablerX class="size-5" />
-                            </Button>
-                        </div>
-                    </div>
-                {/if}
+                <div class="flex items-center gap-2">
+                    <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
+                    <Button
+                        variant="base"
+                        onclick={openRegister}
+                        class="w-full shrink-0 gap-2 lg:w-fit"
+                        tooltip="Register a member for CWL"
+                        tooltipPlacement="bottom"
+                    >
+                        <TablerUserPlus class="size-5" />
+                    </Button>
+                    <Button
+                        variant="base"
+                        disabled={downloading || displayedApplications.length === 0}
+                        onclick={downloadCsv}
+                        class="w-full shrink-0 gap-2 lg:w-fit"
+                        tooltip="Export applications as CSV"
+                        tooltipPlacement="bottom"
+                    >
+                        {#if downloading}
+                            <SvgSpinnersRingResize class="size-5" />
+                        {:else}
+                            <TablerDownload class="size-5" />
+                        {/if}
+                    </Button>
+                    <Button
+                        variant="base"
+                        disabled={unassignedCount === 0}
+                        onclick={() => selectFirstUnassigned()}
+                        class="w-full shrink-0 gap-2 lg:w-fit"
+                        tooltip="Select the first {AUTO_SELECT_COUNT} unassigned applications in the current order (sort by Weight first)"
+                        tooltipPlacement="bottom"
+                    >
+                        <TablerListCheck class="size-5" />
+                    </Button>
+                </div>
             </div>
         </div>
 
@@ -865,6 +818,45 @@
             ]}
         />
     </div>
+
+    {#if selectedIds.length > 0}
+        <Toolbar class="flex-col items-start lg:flex-row lg:items-center">
+            <span class="text-sm font-medium whitespace-nowrap text-stone-200">{selectedIds.length} selected</span>
+            <div class="flex w-full gap-2">
+                <Select bind:value={bulkClan} options={bulkClanOptions} placeholder="Assign to..." />
+                <Button
+                    variant="success"
+                    disabled={bulkProcessing || !bulkClan}
+                    onclick={bulkAssign}
+                    tooltip="Assign to clan"
+                    tooltipPlacement="bottom"
+                >
+                    {#if bulkProcessing}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerCheck class="size-5" />
+                    {/if}
+                </Button>
+                {#if data.canDelete}
+                    <ConfirmationDialog
+                        title="Delete applications?"
+                        description="Permanently delete {selectedIds.length} selected CWL application{selectedIds.length === 1
+                            ? ''
+                            : 's'}. This cannot be undone."
+                        confirmText="Delete"
+                        onConfirm={bulkDelete}
+                    >
+                        <Button variant="danger" disabled={bulkProcessing} tooltip="Delete selected" tooltipPlacement="bottom">
+                            <TablerTrash class="size-5" />
+                        </Button>
+                    </ConfirmationDialog>
+                {/if}
+                <Button variant="ghost" disabled={bulkProcessing} onclick={clearSelection} tooltip="Clear selection" tooltipPlacement="bottom">
+                    <TablerX class="size-5" />
+                </Button>
+            </div>
+        </Toolbar>
+    {/if}
 </div>
 
 <Dialog
