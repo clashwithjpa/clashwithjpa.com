@@ -108,6 +108,13 @@
             if (target) selectUser(target);
         } else if (e.key === "Escape") {
             open = false;
+        } else if (e.key === " ") {
+            e.preventDefault();
+            const input = e.currentTarget as HTMLInputElement;
+            const start = input.selectionStart ?? search.length;
+            const end = input.selectionEnd ?? start;
+            query = query.slice(0, start) + " " + query.slice(end);
+            requestAnimationFrame(() => input.setSelectionRange(start + 1, start + 1));
         }
     }
 </script>

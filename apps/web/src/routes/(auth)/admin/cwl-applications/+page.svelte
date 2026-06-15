@@ -589,7 +589,7 @@
                 <div class="flex items-center gap-2">
                     <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
                     <Button
-                        variant="base"
+                        variant="success"
                         onclick={openRegister}
                         class="w-full shrink-0 gap-2 lg:w-fit"
                         tooltip="Register a member for CWL"
