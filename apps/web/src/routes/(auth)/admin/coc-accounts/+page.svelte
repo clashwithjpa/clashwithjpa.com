@@ -344,12 +344,12 @@
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden" in:fadeIn>
-    <div class="flex flex-col gap-2 px-4 pt-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-2 px-4 pt-4 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl font-bold">COC Accounts</h1>
             <p class="text-sm text-stone-400">{total} account{total === 1 ? "" : "s"}</p>
         </div>
-        <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center">
             <div class="flex items-center gap-2">
                 <Input
                     placeholder="Search anything..."

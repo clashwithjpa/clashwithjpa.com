@@ -127,7 +127,6 @@
             <!-- Discord IDs -->
             <section class="flex flex-col gap-3">
                 {@render sectionHeader(SimpleIconsDiscord, "Discord IDs")}
-                <p class="text-xs text-stone-400">Verified against the configured Discord server when you save.</p>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col items-start gap-1">
                         <p class="text-sm font-medium">Clan role</p>

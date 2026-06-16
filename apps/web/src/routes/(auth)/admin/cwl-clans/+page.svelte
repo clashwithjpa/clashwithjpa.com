@@ -183,18 +183,25 @@
                 {#if clans.length > 0}
                     <Input placeholder="Search by clan name, tag, or leader..." bind:value={searchText} class="min-w-0 flex-1 sm:w-64 sm:flex-none" />
                 {/if}
-                <Button variant="ghost" onclick={syncLeagues} disabled={syncing || clans.length === 0} class="shrink-0">
+                <Button
+                    variant="ghost"
+                    onclick={syncLeagues}
+                    disabled={syncing || clans.length === 0}
+                    class="shrink-0"
+                    tooltip="Fetch the latest league info from the CoC API"
+                    tooltipPlacement="bottom"
+                >
                     <span class="flex items-center gap-2">
                         {#if syncing}
-                            <SvgSpinnersRingResize class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Syncing...</span>
+                            <SvgSpinnersRingResize class="size-5 shrink-0 lg:size-4" /> <span class="hidden lg:inline">Syncing...</span>
                         {:else}
-                            <TablerRefresh class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Sync leagues</span>
+                            <TablerRefresh class="size-5 shrink-0 lg:size-4" /> <span class="hidden lg:inline">Sync leagues</span>
                         {/if}
                     </span>
                 </Button>
-                <Button onclick={openAdd} class="shrink-0">
+                <Button onclick={openAdd} class="shrink-0" tooltip="Add a new CWL clan by its tag (e.g. #CLANTAG)" tooltipPlacement="bottom">
                     <span class="flex items-center gap-2"
-                        ><TablerPlus class="size-5 shrink-0 lg:size-4" /> <span class="hidden sm:inline">Add CWL Clan</span></span
+                        ><TablerPlus class="size-5 shrink-0 lg:size-4" /> <span class="hidden lg:inline">Add CWL Clan</span></span
                     >
                 </Button>
             </div>

@@ -30,11 +30,22 @@
     const pxToPct = (px: number) => (windowWidth > 0 ? (px / windowWidth) * 100 : px / 19.2);
 
     let isSidebarExpanded = $derived(!isMobile && sidebarWidth > 120);
+
+    // Pages that should not have padding applied to the content area (e.g. full-width tables)
     const noPaddingPaths: string[] = [
         "/dashboard/apply",
         "/dashboard/cwl",
         "/admin/rules",
+
         "/admin/users",
+        "/admin/coc-accounts",
+        "/admin/cwl-applications",
+        "/admin/bonus",
+    ];
+
+    // Pages that fill the full height (e.g. data grids) and manage their own overflow
+    const noScrollPaths: string[] = [
+        "/admin/users", //
         "/admin/coc-accounts",
         "/admin/cwl-applications",
         "/admin/bonus",
@@ -248,7 +259,7 @@
 {#snippet ContentPanel()}
     <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
         {#if $session.data}
-            <div in:fadeIn class="size-full overflow-y-auto">
+            <div in:fadeIn class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
                 <div class={!noPaddingPaths.includes(page.url.pathname) ? "p-4" : "size-full"}>
                     {@render children()}
                 </div>

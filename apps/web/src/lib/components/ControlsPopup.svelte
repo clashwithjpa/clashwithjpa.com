@@ -9,7 +9,7 @@
     import { drawRing, emptyRing, rotateToggle } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
-    import { onMount, tick } from "svelte";
+    import { onMount, setContext, tick } from "svelte";
     import { toast } from "svelte-sonner";
     import TablerIcons from "~icons/tabler/icons";
     import TablerMaximize from "~icons/tabler/maximize";
@@ -162,6 +162,8 @@
         }, "lg");
         return cleanup;
     });
+
+    setContext("render-inline", true);
 </script>
 
 <div
