@@ -1,5 +1,6 @@
 <script lang="ts">
     import ControlsPopup from "$lib/components/ControlsPopup.svelte";
+    import Snowfall from "$lib/components/Snowfall.svelte";
     import "@cartamd/plugin-anchor/default.css";
     import "@cartamd/plugin-code/default.css";
     import "@cartamd/plugin-emoji/default.css";
@@ -47,3 +48,5 @@
 </div>
 
 <ControlsPopup />
+
+<Snowfall />

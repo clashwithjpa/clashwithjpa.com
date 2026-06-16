@@ -8,6 +8,7 @@
     import type { Role } from "$lib/config/roles";
     import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import { storage } from "$lib/utils/storage.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount } from "svelte";
     import { Toaster } from "svelte-sonner";
@@ -50,8 +51,7 @@
         },
     };
 
-    let userSidebarPx = $state(SIDEBAR_PX.collapsed);
-    let userSidebarWidth = $derived(pxToPct(userSidebarPx));
+    let userSidebarWidth = $derived(pxToPct(storage.sidebarSize));
     let userInfoWidth = $state(LAYOUT_CONFIG.infoSidebar.default);
     let mobileSize = $state([LAYOUT_CONFIG.mobile.content.default, LAYOUT_CONFIG.mobile.sidebar.default]);
 
@@ -89,7 +89,8 @@
         if (isMobile) return;
         const s = details.size;
         if (s.length === 3) {
-            userSidebarPx = (s[0] / 100) * windowWidth;
+            const px = (s[0] / 100) * windowWidth;
+            storage.sidebarSize = Math.round(Math.min(Math.max(px, SIDEBAR_PX.min), SIDEBAR_PX.max));
             if (showInfo && s[2] > 0) {
                 userInfoWidth = s[2];
             }

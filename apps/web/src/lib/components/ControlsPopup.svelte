@@ -2,6 +2,7 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { authClient } from "$lib/auth";
+    import CustomizePopup from "$lib/components/CustomizePopup.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
@@ -206,6 +207,8 @@
                     <TablerTrash class="size-6" />
                 </Button>
             </ConfirmationDialog>
+
+            <CustomizePopup />
 
             <Button tooltip="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
                 {#if isFullscreen}
