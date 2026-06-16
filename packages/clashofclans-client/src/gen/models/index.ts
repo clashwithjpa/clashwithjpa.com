@@ -402,6 +402,13 @@ export type {
     GetUserCwlApplicationsQueryResponse,
 } from "./GetUserCwlApplications.ts";
 export type {
+    GetUserFeatures200,
+    GetUserFeatures401,
+    GetUserFeatures500,
+    GetUserFeaturesQuery,
+    GetUserFeaturesQueryResponse,
+} from "./GetUserFeatures.ts";
+export type {
     ImportUserAccounts200,
     ImportUserAccounts401,
     ImportUserAccounts500,

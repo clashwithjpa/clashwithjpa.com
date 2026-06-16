@@ -51,6 +51,7 @@ export type { GetUserQueryKey } from "./createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./createGetUserAccounts.ts";
 export type { GetUserCocAccountsByUserIdQueryKey } from "./createGetUserCocAccountsByUserId.ts";
 export type { GetUserCwlApplicationsQueryKey } from "./createGetUserCwlApplications.ts";
+export type { GetUserFeaturesQueryKey } from "./createGetUserFeatures.ts";
 export type { ImportUserAccountsMutationKey } from "./createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./createPostCOCPlayerVerify.ts";
 export type { RefreshDiscordUsernamesMutationKey } from "./createRefreshDiscordUsernames.ts";
@@ -209,6 +210,9 @@ export { getUserCocAccountsByUserIdQueryOptions } from "./createGetUserCocAccoun
 export { createGetUserCwlApplications } from "./createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryKey } from "./createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryOptions } from "./createGetUserCwlApplications.ts";
+export { createGetUserFeatures } from "./createGetUserFeatures.ts";
+export { getUserFeaturesQueryKey } from "./createGetUserFeatures.ts";
+export { getUserFeaturesQueryOptions } from "./createGetUserFeatures.ts";
 export { createImportUserAccounts } from "./createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./createPostCOCPlayerVerify.ts";

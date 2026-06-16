@@ -111,7 +111,25 @@
 
     let navButtonsRef: HTMLElement | null = $state(null);
 
-    let permittedLinks = $derived(links.filter((link) => !link.requiredPerm || data.permissions[link.requiredPerm]));
+    let permittedLinks = $derived(
+        links.filter(
+            (link) => (!link.requiredPerm || data.permissions[link.requiredPerm]) && (!link.requiredFeature || data.features[link.requiredFeature]),
+        ),
+    );
+
+    let groupedLinks = $derived.by(() => {
+        const groups: { category: string; links: typeof permittedLinks }[] = [];
+        for (const link of permittedLinks) {
+            const category = link.category ?? "";
+            let group = groups.find((g) => g.category === category);
+            if (!group) {
+                group = { category, links: [] };
+                groups.push(group);
+            }
+            group.links.push(link);
+        }
+        return groups;
+    });
 
     $effect(() => {
         if (navButtonsRef) {
@@ -160,11 +178,16 @@
     >
         {#if isMobile}
             <div class="edge-fade w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div class="flex w-max min-w-full items-center justify-evenly gap-8 px-4" bind:this={navButtonsRef}>
-                    {#each permittedLinks as link (link.href)}
-                        <div class="dash-nav-btn shrink-0">
-                            {@render button(link)}
-                        </div>
+                <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4" bind:this={navButtonsRef}>
+                    {#each groupedLinks as group, i (group.category)}
+                        {#if i > 0}
+                            <div class="h-8 shrink-0 self-center border-l-2 border-stone-700/50"></div>
+                        {/if}
+                        {#each group.links as link (link.href)}
+                            <div class="dash-nav-btn shrink-0">
+                                {@render button(link)}
+                            </div>
+                        {/each}
                     {/each}
                 </div>
             </div>
@@ -174,9 +197,25 @@
                 bind:clientWidth={sidebarWidth}
                 bind:this={navButtonsRef}
             >
-                {#each permittedLinks as link (link.href)}
-                    <div class="dash-nav-btn">
-                        {@render button(link)}
+                {#each groupedLinks as group, i (group.category)}
+                    <div class="flex flex-col gap-4">
+                        {#if isSidebarExpanded}
+                            {#if group.category}
+                                <div class="flex items-center gap-2 px-4">
+                                    <span class="truncate text-[10px] font-semibold tracking-wider text-stone-500 uppercase">
+                                        {group.category}
+                                    </span>
+                                    <div class="h-0 flex-1 border-t-2 border-stone-700/50"></div>
+                                </div>
+                            {/if}
+                        {:else if i > 0}
+                            <div class="mx-auto w-8 border-t-2 border-stone-700/50"></div>
+                        {/if}
+                        {#each group.links as link (link.href)}
+                            <div class="dash-nav-btn">
+                                {@render button(link)}
+                            </div>
+                        {/each}
                     </div>
                 {/each}
             </div>

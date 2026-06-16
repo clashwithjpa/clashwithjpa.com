@@ -74,6 +74,61 @@ app.get(
     },
 );
 
+const getUserFeatures = z4.object({
+    applicationsEnabled: z4.boolean(),
+    cwlEnabled: z4.boolean(),
+});
+app.get(
+    "/features",
+    hasAccessAuthMiddleware(isAuthenticated),
+    describeRoute({
+        operationId: "getUserFeatures",
+        description: "[Authenticated] Fetches the site feature flags relevant to the current user.",
+        tags: ["user"],
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getUserFeatures)),
+                    },
+                },
+                description: "Feature flags fetched successfully.",
+            },
+            401: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Unauthorized.",
+            },
+            500: {
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+                description: "Internal server error.",
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const settings = await getCachedSettings();
+            return c.json({
+                success: true,
+                data: {
+                    applicationsEnabled: settings?.applicationsEnabled ?? false,
+                    cwlEnabled: settings?.cwlEnabled ?? false,
+                },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch feature flags." }, 500);
+        }
+    },
+);
+
 const getUserAccounts = z4.object({
     accounts: z4.array(
         z4.object({

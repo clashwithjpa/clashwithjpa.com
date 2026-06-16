@@ -51,6 +51,7 @@ export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
 export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCocAccountsByUserId.ts";
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
+export type { GetUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
@@ -477,6 +478,13 @@ export type {
     GetUserCwlApplicationsQueryResponse,
 } from "./models/GetUserCwlApplications.ts";
 export type {
+    GetUserFeatures200,
+    GetUserFeatures401,
+    GetUserFeatures500,
+    GetUserFeaturesQuery,
+    GetUserFeaturesQueryResponse,
+} from "./models/GetUserFeatures.ts";
+export type {
     ImportUserAccounts200,
     ImportUserAccounts401,
     ImportUserAccounts500,
@@ -670,6 +678,7 @@ export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
 export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId.ts";
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
+export { getUserFeatures } from "./clients/getUserFeatures.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
@@ -828,6 +837,9 @@ export { getUserCocAccountsByUserIdQueryOptions } from "./hooks/createGetUserCoc
 export { createGetUserCwlApplications } from "./hooks/createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export { getUserCwlApplicationsQueryOptions } from "./hooks/createGetUserCwlApplications.ts";
+export { createGetUserFeatures } from "./hooks/createGetUserFeatures.ts";
+export { getUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
+export { getUserFeaturesQueryOptions } from "./hooks/createGetUserFeatures.ts";
 export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
@@ -1230,6 +1242,12 @@ export {
     getUserCwlApplications500Schema,
     getUserCwlApplicationsQueryResponseSchema,
 } from "./zod/getUserCwlApplicationsSchema.ts";
+export {
+    getUserFeatures200Schema,
+    getUserFeatures401Schema,
+    getUserFeatures500Schema,
+    getUserFeaturesQueryResponseSchema,
+} from "./zod/getUserFeaturesSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./zod/getUserSchema.ts";
 export {
     importUserAccounts200Schema,

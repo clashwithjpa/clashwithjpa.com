@@ -318,6 +318,12 @@ export {
     getUserCwlApplications500Schema,
     getUserCwlApplicationsQueryResponseSchema,
 } from "./getUserCwlApplicationsSchema.ts";
+export {
+    getUserFeatures200Schema,
+    getUserFeatures401Schema,
+    getUserFeatures500Schema,
+    getUserFeaturesQueryResponseSchema,
+} from "./getUserFeaturesSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./getUserSchema.ts";
 export {
     importUserAccounts200Schema,

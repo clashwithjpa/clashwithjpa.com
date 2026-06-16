@@ -3,7 +3,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import { formatDateTime } from "$lib/utils";
+    import { formatDateTime, formatRelativeTime } from "$lib/utils";
     import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { UAParser } from "ua-parser-js";
 
@@ -117,7 +117,7 @@
             </span>
             <Tooltip title={formatDateTime(sessionData.updatedAt)} placement="top">
                 <span class="cursor-help">
-                    {new Date(sessionData.updatedAt).toLocaleTimeString()}
+                    {formatRelativeTime(sessionData.updatedAt)}
                 </span>
             </Tooltip>
         </div>

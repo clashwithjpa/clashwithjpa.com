@@ -51,6 +51,7 @@ export { getUser } from "./getUser.ts";
 export { getUserAccounts } from "./getUserAccounts.ts";
 export { getUserCocAccountsByUserId } from "./getUserCocAccountsByUserId.ts";
 export { getUserCwlApplications } from "./getUserCwlApplications.ts";
+export { getUserFeatures } from "./getUserFeatures.ts";
 export { importUserAccounts } from "./importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./refreshDiscordUsernames.ts";
