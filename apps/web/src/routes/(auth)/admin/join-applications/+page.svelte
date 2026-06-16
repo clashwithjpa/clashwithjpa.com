@@ -26,6 +26,7 @@
     import TablerBolt from "~icons/tabler/bolt";
     import TablerCheck from "~icons/tabler/check";
     import TablerClock from "~icons/tabler/clock";
+    import TablerExternalLink from "~icons/tabler/external-link";
     import TablerHammer from "~icons/tabler/hammer";
     import TablerMoneybag from "~icons/tabler/moneybag";
     import TablerStar from "~icons/tabler/star";
@@ -335,7 +336,15 @@
                         </Tooltip>
 
                         <!-- Actions pinned to the bottom so every card aligns -->
-                        <div class="mt-auto">
+                        <div class="mt-auto flex flex-col gap-2">
+                            <Button
+                                variant="base"
+                                href="https://cc.fwafarm.com/cc_n/member.php?tag={app.cocAccountTag.replace('#', '')}"
+                                target="_blank"
+                                class="w-full gap-2"
+                            >
+                                <TablerExternalLink class="size-4" /> CC Info
+                            </Button>
                             {#if app.status === "pending"}
                                 <div class="flex gap-2">
                                     <Button
