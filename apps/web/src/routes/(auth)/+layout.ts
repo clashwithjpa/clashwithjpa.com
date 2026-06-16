@@ -68,7 +68,7 @@ export const load: LayoutLoad = async ({ url }) => {
         },
         { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", category: "General", requiredPerm: "cwl", requiredFeature: "cwlEnabled" },
         { name: "Settings", icon: TablerSettings, href: "/dashboard/settings", category: "Account" },
-        { name: "Leave", icon: TablerLogout2, href: "/", category: "Account" },
+        { name: "Leave", icon: TablerLogout2, href: "/", category: "Exit" },
     ];
 
     const adminLinks: NavigationLink[] = [
@@ -153,7 +153,7 @@ export const load: LayoutLoad = async ({ url }) => {
             description: "Site-wide toggles and configuration",
             requiredPerm: "sudo",
         },
-        { name: "Leave", icon: TablerLogout2, href: "/", category: "General" },
+        { name: "Leave", icon: TablerLogout2, href: "/", category: "Exit" },
     ];
 
     return { permissions, features, dashboardLinks, adminLinks };
