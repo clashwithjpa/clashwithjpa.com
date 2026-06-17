@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { page } from "$app/state";
+
     interface Props {
         title?: string;
         description?: string;
@@ -6,6 +8,8 @@
         author?: string;
     }
     let { title = "", description = "", image = "/logo.webp", author = "Team JPA" }: Props = $props();
+
+    let absoluteImage = $derived(image.startsWith("http") ? image : `${page.url.origin}${image}`);
 </script>
 
 <svelte:head>
@@ -17,12 +21,13 @@
     <meta name="author" content={author} />
 
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={page.url.href} />
     <meta property="og:title" content={title ? `${title}` : "JPA"} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={absoluteImage} />
 
     <meta property="twitter:card" content="summary" />
     <meta property="twitter:title" content={title ? `${title}` : "JPA"} />
     <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={image} />
+    <meta property="twitter:image" content={absoluteImage} />
 </svelte:head>

@@ -7,10 +7,13 @@ const config = {
         adapter: adapter({
             pages: "build",
             assets: "build",
-            fallback: "index.html",
+            fallback: "200.html",
             precompress: process.env.CAPACITOR === "true" ? false : true,
             strict: true,
         }),
+        prerender: {
+            origin: "https://clashwithjpa.com",
+        },
     },
     preprocess: vitePreprocess(),
 };
