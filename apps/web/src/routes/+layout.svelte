@@ -5,9 +5,18 @@
     import "@cartamd/plugin-code/default.css";
     import "@cartamd/plugin-emoji/default.css";
     import "carta-md/default.css";
+    import { onMount } from "svelte";
     import "./layout.css";
 
     let { children } = $props();
+
+    onMount(() => {
+        const el = document.getElementById("ls");
+        if (el) {
+            el.classList.add("out");
+            setTimeout(() => el.remove(), 850);
+        }
+    });
 
     function handleMouseMove(e: MouseEvent) {
         let isOverScrollbar = window.innerWidth - e.clientX <= 24 || window.innerHeight - e.clientY <= 24;

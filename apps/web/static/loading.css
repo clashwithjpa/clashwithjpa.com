@@ -1,0 +1,11 @@
+#ls {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0c0a09;
+    transition: opacity 0.8s ease;
+}
+#ls.out {
+    opacity: 0;
+    pointer-events: none;
+}
