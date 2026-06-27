@@ -95,7 +95,6 @@ db-reset:
 
 # Stop, pull latest, then rebuild and redeploy the prod stack
 prod:
-    @just stop prod
     @printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
     @git pull
     @printf '\033[42m\033[30m PULL \033[0m \033[32mRepository up to date\033[0m\n'
