@@ -13,21 +13,22 @@
         rowData?: GridOptions["rowData"];
         columnDefs: GridOptions["columnDefs"];
         gridOptions?: Omit<GridOptions, "rowData" | "columnDefs">;
-        // When true, columns stretch to fill the viewport on desktop (and only fall back to content-sizing on mobile).
-        // Default content-sizes always.
-        fitToWidth?: boolean;
         class?: string;
     }
 
-    let { rowData, columnDefs, gridOptions = {}, fitToWidth = false, class: className = "" }: Props = $props();
+    let { rowData, columnDefs, gridOptions = {}, class: className = "" }: Props = $props();
 
     let gridContainer: HTMLDivElement;
     let gridApi: GridApi | undefined = $state();
 
     function sizeColumns(api: GridApi, containerWidth: number) {
         api.autoSizeAllColumns();
-        if (fitToWidth && containerWidth > 768) {
-            api.sizeColumnsToFit();
+        const cols = api.getColumns();
+        if (cols) {
+            const totalWidth = cols.reduce((sum, col) => sum + col.getActualWidth(), 0);
+            if (totalWidth < containerWidth) {
+                api.sizeColumnsToFit();
+            }
         }
     }
 
@@ -53,12 +54,7 @@
                 }
             },
             onFirstDataRendered: (params) => {
-                // By default, size every column to its content (never cram to fit the
-                // viewport); the grid scrolls horizontally when the total exceeds it.
-                // With fitToWidth on desktop, content-size first, then stretch columns
-                // to fill the viewport — columns marked suppressSizeToFit keep their
-                // content width while the rest absorb the slack. Svelte cell renderers
-                // need a tick to lay out their DOM width before measuring.
+                // Svelte cell renderers need a tick to lay out their DOM before measuring.
                 sizeColumns(params.api, gridContainer.clientWidth);
                 setTimeout(() => sizeColumns(params.api, gridContainer.clientWidth), 50);
                 if (gridOptions.onFirstDataRendered) {

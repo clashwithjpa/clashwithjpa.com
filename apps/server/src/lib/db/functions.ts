@@ -403,13 +403,38 @@ export async function getBonusData(seasonId?: number) {
 }
 
 export async function getCwlSeasons() {
-    const seasons = await db.select().from(cwlSeasonTable).orderBy(desc(cwlSeasonTable.year), desc(cwlSeasonTable.id));
+    const seasons = await db
+        .select()
+        .from(cwlSeasonTable)
+        .orderBy(desc(cwlSeasonTable.year), desc(sql`extract(month from to_date(${cwlSeasonTable.month}, 'Month'))`), desc(cwlSeasonTable.createdAt));
     return { seasons };
 }
 
+export class DuplicateSeasonNameError extends Error {
+    constructor(name: string) {
+        super(`Season "${name}" already exists`);
+        this.name = "DuplicateSeasonNameError";
+    }
+}
+
 export async function createCwlSeason(data: { name: string; month: string; year: number }) {
+    const existing = await db.select({ id: cwlSeasonTable.id }).from(cwlSeasonTable).where(eq(cwlSeasonTable.name, data.name)).limit(1);
+    if (existing.length > 0) throw new DuplicateSeasonNameError(data.name);
     const result = await db.insert(cwlSeasonTable).values(data).returning();
     return result[0]!;
+}
+
+export async function renameCwlSeason(id: number, name: string) {
+    const existing = await db
+        .select({ id: cwlSeasonTable.id })
+        .from(cwlSeasonTable)
+        .where(and(eq(cwlSeasonTable.name, name), sql`${cwlSeasonTable.id} != ${id}`))
+        .limit(1);
+    if (existing.length > 0) throw new DuplicateSeasonNameError(name);
+    const previous = await db.select({ name: cwlSeasonTable.name }).from(cwlSeasonTable).where(eq(cwlSeasonTable.id, id)).limit(1);
+    const result = await db.update(cwlSeasonTable).set({ name }).where(eq(cwlSeasonTable.id, id)).returning();
+    const season = result[0] ?? null;
+    return season ? { season, previousName: previous[0]?.name ?? null } : null;
 }
 
 export async function deleteCwlSeason(id: number) {

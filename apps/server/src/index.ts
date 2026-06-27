@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
-import { getCachedSettings } from "@/lib/settings-cache";
 import { betterAuthMiddleware } from "@/lib/middlewares";
+import { getCachedSettings } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
 import { auth } from "@lib/auth";
@@ -37,7 +37,6 @@ app.use(
         cors({
             origin: [config.JPA_AUTH_URL, config.JPA_APP_URL],
             allowHeaders: ["Content-Type", "Authorization", "x-request-id", "x-visitor-id"],
-            allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
             exposeHeaders: ["Content-Length"],
             maxAge: 600,
             credentials: true,

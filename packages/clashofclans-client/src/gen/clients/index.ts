@@ -55,6 +55,7 @@ export { getUserFeatures } from "./getUserFeatures.ts";
 export { importUserAccounts } from "./importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./refreshDiscordUsernames.ts";
+export { renameCwlSeason } from "./renameCwlSeason.ts";
 export { setRules } from "./setRules.ts";
 export { setUserAccountExternal } from "./setUserAccountExternal.ts";
 export { setUserSeasonBonus } from "./setUserSeasonBonus.ts";

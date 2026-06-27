@@ -41,7 +41,9 @@ import {
     setUserDiscordUsername,
     getCwlStats,
     createCwlSeason,
+    renameCwlSeason,
     deleteCwlSeason,
+    DuplicateSeasonNameError,
     getSettings,
     MissingDiscordAccountError,
     setUserSeasonBonus,
@@ -806,13 +808,14 @@ app.post(
             logAction(c, { action: "cwl_season.create", targetType: "cwl_season", targetId: season.id, metadata: { name: season.name } });
             return c.json({ success: true, data: { season } });
         } catch (error) {
+            if (error instanceof DuplicateSeasonNameError) return c.json({ success: false, error: error.message }, 409);
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to create CWL season" }, 500);
         }
     },
 );
 
-const deleteCwlSeasonPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
+const cwlSeasonPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
 app.delete(
     "/cwl-seasons/:id",
     hasAccessAuthMiddleware(isAdmin),
@@ -830,7 +833,7 @@ app.delete(
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("param", deleteCwlSeasonPathSchema),
+    zValidator("param", cwlSeasonPathSchema),
     async (c) => {
         try {
             const { id } = c.req.valid("param");
@@ -841,6 +844,44 @@ app.delete(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to delete CWL season" }, 500);
+        }
+    },
+);
+
+const renameCwlSeasonBodySchema = z4.object({ name: z4.string().min(1) });
+app.patch(
+    "/cwl-seasons/:id",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "renameCwlSeason",
+        description: "[Admin] Renames a CWL season.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated season.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(createCwlSeasonData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            409: { description: "Name already in use.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", cwlSeasonPathSchema),
+    zValidator("json", renameCwlSeasonBodySchema),
+    async (c) => {
+        try {
+            const { id } = c.req.valid("param");
+            const { name } = c.req.valid("json");
+            const updated = await renameCwlSeason(id, name);
+            if (!updated) return c.json({ success: false, error: "Season not found." }, 404);
+            const { season, previousName } = updated;
+            logAction(c, { action: "cwl_season.rename", targetType: "cwl_season", targetId: id, metadata: { name, previousName } });
+            return c.json({ success: true, data: { season } });
+        } catch (error) {
+            if (error instanceof DuplicateSeasonNameError) return c.json({ success: false, error: error.message }, 409);
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to rename CWL season" }, 500);
         }
     },
 );

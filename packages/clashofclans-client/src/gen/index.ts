@@ -55,6 +55,7 @@ export type { GetUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
+export type { RenameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
@@ -508,6 +509,17 @@ export type {
     RefreshDiscordUsernamesMutation,
     RefreshDiscordUsernamesMutationResponse,
 } from "./models/RefreshDiscordUsernames.ts";
+export type {
+    RenameCwlSeason200,
+    RenameCwlSeason401,
+    RenameCwlSeason404,
+    RenameCwlSeason409,
+    RenameCwlSeason500,
+    RenameCwlSeasonMutation,
+    RenameCwlSeasonMutationRequest,
+    RenameCwlSeasonMutationResponse,
+    RenameCwlSeasonPathParams,
+} from "./models/RenameCwlSeason.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -682,6 +694,7 @@ export { getUserFeatures } from "./clients/getUserFeatures.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
+export { renameCwlSeason } from "./clients/renameCwlSeason.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
@@ -846,6 +859,8 @@ export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts"
 export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export { createRefreshDiscordUsernames } from "./hooks/createRefreshDiscordUsernames.ts";
 export { refreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
+export { createRenameCwlSeason } from "./hooks/createRenameCwlSeason.ts";
+export { renameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
@@ -1269,6 +1284,16 @@ export {
     refreshDiscordUsernames503Schema,
     refreshDiscordUsernamesMutationResponseSchema,
 } from "./zod/refreshDiscordUsernamesSchema.ts";
+export {
+    renameCwlSeason200Schema,
+    renameCwlSeason401Schema,
+    renameCwlSeason404Schema,
+    renameCwlSeason409Schema,
+    renameCwlSeason500Schema,
+    renameCwlSeasonMutationRequestSchema,
+    renameCwlSeasonMutationResponseSchema,
+    renameCwlSeasonPathParamsSchema,
+} from "./zod/renameCwlSeasonSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

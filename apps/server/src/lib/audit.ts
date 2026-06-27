@@ -21,6 +21,7 @@ export const AUDIT_ACTIONS = [
     "cwl_bonus.tick",
     "cwl_bonus.untick",
     "cwl_season.create",
+    "cwl_season.rename",
     "cwl_season.delete",
     "settings.update",
     "rules.update",

@@ -345,6 +345,16 @@ export {
     refreshDiscordUsernames503Schema,
     refreshDiscordUsernamesMutationResponseSchema,
 } from "./refreshDiscordUsernamesSchema.ts";
+export {
+    renameCwlSeason200Schema,
+    renameCwlSeason401Schema,
+    renameCwlSeason404Schema,
+    renameCwlSeason409Schema,
+    renameCwlSeason500Schema,
+    renameCwlSeasonMutationRequestSchema,
+    renameCwlSeasonMutationResponseSchema,
+    renameCwlSeasonPathParamsSchema,
+} from "./renameCwlSeasonSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

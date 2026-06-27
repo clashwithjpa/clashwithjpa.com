@@ -3,6 +3,7 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
+    import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
@@ -15,6 +16,7 @@
         getAdminSettings,
         getCwlSeasons,
         refreshDiscordUsernames,
+        renameCwlSeason,
         updateAdminSettings,
         type GetAdminSettings200,
         type GetCwlSeasons200,
@@ -26,6 +28,7 @@
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCalendarEvent from "~icons/tabler/calendar-event";
     import TablerFileDescription from "~icons/tabler/file-description";
+    import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerSwords from "~icons/tabler/swords";
@@ -63,6 +66,11 @@
         seasonSearch.trim() ? seasons.filter((s) => s.name.toLowerCase().includes(seasonSearch.trim().toLowerCase())) : seasons,
     );
 
+    let editDialogOpen = $state(false);
+    let editingSeasonId = $state<number | null>(null);
+    let editingName = $state("");
+    let renamingSeason = $state(false);
+
     function syncFromSettings() {
         applicationsEnabled = settings?.applicationsEnabled ?? false;
         cwlEnabled = settings?.cwlEnabled ?? false;
@@ -97,10 +105,19 @@
         }
     }
 
+    function nextAvailableName(base: string): string {
+        if (!seasons.some((s) => s.name === base)) return base;
+        let suffix = 2;
+        while (seasons.some((s) => s.name === `${base} ${suffix}`)) suffix++;
+        return `${base} ${suffix}`;
+    }
+
     async function createSeason() {
         const year = Number(newYear);
-        const name = (newName.trim() || `${newMonth} ${year}`).trim();
-        if (!name || !Number.isInteger(year)) return;
+        if (!Number.isInteger(year)) return;
+        const base = (newName.trim() || `${newMonth} ${year}`).trim();
+        if (!base) return;
+        const name = nextAvailableName(base);
         creatingSeason = true;
         try {
             const resp = await createCwlSeason(
@@ -112,12 +129,43 @@
                 newName = "";
                 await loadSeasons();
             } else {
-                toast.error("Failed to create season");
+                toast.error((resp as any).error ?? "Failed to create season");
             }
         } catch (e: any) {
             toast.error("Failed to create season", { description: e?.message });
         } finally {
             creatingSeason = false;
+        }
+    }
+
+    function openEditDialog(season: Season) {
+        editingSeasonId = season.id;
+        editingName = season.name;
+        editDialogOpen = true;
+    }
+
+    async function renameSeason() {
+        if (!editingSeasonId) return;
+        const name = editingName.trim();
+        if (!name) return;
+        renamingSeason = true;
+        try {
+            const resp = await renameCwlSeason(
+                editingSeasonId,
+                { name },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (resp.success) {
+                toast.success(`Season renamed to "${name}"`);
+                editDialogOpen = false;
+                await loadSeasons();
+            } else {
+                toast.error((resp as any).error ?? "Failed to rename season");
+            }
+        } catch (e: any) {
+            toast.error("Failed to rename season", { description: e?.message });
+        } finally {
+            renamingSeason = false;
         }
     }
 
@@ -401,25 +449,30 @@
                                                 </span>
                                             {/if}
                                         </div>
-                                        <ConfirmationDialog
-                                            title="Delete {season.name}?"
-                                            description="This permanently deletes the season and cascades to its CWL applications and awarded bonuses. This cannot be undone."
-                                            confirmText="Delete"
-                                            onConfirm={() => deleteSeason(season.id)}
-                                        >
-                                            <Button
-                                                variant="danger"
-                                                class="shrink-0 px-2"
-                                                disabled={deletingSeasonId === season.id}
-                                                tooltip="Delete season"
-                                            >
-                                                {#if deletingSeasonId === season.id}
-                                                    <SvgSpinnersRingResize class="size-4" />
-                                                {:else}
-                                                    <TablerTrash class="size-4" />
-                                                {/if}
+                                        <div class="flex shrink-0 items-center gap-1">
+                                            <Button variant="ghost" class="px-2" onclick={() => openEditDialog(season)} tooltip="Edit season name">
+                                                <TablerPencil class="size-4" />
                                             </Button>
-                                        </ConfirmationDialog>
+                                            <ConfirmationDialog
+                                                title="Delete {season.name}?"
+                                                description="This permanently deletes the season and cascades to its CWL applications and awarded bonuses. This cannot be undone."
+                                                confirmText="Delete"
+                                                onConfirm={() => deleteSeason(season.id)}
+                                            >
+                                                <Button
+                                                    variant="danger"
+                                                    class="px-2"
+                                                    disabled={deletingSeasonId === season.id}
+                                                    tooltip="Delete season"
+                                                >
+                                                    {#if deletingSeasonId === season.id}
+                                                        <SvgSpinnersRingResize class="size-4" />
+                                                    {:else}
+                                                        <TablerTrash class="size-4" />
+                                                    {/if}
+                                                </Button>
+                                            </ConfirmationDialog>
+                                        </div>
                                     </div>
                                 {/each}
                             </div>
@@ -462,3 +515,13 @@
 >
     <span class="hidden"></span>
 </ConfirmationDialog>
+
+<Dialog
+    bind:open={editDialogOpen}
+    title="Edit Season Name"
+    description="Change the name of this CWL season."
+    confirmText={renamingSeason ? "Saving..." : "Save"}
+    onConfirm={renameSeason}
+>
+    <Input bind:value={editingName} placeholder="Season name" disabled={renamingSeason} />
+</Dialog>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
+    import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
     import ActionCell from "$lib/components/grid/ActionCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
@@ -160,30 +161,29 @@
                     const limit = (params.endRow || 0) - skip;
                     const sort = params.sortModel?.[0];
 
-                    const query = new URLSearchParams({ limit: String(limit), offset: String(skip) });
-                    if (searchText) query.set("search", searchText);
-                    if (roleFilter) query.set("role", roleFilter);
+                    const queryParams: GetAdminUsersQueryParams = { limit, offset: skip };
+                    if (searchText) queryParams.search = searchText;
+                    if (roleFilter) queryParams.role = roleFilter;
                     if (sort) {
-                        query.set("sortBy", sort.colId);
-                        query.set("sortDirection", sort.sort ?? "asc");
+                        queryParams.sortBy = sort.colId;
+                        queryParams.sortDirection = sort.sort ?? "asc";
                     }
 
-                    const resp = await fetch(`${PUBLIC_SERVER_URL}/admin/users?${query}`, { credentials: "include" });
-                    const json = await resp.json();
+                    const resp = await getAdminUsers(queryParams, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
 
-                    if (!resp.ok || !json.success) {
+                    if (!resp.success) {
                         params.failCallback();
                         return;
                     }
 
-                    total = json.data.total;
-                    if (json.data.roleCounts) roleCounts = json.data.roleCounts;
+                    total = resp.data.total;
+                    if (resp.data.roleCounts) roleCounts = resp.data.roleCounts;
                     params.successCallback(
-                        json.data.users.map((u: { discordId?: string | null }) => ({
+                        resp.data.users.map((u: { discordId?: string | null }) => ({
                             ...u,
                             discordNickname: u.discordId ? guildNicknames[u.discordId] : undefined,
                         })),
-                        json.data.total,
+                        resp.data.total,
                     );
                 } catch (error) {
                     toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
@@ -375,7 +375,6 @@
 
     <div class="flex-1">
         <Grid
-            fitToWidth
             gridOptions={{
                 context: gridContext,
                 rowHeight: 56,
@@ -384,8 +383,6 @@
                 blockLoadDebounceMillis: 300,
                 onGridReady: (params) => {
                     gridApi = params.api;
-                    // Load rows immediately; nicknames fill in afterwards so the grid
-                    // isn't blocked on the Discord guild-member walk.
                     gridApi.setGridOption("datasource", createDatasource());
                     loadNicknames();
                 },

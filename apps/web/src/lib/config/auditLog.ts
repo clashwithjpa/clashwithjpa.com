@@ -164,6 +164,12 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "green",
         describe: (m) => `created CWL season ${m.name ?? "?"}`,
     },
+    "cwl_season.rename": {
+        label: "CWL season · renamed",
+        icon: TablerEdit,
+        variant: "yellow",
+        describe: (m) => (m.previousName ? `renamed CWL season ${m.previousName} → ${m.name ?? "?"}` : `renamed CWL season to ${m.name ?? "?"}`),
+    },
     "cwl_season.delete": {
         label: "CWL season · deleted",
         icon: TablerCalendarX,

@@ -432,6 +432,17 @@ export type {
     RefreshDiscordUsernamesMutation,
     RefreshDiscordUsernamesMutationResponse,
 } from "./RefreshDiscordUsernames.ts";
+export type {
+    RenameCwlSeason200,
+    RenameCwlSeason401,
+    RenameCwlSeason404,
+    RenameCwlSeason409,
+    RenameCwlSeason500,
+    RenameCwlSeasonMutation,
+    RenameCwlSeasonMutationRequest,
+    RenameCwlSeasonMutationResponse,
+    RenameCwlSeasonPathParams,
+} from "./RenameCwlSeason.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,
