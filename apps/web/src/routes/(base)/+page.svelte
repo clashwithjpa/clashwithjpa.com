@@ -4,9 +4,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { fadeIn, fadeUp, textGlide } from "$lib/utils/animations";
     import { LINKS } from "$lib/utils/links";
-    import SimpleIconsAppstore from "~icons/simple-icons/appstore";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
-    import SimpleIconsGoogleplay from "~icons/simple-icons/googleplay";
 
     let links: { name: string; href: string }[] = [
         { name: "Clans", href: "/clans" },
@@ -54,14 +52,14 @@
         {/each}
     </div>
     <div class="flex items-center justify-center gap-4 pb-4">
-        <CocBtn variant="green" size="sm" class="social-btn" href={LINKS.playstore} target="_blank">
+        <!-- <CocBtn variant="green" size="sm" class="social-btn" href={LINKS.playstore} target="_blank">
             <SimpleIconsGoogleplay />
         </CocBtn>
         <CocBtn variant="orange" size="sm" class="social-btn" href={LINKS.appstore} target="_blank">
             <SimpleIconsAppstore />
-        </CocBtn>
+        </CocBtn> -->
         <CocBtn variant="blurple" size="sm" class="social-btn" href={LINKS.discord} target="_blank">
-            <SimpleIconsDiscord />
+            <SimpleIconsDiscord /> Join Discord
         </CocBtn>
     </div>
 </div>
