@@ -48,6 +48,7 @@ import {
     MissingDiscordAccountError,
     setUserSeasonBonus,
     syncCocAccountStats,
+    syncCocAccountWarWeights,
     updateClan,
     updateClanApplicationStatus,
     updateCocAccountExternal,
@@ -1864,6 +1865,105 @@ app.post(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to sync COC accounts" }, 500);
+        }
+    },
+);
+
+// fwastats.com sends no CORS headers, so its rosters can't be read from the
+// browser; the server fetches them and reports any it can't reach for manual paste.
+const FWA_FETCH_CONCURRENCY = 5;
+const FWA_BROWSER_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    Accept: "application/json,text/plain,*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+};
+type FwaMember = { tag: string; weight: number };
+
+async function fetchFwaMembers(clanTag: string): Promise<FwaMember[]> {
+    const tag = clanTag.replace(/^#/, "");
+    const res = await fetch(`https://fwastats.com/Clan/${encodeURIComponent(tag)}/Members.json`, {
+        headers: FWA_BROWSER_HEADERS,
+        signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`FWA responded ${res.status}`);
+    return (await res.json()) as FwaMember[];
+}
+
+const syncWarWeightsBodySchema = z4.object({
+    // Pasted rosters (raw Members.json shape); omit to have the server fetch every clan.
+    members: z4
+        .array(z4.object({ tag: z4.string().min(1).max(20), weight: z4.number().int().min(0) }))
+        .max(50000)
+        .optional(),
+});
+const syncWarWeightsData = z4.object({
+    updated: z4.number(),
+    notInFwa: z4.array(z4.object({ cocAccountTag: z4.string(), ownerName: z4.string().nullable() })),
+    failedClans: z4.array(z4.object({ tag: z4.string(), name: z4.string().nullable() })),
+});
+app.post(
+    "/coc-accounts/sync-war-weights",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "syncCocAccountWarWeights",
+        description:
+            "[Manager] Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Sync result.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(syncWarWeightsData)) } },
+            },
+            400: { description: "No JPA clans configured.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", syncWarWeightsBodySchema),
+    async (c) => {
+        try {
+            const { members } = c.req.valid("json");
+
+            const weightByTag = new Map<string, number>();
+            const failedClans: { tag: string; name: string | null }[] = [];
+
+            if (members && members.length > 0) {
+                for (const m of members) {
+                    if (m?.tag && typeof m.weight === "number" && m.weight > 0) weightByTag.set(m.tag, m.weight);
+                }
+            } else {
+                const clans = await getAllClans();
+                if (clans.length === 0) return c.json({ success: false, error: "No JPA clans are configured" }, 400);
+                for (let i = 0; i < clans.length; i += FWA_FETCH_CONCURRENCY) {
+                    const batch = clans.slice(i, i + FWA_FETCH_CONCURRENCY);
+                    await Promise.all(
+                        batch.map(async (clan) => {
+                            try {
+                                const fwa = await fetchFwaMembers(clan.cocClanTag);
+                                for (const m of fwa) {
+                                    // Skip 0/unknown weights so we never wipe an existing weight.
+                                    if (m?.tag && typeof m.weight === "number" && m.weight > 0) weightByTag.set(m.tag, m.weight);
+                                }
+                            } catch (error) {
+                                failedClans.push({ tag: clan.cocClanTag, name: clan.cocClanName });
+                                Sentry.captureException(error);
+                            }
+                        }),
+                    );
+                }
+            }
+
+            const rows = Array.from(weightByTag, ([cocAccountTag, warWeight]) => ({ cocAccountTag, warWeight }));
+            const { updated, notInFwa } = await syncCocAccountWarWeights(rows);
+            logAction(c, {
+                action: "coc_account.sync_war_weights",
+                targetType: "coc_account",
+                metadata: { updated, notInFwa: notInFwa.length, failedClans: failedClans.length, manual: !!(members && members.length) },
+            });
+            return c.json({ success: true, data: { updated, notInFwa, failedClans } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to sync war weights" }, 500);
         }
     },
 );

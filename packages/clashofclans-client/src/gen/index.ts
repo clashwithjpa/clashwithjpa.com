@@ -60,6 +60,7 @@ export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
+export type { SyncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
 export type { SyncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
@@ -547,6 +548,15 @@ export type {
     SyncAdminCwlClanLeaguesMutationResponse,
 } from "./models/SyncAdminCwlClanLeagues.ts";
 export type {
+    SyncCocAccountWarWeights200,
+    SyncCocAccountWarWeights400,
+    SyncCocAccountWarWeights401,
+    SyncCocAccountWarWeights500,
+    SyncCocAccountWarWeightsMutation,
+    SyncCocAccountWarWeightsMutationRequest,
+    SyncCocAccountWarWeightsMutationResponse,
+} from "./models/SyncCocAccountWarWeights.ts";
+export type {
     SyncCocAccounts200,
     SyncCocAccounts400,
     SyncCocAccounts401,
@@ -699,6 +709,7 @@ export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
+export { syncCocAccountWarWeights } from "./clients/syncCocAccountWarWeights.ts";
 export { syncCocAccounts } from "./clients/syncCocAccounts.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
@@ -869,6 +880,8 @@ export { createSetUserSeasonBonus } from "./hooks/createSetUserSeasonBonus.ts";
 export { setUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export { createSyncAdminCwlClanLeagues } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export { syncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
+export { createSyncCocAccountWarWeights } from "./hooks/createSyncCocAccountWarWeights.ts";
+export { syncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
 export { createSyncCocAccounts } from "./hooks/createSyncCocAccounts.ts";
 export { syncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
 export { createUpdateAdminClan } from "./hooks/createUpdateAdminClan.ts";
@@ -1317,6 +1330,14 @@ export {
     syncAdminCwlClanLeagues500Schema,
     syncAdminCwlClanLeaguesMutationResponseSchema,
 } from "./zod/syncAdminCwlClanLeaguesSchema.ts";
+export {
+    syncCocAccountWarWeights200Schema,
+    syncCocAccountWarWeights400Schema,
+    syncCocAccountWarWeights401Schema,
+    syncCocAccountWarWeights500Schema,
+    syncCocAccountWarWeightsMutationRequestSchema,
+    syncCocAccountWarWeightsMutationResponseSchema,
+} from "./zod/syncCocAccountWarWeightsSchema.ts";
 export {
     syncCocAccounts200Schema,
     syncCocAccounts400Schema,

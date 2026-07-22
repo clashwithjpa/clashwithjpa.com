@@ -23,6 +23,7 @@
         getAdminCocAccounts,
         getAdminUsers,
         syncCocAccounts,
+        syncCocAccountWarWeights,
         updateCocAccountExternal,
         updateCocAccountStats,
         updateCocAccountWarWeight,
@@ -33,6 +34,7 @@
     import TablerCheck from "~icons/tabler/check";
     import TablerCopy from "~icons/tabler/copy";
     import TablerDownload from "~icons/tabler/download";
+    import TablerScale from "~icons/tabler/scale";
     import TablerSearch from "~icons/tabler/search";
     import TablerTableDashed from "~icons/tabler/table-dashed";
     import TablerTrash from "~icons/tabler/trash";
@@ -44,6 +46,12 @@
         skipped: number;
         notLinked: { tag: string; name: string }[];
         notInSheet: { cocAccountTag: string; ownerName: string | null }[];
+    };
+
+    type WarWeightSyncResult = {
+        updated: number;
+        notInFwa: { cocAccountTag: string; ownerName: string | null }[];
+        failedClans: { tag: string; name: string | null }[];
     };
 
     let { data }: { data: { canDelete: boolean } } = $props();
@@ -60,6 +68,12 @@
     let sheetUrl = $state("");
     let syncResult = $state<SyncResult | null>(null);
     let syncResultOpen = $state(false);
+    let warWeightDialogOpen = $state(false);
+    let warWeightSyncing = $state(false);
+    let warWeightResult = $state<WarWeightSyncResult | null>(null);
+    let warWeightResultOpen = $state(false);
+    let pastedFwa = $state("");
+    let applyingPaste = $state(false);
     let accountSidebar: Sidebar | null = $state(null);
     let selectedAccount = $state<Record<string, unknown> | null>(null);
     let copied: Record<string, boolean> = $state({});
@@ -213,6 +227,85 @@
             });
             // Dialog auto-closes on confirm; reopen so the URL can be fixed and retried.
             syncDialogOpen = true;
+        }
+    }
+
+    type FwaMember = { tag: string; weight: number };
+
+    const fwaMembersUrl = (clanTag: string) => `https://fwastats.com/Clan/${encodeURIComponent(clanTag.replace(/^#/, ""))}/Members.json`;
+
+    // Server fetches every clan's roster and updates by tag; unreachable clans come back for manual paste.
+    async function handleWarWeightSync() {
+        warWeightSyncing = true;
+        const toastId = toast.loading("Syncing war weights from FWA…");
+        try {
+            const resp = (await syncCocAccountWarWeights(
+                {},
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            )) as { success: true; data: WarWeightSyncResult } | { success: false; error: string | Record<string, unknown> };
+            if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Failed to sync war weights");
+
+            const failed = resp.data.failedClans.length;
+            const suffix = failed ? ` (${failed} clan${failed === 1 ? "" : "s"} need manual paste)` : "";
+            toast.success(`Updated ${resp.data.updated} war weight${resp.data.updated === 1 ? "" : "s"}${suffix}`, { id: toastId });
+            warWeightResult = resp.data;
+            pastedFwa = "";
+            warWeightResultOpen = true;
+            gridApi?.setGridOption("datasource", createDatasource());
+        } catch (error) {
+            toast.error("War weight sync failed", {
+                id: toastId,
+                description: error instanceof Error && error.message ? error.message : undefined,
+            });
+            // Dialog auto-closes on confirm; reopen so it can be retried.
+            warWeightDialogOpen = true;
+        } finally {
+            warWeightSyncing = false;
+        }
+    }
+
+    // Send a pasted roster to the same endpoint, which applies `members` without re-fetching.
+    async function applyPastedFwa() {
+        const text = pastedFwa.trim();
+        if (!text) {
+            toast.error("Paste a clan's Members.json first");
+            return;
+        }
+        let members: FwaMember[];
+        try {
+            const parsed = JSON.parse(text);
+            if (!Array.isArray(parsed)) throw new Error();
+            members = parsed;
+        } catch {
+            toast.error("That doesn't look like valid FWA JSON");
+            return;
+        }
+        const clean = members
+            .filter((m) => m && typeof m.tag === "string" && typeof m.weight === "number" && m.weight > 0)
+            .map((m) => ({ tag: m.tag, weight: m.weight }));
+        if (clean.length === 0) {
+            toast.error("No usable weights found in the pasted data");
+            return;
+        }
+
+        applyingPaste = true;
+        const toastId = toast.loading("Applying pasted weights…");
+        try {
+            const resp = (await syncCocAccountWarWeights(
+                { members: clean },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            )) as { success: true; data: WarWeightSyncResult } | { success: false; error: string | Record<string, unknown> };
+            if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Failed to apply weights");
+            toast.success(`Updated ${resp.data.updated} war weight${resp.data.updated === 1 ? "" : "s"} from pasted data`, { id: toastId });
+            pastedFwa = "";
+            gridApi?.setGridOption("datasource", createDatasource());
+        } catch (error) {
+            toast.error("Failed to apply pasted weights", {
+                id: toastId,
+                description: error instanceof Error && error.message ? error.message : undefined,
+            });
+        } finally {
+            applyingPaste = false;
         }
     }
 
@@ -375,6 +468,20 @@
                     tooltipPlacement="bottom"
                 >
                     <TablerTableDashed class="size-5" />
+                </Button>
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    disabled={warWeightSyncing}
+                    onclick={() => (warWeightDialogOpen = true)}
+                    tooltip="Sync war weights from FWA"
+                    tooltipPlacement="bottom"
+                >
+                    {#if warWeightSyncing}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerScale class="size-5" />
+                    {/if}
                 </Button>
                 <Button
                     variant="base"
@@ -778,6 +885,106 @@
                     </div>
                 {:else}
                     <p class="text-xs text-stone-500">Every sheet row matched a linked account.</p>
+                {/if}
+            </div>
+        </div>
+    {/if}
+</Dialog>
+
+<Dialog
+    bind:open={warWeightDialogOpen}
+    title="Sync war weights from FWA"
+    description="Fetches every JPA clan's roster from fwastats.com and overwrites the war weight of each matching linked account."
+    confirmText={warWeightSyncing ? "Syncing…" : "Sync war weights"}
+    onConfirm={handleWarWeightSync}
+>
+    <p class="text-sm text-stone-400">
+        The server pulls each clan's roster from fwastats.com and matches by tag. Accounts with an unknown (0) FWA weight, or not in a JPA clan's
+        roster, are left untouched. Any clan the server can't reach will be listed afterwards for a quick copy/paste.
+    </p>
+</Dialog>
+
+<Dialog
+    bind:open={warWeightResultOpen}
+    title="War weights synced"
+    description={warWeightResult ? `Updated ${warWeightResult.updated} account${warWeightResult.updated === 1 ? "" : "s"}.` : ""}
+    confirmText="Done"
+    cancelText="Close"
+    onConfirm={() => {}}
+>
+    {#if warWeightResult}
+        <div class="flex flex-col gap-4 text-sm">
+            {#if warWeightResult.failedClans.length}
+                <div class="flex flex-col gap-2 rounded-md border border-amber-700/40 bg-amber-950/20 p-3">
+                    <p class="font-medium text-amber-200">Couldn't reach {warWeightResult.failedClans.length} clan on the server</p>
+                    <p class="text-xs text-stone-400">
+                        Open each link, copy the whole JSON, paste it below and apply. One clan at a time is fine — repeat for each.
+                    </p>
+                    <div class="flex flex-col gap-1">
+                        {#each warWeightResult.failedClans as clan}
+                            <a
+                                href={fwaMembersUrl(clan.tag)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center justify-between gap-3 rounded px-2 py-1 text-stone-200 hover:bg-stone-800/60"
+                            >
+                                <span class="truncate">{clan.name ?? clan.tag}</span>
+                                <span class="shrink-0 font-mono text-xs text-sky-400 underline">{clan.tag}</span>
+                            </a>
+                        {/each}
+                    </div>
+                    <textarea
+                        bind:value={pastedFwa}
+                        placeholder="Paste a clan's Members.json here…"
+                        rows="4"
+                        class="mt-1 w-full resize-y rounded-lg border-2 border-stone-700/50 bg-stone-900 px-3 py-2 font-mono text-xs text-stone-50 transition-colors duration-200 ease-in-out outline-none placeholder:text-stone-400 focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50"
+                    ></textarea>
+                    <div class="flex justify-end">
+                        <Button variant="base" size="sm" disabled={applyingPaste || !pastedFwa.trim()} onclick={applyPastedFwa}>
+                            {#if applyingPaste}
+                                <SvgSpinnersRingResize class="size-4" />
+                            {:else}
+                                Apply pasted roster
+                            {/if}
+                        </Button>
+                    </div>
+                </div>
+            {/if}
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="font-medium text-stone-100">Not on FWA ({warWeightResult.notInFwa.length})</p>
+                    {#if warWeightResult.notInFwa.length}
+                        <Button
+                            variant={copied["notInFwa"] ? "success" : "ghost"}
+                            size="icon"
+                            tooltip={copied["notInFwa"] ? "Copied!" : "Copy name + tag"}
+                            tooltipPlacement="top"
+                            onclick={() =>
+                                copyList(
+                                    warWeightResult!.notInFwa.map((a) => ({ name: a.ownerName ?? "", tag: a.cocAccountTag })),
+                                    "notInFwa",
+                                )}
+                        >
+                            {#if copied["notInFwa"]}
+                                <TablerCheck class="size-4" />
+                            {:else}
+                                <TablerCopy class="size-4" />
+                            {/if}
+                        </Button>
+                    {/if}
+                </div>
+                <p class="text-xs text-stone-400">Linked main accounts with no war weight in any JPA clan's FWA roster.</p>
+                {#if warWeightResult.notInFwa.length}
+                    <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
+                        {#each warWeightResult.notInFwa as a}
+                            <div class="flex items-center justify-between gap-3 px-3 py-1.5">
+                                <span class="truncate text-stone-200">{a.ownerName ?? "—"}</span>
+                                <span class="shrink-0 font-mono text-xs text-stone-400">{a.cocAccountTag}</span>
+                            </div>
+                        {/each}
+                    </div>
+                {:else}
+                    <p class="text-xs text-stone-500">Every linked main account got a war weight.</p>
                 {/if}
             </div>
         </div>

@@ -470,6 +470,15 @@ export type {
     SyncAdminCwlClanLeaguesMutationResponse,
 } from "./SyncAdminCwlClanLeagues.ts";
 export type {
+    SyncCocAccountWarWeights200,
+    SyncCocAccountWarWeights400,
+    SyncCocAccountWarWeights401,
+    SyncCocAccountWarWeights500,
+    SyncCocAccountWarWeightsMutation,
+    SyncCocAccountWarWeightsMutationRequest,
+    SyncCocAccountWarWeightsMutationResponse,
+} from "./SyncCocAccountWarWeights.ts";
+export type {
     SyncCocAccounts200,
     SyncCocAccounts400,
     SyncCocAccounts401,

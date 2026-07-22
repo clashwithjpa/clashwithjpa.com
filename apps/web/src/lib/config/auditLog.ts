@@ -288,6 +288,13 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         describe: (m) =>
             `synced stats for ${m.updated ?? "?"} account${m.updated === 1 ? "" : "s"} from a sheet${m.notLinked ? ` (${m.notLinked} not linked)` : ""}`,
     },
+    "coc_account.sync_war_weights": {
+        label: "COC account · war weights synced",
+        icon: TablerRefresh,
+        variant: "blue",
+        describe: (m) =>
+            `synced ${m.updated ?? "?"} war weight${m.updated === 1 ? "" : "s"} from FWA${m.notInFwa ? ` (${m.notInFwa} not on FWA)` : ""}`,
+    },
     "coc_account.delete": {
         label: "COC account · deleted",
         icon: TablerTrash,

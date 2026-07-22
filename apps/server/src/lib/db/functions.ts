@@ -816,6 +816,43 @@ export async function syncCocAccountStats(rows: CocAccountSheetStats[]) {
     return { updated: matched.length, notFound, notInSheet };
 }
 
+export type CocAccountWarWeightRow = { cocAccountTag: string; warWeight: number };
+
+// notInFwa excludes external accounts, which legitimately aren't in a JPA clan's FWA roster.
+export async function syncCocAccountWarWeights(rows: CocAccountWarWeightRow[]) {
+    const existing = await db
+        .select({
+            id: cocAccountTable.id,
+            cocAccountTag: cocAccountTable.cocAccountTag,
+            isExternal: cocAccountTable.isExternal,
+            ownerName: user.name,
+        })
+        .from(cocAccountTable)
+        .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
+        .leftJoin(user, eq(user.id, account.userId));
+    const accByTag = new Map(existing.map((a) => [normalizeCocTag(a.cocAccountTag), a]));
+
+    const weightById = new Map<number, number>();
+    for (const row of rows) {
+        const acc = accByTag.get(normalizeCocTag(row.cocAccountTag));
+        if (acc) weightById.set(acc.id, row.warWeight);
+    }
+
+    if (weightById.size > 0) {
+        await db.transaction(async (tx) => {
+            for (const [id, warWeight] of weightById) {
+                await tx.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, id));
+            }
+        });
+    }
+
+    const notInFwa = existing
+        .filter((a) => !a.isExternal && !weightById.has(a.id))
+        .map((a) => ({ cocAccountTag: a.cocAccountTag, ownerName: a.ownerName }));
+
+    return { updated: weightById.size, notInFwa };
+}
+
 export async function getAdminUsers(
     opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDirection?: "asc" | "desc"; role?: string } = {},
 ) {

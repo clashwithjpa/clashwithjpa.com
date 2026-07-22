@@ -16,7 +16,7 @@
     },
     "prettier": "./packages/prettier-config",
     "dependencies": {
-        "@typescript/native-preview": "^7.0.0-dev.20260502.1"
+        "@typescript/native-preview": "^7.0.0-dev.20260707.2"
     },
     "devDependencies": {
         "@commitlint/cli": "^20.5.3",
@@ -24,10 +24,10 @@
         "@types/bun": "latest",
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",
-        "prettier": "^3.8.3",
-        "prettier-plugin-svelte": "^3.5.1",
+        "prettier": "^3.9.6",
+        "prettier-plugin-svelte": "^3.5.2",
         "prettier-plugin-tailwindcss": "^0.7.4",
-        "sort-package-json": "^3.6.1",
+        "sort-package-json": "^3.7.1",
         "turbo": "2.8.17"
     },
     "peerDependencies": {

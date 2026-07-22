@@ -60,6 +60,7 @@ export { setRules } from "./setRules.ts";
 export { setUserAccountExternal } from "./setUserAccountExternal.ts";
 export { setUserSeasonBonus } from "./setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./syncAdminCwlClanLeagues.ts";
+export { syncCocAccountWarWeights } from "./syncCocAccountWarWeights.ts";
 export { syncCocAccounts } from "./syncCocAccounts.ts";
 export { updateAdminClan } from "./updateAdminClan.ts";
 export { updateAdminSettings } from "./updateAdminSettings.ts";

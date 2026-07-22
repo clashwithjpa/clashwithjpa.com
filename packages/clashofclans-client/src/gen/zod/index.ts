@@ -379,6 +379,14 @@ export {
     syncAdminCwlClanLeaguesMutationResponseSchema,
 } from "./syncAdminCwlClanLeaguesSchema.ts";
 export {
+    syncCocAccountWarWeights200Schema,
+    syncCocAccountWarWeights400Schema,
+    syncCocAccountWarWeights401Schema,
+    syncCocAccountWarWeights500Schema,
+    syncCocAccountWarWeightsMutationRequestSchema,
+    syncCocAccountWarWeightsMutationResponseSchema,
+} from "./syncCocAccountWarWeightsSchema.ts";
+export {
     syncCocAccounts200Schema,
     syncCocAccounts400Schema,
     syncCocAccounts401Schema,
