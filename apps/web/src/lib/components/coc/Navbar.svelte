@@ -17,10 +17,12 @@
     ];
 
     let logo: HTMLElement;
+    let scrollY = $state(0);
 
     const session = authClient.useSession();
 
     const isHomePage = $derived($page.url.pathname === "/");
+    const isScrolled = $derived(scrollY > 20);
 
     $effect(() => {
         fadeUp(document.querySelectorAll(".animate-desktop"));
@@ -28,10 +30,12 @@
     });
 </script>
 
+<svelte:window bind:scrollY />
+
 <nav
     class={cn(
         "fixed top-0 z-40 flex h-20 w-full items-center justify-between p-4 font-coc transition-all duration-200 md:p-6",
-        !isHomePage && "bg-stone-950/50 backdrop-blur-sm",
+        (!isHomePage || isScrolled) && "bg-stone-950/50 backdrop-blur-sm",
     )}
 >
     <a href="/" class="flex h-12 items-center gap-4">

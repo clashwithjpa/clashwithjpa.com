@@ -140,6 +140,26 @@ export const emptyRing = (el: Element, onComplete: () => void) => {
     });
 };
 
+export const float = (
+    el: Element,
+    options?: {
+        distance?: number;
+        duration?: number;
+        delay?: number;
+    },
+) => {
+    const { distance = 20, duration = 4000, delay = 0 } = options || {};
+    return animate(el, {
+        translateY: [0, -distance],
+        rotate: [0, 3],
+        duration,
+        delay,
+        loop: true,
+        alternate: true,
+        ease: "inOut(2)",
+    });
+};
+
 export const cardSlideIn = (el: Element) => {
     const children = Array.from(el.children);
 
