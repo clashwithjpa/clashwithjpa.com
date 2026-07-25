@@ -34,7 +34,7 @@ body {
     background-color: var(--color-stone-950);
     color: var(--color-stone-50);
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
