@@ -9,7 +9,6 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
-    import { fadeIn } from "$lib/utils/animations";
     import {
         createCwlSeason,
         deleteCwlSeason,
@@ -276,7 +275,7 @@
 
 <Seo title="Admin Settings" description="Manage site settings" />
 
-<div in:fadeIn class="flex size-full flex-col gap-6">
+<div class="flex size-full flex-col gap-6">
     <div>
         <h1 class="text-2xl font-bold">Site Settings</h1>
         <p class="text-sm text-stone-400">Toggles and configuration that apply across the site.</p>

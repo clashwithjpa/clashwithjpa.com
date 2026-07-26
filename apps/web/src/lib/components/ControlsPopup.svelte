@@ -6,7 +6,6 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
-    import { drawRing, emptyRing, rotateToggle } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { onMount, setContext, tick } from "svelte";
@@ -113,25 +112,26 @@
             }
         }
 
+        try {
+            const cacheableAssets = new Set(["script", "link", "css", "font", "img"]);
+            const assetUrls = new Set(
+                (performance.getEntriesByType("resource") as PerformanceResourceTiming[])
+                    .filter((entry) => cacheableAssets.has(entry.initiatorType) && entry.name.startsWith(window.location.origin))
+                    .map((entry) => entry.name),
+            );
+            await Promise.allSettled([...assetUrls].map((url) => fetch(url, { cache: "reload", credentials: "same-origin" })));
+        } catch (err) {
+            console.error("Error revalidating cached assets", err);
+        }
+
         window.location.reload();
     }
 
     let open = $state(false);
-    let triggerButton = $state<HTMLElement | null>(null);
-    let impersonationRing = $state<SVGCircleElement | null>(null);
     let showRing = $state(false);
 
     $effect(() => {
         if (isImpersonating) showRing = true;
-    });
-
-    $effect(() => {
-        if (!impersonationRing) return;
-        if (isImpersonating) {
-            drawRing(impersonationRing);
-        } else if (showRing) {
-            emptyRing(impersonationRing, () => (showRing = false));
-        }
     });
 
     function handleOpenChange() {
@@ -143,9 +143,6 @@
     $effect(() => {
         page.url.pathname;
         void tick().then(checkVideo);
-        if (triggerButton) {
-            rotateToggle(triggerButton, open);
-        }
     });
 
     function handleDragEnd() {
@@ -173,13 +170,23 @@
 >
     <RawPopup placement="top" contentClass="flex flex-col gap-4 rounded-full p-2 z-60" bind:open onOpenChange={handleOpenChange}>
         {#snippet trigger()}
-            <div bind:this={triggerButton} class="relative">
+            <div class="relative transition-[rotate] duration-800 ease-glide" class:rotate-180={open}>
                 <Button class="size-14 rounded-full" size="" variant="ghost">
                     <TablerIcons class="pointer-events-none size-6" />
                 </Button>
                 {#if showRing}
                     <svg class="pointer-events-none absolute inset-0 size-full -rotate-90 overflow-visible" viewBox="0 0 56 56" fill="none">
-                        <circle bind:this={impersonationRing} cx="28" cy="28" r="27" stroke="#f59e0b" stroke-width="2" />
+                        <circle
+                            cx="28"
+                            cy="28"
+                            r="27"
+                            stroke="#f59e0b"
+                            stroke-width="2"
+                            class="[stroke-dasharray:169.65] {isImpersonating ? 'animate-ring-draw' : 'animate-ring-empty'}"
+                            onanimationend={() => {
+                                if (!isImpersonating) showRing = false;
+                            }}
+                        />
                     </svg>
                 {/if}
             </div>

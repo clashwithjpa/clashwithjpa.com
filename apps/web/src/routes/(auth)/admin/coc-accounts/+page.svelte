@@ -16,7 +16,6 @@
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
-    import { fadeIn } from "$lib/utils/animations";
     import {
         createCocAccount,
         deleteCocAccountsBulk,
@@ -436,7 +435,7 @@
 
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
-<div class="relative flex size-full flex-col gap-4 overflow-hidden" in:fadeIn>
+<div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-2 px-4 pt-4 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl font-bold">COC Accounts</h1>

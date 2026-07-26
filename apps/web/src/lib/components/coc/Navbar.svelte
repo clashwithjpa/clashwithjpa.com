@@ -3,7 +3,6 @@
     import { authClient, hasPermission } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
-    import { fadeUp, wavyBounce } from "$lib/utils/animations";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
     import CocPopup from "../ui/coc/CocPopup.svelte";
@@ -16,18 +15,12 @@
         { name: "Rules", href: "/rules" },
     ];
 
-    let logo: HTMLElement;
     let scrollY = $state(0);
 
     const session = authClient.useSession();
 
     const isHomePage = $derived($page.url.pathname === "/");
     const isScrolled = $derived(scrollY > 20);
-
-    $effect(() => {
-        fadeUp(document.querySelectorAll(".animate-desktop"));
-        wavyBounce(logo);
-    });
 </script>
 
 <svelte:window bind:scrollY />
@@ -39,7 +32,7 @@
     )}
 >
     <a href="/" class="flex h-12 items-center gap-4">
-        <div class="size-12 bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');" bind:this={logo}></div>
+        <div class="size-12 animate-wavy-bounce bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');"></div>
         <div class="h-full border-l-2 border-stone-700/50"></div>
         <div class="flex flex-col">
             <span class="text-xl font-bold">JPA</span>
@@ -48,8 +41,8 @@
     </a>
 
     <div class="hidden **:text-sm md:absolute md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-8">
-        {#each links as link}
-            <Link href={link.href} class="animate-desktop opacity-0">
+        {#each links as link, i}
+            <Link href={link.href} class="stagger-up" style="--i:{i}">
                 {link.name}
             </Link>
         {/each}

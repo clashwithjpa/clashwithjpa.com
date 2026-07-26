@@ -3,7 +3,6 @@
     import { authClient } from "$lib/auth";
     import AdminAnalytics from "$lib/components/AdminAnalytics.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { bounceDown, bounceUp, cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { getCwlApplications, getJoinApplications } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
@@ -16,17 +15,6 @@
 
     let pendingJoin = $state<number | null>(null);
     let unassignedCwl = $state<number | null>(null);
-
-    let isPressed = false;
-    function handlePointerDown(e: Event) {
-        isPressed = true;
-        bounceDown(e.currentTarget as Element);
-    }
-    function handlePointerUp(e: Event) {
-        if (!isPressed) return;
-        isPressed = false;
-        bounceUp(e.currentTarget as Element);
-    }
 
     onMount(async () => {
         if (!data.permissions?.review) return;
@@ -43,7 +31,7 @@
 
 <Seo title="Admin Panel" description="Admin control panel" />
 
-<div in:fadeIn class="flex size-full flex-col gap-8">
+<div class="flex size-full flex-col gap-8">
     <div>
         <h1 class="text-3xl font-bold">Admin Panel</h1>
         <p class="text-sm text-stone-400">
@@ -53,12 +41,8 @@
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <a
-            use:cardSlideIn
             href="/admin/join-applications"
-            onpointerdown={handlePointerDown}
-            onpointerup={handlePointerUp}
-            onpointerleave={handlePointerUp}
-            class="flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 transition-colors duration-200 outline-none hover:border-stone-600 hover:bg-stone-800"
+            class="stagger-children press flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
         >
             <div>
                 <p class="text-xs font-medium text-stone-400">Pending join applications</p>
@@ -71,12 +55,8 @@
             <TablerFileDescription class="size-10 text-stone-400" />
         </a>
         <a
-            use:cardSlideIn
             href="/admin/cwl-applications"
-            onpointerdown={handlePointerDown}
-            onpointerup={handlePointerUp}
-            onpointerleave={handlePointerUp}
-            class="group flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 transition-colors duration-200 outline-none hover:border-stone-600 hover:bg-stone-800"
+            class="stagger-children press group flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
         >
             <div>
                 <p class="text-xs font-medium text-stone-400">Unassigned CWL applications</p>

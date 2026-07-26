@@ -3,7 +3,6 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { fadeIn } from "$lib/utils/animations";
     import { Field } from "@ark-ui/svelte/field";
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
@@ -114,7 +113,7 @@
 
 <Seo title="Apply" description="Fill the application to join JPA Clans" />
 
-<div in:fadeIn class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
+<div class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
     <div class="hidden h-full rounded-xl bg-cover bg-center bg-no-repeat md:flex" style="background-image: url('/apply_bg.webp')"></div>
     <div class="flex size-full flex-col justify-center gap-8 lg:p-8">
         <div class="flex flex-col gap-1">

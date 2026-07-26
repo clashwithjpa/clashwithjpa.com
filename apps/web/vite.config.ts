@@ -12,6 +12,7 @@ export default defineConfig({
         }),
     ],
     optimizeDeps: {
+        include: ["@sentry/sveltekit"],
         exclude: [
             "codemirror",
             "prettier",

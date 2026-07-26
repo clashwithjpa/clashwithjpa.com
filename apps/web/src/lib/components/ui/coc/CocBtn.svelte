@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { bounceDown, bounceUp } from "$lib/utils/animations";
     import type { Snippet } from "svelte";
 
     let {
@@ -52,8 +51,6 @@
 
     const v = $derived(variants[variant] ?? variants.green);
     const sizeClasses = $derived(sizes[size] ?? sizes.base);
-
-    let isPressed = false;
 </script>
 
 <svelte:element
@@ -61,23 +58,7 @@
     {href}
     {target}
     role={href ? "link" : "button"}
-    class={`relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-[1.2] font-bold tracking-wide text-white shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
-    onpointerdown={(e: PointerEvent) => {
-        isPressed = true;
-        bounceDown(e.currentTarget as Element);
-    }}
-    onpointerup={(e: PointerEvent) => {
-        if (isPressed) {
-            isPressed = false;
-            bounceUp(e.currentTarget as Element);
-        }
-    }}
-    onpointerleave={(e: PointerEvent) => {
-        if (isPressed) {
-            isPressed = false;
-            bounceUp(e.currentTarget as Element);
-        }
-    }}
+    class={`press relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-[1.2] font-bold tracking-wide text-white shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
     onclick={() => {
         onclick?.();
     }}

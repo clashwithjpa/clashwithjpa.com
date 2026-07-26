@@ -5,7 +5,6 @@
     import H1 from "$lib/components/ui/coc/H1.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { fadeIn, fadeUp, float, textGlide } from "$lib/utils/animations";
     import { LINKS } from "$lib/utils/links";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import type { PageProps } from "./$types";
@@ -41,27 +40,6 @@
         { src: "neutral_noshadow", position: "bottom-20 left-[6%] w-36 md:w-48 lg:w-60", distance: 26, duration: 4600, delay: 600 },
         { src: "broom_witch_anime", position: "bottom-16 right-[6%] w-36 md:w-48 lg:w-60", distance: 20, duration: 4800, delay: 900 },
     ];
-
-    $effect(() => {
-        fadeIn(document.querySelector(".hero-eyebrow") as HTMLElement);
-        fadeIn(document.querySelector(".clash-with") as HTMLElement);
-        textGlide(document.querySelector(".jpa-txt") as HTMLElement);
-        fadeUp(document.querySelectorAll(".hero-desc"));
-        fadeIn(document.querySelectorAll(".hero-cta"));
-        fadeIn(document.querySelector(".scroll-cue") as HTMLElement);
-
-        const floatEls = document.querySelectorAll(".float-sprite");
-        const floats = Array.from(floatEls).map((el, i) =>
-            float(el as HTMLElement, {
-                distance: floatingSprites[i].distance,
-                duration: floatingSprites[i].duration,
-                delay: floatingSprites[i].delay,
-            }),
-        );
-        return () => {
-            for (const anim of floats) anim.pause();
-        };
-    });
 </script>
 
 <Seo
@@ -80,13 +58,20 @@
             <img
                 src="/sprites/{sprite.src}.webp"
                 alt=""
-                class="float-sprite pointer-events-none absolute z-0 hidden drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] select-none md:block {sprite.position}"
+                class="pointer-events-none absolute z-0 hidden animate-float-sprite drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] select-none md:block {sprite.position}"
+                style="--float-distance:{sprite.distance}px; --float-duration:{sprite.duration}ms; --float-delay:{sprite.delay}ms"
             />
         {/each}
 
         <H1 class="text-5xl font-bold md:text-7xl lg:text-8xl">
-            <span class="clash-with opacity-0">Clash With</span>
-            <span class="jpa-txt"> JPA</span>
+            <span class="animate-in duration-800 ease-glide fill-mode-both fade-in">Clash With</span>
+            <span class="inline-flex">
+                {#each "JPA" as char, i}
+                    <span class="inline-block overflow-hidden">
+                        <span class="glide-char inline-block" style="--i:{i}">{char}</span>
+                    </span>
+                {/each}
+            </span>
         </H1>
 
         <p class="max-w-2xl font-coc text-base text-stone-200 md:text-xl">
@@ -96,15 +81,15 @@
         </p>
 
         <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <a href="/clans" class="hero-cta opacity-0">
+            <a href="/clans" class="animate-in duration-800 ease-glide fill-mode-both fade-in">
                 <CocBtn variant="green">Explore the clans</CocBtn>
             </a>
-            <a href={LINKS.discord} target="_blank" class="hero-cta opacity-0">
+            <a href={LINKS.discord} target="_blank" class="animate-in delay-150 duration-800 ease-glide fill-mode-both fade-in">
                 <CocBtn variant="blurple"><SimpleIconsDiscord /> Join Discord</CocBtn>
             </a>
         </div>
 
-        <div class="scroll-cue absolute bottom-4 flex flex-col items-center gap-1 opacity-0">
+        <div class="absolute bottom-4 flex animate-in flex-col items-center gap-1 duration-800 ease-glide fill-mode-both fade-in">
             <span class="font-coc text-xs tracking-widest text-stone-400 uppercase">Scroll to explore</span>
             <div class="h-8 w-5 rounded-full border-2 border-stone-500/60 p-1">
                 <div class="mx-auto h-2 w-1 animate-bounce rounded-full bg-stone-400"></div>

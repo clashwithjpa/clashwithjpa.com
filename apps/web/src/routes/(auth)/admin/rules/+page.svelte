@@ -2,7 +2,6 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import ReadmeEditor from "$lib/components/ui/ReadmeEditor.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { setRules } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -36,6 +35,6 @@
 
 <Seo title="Admin Rules" description="Edit the rules for your server" />
 
-<div in:fadeIn class="size-full overflow-hidden">
+<div class="size-full overflow-hidden">
     <ReadmeEditor bind:value={rulesContent} {isMobile} onSave={handleSave} />
 </div>

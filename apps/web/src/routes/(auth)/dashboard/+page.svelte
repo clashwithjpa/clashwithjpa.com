@@ -13,7 +13,6 @@
 
     import type { Role } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import {
         getCOCPlayer,
         type GetCOCPlayer500,
@@ -161,7 +160,6 @@
 {#snippet importBanner()}
     {#if !importDismissed}
         <div
-            in:fadeIn
             class="mb-6 flex flex-col items-start justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 md:flex-row md:items-center"
         >
             <div class="flex items-start gap-3">
@@ -200,14 +198,12 @@
             <span>Linked Accounts</span>
         </div>
     {:else}
-        <div in:fadeIn>
+        <div>
             <h1 class="text-2xl font-bold">Linked Accounts</h1>
             <br />
             {#if accounts.length === 0}
                 <div
-                    in:fadeIn
-                    use:cardSlideIn
-                    class="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
+                    class="stagger-children flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
                 >
                     {#if importDismissed}
                         <div class="rounded-full bg-stone-800 p-3">
@@ -260,11 +256,11 @@
                             class="flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
                         >
                             <div class="flex w-full grow items-center justify-center">
-                                {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )}
+                                {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
                                     <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
                                 {:then acc}
                                     {#if !acc.success}
-                                        <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                        <div class="stagger-children flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <TablerX class="size-16 text-stone-400" />
                                             <div class="flex flex-col items-start justify-center gap-1">
                                                 <span class="text-lg font-semibold">Error fetching player</span>
@@ -272,7 +268,7 @@
                                             </div>
                                         </div>
                                     {:else}
-                                        <div in:fadeIn use:cardSlideIn class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                        <div class="stagger-children flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
                                                 <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
                                                     <Icon name="th/{acc.data.player.townHallLevel}" class="size-16 shrink-0" />
@@ -336,21 +332,17 @@
 
 {#await hasPermission($session.data?.user.id, "cwl") then canApplyCWL}
     {#if canApplyCWL}
-        {#await Promise.all( [getUserCwlApplications( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, ), getJPAClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, ), getJPACwlClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )], )}
-            <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
+        {#await Promise.all( [getUserCwlApplications( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPAClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPACwlClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )] )}
+            <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
                 <SvgSpinnersRingResize />
                 <span>CWL Applications</span>
             </div>
         {:then [resp, jpaClansResp, jpaCwlClansResp]}
             {@const currentApplications = resp.data.applications.filter((application) => application.seasonId === resp.data.currentSeasonId)}
             {#if cwlEnabled || currentApplications.length > 0}
-                <div in:fadeIn>
+                <div>
                     {#snippet applicationCard(application: CwlApplication)}
-                        <div
-                            in:fadeIn
-                            use:cardSlideIn
-                            class="flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
-                        >
+                        <div class="stagger-children flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex min-w-0 flex-col items-start justify-center gap-1">
                                     <Tooltip title={application.cocAccountName} placement="top" class="w-full text-left">
@@ -437,9 +429,7 @@
                     {#if currentApplications.length === 0}
                         {@const hasActiveSeason = resp.data.currentSeasonId != null}
                         <div
-                            in:fadeIn
-                            use:cardSlideIn
-                            class="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
+                            class="stagger-children flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
                         >
                             <div class="rounded-full bg-stone-800 p-3">
                                 <TablerSwords class="size-7 text-stone-300" />

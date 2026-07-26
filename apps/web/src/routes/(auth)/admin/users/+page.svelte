@@ -19,7 +19,6 @@
     import { roleLevel } from "$lib/config/roles";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate } from "$lib/utils";
-    import { fadeIn } from "$lib/utils/animations";
     import type { CellValueChangedEvent, GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
@@ -334,7 +333,7 @@
     description="Manage users in your server. View user details, edit roles and permissions, and perform administrative actions etc."
 />
 
-<div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
+<div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>

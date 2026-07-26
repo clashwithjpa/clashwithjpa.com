@@ -1,7 +1,6 @@
 <script lang="ts">
     import { authClient } from "$lib/auth";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { fadeIn } from "$lib/utils/animations";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerServer from "~icons/tabler/server";
     import SessionCard from "$lib/components/SessionCard.svelte";
@@ -18,12 +17,12 @@
 <Seo title="Settings" />
 
 {#await sessions}
-    <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
+    <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
         <SvgSpinnersBlocksScale />
         <span>Active Sessions</span>
     </div>
 {:then resp}
-    <div in:fadeIn>
+    <div>
         <div class="flex flex-col gap-1">
             <h1 class="text-4xl font-bold">Active Sessions</h1>
             <p class="text-sm text-stone-400">Manage your active sessions across all devices.</p>

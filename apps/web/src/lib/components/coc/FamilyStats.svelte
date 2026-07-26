@@ -6,7 +6,6 @@
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
-    import { fadeUp } from "$lib/utils/animations";
     import type { GetCOCClan200 } from "@repo/clashofclans-client";
     import { getCOCClan } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -68,12 +67,6 @@
     );
 
     const formatNumber = (n: number) => new Intl.NumberFormat("en-US").format(n);
-
-    $effect(() => {
-        if (!loading && clans.length > 0) {
-            fadeUp(document.querySelectorAll(".muster-tile"));
-        }
-    });
 </script>
 
 <div class="flex flex-col gap-10">
@@ -147,12 +140,13 @@
             </div>
         {:else}
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {#each clans as clan (clan.tag)}
+                {#each clans as clan, i (clan.tag)}
                     <a
                         href="https://link.clashofclans.com/?action=OpenClanProfile&tag={encodeURIComponent(clan.tag)}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="muster-tile block origin-center transform opacity-0 transition-all duration-200 hover:scale-[1.02]"
+                        class="stagger-up block origin-center transform transition-all duration-200 hover:scale-[1.02]"
+                        style="--i:{i}"
                     >
                         <CocCard variant="dark" contentClass="flex items-center gap-3 p-3">
                             <div

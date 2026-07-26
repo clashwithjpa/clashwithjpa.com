@@ -6,7 +6,6 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import {
         createAdminCwlClan,
         deleteAdminCwlClan,
@@ -79,9 +78,7 @@
         syncing = true;
         try {
             const resp = (await syncAdminCwlClanLeagues({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                | Awaited<ReturnType<typeof syncAdminCwlClanLeagues>>
-                | SyncAdminCwlClanLeagues401
-                | SyncAdminCwlClanLeagues500;
+                Awaited<ReturnType<typeof syncAdminCwlClanLeagues>> | SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
             if (resp.success) {
                 clans = resp.data.clans;
                 const { updated, unchanged, failed } = resp.data;
@@ -150,10 +147,7 @@
         removing = tag;
         try {
             const resp = (await deleteAdminCwlClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                | Awaited<ReturnType<typeof deleteAdminCwlClan>>
-                | DeleteAdminCwlClan401
-                | DeleteAdminCwlClan404
-                | DeleteAdminCwlClan500;
+                Awaited<ReturnType<typeof deleteAdminCwlClan>> | DeleteAdminCwlClan401 | DeleteAdminCwlClan404 | DeleteAdminCwlClan500;
             if (resp.success) {
                 clans = clans.filter((c) => c.cocClanTag !== tag);
                 toast.success("CWL clan removed");
@@ -172,7 +166,7 @@
 
 <Seo title="CWL Clans" description="Add or remove CWL clans" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4">
+<div class="flex size-full flex-col gap-4">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
             <h1 class="text-2xl font-bold">CWL Clans</h1>
@@ -226,8 +220,7 @@
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {#each filteredClans as clan (clan.cocClanTag)}
                 <div
-                    use:cardSlideIn
-                    class="@container flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
+                    class="stagger-children @container flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
                 >
                     <div class="flex min-w-0 gap-3">
                         <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />

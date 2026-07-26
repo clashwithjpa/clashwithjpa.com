@@ -1,6 +1,5 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
-    import { bounceDown, bounceUp } from "$lib/utils/animations";
 
     let {
         checked = $bindable(false),
@@ -13,22 +12,6 @@
         class?: string;
         onCheckedChange?: (checked: boolean) => void;
     } = $props();
-
-    let isPressed = false;
-
-    function handlePointerDown(e: Event) {
-        if (disabled) return;
-        isPressed = true;
-        bounceDown(e.currentTarget as Element);
-    }
-
-    function handlePointerUp(e: Event) {
-        if (disabled) return;
-        if (isPressed) {
-            isPressed = false;
-            bounceUp(e.currentTarget as Element);
-        }
-    }
 
     function toggle() {
         if (disabled) return;
@@ -44,11 +27,8 @@
     aria-checked={checked}
     {disabled}
     onclick={toggle}
-    onpointerdown={handlePointerDown}
-    onpointerup={handlePointerUp}
-    onpointerleave={handlePointerUp}
     class={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 shadow-xs transition-colors duration-200 ease-in-out outline-none disabled:cursor-not-allowed disabled:opacity-50!",
+        "press relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 shadow-xs outline-none disabled:cursor-not-allowed disabled:opacity-50!",
         checked ? "border-green-700/50 bg-green-900" : "border-red-700/50 bg-red-900",
         className,
     )}

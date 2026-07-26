@@ -12,7 +12,6 @@
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
     import { formatDateTime, formatRelativeTime } from "$lib/utils";
-    import { fadeIn } from "$lib/utils/animations";
     import {
         clearAcceptedJoinApplications,
         deleteJoinApplication,
@@ -42,7 +41,7 @@
     let applications = $state<Application[]>([]);
     let total = $state(0);
     let loading = $state(true);
-    let statusFilter = $state<string>("");
+    let statusFilter = $state<string>("pending");
     let processingId = $state<number | null>(null);
     let clearingAccepted = $state(false);
     // A single shared delete dialog is reused for every card so we don't mount
@@ -197,7 +196,7 @@
     </div>
 {/snippet}
 
-<div in:fadeIn class="flex size-full flex-col gap-4">
+<div class="flex size-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold">Join Applications</h1>

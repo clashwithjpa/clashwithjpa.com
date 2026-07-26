@@ -1,6 +1,5 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
-    import { bounceDown, bounceUp } from "$lib/utils/animations";
     import type { Snippet } from "svelte";
     import type { HTMLAttributes } from "svelte/elements";
     import Tooltip from "./Tooltip.svelte";
@@ -46,22 +45,6 @@
         type?: string;
     } & HTMLAttributes<HTMLElement> = $props();
 
-    let isPressed = false;
-
-    function handlePointerDown(e: Event) {
-        if (disabled) return;
-        isPressed = true;
-        if (animateClick) bounceDown(e.currentTarget as Element);
-    }
-
-    function handlePointerUp(e: Event) {
-        if (disabled) return;
-        if (isPressed) {
-            isPressed = false;
-            if (animateClick) bounceUp(e.currentTarget as Element);
-        }
-    }
-
     function handleClick(e: MouseEvent) {
         if (disabled) return;
         if (onclick) onclick(e);
@@ -90,6 +73,7 @@
                 "flex cursor-pointer items-center justify-center rounded-lg border-2 shadow-xs transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50!",
             variant && variantClasses[variant],
             variant && sizeClasses[size],
+            animateClick && "press",
             className,
         ),
     );
@@ -105,9 +89,6 @@
         {target}
         class={buttonClass}
         onclick={handleClick}
-        onpointerdown={handlePointerDown}
-        onpointerup={handlePointerUp}
-        onpointerleave={handlePointerUp}
         {...restProps}
     >
         {@render children()}

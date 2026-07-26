@@ -4,7 +4,6 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { formatDateTime, formatRelativeTime } from "$lib/utils";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { UAParser } from "ua-parser-js";
 
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
@@ -61,7 +60,7 @@
     const BrowserIcon = $derived(getBrowserIcon(ua.browser));
 </script>
 
-<div in:fadeIn use:cardSlideIn class="flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+<div class="stagger-children flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
     <div class="flex items-start justify-between gap-4">
         <div class="flex min-w-0 flex-col items-start justify-center gap-1">
             <div class="flex items-center gap-2">

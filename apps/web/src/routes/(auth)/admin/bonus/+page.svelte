@@ -15,7 +15,6 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import { loadGuildNicknames } from "$lib/discordNicknames";
-    import { fadeIn } from "$lib/utils/animations";
     import {
         assignCwlApplication,
         getBonusData,
@@ -379,7 +378,7 @@
 
 <Seo title="CWL Bonus" description="Assign CWL bonuses and review linked account stats." />
 
-<div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
+<div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-2 px-4 pt-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
             <h1 class="text-2xl font-bold">CWL Bonus</h1>

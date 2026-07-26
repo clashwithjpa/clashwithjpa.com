@@ -6,11 +6,12 @@
     interface Props {
         href?: string | null;
         class?: string;
+        style?: string;
         newTab?: boolean;
         onclick?: () => void;
         children: Snippet;
     }
-    let { href = null, class: className = "", newTab = false, onclick = () => {}, children }: Props = $props();
+    let { href = null, class: className = "", style = "", newTab = false, onclick = () => {}, children }: Props = $props();
 
     function getClass(pathname: string, href: string | null): string {
         const baseClass =
@@ -28,6 +29,7 @@
     {href}
     target={newTab ? "_blank" : ""}
     class={cn(getClass(page.url.pathname, href), "group flex items-center space-x-1 transition-all duration-200 ease-in-out", className)}
+    {style}
     {onclick}
     data-sveltekit-preload-data="hover"
 >

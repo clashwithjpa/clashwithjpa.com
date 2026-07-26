@@ -13,7 +13,6 @@
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { actionConfig, actorLabel, auditActionOptions, auditTargetOptions, describeAction, type AuditEntry } from "$lib/config/auditLog";
     import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
-    import { cardSlideIn, DURATION, fadeIn } from "$lib/utils/animations";
     import { getAuditLog, type GetAuditLogQueryParamsActionEnumKey, type GetAuditLogQueryParamsTargetTypeEnumKey } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { PreRendered } from "carta-md";
@@ -198,7 +197,7 @@
 
 <Seo title="Audit Log" description="View server actions audit log" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4">
+<div class="flex size-full flex-col gap-4">
     <div class="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between">
         <div>
             <h1 class="text-2xl font-bold">Audit Log</h1>
@@ -234,13 +233,11 @@
                     {@const ActionIcon = cfg.icon}
                     {@const hasMeta = !!entry.metadata && Object.keys(entry.metadata).length > 0}
                     <div
-                        in:fadeIn
-                        use:cardSlideIn
                         class="flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 hover:border-stone-700"
                     >
                         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                         <div
-                            class="flex flex-col gap-1.5 {hasMeta ? 'cursor-pointer' : ''}"
+                            class="stagger-children flex flex-col gap-1.5 {hasMeta ? 'cursor-pointer' : ''}"
                             role={hasMeta ? "button" : undefined}
                             tabindex={hasMeta ? 0 : undefined}
                             aria-expanded={hasMeta ? expanded[entry.id] : undefined}
@@ -302,7 +299,7 @@
                         </div>
 
                         {#if expanded[entry.id]}
-                            <div transition:slide={{ duration: DURATION.MEDIUM }}>
+                            <div transition:slide={{ duration: 200 }}>
                                 <div class="typography max-w-none! text-sm! **:mb-0!">
                                     <PreRendered html={renderedMetadata[entry.id]} />
                                 </div>

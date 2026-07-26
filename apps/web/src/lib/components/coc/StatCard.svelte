@@ -2,7 +2,6 @@
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import { cn } from "$lib/utils";
-    import { animate } from "animejs";
 
     let {
         value = null,
@@ -29,15 +28,19 @@
     $effect(() => {
         if (loading || value == null) return;
         const target = value;
-        const obj = { v: 0 };
-        const anim = animate(obj, {
-            v: target,
-            duration: 1600,
-            delay,
-            ease: "out(3)",
-            onUpdate: () => (display = obj.v),
-        });
-        return () => anim.pause();
+        const duration = 1600;
+        let frame = 0;
+        let start = 0;
+
+        const step = (now: number) => {
+            start ||= now + delay;
+            const t = Math.min(Math.max((now - start) / duration, 0), 1);
+            display = target * (1 - Math.pow(1 - t, 3));
+            if (t < 1) frame = requestAnimationFrame(step);
+        };
+
+        frame = requestAnimationFrame(step);
+        return () => cancelAnimationFrame(frame);
     });
 </script>
 

@@ -5,7 +5,6 @@
     import H1 from "$lib/components/ui/coc/H1.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { cn } from "$lib/utils";
-    import { fadeIn, fadeUp } from "$lib/utils/animations";
     import { LINKS } from "$lib/utils/links";
     import { PreRendered } from "carta-md";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -49,13 +48,6 @@
         els.forEach((el) => observer.observe(el));
         return () => observer.disconnect();
     });
-
-    $effect(() => {
-        fadeIn(document.querySelector(".page-title") as HTMLElement);
-        fadeUp(document.querySelector(".page-desc") as HTMLElement);
-        fadeIn(document.querySelector(".rules-aside") as HTMLElement);
-        fadeIn(document.querySelector(".rules-content") as HTMLElement);
-    });
 </script>
 
 <Seo
@@ -67,14 +59,16 @@
 
 <div class="container mx-auto flex min-h-screen flex-col gap-8">
     <div class="flex flex-col items-center gap-4 text-center">
-        <H1 class="page-title text-4xl opacity-0 md:text-6xl">JPA Rules</H1>
-        <p class="page-desc max-w-2xl font-coc text-lg text-stone-200 opacity-0 md:text-xl">
+        <H1 class="animate-in text-4xl duration-800 ease-glide fill-mode-both fade-in md:text-6xl">JPA Rules</H1>
+        <p
+            class="max-w-2xl animate-in font-coc text-lg text-stone-200 duration-200 ease-glide fill-mode-both fade-in slide-in-from-bottom md:text-xl"
+        >
             The shared playbook for our family of clans. Read it before applying, most strikes happen because someone skimmed.
         </p>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
-        <aside class="rules-aside flex flex-col gap-4 opacity-0 lg:sticky lg:top-28 lg:self-start">
+        <aside class="flex animate-in flex-col gap-4 duration-800 ease-glide fill-mode-both fade-in lg:sticky lg:top-28 lg:self-start">
             {#if data.sections.length}
                 <CocCard contentClass="flex flex-col gap-1 p-3">
                     <nav class="flex flex-col gap-1">
@@ -108,7 +102,7 @@
             </CocCard>
         </aside>
 
-        <main class="rules-content flex flex-col gap-4 opacity-0">
+        <main class="flex animate-in flex-col gap-4 duration-800 ease-glide fill-mode-both fade-in">
             {#if data.sections.length}
                 {#each data.sections as section (section.id)}
                     <section id={section.id} class="scroll-mt-28">

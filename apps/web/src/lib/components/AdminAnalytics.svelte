@@ -7,7 +7,6 @@
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import { actionConfig } from "$lib/config/auditLog";
     import type { Role } from "$lib/config/roles";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import {
         getAnalyticsAdminActivity,
         getAnalyticsAuditCategories,
@@ -221,12 +220,12 @@
 </script>
 
 {#if loading}
-    <div in:fadeIn class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
+    <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
         <SvgSpinnersRingResize />
         <span>Analytics</span>
     </div>
 {:else}
-    <div in:fadeIn class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="text-2xl font-bold">Analytics</h2>
             {#if seasonOptions.length > 0}
@@ -252,12 +251,12 @@
         {:else}
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {#if userJoinTrendOptions}
-                    <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                    <div class="stagger-children h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
                         <Chart options={userJoinTrendOptions} />
                     </div>
                 {/if}
                 {#if adminActivity && adminActivity.length > 0}
-                    <div use:cardSlideIn class="flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                    <div class="stagger-children flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
                         <h3 class="text-center text-sm font-bold text-stone-200">Top Admin Activity</h3>
                         <div class="edge-fade flex items-end justify-around gap-2 overflow-x-auto pt-2 sm:gap-4">
                             {#each adminActivity as actor (actor.actorId)}
@@ -330,7 +329,7 @@
                     </div>
                 {/if}
                 {#each charts as chart (chart.options.title?.text)}
-                    <div use:cardSlideIn class="h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    <div class="stagger-children h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
                         <Chart options={chart.options} />
                     </div>
                 {/each}

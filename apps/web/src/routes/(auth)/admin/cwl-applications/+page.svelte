@@ -20,7 +20,6 @@
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate, formatDateTime } from "$lib/utils";
-    import { fadeIn } from "$lib/utils/animations";
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,
@@ -587,7 +586,7 @@
 
 <Seo title="CWL Applications" description="Manage CWL applications and assign players to clans" />
 
-<div in:fadeIn class="relative flex size-full flex-col gap-4 overflow-hidden">
+<div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>

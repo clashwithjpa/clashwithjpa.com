@@ -6,7 +6,6 @@
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
     import { sidebarStore } from "$lib/components/ui/sidebar";
     import type { Role } from "$lib/config/roles";
-    import { fadeIn } from "$lib/utils/animations";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { storage } from "$lib/utils/storage.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
@@ -121,8 +120,6 @@
         };
     });
 
-    let navButtonsRef: HTMLElement | null = $state(null);
-
     let permittedLinks = $derived(
         links.filter(
             (link) => (!link.requiredPerm || data.permissions[link.requiredPerm]) && (!link.requiredFeature || data.features[link.requiredFeature]),
@@ -130,23 +127,22 @@
     );
 
     let groupedLinks = $derived.by(() => {
-        const groups: { category: string; links: typeof permittedLinks }[] = [];
+        const groups: { category: string; startIndex: number; links: typeof permittedLinks }[] = [];
         for (const link of permittedLinks) {
             const category = link.category ?? "";
             let group = groups.find((g) => g.category === category);
             if (!group) {
-                group = { category, links: [] };
+                group = { category, startIndex: 0, links: [] };
                 groups.push(group);
             }
             group.links.push(link);
         }
-        return groups;
-    });
-
-    $effect(() => {
-        if (navButtonsRef) {
-            fadeIn(navButtonsRef.querySelectorAll(".dash-nav-btn"));
+        let index = 0;
+        for (const group of groups) {
+            group.startIndex = index;
+            index += group.links.length;
         }
+        return groups;
     });
 </script>
 
@@ -166,7 +162,7 @@
 </Toaster>
 
 {#snippet button(link: any)}
-    <div in:fadeIn>
+    <div>
         <Button
             variant={null}
             href={link.href}
@@ -190,13 +186,13 @@
     >
         {#if isMobile}
             <div class="edge-fade w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4" bind:this={navButtonsRef}>
+                <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4">
                     {#each groupedLinks as group, i (group.category)}
                         {#if i > 0}
                             <div class="h-8 shrink-0 self-center border-l-2 border-stone-700/50"></div>
                         {/if}
-                        {#each group.links as link (link.href)}
-                            <div class="dash-nav-btn shrink-0">
+                        {#each group.links as link, j (link.href)}
+                            <div class="stagger-fade shrink-0" style="--i:{group.startIndex + j}">
                                 {@render button(link)}
                             </div>
                         {/each}
@@ -207,7 +203,6 @@
             <div
                 class="edge-fade flex min-h-0 w-full flex-1 flex-col justify-start gap-6 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 bind:clientWidth={sidebarWidth}
-                bind:this={navButtonsRef}
             >
                 {#each groupedLinks as group, i (group.category)}
                     <div class="flex flex-col gap-4">
@@ -223,8 +218,8 @@
                         {:else if i > 0}
                             <div class="mx-auto w-8 border-t-2 border-stone-700/50"></div>
                         {/if}
-                        {#each group.links as link (link.href)}
-                            <div class="dash-nav-btn">
+                        {#each group.links as link, j (link.href)}
+                            <div class="stagger-fade" style="--i:{group.startIndex + j}">
                                 {@render button(link)}
                             </div>
                         {/each}
@@ -259,10 +254,12 @@
 {#snippet ContentPanel()}
     <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
         {#if $session.data}
-            <div in:fadeIn class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
-                <div class={!noPaddingPaths.includes(page.url.pathname) ? "p-4" : "size-full"}>
-                    {@render children()}
-                </div>
+            <div class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
+                {#key page.url.pathname}
+                    <div class="page-enter {!noPaddingPaths.includes(page.url.pathname) ? 'p-4' : 'size-full'}">
+                        {@render children()}
+                    </div>
+                {/key}
             </div>
         {:else}
             <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">

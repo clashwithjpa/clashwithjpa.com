@@ -3,7 +3,6 @@
     import Popup from "$lib/components/ui/Popup.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import { storage } from "$lib/utils/storage.svelte";
-    import { animate } from "animejs";
     import { onDestroy } from "svelte";
     import TablerBrush from "~icons/tabler/brush";
     import TablerMoon from "~icons/tabler/moon";
@@ -24,6 +23,26 @@
     // Arm swing angles (deg). The arm hinges at a shoulder pivot right under the bear,
     const PAW = { hide: 130, reach: -32, bat: 24 };
 
+    const EASE = {
+        out3: "cubic-bezier(0.33, 1, 0.68, 1)",
+        out2: "cubic-bezier(0.5, 1, 0.89, 1)",
+        in2: "cubic-bezier(0.11, 0, 0.5, 0)",
+        inOut: "cubic-bezier(0.45, 0, 0.55, 1)",
+    };
+
+    const bearAt = (y: string, rotate = 0) => ({ transform: `translateY(${y}) rotate(${rotate}deg)` });
+    const pawAt = (rotate: number) => ({ transform: `rotate(${rotate}deg)` });
+
+    async function play(el: HTMLElement, keyframes: Keyframe[], options: KeyframeAnimationOptions) {
+        const anim = el.animate(keyframes, { fill: "forwards", ...options });
+        await anim.finished;
+        try {
+            anim.commitStyles();
+        } finally {
+            anim.cancel();
+        }
+    }
+
     function clearWatch() {
         if (watchTimer) {
             clearTimeout(watchTimer);
@@ -31,32 +50,25 @@
         }
     }
 
-    function retractBear(target: HTMLElement) {
+    async function retractBear(target: HTMLElement) {
         curse = false;
-        animate(target, {
-            translateY: BEAR.hidden,
-            rotate: 0,
-            duration: 260,
-            ease: "in(2)",
-            onComplete: () => {
-                busy = false;
-                mood = "calm";
-            },
-        });
+        await play(target, [bearAt(BEAR.hidden)], { duration: 260, easing: EASE.in2 });
+        busy = false;
+        mood = "calm";
     }
 
     function startWatch(target: HTMLElement) {
         busy = false;
-        animate(target, { translateY: BEAR.watch, rotate: 0, duration: 300, ease: "out(2)" });
+        void play(target, [bearAt(BEAR.watch)], { duration: 300, easing: EASE.out2 });
         clearWatch();
         watchTimer = setTimeout(() => {
             curse = false;
             mood = "calm";
-            animate(target, { translateY: BEAR.hidden, rotate: 0, duration: 320, ease: "in(2)" });
+            void play(target, [bearAt(BEAR.hidden)], { duration: 320, easing: EASE.in2 });
         }, 2800);
     }
 
-    function handleLightToggle(checked: boolean) {
+    async function handleLightToggle(checked: boolean) {
         if (!checked || busy || !bear || !paw) return;
         const bearEl = bear;
         const pawEl = paw;
@@ -69,45 +81,30 @@
         mood = angry ? "angry" : annoyed ? "annoyed" : "calm";
         curse = angry;
 
-        // 1) Bear pops its head up behind the switch.
-        animate(bearEl, {
-            translateY: angry ? BEAR.lean : BEAR.peek,
-            rotate: 0,
-            duration: 220,
-            ease: "out(3)",
-        });
+        const perch = angry ? BEAR.lean : BEAR.peek;
 
-        // 2) A beat later, the bear's arm swings down from its shoulder onto the knob.
-        animate(pawEl, {
-            keyframes: [
-                { rotate: PAW.hide, duration: 0 },
-                { rotate: PAW.reach, duration: 240, ease: "out(3)" },
-            ],
-            delay: 160,
-            onComplete: () => {
-                // 3) Contact — swat the knob so it slides off, then tuck the arm back up.
-                lightMode = false;
-                animate(pawEl, {
-                    keyframes: [
-                        { rotate: PAW.bat, duration: 140, ease: "inOut" },
-                        { rotate: PAW.hide, duration: 240, ease: "in(2)" },
-                    ],
-                    onComplete: () => {
-                        if (angry) {
-                            // Furious little head shake, then lurk and watch.
-                            animate(bearEl, {
-                                keyframes: [{ rotate: -5 }, { rotate: 6 }, { rotate: -4 }, { rotate: 0 }],
-                                duration: 320,
-                                ease: "inOut",
-                                onComplete: () => startWatch(bearEl),
-                            });
-                        } else {
-                            retractBear(bearEl);
-                        }
-                    },
+        try {
+            // Head pops up behind the switch, then the arm swings down onto the knob.
+            void play(bearEl, [bearAt(perch)], { duration: 220, easing: EASE.out3 });
+            await play(pawEl, [pawAt(PAW.hide), pawAt(PAW.reach)], { duration: 240, delay: 160, easing: EASE.out3 });
+
+            // Contact — swat the knob off, then tuck the arm back up.
+            lightMode = false;
+            await play(pawEl, [pawAt(PAW.bat)], { duration: 140, easing: EASE.inOut });
+            await play(pawEl, [pawAt(PAW.hide)], { duration: 240, easing: EASE.in2 });
+
+            if (angry) {
+                await play(bearEl, [bearAt(perch, -5), bearAt(perch, 6), bearAt(perch, -4), bearAt(perch, 0)], {
+                    duration: 320,
+                    easing: EASE.inOut,
                 });
-            },
-        });
+                startWatch(bearEl);
+            } else {
+                await retractBear(bearEl);
+            }
+        } catch {
+            busy = false;
+        }
     }
 
     onDestroy(clearWatch);

@@ -4,7 +4,6 @@
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import { cn } from "$lib/utils";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import type { GetCOCClan200, GetCOCClanCurrentWar200 } from "@repo/clashofclans-client";
     import { getCOCClan, getCOCClanCurrentWar } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -172,21 +171,21 @@
     contentClass="flex flex-col h-full"
 >
     {#if loading}
-        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fadeIn>
+        <div class="flex min-h-64 flex-1 animate-in items-center justify-center p-6 duration-800 ease-glide fill-mode-both fade-in">
             <div class="flex flex-col items-center gap-4">
                 <SvgSpinnersBlocksScale class="size-12 text-stone-700" />
                 <p class="font-coc text-lg font-bold text-stone-700">Loading war...</p>
             </div>
         </div>
     {:else if error || !warData}
-        <div class="flex min-h-64 flex-1 items-center justify-center p-6" in:fadeIn>
+        <div class="flex min-h-64 flex-1 animate-in items-center justify-center p-6 duration-800 ease-glide fill-mode-both fade-in">
             <div class="flex flex-col items-center gap-4 text-center">
                 <p class="font-coc text-xl font-bold text-red-700">Error Loading War</p>
                 <p class="font-coc text-sm text-stone-700">{error || "War data not found"}</p>
             </div>
         </div>
     {:else}
-        <div class="flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5" in:fadeIn use:cardSlideIn>
+        <div class="stagger-children flex min-h-64 flex-1 flex-col gap-4 overflow-hidden p-5">
             <div class="flex items-center gap-4">
                 {#if displayBadge}
                     <div
@@ -209,9 +208,9 @@
                             onclick={copyTagToClipboard}
                         >
                             {#if tagCopied}
-                                <span in:fadeIn>Copied!</span>
+                                <span class="animate-in duration-800 ease-glide fill-mode-both fade-in">Copied!</span>
                             {:else}
-                                <span in:fadeIn>{clanTag}</span>
+                                <span class="animate-in duration-800 ease-glide fill-mode-both fade-in">{clanTag}</span>
                             {/if}
                         </button>
                         {#if clanData?.clanLevel}

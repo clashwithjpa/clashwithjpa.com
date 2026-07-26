@@ -383,7 +383,7 @@
                         <div class="space-y-2">
                             {#each response.data.accounts as account (account.id)}
                                 <div class="rounded-lg bg-stone-800 px-3 py-2">
-                                    {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }, )}
+                                    {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
                                         <div class="flex items-center justify-between gap-2">
                                             <div class="flex min-w-0 items-center gap-2">
                                                 <SvgSpinnersBlocksScale class="size-10 shrink-0 text-stone-400" />

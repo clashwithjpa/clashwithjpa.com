@@ -6,7 +6,6 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
@@ -155,13 +154,13 @@
 
 <Seo title="Clan War League" description="Apply for Clan War League and manage your application." />
 
-<div in:fadeIn class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
+<div class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
     {#await Promise.all([setOptions(), setClanOptions()])}
         <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
             <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
         </div>
     {:then}
-        <div use:cardSlideIn class="flex size-full flex-col justify-center gap-8 lg:p-8">
+        <div class="stagger-children flex size-full flex-col justify-center gap-8 lg:p-8">
             <div class="flex flex-col gap-1">
                 <h1 class="text-4xl font-bold">Clan War League</h1>
                 <p class="text-sm text-stone-400">Apply to participate in Clan War League.</p>

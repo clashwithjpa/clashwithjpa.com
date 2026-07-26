@@ -47,13 +47,73 @@ All UI elements use Tailwind's **Stone** palette as the foundation.
 
 ## Animations & Transitions
 
+There is **no animation library**. Everything is CSS — keyframes in `routes/layout.css`, plus [`tw-animate-css`](https://github.com/Wombosvideo/tw-animate-css) utilities. Do not add one back.
+
+### Interactive states
+
 | Property   | Value                                                             |
 | :--------- | :---------------------------------------------------------------- |
 | Transition | `transition-all` (or `transition-colors`, `transition-transform`) |
 | Duration   | `duration-200`                                                    |
 | Easing     | `ease-in-out`                                                     |
 
-All interactive elements (hovers, focus states, popovers) must use `duration-200` for a snappy but smooth feel.
+All hovers, focus states and popovers use `duration-200` for a snappy but smooth feel.
+
+### Easings
+
+| Token             | Curve                            | Used by                    |
+| :---------------- | :------------------------------- | :------------------------- |
+| `ease-glide`      | `cubic-bezier(0.33, 1, 0.68, 1)` | Entrances, page transition |
+| `ease-glide-soft` | `cubic-bezier(0.25, 1, 0.5, 1)`  | Card and child stagger     |
+
+### Entrances
+
+| What                       | How                                                         |
+| :------------------------- | :---------------------------------------------------------- |
+| One element                | `animate-in fade-in duration-800 ease-glide fill-mode-both` |
+| List, indexed stagger      | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`         |
+| A container's own children | `.stagger-children` on the parent                           |
+
+- `.stagger-fade` fades over `800ms`, `.stagger-up` fades and rises `100%` over `200ms`; both step `150ms` per `--i`.
+- `.stagger-children` slides its **direct children** up `30px` from `scale(0.95)` over `200ms`, starting at `100ms` and stepping `80ms` (flat from the 8th child).
+- `fill-mode-both` is required — without it a delayed element flashes at full opacity before it starts.
+- Never ship an element that is invisible until JS runs (`opacity-0` + a script). The animation must be the thing that reveals it.
+
+### Named animations
+
+| Utility                | Purpose                      | Requires                                                      |
+| :--------------------- | :--------------------------- | :------------------------------------------------------------ |
+| `.page-enter`          | Page transition, `800ms`     | A `{#key}` on the routed content — see below                  |
+| `.press`               | Pointer squish + spring back | Built into `<Button />` via `animateClick`                    |
+| `.glide-char`          | Per-character heading rise   | Characters split in markup, parent clips, `--i` per character |
+| `animate-wavy-bounce`  | Logo pop-in, `900ms`         | —                                                             |
+| `animate-float-sprite` | Endless hover drift          | `--float-distance`, `--float-duration`, `--float-delay`       |
+| `animate-ring-draw`    | Draws an SVG ring stroke     | `[stroke-dasharray:<circumference>]`                          |
+| `animate-ring-empty`   | Erases it again              | Same, plus `onanimationend` to unmount                        |
+
+`.press` squishes to `0.95` in `100ms` and overshoots back to ~`1.05` on release via a back-out easing — no JS, and it supersedes `transition-colors` on the same element.
+
+### Page transitions
+
+The routed content is wrapped in `{#key page.url.pathname}` with `.page-enter` in `(auth)/+layout.svelte`. This is the **only** navigation animation — pages must not fade themselves in on mount.
+
+> [!NOTE]
+> The View Transitions API is deliberately unused. Its root snapshot cross-fades the whole document, sidebar included, which reads as a full-page blink. Keying on `pathname` also means query-param changes (filters, pagination) don't replay the animation.
+
+### Enter/exit of conditional blocks
+
+Use Svelte's built-in transitions (`transition:slide`, etc.) for `{#if}` blocks that open and close. Reserve the Web Animations API (`el.animate()`) for sequenced timelines that flip state mid-flight — nothing else needs JS.
+
+> [!WARNING]
+> **Never put a class animation on an element that also has a Svelte transition.**
+>
+> Svelte applies its transition as an *inline* `animation`, which wins while the transition runs. The moment it clears that inline style the class animation takes over and replays — so the element slides in correctly, then pops. Exits look fine because the inline style survives until unmount, which makes it read as an in/out mismatch.
+>
+> `animate-none` does not fix it: `.stagger-children > *:nth-child(n)` outranks it, and these rules are unlayered so they beat Tailwind utilities anyway. Restructure instead — move the stagger to an inner wrapper so the transitioning element is a plain sibling.
+
+### Reduced motion
+
+`.glide-char`, `.stagger-fade`, `.stagger-up`, `.stagger-children > *`, `.page-enter` and `.press` are all disabled under `prefers-reduced-motion: reduce`. Anything new that moves belongs in that block too.
 
 ---
 

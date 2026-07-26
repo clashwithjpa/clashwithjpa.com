@@ -1,6 +1,5 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
-    import { bounceDown, bounceUp } from "$lib/utils/animations";
     import type { Component } from "svelte";
     import TablerCheck from "~icons/tabler/check";
     import Icon from "./Icon.svelte";
@@ -51,20 +50,6 @@
     let baseClass = $derived(
         cn("flex w-fit shrink-0 items-center justify-center gap-1 rounded border", sizes[props.size ?? "base"], variantClass, props.class),
     );
-
-    let isPressed = false;
-
-    function handlePointerDown(e: Event) {
-        isPressed = true;
-        bounceDown(e.currentTarget as Element);
-    }
-
-    function handlePointerUp(e: Event) {
-        if (isPressed) {
-            isPressed = false;
-            bounceUp(e.currentTarget as Element);
-        }
-    }
 </script>
 
 {#snippet inner()}
@@ -96,14 +81,7 @@
 {/snippet}
 
 {#if isClickable}
-    <button
-        type="button"
-        onclick={props.onclick}
-        onpointerdown={handlePointerDown}
-        onpointerup={handlePointerUp}
-        onpointerleave={handlePointerUp}
-        class={cn(baseClass, "cursor-pointer transition-colors duration-200", hoverClass)}
-    >
+    <button type="button" onclick={props.onclick} class={cn(baseClass, "press cursor-pointer", hoverClass)}>
         {@render inner()}
     </button>
 {:else}

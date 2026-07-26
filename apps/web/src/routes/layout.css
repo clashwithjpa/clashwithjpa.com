@@ -9,6 +9,16 @@
     --font-mono: "JetBrains Mono", monospace;
 }
 
+@theme {
+    --ease-glide: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-glide-soft: cubic-bezier(0.25, 1, 0.5, 1);
+
+    --animate-wavy-bounce: wavy-bounce 900ms var(--ease-glide-soft) both;
+    --animate-float-sprite: float-sprite var(--float-duration, 4s) ease-in-out var(--float-delay, 0s) infinite alternate;
+    --animate-ring-draw: ring-draw 800ms var(--ease-glide) both;
+    --animate-ring-empty: ring-empty 800ms var(--ease-glide) both;
+}
+
 @font-face {
     font-family: "COC";
     font-style: normal;
@@ -154,6 +164,167 @@ body {
     }
     to {
         --fade-b: 0;
+    }
+}
+
+.press {
+    transition-property: transform, color, background-color, border-color, box-shadow;
+    transition-duration: 300ms, 200ms, 200ms, 200ms, 200ms;
+    transition-timing-function: cubic-bezier(0.25, 1.5, 0.5, 3), ease, ease, ease, ease;
+}
+
+.press:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(0.95);
+    transition-duration: 100ms, 200ms, 200ms, 200ms, 200ms;
+    transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1), ease, ease, ease, ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .press:active:not(:disabled, [aria-disabled="true"]) {
+        transform: none;
+    }
+}
+
+@keyframes enter-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes enter-up {
+    from {
+        opacity: 0;
+        translate: 0 100%;
+    }
+}
+
+@keyframes enter-card {
+    from {
+        opacity: 0;
+        translate: 0 30px;
+        scale: 0.95;
+    }
+}
+
+@keyframes glide-char {
+    from {
+        translate: 0 100%;
+    }
+}
+
+.glide-char {
+    animation: glide-char 800ms var(--ease-glide) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* Set --i to the item's index in the list. */
+.stagger-fade {
+    animation: enter-fade 800ms var(--ease-glide) both;
+    animation-delay: calc(var(--i, 0) * 150ms);
+}
+
+.stagger-up {
+    animation: enter-up 200ms var(--ease-glide) both;
+    animation-delay: calc(var(--i, 0) * 150ms);
+}
+
+.stagger-children > * {
+    animation: enter-card 200ms var(--ease-glide-soft) both;
+    animation-delay: 100ms;
+}
+.stagger-children > *:nth-child(2) {
+    animation-delay: 180ms;
+}
+.stagger-children > *:nth-child(3) {
+    animation-delay: 260ms;
+}
+.stagger-children > *:nth-child(4) {
+    animation-delay: 340ms;
+}
+.stagger-children > *:nth-child(5) {
+    animation-delay: 420ms;
+}
+.stagger-children > *:nth-child(6) {
+    animation-delay: 500ms;
+}
+.stagger-children > *:nth-child(7) {
+    animation-delay: 580ms;
+}
+.stagger-children > *:nth-child(n + 8) {
+    animation-delay: 660ms;
+}
+
+@keyframes wavy-bounce {
+    0% {
+        scale: 0;
+        rotate: 0deg;
+    }
+    44% {
+        scale: 1.15;
+        rotate: -5deg;
+    }
+    67% {
+        scale: 0.95;
+        rotate: 3deg;
+    }
+    83% {
+        scale: 1.05;
+        rotate: -2deg;
+    }
+    100% {
+        scale: 1;
+        rotate: 0deg;
+    }
+}
+
+@keyframes float-sprite {
+    to {
+        translate: 0 calc(-1 * var(--float-distance, 20px));
+        rotate: 3deg;
+    }
+}
+
+/* Impersonation ring: circumference of the r=27 circle is 2πr ≈ 169.65. */
+@keyframes ring-draw {
+    from {
+        stroke-dashoffset: 169.65;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes ring-empty {
+    from {
+        stroke-dashoffset: 0;
+    }
+    to {
+        stroke-dashoffset: 169.65;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glide-char,
+    .stagger-fade,
+    .stagger-up,
+    .stagger-children > * {
+        animation: none;
+    }
+}
+
+@keyframes page-enter {
+    from {
+        opacity: 0;
+    }
+}
+
+.page-enter {
+    animation: page-enter 800ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-enter {
+        animation: none;
     }
 }
 

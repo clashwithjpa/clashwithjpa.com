@@ -7,7 +7,6 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
-    import { cardSlideIn, fadeIn } from "$lib/utils/animations";
     import {
         createAdminClan,
         deleteAdminClan,
@@ -346,10 +345,7 @@
         removing = clan.id;
         try {
             const resp = (await deleteAdminClan(clan.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                | Awaited<ReturnType<typeof deleteAdminClan>>
-                | DeleteAdminClan401
-                | DeleteAdminClan404
-                | DeleteAdminClan500;
+                Awaited<ReturnType<typeof deleteAdminClan>> | DeleteAdminClan401 | DeleteAdminClan404 | DeleteAdminClan500;
             if (resp.success) {
                 clans = clans.filter((c) => c.id !== clan.id);
                 toast.success("Clan removed");
@@ -368,7 +364,7 @@
 
 <Seo title="Clans" description="Manage JPA clans" />
 
-<div in:fadeIn class="flex size-full flex-col gap-4">
+<div class="flex size-full flex-col gap-4">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
             <h1 class="text-2xl font-bold">Clans</h1>
@@ -407,8 +403,7 @@
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {#each filteredClans as clan (clan.id)}
                 <div
-                    use:cardSlideIn
-                    class="@container flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 ease-in-out"
+                    class="stagger-children @container flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 ease-in-out"
                 >
                     <div class="flex min-w-0 items-center gap-3">
                         <div
