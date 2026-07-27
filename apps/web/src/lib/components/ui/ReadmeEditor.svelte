@@ -140,7 +140,43 @@
         }
     });
 
-    let typingTimeout: ReturnType<typeof setTimeout>;
+    let previewScroller: HTMLElement | null = null;
+    let scrollLock: "editor" | "preview" | null = null;
+    let scrollFrame = 0;
+
+    function syncScroll(from: HTMLElement, to: HTMLElement, source: "editor" | "preview") {
+        if (scrollLock && scrollLock !== source) return;
+        scrollLock = source;
+        if (scrollFrame) return;
+
+        scrollFrame = requestAnimationFrame(() => {
+            scrollFrame = 0;
+            const fromMax = from.scrollHeight - from.clientHeight;
+            const toMax = to.scrollHeight - to.clientHeight;
+            if (fromMax > 0 && toMax > 0) {
+                const target = Math.round((from.scrollTop / fromMax) * toMax);
+                if (target !== Math.round(to.scrollTop)) to.scrollTop = target;
+            }
+            // Release only after the echoed scroll event on `to` has been dispatched
+            requestAnimationFrame(() => {
+                if (scrollLock === source) scrollLock = null;
+            });
+        });
+    }
+
+    function attachPreviewScroll(node: HTMLDivElement) {
+        previewScroller = node;
+        const onScroll = () => {
+            if (editor) syncScroll(node, editor.scrollDOM, "preview");
+        };
+        node.addEventListener("scroll", onScroll, { passive: true });
+        return {
+            destroy() {
+                node.removeEventListener("scroll", onScroll);
+                previewScroller = null;
+            },
+        };
+    }
 
     function createEditorState() {
         return EditorState.create({
@@ -220,20 +256,14 @@
                         value = update.state.doc.toString();
                         hasChanges = true;
                     }
-
-                    if (update.docChanged || update.selectionSet) {
-                        update.view.dom.classList.add("cursor-typing");
-                        clearTimeout(typingTimeout);
-                        typingTimeout = setTimeout(() => {
-                            update.view.dom.classList.remove("cursor-typing");
-                        }, 500);
-                    }
                 }),
             ],
         });
     }
 
     function attachEditor(node: HTMLDivElement) {
+        let detachScroll: (() => void) | undefined;
+
         if (!editorRef) {
             editorRef = node;
 
@@ -241,9 +271,17 @@
                 state: createEditorState(),
                 parent: editorRef,
             });
+
+            const scroller = editor.scrollDOM;
+            const onScroll = () => {
+                if (previewScroller) syncScroll(scroller, previewScroller, "editor");
+            };
+            scroller.addEventListener("scroll", onScroll, { passive: true });
+            detachScroll = () => scroller.removeEventListener("scroll", onScroll);
         }
         return {
             destroy() {
+                detachScroll?.();
                 editor?.destroy();
                 editorRef = undefined as any;
             },
@@ -410,7 +448,7 @@
             </Splitter.ResizeTrigger>
 
             <Splitter.Panel id="preview" class="flex size-full overflow-hidden bg-stone-950">
-                <div class="size-full overflow-y-auto p-4">
+                <div use:attachPreviewScroll class="size-full overflow-y-auto p-4">
                     <div class="typography rules max-w-none!">
                         <PreRendered html={previewHtml} />
                     </div>
@@ -472,28 +510,7 @@
         overflow: auto;
     }
 
-    :global(.cm-cursorLayer) {
-        animation: cm-blink-pulse 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite !important;
-    }
-
-    :global(.cm-editor.cursor-typing .cm-cursorLayer) {
-        animation: none !important;
-    }
-
-    @keyframes -global-cm-blink-pulse {
-        0%,
-        100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0;
-        }
-    }
-
     :global(.cm-cursor) {
-        transition:
-            left 80ms ease-out,
-            top 80ms ease-out !important;
         border-left-width: 2px !important;
     }
 
