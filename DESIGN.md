@@ -68,16 +68,36 @@ All hovers, focus states and popovers use `duration-200` for a snappy but smooth
 
 ### Entrances
 
-| What                       | How                                                         |
-| :------------------------- | :---------------------------------------------------------- |
-| One element                | `animate-in fade-in duration-800 ease-glide fill-mode-both` |
-| List, indexed stagger      | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`         |
-| A container's own children | `.stagger-children` on the parent                           |
+| What                     | How                                                         |
+| :----------------------- | :---------------------------------------------------------- |
+| One element              | `animate-in fade-in duration-800 ease-glide fill-mode-both` |
+| List, indexed stagger    | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`         |
+| A card, grid or list     | `.stagger-card` on each card + `style="--i:{i}"`            |
+| A single panel's insides | `.stagger-children` on the parent — never on a repeated card |
 
-- `.stagger-fade` fades over `800ms`, `.stagger-up` fades and rises `100%` over `200ms`; both step `150ms` per `--i`.
+- `.stagger-fade` fades and slides in `8px` from the left over `200ms`, stepping `30ms` per `--i` and capping at the 9th item. `.stagger-up` fades and rises `100%` over `200ms`, stepping `150ms` per `--i`.
+- Index a stagger by the **group**, not the flat item, wherever the list is visually grouped — the `(auth)` sidebar passes the category index, so a heading, its divider and its links arrive as one band instead of trickling down the rail.
+- `.stagger-card` fades and rises `12px` over `200ms`, stepping `40ms` per `--i` and capping at the 11th card so long lists don't trickle in. Omit `--i` for a standalone card and it enters immediately.
 - `.stagger-children` slides its **direct children** up `30px` from `scale(0.95)` over `200ms`, starting at `100ms` and stepping `80ms` (flat from the 8th child).
 - `fill-mode-both` is required — without it a delayed element flashes at full opacity before it starts.
 - Never ship an element that is invisible until JS runs (`opacity-0` + a script). The animation must be the thing that reveals it.
+
+> [!IMPORTANT]
+> **A repeated card animates as one piece.** Anything rendered once per row of an `{#each}` gets `.stagger-card` with the loop index, so the sequence runs across the collection. Never `.stagger-children` there — every heading, badge and button arrives separately, and it fires inside every card at once, which reads as noise.
+>
+> `.stagger-children` is for a **one-off** container whose interior unpacking is the effect: the CoC game panels (`ClanCard`, `WarCard`) and single-column page panels like `(auth)/dashboard/cwl`.
+
+Own the entrance at the **page**, not inside a shared card component. A card component that animates itself drags that entrance into every context it's reused in. Leave the component plain and let the list that renders it wrap each item:
+
+```svelte
+{#each items as item, i (item.id)}
+    <div class="stagger-card" style="--i:{i}">
+        <ItemCard {item} />
+    </div>
+{/each}
+```
+
+A wrapper becomes the grid item, so give the card `h-full` if its contents rely on stretching (`mt-auto` footers, equal-height rows).
 
 ### Named animations
 
@@ -113,7 +133,7 @@ Use Svelte's built-in transitions (`transition:slide`, etc.) for `{#if}` blocks 
 
 ### Reduced motion
 
-`.glide-char`, `.stagger-fade`, `.stagger-up`, `.stagger-children > *`, `.page-enter` and `.press` are all disabled under `prefers-reduced-motion: reduce`. Anything new that moves belongs in that block too.
+`.glide-char`, `.stagger-fade`, `.stagger-up`, `.stagger-card`, `.stagger-children > *`, `.page-enter` and `.press` are all disabled under `prefers-reduced-motion: reduce`. Anything new that moves belongs in that block too.
 
 ---
 

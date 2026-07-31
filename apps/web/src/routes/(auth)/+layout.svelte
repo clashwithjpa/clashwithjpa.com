@@ -127,20 +127,15 @@
     );
 
     let groupedLinks = $derived.by(() => {
-        const groups: { category: string; startIndex: number; links: typeof permittedLinks }[] = [];
+        const groups: { category: string; links: typeof permittedLinks }[] = [];
         for (const link of permittedLinks) {
             const category = link.category ?? "";
             let group = groups.find((g) => g.category === category);
             if (!group) {
-                group = { category, startIndex: 0, links: [] };
+                group = { category, links: [] };
                 groups.push(group);
             }
             group.links.push(link);
-        }
-        let index = 0;
-        for (const group of groups) {
-            group.startIndex = index;
-            index += group.links.length;
         }
         return groups;
     });
@@ -189,10 +184,10 @@
                 <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4">
                     {#each groupedLinks as group, i (group.category)}
                         {#if i > 0}
-                            <div class="h-8 shrink-0 self-center border-l-2 border-stone-700/50"></div>
+                            <div class="stagger-fade h-8 shrink-0 self-center border-l-2 border-stone-700/50" style="--i:{i}"></div>
                         {/if}
-                        {#each group.links as link, j (link.href)}
-                            <div class="stagger-fade shrink-0" style="--i:{group.startIndex + j}">
+                        {#each group.links as link (link.href)}
+                            <div class="stagger-fade shrink-0" style="--i:{i}">
                                 {@render button(link)}
                             </div>
                         {/each}
@@ -205,7 +200,7 @@
                 bind:clientWidth={sidebarWidth}
             >
                 {#each groupedLinks as group, i (group.category)}
-                    <div class="flex flex-col gap-4">
+                    <div class="stagger-fade flex flex-col gap-4" style="--i:{i}">
                         {#if isSidebarExpanded}
                             {#if group.category}
                                 <div class="flex items-center gap-2 px-4">
@@ -218,10 +213,8 @@
                         {:else if i > 0}
                             <div class="mx-auto w-8 border-t-2 border-stone-700/50"></div>
                         {/if}
-                        {#each group.links as link, j (link.href)}
-                            <div class="stagger-fade" style="--i:{group.startIndex + j}">
-                                {@render button(link)}
-                            </div>
+                        {#each group.links as link (link.href)}
+                            {@render button(link)}
                         {/each}
                     </div>
                 {/each}

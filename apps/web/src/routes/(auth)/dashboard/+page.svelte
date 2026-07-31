@@ -203,7 +203,7 @@
             <br />
             {#if accounts.length === 0}
                 <div
-                    class="stagger-children flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
+                    class="stagger-card flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
                 >
                     {#if importDismissed}
                         <div class="rounded-full bg-stone-800 p-3">
@@ -251,16 +251,17 @@
                 </div>
             {:else}
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                    {#each accounts as account (account.id)}
+                    {#each accounts as account, i (account.id)}
                         <div
-                            class="flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
+                            class="stagger-card flex min-h-20 w-full flex-col items-stretch justify-between gap-2 overflow-hidden rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2"
+                            style="--i:{i}"
                         >
                             <div class="flex w-full grow items-center justify-center">
                                 {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
                                     <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
                                 {:then acc}
                                     {#if !acc.success}
-                                        <div class="stagger-children flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                        <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <TablerX class="size-16 text-stone-400" />
                                             <div class="flex flex-col items-start justify-center gap-1">
                                                 <span class="text-lg font-semibold">Error fetching player</span>
@@ -268,7 +269,7 @@
                                             </div>
                                         </div>
                                     {:else}
-                                        <div class="stagger-children flex size-full min-w-0 flex-col items-start justify-start gap-2">
+                                        <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
                                                 <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
                                                     <Icon name="th/{acc.data.player.townHallLevel}" class="size-16 shrink-0" />
@@ -341,8 +342,11 @@
             {@const currentApplications = resp.data.applications.filter((application) => application.seasonId === resp.data.currentSeasonId)}
             {#if cwlEnabled || currentApplications.length > 0}
                 <div>
-                    {#snippet applicationCard(application: CwlApplication)}
-                        <div class="stagger-children flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    {#snippet applicationCard(application: CwlApplication, i: number)}
+                        <div
+                            class="stagger-card flex min-h-40 min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
+                            style="--i:{i}"
+                        >
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex min-w-0 flex-col items-start justify-center gap-1">
                                     <Tooltip title={application.cocAccountName} placement="top" class="w-full text-left">
@@ -429,7 +433,7 @@
                     {#if currentApplications.length === 0}
                         {@const hasActiveSeason = resp.data.currentSeasonId != null}
                         <div
-                            class="stagger-children flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
+                            class="stagger-card flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-stone-700/50 bg-stone-900/50 px-6 py-10 text-center"
                         >
                             <div class="rounded-full bg-stone-800 p-3">
                                 <TablerSwords class="size-7 text-stone-300" />
@@ -460,8 +464,8 @@
                         </div>
                     {:else}
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {#each currentApplications as application (application.id)}
-                                {@render applicationCard(application)}
+                            {#each currentApplications as application, i (application.id)}
+                                {@render applicationCard(application, i)}
                             {/each}
                         </div>
                     {/if}

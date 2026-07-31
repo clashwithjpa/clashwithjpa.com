@@ -228,16 +228,17 @@
             </div>
         {:else}
             <div class="flex flex-col gap-2">
-                {#each entries as entry (entry.id)}
+                {#each entries as entry, i (entry.id)}
                     {@const cfg = actionConfig(entry.action)}
                     {@const ActionIcon = cfg.icon}
                     {@const hasMeta = !!entry.metadata && Object.keys(entry.metadata).length > 0}
                     <div
-                        class="flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 hover:border-stone-700"
+                        class="stagger-card flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 hover:border-stone-700"
+                        style="--i:{i}"
                     >
                         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                         <div
-                            class="stagger-children flex flex-col gap-1.5 {hasMeta ? 'cursor-pointer' : ''}"
+                            class="flex flex-col gap-1.5 {hasMeta ? 'cursor-pointer' : ''}"
                             role={hasMeta ? "button" : undefined}
                             tabindex={hasMeta ? 0 : undefined}
                             aria-expanded={hasMeta ? expanded[entry.id] : undefined}

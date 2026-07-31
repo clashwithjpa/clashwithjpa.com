@@ -218,9 +218,9 @@
                 >
                     <Button variant="danger" class="shrink-0 gap-1" disabled={clearingAccepted}>
                         {#if clearingAccepted}
-                            <SvgSpinnersRingResize class="size-4" />
+                            <SvgSpinnersRingResize class="size-5" />
                         {:else}
-                            <TablerTrash class="size-4" />
+                            <TablerTrash class="size-5" />
                         {/if}
                         Clear accepted
                     </Button>
@@ -241,7 +241,7 @@
             </div>
         {:else}
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {#each applications as app (app.id)}
+                {#each applications as app, i (app.id)}
                     {@const p = getPlayer(app)}
                     {@const stats = [
                         { icon: TablerTrophy, label: "Trophies", value: p.trophies != null ? p.trophies.toLocaleString() : "—" },
@@ -252,7 +252,8 @@
                     <!-- content-visibility skips layout/paint (and pauses animations) for
                          off-screen cards, so scrolling stays smooth as the list grows. -->
                     <div
-                        class="flex h-full min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 [contain-intrinsic-size:auto_360px] [content-visibility:auto]"
+                        class="stagger-card flex h-full min-w-0 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 [contain-intrinsic-size:auto_360px] [content-visibility:auto]"
+                        style="--i:{i}"
                     >
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex min-w-0 items-start gap-3">
@@ -276,9 +277,9 @@
                                         onclick={() => requestDelete(app)}
                                     >
                                         {#if processingId === app.id}
-                                            <SvgSpinnersRingResize class="size-4" />
+                                            <SvgSpinnersRingResize />
                                         {:else}
-                                            <TablerTrash class="size-4" />
+                                            <TablerTrash />
                                         {/if}
                                     </Button>
                                 {/if}
@@ -288,12 +289,12 @@
                         <div class="flex flex-wrap gap-1">
                             {#if p.clan}
                                 <Tooltip title="Clan: {p.clan}" placement="top">
-                                    <Badge variant="blue" content={p.clan} icon={p.clanBadge} iconSize="size-4" />
+                                    <Badge variant="blue" content={p.clan} icon={p.clanBadge} iconSize="size-5" />
                                 </Tooltip>
                             {/if}
                             {#if p.league}
                                 <Tooltip title="League: {p.league}" placement="top">
-                                    <Badge variant="ghost" content={p.league} icon={p.leagueIcon} iconSize="size-4" />
+                                    <Badge variant="ghost" content={p.league} icon={p.leagueIcon} iconSize="size-5" />
                                 </Tooltip>
                             {/if}
                             {#if p.builderHall != null}
@@ -342,7 +343,7 @@
                                 target="_blank"
                                 class="w-full gap-2"
                             >
-                                <TablerExternalLink class="size-4" /> CC Info
+                                <TablerExternalLink class="size-5" /> CC Info
                             </Button>
                             {#if app.status === "pending"}
                                 <div class="flex gap-2">
@@ -352,7 +353,7 @@
                                         disabled={processingId === app.id}
                                         onclick={() => updateStatus(app.id, "accepted")}
                                     >
-                                        <TablerCheck class="size-4" /> Accept
+                                        <TablerCheck class="size-5" /> Accept
                                     </Button>
                                     <Button
                                         variant="danger"
@@ -360,7 +361,7 @@
                                         disabled={processingId === app.id}
                                         onclick={() => updateStatus(app.id, "rejected")}
                                     >
-                                        <TablerX class="size-4" /> Reject
+                                        <TablerX class="size-5" /> Reject
                                     </Button>
                                 </div>
                             {:else}

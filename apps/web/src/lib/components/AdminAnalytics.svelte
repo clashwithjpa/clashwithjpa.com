@@ -251,12 +251,15 @@
         {:else}
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {#if userJoinTrendOptions}
-                    <div class="stagger-children h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                    <div class="stagger-card h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2" style="--i:0">
                         <Chart options={userJoinTrendOptions} />
                     </div>
                 {/if}
                 {#if adminActivity && adminActivity.length > 0}
-                    <div class="stagger-children flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2">
+                    <div
+                        class="stagger-card flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2"
+                        style="--i:1"
+                    >
                         <h3 class="text-center text-sm font-bold text-stone-200">Top Admin Activity</h3>
                         <div class="edge-fade flex items-end justify-around gap-2 overflow-x-auto pt-2 sm:gap-4">
                             {#each adminActivity as actor (actor.actorId)}
@@ -328,8 +331,9 @@
                         </div>
                     </div>
                 {/if}
-                {#each charts as chart (chart.options.title?.text)}
-                    <div class="stagger-children h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                {#each charts as chart, i (chart.options.title?.text)}
+                    <!-- Offset by the two optional panels above so the sequence keeps running. -->
+                    <div class="stagger-card h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4" style="--i:{i + 2}">
                         <Chart options={chart.options} />
                     </div>
                 {/each}

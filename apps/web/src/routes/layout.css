@@ -188,6 +188,7 @@ body {
 @keyframes enter-fade {
     from {
         opacity: 0;
+        translate: -8px 0;
     }
 }
 
@@ -199,6 +200,13 @@ body {
 }
 
 @keyframes enter-card {
+    from {
+        opacity: 0;
+        translate: 0 12px;
+    }
+}
+
+@keyframes enter-child {
     from {
         opacity: 0;
         translate: 0 30px;
@@ -217,10 +225,10 @@ body {
     animation-delay: calc(var(--i, 0) * 50ms);
 }
 
-/* Set --i to the item's index in the list. */
+/* Set --i to the item's index in the list. Delay is capped so long lists don't trickle in. */
 .stagger-fade {
-    animation: enter-fade 800ms var(--ease-glide) both;
-    animation-delay: calc(var(--i, 0) * 150ms);
+    animation: enter-fade 200ms var(--ease-glide-soft) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 30ms);
 }
 
 .stagger-up {
@@ -228,8 +236,15 @@ body {
     animation-delay: calc(var(--i, 0) * 150ms);
 }
 
-.stagger-children > * {
+/* Cards arrive as one piece. Delay is capped so long lists don't trickle in. */
+.stagger-card {
     animation: enter-card 200ms var(--ease-glide-soft) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 40ms);
+}
+
+/* Reveals a card's contents one by one. */
+.stagger-children > * {
+    animation: enter-child 200ms var(--ease-glide-soft) both;
     animation-delay: 100ms;
 }
 .stagger-children > *:nth-child(2) {
@@ -307,6 +322,7 @@ body {
     .glide-char,
     .stagger-fade,
     .stagger-up,
+    .stagger-card,
     .stagger-children > * {
         animation: none;
     }

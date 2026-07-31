@@ -4,8 +4,8 @@
     import Icon from "$lib/components/ui/Icon.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { ICellRendererParams } from "ag-grid-community";
-    import TablerWorld from "~icons/tabler/world";
     import TablerEye from "~icons/tabler/eye";
+    import TablerWorld from "~icons/tabler/world";
 
     let { params }: { params: ICellRendererParams } = $props();
     let account = $derived(params.data || null);
@@ -32,7 +32,7 @@
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="ml-auto" onmousedown={(e) => e.stopPropagation()}>
             <Button size="icon" variant="ghost" tooltip="View account details" tooltipPlacement="top" onclick={openDetails}>
-                <TablerEye class="size-5" />
+                <TablerEye />
             </Button>
         </div>
     </div>

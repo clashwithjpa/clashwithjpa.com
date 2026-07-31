@@ -35,8 +35,10 @@
             </div>
         {:else}
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {#each resp.data as s (s.id)}
-                    <SessionCard sessionData={s} currentSessionId={$session.data?.session?.id} onRevoke={invalidateSession} />
+                {#each resp.data as s, i (s.id)}
+                    <div class="stagger-card" style="--i:{i}">
+                        <SessionCard sessionData={s} currentSessionId={$session.data?.session?.id} onRevoke={invalidateSession} />
+                    </div>
                 {/each}
             </div>
         {/if}

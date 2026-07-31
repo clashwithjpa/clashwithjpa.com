@@ -827,9 +827,9 @@
                                 )}
                         >
                             {#if copied["notInSheet"]}
-                                <TablerCheck class="size-4" />
+                                <TablerCheck />
                             {:else}
-                                <TablerCopy class="size-4" />
+                                <TablerCopy />
                             {/if}
                         </Button>
                     {/if}
@@ -865,9 +865,9 @@
                                 )}
                         >
                             {#if copied["notLinked"]}
-                                <TablerCheck class="size-4" />
+                                <TablerCheck />
                             {:else}
-                                <TablerCopy class="size-4" />
+                                <TablerCopy />
                             {/if}
                         </Button>
                     {/if}
@@ -965,9 +965,9 @@
                                 )}
                         >
                             {#if copied["notInFwa"]}
-                                <TablerCheck class="size-4" />
+                                <TablerCheck />
                             {:else}
-                                <TablerCopy class="size-4" />
+                                <TablerCopy />
                             {/if}
                         </Button>
                     {/if}

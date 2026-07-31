@@ -4,6 +4,7 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
+    import Icon from "$lib/components/ui/Icon.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
@@ -36,16 +37,24 @@
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
-    import TablerCards from "~icons/tabler/cards";
     import TablerFlag from "~icons/tabler/flag";
-    import TablerGift from "~icons/tabler/gift";
     import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
-    import TablerSwords from "~icons/tabler/swords";
     import TablerTrash from "~icons/tabler/trash";
     import TablerX from "~icons/tabler/x";
 
     type Clan = GetAdminClans200["data"]["clans"][number];
+
+    const nf = new Intl.NumberFormat("en-US");
+
+    // The three joining requirements, in the order the game itself lists them.
+    function requirementsOf(clan: Clan) {
+        return [
+            { icon: "labels/attacks", label: "Attacks", value: clan.attacksRequirement },
+            { icon: "labels/donations", label: "Donations", value: clan.donationsRequirement },
+            { icon: "labels/clangames", label: "Clan games", value: clan.clangamesRequirement },
+        ];
+    }
 
     let clans = $state<Clan[]>([]);
     let loading = $state(true);
@@ -375,11 +384,8 @@
                 {#if clans.length > 0}
                     <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-0 flex-1 sm:w-72 sm:flex-none" />
                 {/if}
-                <Button onclick={openAdd} class="shrink-0">
-                    <span class="flex items-center gap-2">
-                        <TablerPlus class="size-5 shrink-0 lg:size-4" />
-                        <span class="hidden sm:inline">Add Clan</span>
-                    </span>
+                <Button onclick={openAdd} class="shrink-0" tooltip="Add a new clan" tooltipPlacement="bottom">
+                    <TablerPlus class="size-5 shrink-0" />
                 </Button>
             </div>
         {/if}
@@ -400,14 +406,13 @@
             <p class="text-sm">No clans match your search.</p>
         </div>
     {:else}
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {#each filteredClans as clan (clan.id)}
-                <div
-                    class="stagger-children @container flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 ease-in-out"
-                >
-                    <div class="flex min-w-0 items-center gap-3">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            {#each filteredClans as clan, i (clan.id)}
+                <div class="stagger-card flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4" style="--i:{i}">
+                    <div class="flex min-w-0 items-center gap-4">
+                        <!-- The clan code is how managers refer to each clan day to day, so it anchors the card. -->
                         <div
-                            class="flex size-11 shrink-0 items-center justify-center rounded-lg border-2 border-stone-700/50 bg-stone-950 px-1"
+                            class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 border-stone-700/50 bg-stone-950 px-1"
                             title="Clan code"
                         >
                             <span class="truncate text-sm font-bold text-stone-200">{clan.cocClanCode}</span>
@@ -416,39 +421,45 @@
                             <h3 class="truncate font-semibold text-stone-50">{clan.cocClanName ?? "Unnamed clan"}</h3>
                             <p class="truncate font-mono text-xs text-stone-400">{clan.cocClanTag}</p>
                         </div>
-                        <Badge variant="ghost" content={`Lvl ${clan.cocClanLevel ?? "–"}`} class="shrink-0" />
+                        {#if clan.cocClanLevel === null}
+                            <Badge variant="ghost" content="No level" class="shrink-0" />
+                        {:else}
+                            <Badge variant="yellow" content={`Lv ${clan.cocClanLevel}`} class="shrink-0" />
+                        {/if}
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <Badge variant="blue" icon={TablerSwords} content={`${clan.attacksRequirement}`} />
-                        <Badge variant="green" icon={TablerGift} content={`${clan.donationsRequirement}`} />
-                        <Badge variant="purple" icon={TablerCards} content={`${clan.clangamesRequirement}`} />
+                    <div class="grid grid-cols-3 divide-x-2 divide-stone-700/50 rounded-lg border-2 border-stone-700/50 bg-stone-950">
+                        {#each requirementsOf(clan) as req (req.label)}
+                            <div class="flex flex-col items-center p-4">
+                                <Icon name={req.icon} class="size-8" />
+                                <span class="text-base font-bold text-stone-50">{nf.format(req.value)}</span>
+                                <span class="text-center text-xs text-stone-400">{req.label}</span>
+                            </div>
+                        {/each}
                     </div>
 
-                    <div class="flex flex-col gap-2 border-t border-stone-700/50 pt-3 @[14rem]:flex-row @[14rem]:items-center">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
-                            onclick={() => openEdit(clan)}
-                            disabled={removing === clan.id}
-                        >
-                            <span class="flex items-center justify-center gap-2"><TablerPencil class="size-4 shrink-0" /> Edit</span>
+                    <div class="mt-auto flex items-center gap-2">
+                        <Button variant="base" size="sm" class="min-w-0 flex-1" onclick={() => openEdit(clan)} disabled={removing === clan.id}>
+                            <span class="flex items-center justify-center gap-2"><TablerPencil class="size-5 shrink-0" /> Edit</span>
                         </Button>
                         <ConfirmationDialog
-                            class="w-full min-w-0 @[14rem]:w-auto @[14rem]:flex-1"
+                            class="shrink-0"
                             title="Remove Clan"
                             description={`Remove ${clan.cocClanName ?? clan.cocClanTag} (${clan.cocClanTag})? This cannot be undone.`}
                             confirmText="Remove"
                             onConfirm={() => removeClan(clan)}
                         >
-                            <Button variant="danger" size="sm" class="w-full min-w-0" disabled={removing === clan.id}>
+                            <Button
+                                variant="danger"
+                                class="size-10"
+                                disabled={removing === clan.id}
+                                tooltip="Remove {clan.cocClanName ?? clan.cocClanTag}"
+                                tooltipPlacement="top"
+                            >
                                 {#if removing === clan.id}
-                                    <span class="flex items-center justify-center gap-2"
-                                        ><SvgSpinnersRingResize class="size-4 shrink-0" /> Removing</span
-                                    >
+                                    <SvgSpinnersRingResize class="size-5 shrink-0" />
                                 {:else}
-                                    <span class="flex items-center justify-center gap-2"><TablerTrash class="size-4 shrink-0" /> Remove</span>
+                                    <TablerTrash class="size-5 shrink-0" />
                                 {/if}
                             </Button>
                         </ConfirmationDialog>

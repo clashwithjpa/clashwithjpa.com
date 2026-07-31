@@ -42,7 +42,8 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <a
             href="/admin/join-applications"
-            class="stagger-children press flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
+            class="stagger-card press flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
+            style="--i:0"
         >
             <div>
                 <p class="text-xs font-medium text-stone-400">Pending join applications</p>
@@ -56,7 +57,8 @@
         </a>
         <a
             href="/admin/cwl-applications"
-            class="stagger-children press group flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
+            class="stagger-card press group flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 outline-none hover:border-stone-600 hover:bg-stone-800"
+            style="--i:1"
         >
             <div>
                 <p class="text-xs font-medium text-stone-400">Unassigned CWL applications</p>

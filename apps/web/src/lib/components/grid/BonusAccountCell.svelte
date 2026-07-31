@@ -33,7 +33,7 @@
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="ml-auto shrink-0" onmousedown={(e) => e.stopPropagation()}>
             <Button size="icon" variant="ghost" tooltip="View account details" tooltipPlacement="top" onclick={openDetails}>
-                <TablerEye class="size-5" />
+                <TablerEye />
             </Button>
         </div>
     </div>
