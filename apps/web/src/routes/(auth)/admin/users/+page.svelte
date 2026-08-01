@@ -1,7 +1,6 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
-    import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
     import ActionCell from "$lib/components/grid/ActionCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import RoleCell from "$lib/components/grid/RoleCell.svelte";
@@ -14,19 +13,25 @@
     import Input from "$lib/components/ui/Input.svelte";
     import RoleBadge, { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
+    import { Sidebar } from "$lib/components/ui/sidebar";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate } from "$lib/utils";
+    import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
     import type { CellValueChangedEvent, GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
+    import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowRight from "~icons/tabler/arrow-right";
+    import TablerKey from "~icons/tabler/key";
+    import TablerKeyOff from "~icons/tabler/key-off";
     import TablerSearch from "~icons/tabler/search";
 
     let isProcessing = $state<string | null>(null);
     let banUserDialogOpen = $state(false);
+    let removeUserDialogOpen = $state(false);
+    let pendingRemoval = $state<{ userId: string; name: string } | null>(null);
     let roleDialogOpen = $state(false);
     let pendingRoleChange = $state<{ event: CellValueChangedEvent; oldValue: string; newValue: string } | null>(null);
     let lastRevert: { id: string; value: string } | null = null;
@@ -51,6 +56,9 @@
     let total = $state(0);
     let roleFilter = $state<string>("");
     let roleCounts = $state<Record<string, number>>({});
+    // null = no preference; it narrows alongside the role filter, not instead of it.
+    let apiAccessFilter = $state<boolean | null>(null);
+    let apiAccessCounts = $state<{ granted: number; none: number }>({ granted: 0, none: 0 });
 
     // Highest roles first; only show roles that have members (or the active filter).
     let roleBars = $derived(
@@ -62,6 +70,11 @@
 
     function handleRoleFilter(role: string) {
         roleFilter = roleFilter === role ? "" : role;
+        gridApi?.setGridOption("datasource", createDatasource());
+    }
+
+    function handleApiAccessFilter(granted: boolean) {
+        apiAccessFilter = apiAccessFilter === granted ? null : granted;
         gridApi?.setGridOption("datasource", createDatasource());
     }
 
@@ -163,6 +176,7 @@
                     const queryParams: GetAdminUsersQueryParams = { limit, offset: skip };
                     if (searchText) queryParams.search = searchText;
                     if (roleFilter) queryParams.role = roleFilter;
+                    if (apiAccessFilter !== null) queryParams.apiAccess = String(apiAccessFilter);
                     if (sort) {
                         queryParams.sortBy = sort.colId;
                         queryParams.sortDirection = sort.sort ?? "asc";
@@ -177,6 +191,7 @@
 
                     total = resp.data.total;
                     if (resp.data.roleCounts) roleCounts = resp.data.roleCounts;
+                    if (resp.data.apiAccessCounts) apiAccessCounts = resp.data.apiAccessCounts;
                     params.successCallback(
                         resp.data.users.map((u: { discordId?: string | null }) => ({
                             ...u,
@@ -213,6 +228,24 @@
             );
             gridApi?.refreshInfiniteCache();
         }
+    }
+
+    async function confirmRemoveUser() {
+        const target = pendingRemoval;
+        if (!target) return;
+        pendingRemoval = null;
+
+        isProcessing = target.userId;
+        const { error } = await authClient.admin.removeUser({ userId: target.userId });
+
+        if (error) {
+            toast.error("Failed to remove user", { description: error.message });
+        } else {
+            toast.success(`${target.name} has been removed`);
+            if (selectedSidebarUser?.id === target.userId) closeUserSidebar();
+            gridApi?.refreshInfiniteCache();
+        }
+        isProcessing = null;
     }
 
     function revertRoleCell(change: { event: CellValueChangedEvent; oldValue: string }) {
@@ -261,22 +294,12 @@
 
         openUserSidebar,
         closeUserSidebar,
-        isSidebarOpenFor: (userId: string) => sidebarStore.isOpen && selectedSidebarUser?.id === userId,
 
-        removeUser: async (userId: string) => {
-            isProcessing = userId;
-            const { error } = await authClient.admin.removeUser({ userId });
-
-            if (error) {
-                toast.error("Failed to remove user", { description: error.message });
-            } else {
-                toast.success("User removed successfully");
-                if (selectedSidebarUser?.id === userId) {
-                    closeUserSidebar();
-                }
-                gridApi?.refreshInfiniteCache();
-            }
-            isProcessing = null;
+        // Gated here rather than at each button so both entry points — the grid's
+        // trash action and the sidebar's Remove User — go through the same prompt.
+        removeUser: (userId: string, name?: string) => {
+            pendingRemoval = { userId, name: name ?? "this user" };
+            removeUserDialogOpen = true;
         },
 
         toggleBanUser: async (userId: string, isCurrentlyBanned: boolean) => {
@@ -368,6 +391,27 @@
                         class="font-medium {isActive ? '' : roleFilter !== '' ? 'opacity-50 hover:opacity-100' : ''}"
                     />
                 {/each}
+
+                <div class="h-6 shrink-0 self-center border-l-2 border-stone-700/50"></div>
+
+                <Badge
+                    icon={TablerKey}
+                    content="API Access • {apiAccessCounts.granted}"
+                    variant="purple"
+                    size="button"
+                    iconSize="size-4"
+                    onclick={() => handleApiAccessFilter(true)}
+                    class="font-medium {apiAccessFilter === true ? '' : apiAccessFilter !== null ? 'opacity-50 hover:opacity-100' : ''}"
+                />
+                <Badge
+                    icon={TablerKeyOff}
+                    content="No API Access • {apiAccessCounts.none}"
+                    variant="ghost"
+                    size="button"
+                    iconSize="size-4"
+                    onclick={() => handleApiAccessFilter(false)}
+                    class="font-medium {apiAccessFilter === false ? '' : apiAccessFilter !== null ? 'opacity-50 hover:opacity-100' : ''}"
+                />
             </div>
         {/if}
     </div>
@@ -443,7 +487,8 @@
         <UserManagementSidebar
             user={selectedSidebarUser}
             onBanToggle={(userId, banned) => gridContext.toggleBanUser(userId, banned)}
-            onRemove={(userId) => gridContext.removeUser(userId)}
+            onRemove={(userId) => gridContext.removeUser(userId, selectedSidebarUser?.name)}
+            onUserUpdated={(userId) => syncUserViews(userId)}
             isCurrentUser={selectedSidebarUser.id === $session.data?.user?.id}
             isProcessing={isProcessing === selectedSidebarUser.id}
         />
@@ -472,6 +517,24 @@
             <Input type="date" bind:value={selectedUser.duration} min={getMinDate()} />
         </div>
     </div>
+</Dialog>
+
+<Dialog
+    bind:open={removeUserDialogOpen}
+    title="Remove User"
+    description={pendingRemoval
+        ? `Permanently delete ${pendingRemoval.name}? This also removes their sessions and linked logins, and cannot be undone.`
+        : "Permanently delete this user? This cannot be undone."}
+    confirmText="Remove user"
+    onConfirm={confirmRemoveUser}
+    onClose={() => (pendingRemoval = null)}
+>
+    {#if pendingRemoval}
+        <div class="flex items-start gap-2 rounded-lg border-2 border-red-700/50 bg-red-900 p-2 text-sm text-red-200">
+            <TablerAlertTriangle class="mt-0.5 size-4 shrink-0" />
+            <span>Ban the user instead if you only need to revoke their access; removal is not recoverable.</span>
+        </div>
+    {/if}
 </Dialog>
 
 <Dialog

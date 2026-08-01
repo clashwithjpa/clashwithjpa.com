@@ -5,6 +5,7 @@ export type { AssignCwlApplicationsBulkMutationKey } from "./hooks/createAssignC
 export type { ClearAcceptedJoinApplicationsMutationKey } from "./hooks/createClearAcceptedJoinApplications.ts";
 export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
+export type { CreateApiKeyMutationKey } from "./hooks/createCreateApiKey.ts";
 export type { CreateCocAccountMutationKey } from "./hooks/createCreateCocAccount.ts";
 export type { CreateCwlApplicationMutationKey } from "./hooks/createCreateCwlApplication.ts";
 export type { CreateCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
@@ -27,6 +28,10 @@ export type { GetAnalyticsCwlAssignmentQueryKey } from "./hooks/createGetAnalyti
 export type { GetAnalyticsCwlParticipationQueryKey } from "./hooks/createGetAnalyticsCwlParticipation.ts";
 export type { GetAnalyticsCwlSeasonsQueryKey } from "./hooks/createGetAnalyticsCwlSeasons.ts";
 export type { GetAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
+export type { GetApiKeyUsageDailyQueryKey } from "./hooks/createGetApiKeyUsageDaily.ts";
+export type { GetApiKeyUsageEndpointsQueryKey } from "./hooks/createGetApiKeyUsageEndpoints.ts";
+export type { GetApiKeyUsageStatusQueryKey } from "./hooks/createGetApiKeyUsageStatus.ts";
+export type { GetApiKeyUsageSummaryQueryKey } from "./hooks/createGetApiKeyUsageSummary.ts";
 export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export type { GetBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
 export type { GetBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
@@ -45,7 +50,6 @@ export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanReq
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
 export type { GetJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
-export type { GetRootQueryKey } from "./hooks/createGetRoot.ts";
 export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
@@ -58,6 +62,7 @@ export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDi
 export type { RenameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
+export type { SetUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
 export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
@@ -139,6 +144,17 @@ export type {
     CreateAdminCwlClanMutationRequest,
     CreateAdminCwlClanMutationResponse,
 } from "./models/CreateAdminCwlClan.ts";
+export type {
+    CreateApiKey200,
+    CreateApiKey401,
+    CreateApiKey403,
+    CreateApiKey404,
+    CreateApiKey500,
+    CreateApiKeyMutation,
+    CreateApiKeyMutationRequest,
+    CreateApiKeyMutationRequestScopeEnumKey,
+    CreateApiKeyMutationResponse,
+} from "./models/CreateApiKey.ts";
 export type {
     CreateCocAccount200,
     CreateCocAccount400,
@@ -319,8 +335,45 @@ export type {
     GetAnalyticsUserJoinsQueryResponse,
 } from "./models/GetAnalyticsUserJoins.ts";
 export type {
+    GetApiKeyUsageDaily200,
+    GetApiKeyUsageDaily401,
+    GetApiKeyUsageDaily404,
+    GetApiKeyUsageDaily500,
+    GetApiKeyUsageDailyQuery,
+    GetApiKeyUsageDailyQueryParams,
+    GetApiKeyUsageDailyQueryResponse,
+} from "./models/GetApiKeyUsageDaily.ts";
+export type {
+    GetApiKeyUsageEndpoints200,
+    GetApiKeyUsageEndpoints401,
+    GetApiKeyUsageEndpoints404,
+    GetApiKeyUsageEndpoints500,
+    GetApiKeyUsageEndpointsQuery,
+    GetApiKeyUsageEndpointsQueryParams,
+    GetApiKeyUsageEndpointsQueryResponse,
+} from "./models/GetApiKeyUsageEndpoints.ts";
+export type {
+    GetApiKeyUsageStatus200,
+    GetApiKeyUsageStatus401,
+    GetApiKeyUsageStatus404,
+    GetApiKeyUsageStatus500,
+    GetApiKeyUsageStatusQuery,
+    GetApiKeyUsageStatusQueryParams,
+    GetApiKeyUsageStatusQueryResponse,
+} from "./models/GetApiKeyUsageStatus.ts";
+export type {
+    GetApiKeyUsageSummary200,
+    GetApiKeyUsageSummary401,
+    GetApiKeyUsageSummary404,
+    GetApiKeyUsageSummary500,
+    GetApiKeyUsageSummaryQuery,
+    GetApiKeyUsageSummaryQueryParams,
+    GetApiKeyUsageSummaryQueryResponse,
+} from "./models/GetApiKeyUsageSummary.ts";
+export type {
     EntriesActionEnumKey,
     EntriesActorCurrentRoleEnumKey,
+    EntriesSourceEnumKey,
     EntriesTargetTypeEnumKey,
     GetAuditLog200,
     GetAuditLog401,
@@ -328,6 +381,7 @@ export type {
     GetAuditLogQuery,
     GetAuditLogQueryParams,
     GetAuditLogQueryParamsActionEnumKey,
+    GetAuditLogQueryParamsSourceEnumKey,
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./models/GetAuditLog.ts";
@@ -454,7 +508,6 @@ export type {
     GetJoinApplicationsQueryParamsStatusEnumKey,
     GetJoinApplicationsQueryResponse,
 } from "./models/GetJoinApplications.ts";
-export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./models/GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
 export type {
@@ -531,6 +584,16 @@ export type {
     SetUserAccountExternalMutationResponse,
     SetUserAccountExternalPathParams,
 } from "./models/SetUserAccountExternal.ts";
+export type {
+    SetUserApiAccess200,
+    SetUserApiAccess401,
+    SetUserApiAccess404,
+    SetUserApiAccess500,
+    SetUserApiAccessMutation,
+    SetUserApiAccessMutationRequest,
+    SetUserApiAccessMutationResponse,
+    SetUserApiAccessPathParams,
+} from "./models/SetUserApiAccess.ts";
 export type {
     SetUserSeasonBonus200,
     SetUserSeasonBonus400,
@@ -654,6 +717,7 @@ export { assignCwlApplicationsBulk } from "./clients/assignCwlApplicationsBulk.t
 export { clearAcceptedJoinApplications } from "./clients/clearAcceptedJoinApplications.ts";
 export { createAdminClan } from "./clients/createAdminClan.ts";
 export { createAdminCwlClan } from "./clients/createAdminCwlClan.ts";
+export { createApiKey } from "./clients/createApiKey.ts";
 export { createCocAccount } from "./clients/createCocAccount.ts";
 export { createCwlApplication } from "./clients/createCwlApplication.ts";
 export { createCwlSeason } from "./clients/createCwlSeason.ts";
@@ -676,6 +740,10 @@ export { getAnalyticsCwlAssignment } from "./clients/getAnalyticsCwlAssignment.t
 export { getAnalyticsCwlParticipation } from "./clients/getAnalyticsCwlParticipation.ts";
 export { getAnalyticsCwlSeasons } from "./clients/getAnalyticsCwlSeasons.ts";
 export { getAnalyticsUserJoins } from "./clients/getAnalyticsUserJoins.ts";
+export { getApiKeyUsageDaily } from "./clients/getApiKeyUsageDaily.ts";
+export { getApiKeyUsageEndpoints } from "./clients/getApiKeyUsageEndpoints.ts";
+export { getApiKeyUsageStatus } from "./clients/getApiKeyUsageStatus.ts";
+export { getApiKeyUsageSummary } from "./clients/getApiKeyUsageSummary.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
 export { getBonusData } from "./clients/getBonusData.ts";
 export { getBonusLedger } from "./clients/getBonusLedger.ts";
@@ -694,7 +762,6 @@ export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
 export { getJoinApplications } from "./clients/getJoinApplications.ts";
-export { getRoot } from "./clients/getRoot.ts";
 export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
@@ -707,6 +774,7 @@ export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
 export { renameCwlSeason } from "./clients/renameCwlSeason.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
+export { setUserApiAccess } from "./clients/setUserApiAccess.ts";
 export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
 export { syncCocAccountWarWeights } from "./clients/syncCocAccountWarWeights.ts";
@@ -733,6 +801,8 @@ export { createAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
 export { createCreateAdminClan } from "./hooks/createCreateAdminClan.ts";
 export { createAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
 export { createCreateAdminCwlClan } from "./hooks/createCreateAdminCwlClan.ts";
+export { createApiKeyMutationKey } from "./hooks/createCreateApiKey.ts";
+export { createCreateApiKey } from "./hooks/createCreateApiKey.ts";
 export { createCocAccountMutationKey } from "./hooks/createCreateCocAccount.ts";
 export { createCreateCocAccount } from "./hooks/createCreateCocAccount.ts";
 export { createCreateCwlApplication } from "./hooks/createCreateCwlApplication.ts";
@@ -789,6 +859,18 @@ export { getAnalyticsCwlSeasonsQueryOptions } from "./hooks/createGetAnalyticsCw
 export { createGetAnalyticsUserJoins } from "./hooks/createGetAnalyticsUserJoins.ts";
 export { getAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
 export { getAnalyticsUserJoinsQueryOptions } from "./hooks/createGetAnalyticsUserJoins.ts";
+export { createGetApiKeyUsageDaily } from "./hooks/createGetApiKeyUsageDaily.ts";
+export { getApiKeyUsageDailyQueryKey } from "./hooks/createGetApiKeyUsageDaily.ts";
+export { getApiKeyUsageDailyQueryOptions } from "./hooks/createGetApiKeyUsageDaily.ts";
+export { createGetApiKeyUsageEndpoints } from "./hooks/createGetApiKeyUsageEndpoints.ts";
+export { getApiKeyUsageEndpointsQueryKey } from "./hooks/createGetApiKeyUsageEndpoints.ts";
+export { getApiKeyUsageEndpointsQueryOptions } from "./hooks/createGetApiKeyUsageEndpoints.ts";
+export { createGetApiKeyUsageStatus } from "./hooks/createGetApiKeyUsageStatus.ts";
+export { getApiKeyUsageStatusQueryKey } from "./hooks/createGetApiKeyUsageStatus.ts";
+export { getApiKeyUsageStatusQueryOptions } from "./hooks/createGetApiKeyUsageStatus.ts";
+export { createGetApiKeyUsageSummary } from "./hooks/createGetApiKeyUsageSummary.ts";
+export { getApiKeyUsageSummaryQueryKey } from "./hooks/createGetApiKeyUsageSummary.ts";
+export { getApiKeyUsageSummaryQueryOptions } from "./hooks/createGetApiKeyUsageSummary.ts";
 export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
 export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
@@ -843,9 +925,6 @@ export { getJPACwlClansQueryOptions } from "./hooks/createGetJPACwlClans.ts";
 export { createGetJoinApplications } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryOptions } from "./hooks/createGetJoinApplications.ts";
-export { createGetRoot } from "./hooks/createGetRoot.ts";
-export { getRootQueryKey } from "./hooks/createGetRoot.ts";
-export { getRootQueryOptions } from "./hooks/createGetRoot.ts";
 export { createGetRules } from "./hooks/createGetRules.ts";
 export { getRulesQueryKey } from "./hooks/createGetRules.ts";
 export { getRulesQueryOptions } from "./hooks/createGetRules.ts";
@@ -876,6 +955,8 @@ export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
 export { setUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
+export { createSetUserApiAccess } from "./hooks/createSetUserApiAccess.ts";
+export { setUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
 export { createSetUserSeasonBonus } from "./hooks/createSetUserSeasonBonus.ts";
 export { setUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
 export { createSyncAdminCwlClanLeagues } from "./hooks/createSyncAdminCwlClanLeagues.ts";
@@ -900,13 +981,16 @@ export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinAppli
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { createVerifyAdminClanDiscord } from "./hooks/createVerifyAdminClanDiscord.ts";
 export { verifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
+export { createApiKeyMutationRequestScopeEnum } from "./models/CreateApiKey.ts";
 export { applicationStatusEnum2 } from "./models/DeleteJoinApplication.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
 export { getAdminUsersQueryParamsSortDirectionEnum } from "./models/GetAdminUsers.ts";
 export { entriesActionEnum } from "./models/GetAuditLog.ts";
 export { entriesActorCurrentRoleEnum } from "./models/GetAuditLog.ts";
+export { entriesSourceEnum } from "./models/GetAuditLog.ts";
 export { entriesTargetTypeEnum } from "./models/GetAuditLog.ts";
 export { getAuditLogQueryParamsActionEnum } from "./models/GetAuditLog.ts";
+export { getAuditLogQueryParamsSourceEnum } from "./models/GetAuditLog.ts";
 export { getAuditLogQueryParamsTargetTypeEnum } from "./models/GetAuditLog.ts";
 export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
 export { warStateEnum } from "./models/GetCOCCWLWar.ts";
@@ -992,6 +1076,15 @@ export {
     createAdminCwlClanMutationRequestSchema,
     createAdminCwlClanMutationResponseSchema,
 } from "./zod/createAdminCwlClanSchema.ts";
+export {
+    createApiKey200Schema,
+    createApiKey401Schema,
+    createApiKey403Schema,
+    createApiKey404Schema,
+    createApiKey500Schema,
+    createApiKeyMutationRequestSchema,
+    createApiKeyMutationResponseSchema,
+} from "./zod/createApiKeySchema.ts";
 export {
     createCocAccount200Schema,
     createCocAccount400Schema,
@@ -1153,6 +1246,38 @@ export {
     getAnalyticsUserJoinsQueryResponseSchema,
 } from "./zod/getAnalyticsUserJoinsSchema.ts";
 export {
+    getApiKeyUsageDaily200Schema,
+    getApiKeyUsageDaily401Schema,
+    getApiKeyUsageDaily404Schema,
+    getApiKeyUsageDaily500Schema,
+    getApiKeyUsageDailyQueryParamsSchema,
+    getApiKeyUsageDailyQueryResponseSchema,
+} from "./zod/getApiKeyUsageDailySchema.ts";
+export {
+    getApiKeyUsageEndpoints200Schema,
+    getApiKeyUsageEndpoints401Schema,
+    getApiKeyUsageEndpoints404Schema,
+    getApiKeyUsageEndpoints500Schema,
+    getApiKeyUsageEndpointsQueryParamsSchema,
+    getApiKeyUsageEndpointsQueryResponseSchema,
+} from "./zod/getApiKeyUsageEndpointsSchema.ts";
+export {
+    getApiKeyUsageStatus200Schema,
+    getApiKeyUsageStatus401Schema,
+    getApiKeyUsageStatus404Schema,
+    getApiKeyUsageStatus500Schema,
+    getApiKeyUsageStatusQueryParamsSchema,
+    getApiKeyUsageStatusQueryResponseSchema,
+} from "./zod/getApiKeyUsageStatusSchema.ts";
+export {
+    getApiKeyUsageSummary200Schema,
+    getApiKeyUsageSummary401Schema,
+    getApiKeyUsageSummary404Schema,
+    getApiKeyUsageSummary500Schema,
+    getApiKeyUsageSummaryQueryParamsSchema,
+    getApiKeyUsageSummaryQueryResponseSchema,
+} from "./zod/getApiKeyUsageSummarySchema.ts";
+export {
     getAuditLog200Schema,
     getAuditLog401Schema,
     getAuditLog500Schema,
@@ -1249,7 +1374,6 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./zod/getJoinApplicationsSchema.ts";
-export { getRoot200Schema, getRootQueryResponseSchema } from "./zod/getRootSchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
@@ -1316,6 +1440,15 @@ export {
     setUserAccountExternalMutationResponseSchema,
     setUserAccountExternalPathParamsSchema,
 } from "./zod/setUserAccountExternalSchema.ts";
+export {
+    setUserApiAccess200Schema,
+    setUserApiAccess401Schema,
+    setUserApiAccess404Schema,
+    setUserApiAccess500Schema,
+    setUserApiAccessMutationRequestSchema,
+    setUserApiAccessMutationResponseSchema,
+    setUserApiAccessPathParamsSchema,
+} from "./zod/setUserApiAccessSchema.ts";
 export {
     setUserSeasonBonus200Schema,
     setUserSeasonBonus400Schema,

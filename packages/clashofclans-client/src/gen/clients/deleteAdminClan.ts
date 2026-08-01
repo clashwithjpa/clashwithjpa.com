@@ -19,7 +19,7 @@ function getDeleteAdminClanUrl(id: DeleteAdminClanPathParams["id"]) {
 }
 
 /**
- * @description [Admin/sudo] Deletes a JPA clan.
+ * @description Deletes a JPA clan.
  * {@link /admin/clans/:id}
  */
 export async function deleteAdminClan(id: DeleteAdminClanPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {

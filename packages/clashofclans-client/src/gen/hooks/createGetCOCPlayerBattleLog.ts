@@ -38,7 +38,7 @@ export function getCOCPlayerBattleLogQueryOptions(
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.
+ * @description Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.
  * {@link /coc/player/:tag/battlelog}
  */
 export function createGetCOCPlayerBattleLog<

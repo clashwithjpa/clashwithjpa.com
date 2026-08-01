@@ -4,8 +4,14 @@
     import { authClient } from "$lib/auth";
     import type { Role } from "$lib/config/roles";
     import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
-    import { formatDate, formatDateTime } from "$lib/utils";
-    import { deleteCocAccount, getCOCPlayer, getUserCocAccountsByUserId, updateCocAccountExternal } from "@repo/clashofclans-client";
+    import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
+    import {
+        deleteCocAccount,
+        getCOCPlayer,
+        getUserCocAccountsByUserId,
+        setUserApiAccess,
+        updateCocAccountExternal,
+    } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -18,6 +24,7 @@
     import TablerExternalLink from "~icons/tabler/external-link";
     import TablerHash from "~icons/tabler/hash";
     import TablerIdBadge from "~icons/tabler/id-badge";
+    import TablerKey from "~icons/tabler/key";
     import TablerLogin2 from "~icons/tabler/login-2";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerShieldCheck from "~icons/tabler/shield-check";
@@ -34,17 +41,19 @@
     import ConfirmationDialog from "./ui/ConfirmationDialog.svelte";
     import Icon from "./ui/Icon.svelte";
     import RoleBadge from "./ui/RoleBadge.svelte";
+    import Toggle from "./ui/Toggle.svelte";
     import Tooltip from "./ui/Tooltip.svelte";
 
     interface Props {
         user: UserWithRole & { discordId?: string };
         onBanToggle: (userId: string, banned: boolean) => void;
         onRemove: (userId: string) => void;
+        onUserUpdated?: (userId: string) => void;
         isCurrentUser?: boolean;
         isProcessing?: boolean;
     }
 
-    let { user, onBanToggle, onRemove, isCurrentUser = false, isProcessing = false }: Props = $props();
+    let { user, onBanToggle, onRemove, onUserUpdated, isCurrentUser = false, isProcessing = false }: Props = $props();
 
     const currentSession = authClient.useSession();
     // Session endpoints are superadmin-only; hide the tab from anyone who can't use them.
@@ -66,6 +75,54 @@
     let canToggleExternal = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.manager);
     let impersonating = $state(false);
     let togglingExternalId = $state<number | null>(null);
+
+    // Newest session activity, from the users list query. Null once every session
+    // has expired and been swept.
+    let lastActiveAt = $derived((user as { lastActiveAt?: string | Date | null }).lastActiveAt);
+
+    // Mirrors the server's isAdmin (sudo) gate on PUT /admin/users/:userid/api-access.
+    let canGrantApiAccess = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Minting a key needs verified, so the grant does nothing below that.
+    let targetCanUseApiKeys = $derived(roleLevel(user.role) >= ROLE_LEVELS.verified);
+    // Tracked locally so the switch reflects the change immediately; the grid
+    // row is refreshed by the parent through onUserUpdated.
+    let apiAccess = $state(false);
+    let togglingApiAccess = $state(false);
+    $effect(() => {
+        apiAccess = !!(user as { apiAccess?: boolean }).apiAccess;
+    });
+
+    async function toggleApiAccess(next: boolean) {
+        togglingApiAccess = true;
+        // Optimistic, rolled back on failure — the switch shouldn't sit inert
+        // while the request is in flight.
+        const previous = apiAccess;
+        apiAccess = next;
+        try {
+            const resp = await setUserApiAccess(
+                user.id,
+                { enabled: next },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (resp.success) {
+                toast.success(
+                    next
+                        ? `API access enabled for ${user.name}`
+                        : `API access revoked for ${user.name}${resp.data.disabledKeys ? `, ${resp.data.disabledKeys} key(s) disabled` : ""}`,
+                );
+                onUserUpdated?.(user.id);
+            } else {
+                apiAccess = previous;
+                toast.error("Failed to update API access");
+            }
+        } catch (err) {
+            console.error("Toggle API access error:", err);
+            apiAccess = previous;
+            toast.error("Failed to update API access");
+        } finally {
+            togglingApiAccess = false;
+        }
+    }
 
     async function handleImpersonate() {
         impersonating = true;
@@ -204,7 +261,7 @@
 
 <div class="flex size-full flex-col overflow-hidden">
     <div>
-        <div class="mb-4 flex items-center gap-4">
+        <div class="mb-4 flex items-center gap-4 pr-10">
             <Avatar src={user.image} name={user.name} role={user.role as Role} size="lg" />
             <div class="flex-1 overflow-hidden">
                 <h3 class="truncate text-xl font-medium text-stone-50">{user.name}</h3>
@@ -296,7 +353,9 @@
                         <TablerLogin2 class="size-4" />
                         <span>Joined</span>
                     </div>
-                    <p class="text-sm text-stone-200">{formatDateTime(user.createdAt)}</p>
+                    <Tooltip title={formatDateTime(user.createdAt)} placement="top" class="block w-fit text-left">
+                        <span class="text-sm text-stone-200">{formatRelativeTime(user.createdAt)}</span>
+                    </Tooltip>
                 </div>
 
                 <div class="space-y-1">
@@ -304,7 +363,13 @@
                         <TablerClock class="size-4" />
                         <span>Last Active</span>
                     </div>
-                    <p class="text-sm text-stone-200">{formatDateTime(user.updatedAt)}</p>
+                    {#if lastActiveAt}
+                        <Tooltip title={formatDateTime(lastActiveAt)} placement="top" class="block w-fit text-left">
+                            <span class="text-sm text-stone-200">{formatRelativeTime(lastActiveAt)}</span>
+                        </Tooltip>
+                    {:else}
+                        <p class="text-sm text-stone-200">No recorded sessions</p>
+                    {/if}
                 </div>
 
                 <div class="space-y-1">
@@ -335,6 +400,29 @@
                         <p class="text-sm text-stone-200">Not banned</p>
                     {/if}
                 </div>
+
+                <!-- Hidden for unverified accounts, which can't mint a key whatever
+                     the grant says. Still shown if one somehow holds the grant, so a
+                     stale flag left by a demotion can always be cleared. -->
+                {#if canGrantApiAccess && (targetCanUseApiKeys || apiAccess)}
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
+                            <TablerKey class="size-4" />
+                            <span>API Access</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 rounded-lg bg-stone-800 px-3 py-2">
+                            <p class="text-sm text-stone-200">
+                                {apiAccess ? "Can create API keys" : "Cannot create API keys"}
+                                {#if !targetCanUseApiKeys}
+                                    <span class="block text-xs text-yellow-200">Unverified, so this grant does nothing until they're verified.</span>
+                                {:else if !apiAccess}
+                                    <span class="block text-xs text-stone-400">Revoking also disables every key they already hold.</span>
+                                {/if}
+                            </p>
+                            <Toggle checked={apiAccess} disabled={togglingApiAccess} onCheckedChange={toggleApiAccess} />
+                        </div>
+                    </div>
+                {/if}
             </div>
         {:else if activeTab === "sessions"}
             {#key sessionsRefreshKey}

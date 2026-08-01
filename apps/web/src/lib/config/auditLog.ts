@@ -16,6 +16,7 @@ import TablerDownload from "~icons/tabler/download";
 import TablerEdit from "~icons/tabler/edit";
 import TablerGavel from "~icons/tabler/gavel";
 import TablerKey from "~icons/tabler/key";
+import TablerKeyOff from "~icons/tabler/key-off";
 import TablerList from "~icons/tabler/list";
 import TablerLogout from "~icons/tabler/logout";
 import TablerLogout2 from "~icons/tabler/logout-2";
@@ -370,7 +371,44 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         variant: "red",
         describe: (m, e) => `revoked all sessions for ${userTargetLabel(e, m)}`,
     },
+    "user.api_access_granted": {
+        label: "User · API access granted",
+        icon: TablerKey,
+        variant: "green",
+        describe: (m, e) => `granted API access to ${userTargetLabel(e, m)}`,
+    },
+    "user.api_access_revoked": {
+        label: "User · API access revoked",
+        icon: TablerKeyOff,
+        variant: "red",
+        // The count matters: revoking access also disables every live key, and
+        // that's the part someone reading the log needs to see.
+        describe: (m, e) =>
+            `revoked API access from ${userTargetLabel(e, m)}${m.disabledKeys ? `, disabling ${m.disabledKeys} key${m.disabledKeys === 1 ? "" : "s"}` : ""}`,
+    },
+    "api_key.create": {
+        label: "API key · created",
+        icon: TablerPlus,
+        variant: "green",
+        describe: (m) => `created the API key ${m.name ? `"${m.name}"` : ""}${scopeSuffix(m)}`,
+    },
+    "api_key.update": {
+        label: "API key · updated",
+        icon: TablerEdit,
+        variant: "yellow",
+        describe: (m) => `updated the API key ${m.name ? `"${m.name}"` : ""}${scopeSuffix(m)}`,
+    },
+    "api_key.delete": {
+        label: "API key · revoked",
+        icon: TablerTrash,
+        variant: "red",
+        describe: (m, e) => `revoked an API key${e.targetId ? ` (${e.targetId})` : ""}`,
+    },
 };
+
+function scopeSuffix(m: Meta): string {
+    return Array.isArray(m.scopes) && m.scopes.length > 0 ? ` with scopes: ${m.scopes.join(", ")}` : "";
+}
 
 export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
     clan_application: "Clan applications",
@@ -383,6 +421,7 @@ export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
     cwl_clan: "CWL clans",
     coc_account: "COC accounts",
     user: "Users",
+    api_key: "API keys",
 };
 
 export const AUDIT_TARGET_ICONS: Record<AuditTargetType, Component> = {
@@ -396,6 +435,7 @@ export const AUDIT_TARGET_ICONS: Record<AuditTargetType, Component> = {
     cwl_clan: TablerSwords,
     coc_account: TablerUser,
     user: TablerUsers,
+    api_key: TablerKey,
 };
 
 const FALLBACK_CONFIG: AuditActionConfig = {
@@ -440,4 +480,12 @@ export const auditTargetOptions: Option[] = [
         value,
         icon: AUDIT_TARGET_ICONS[value],
     })),
+];
+
+// Where an action came from, orthogonal to what it did. Filtering by it answers
+// "what have the bots been changing?" without wading through web traffic.
+export const auditSourceOptions: Option[] = [
+    { label: "All sources", value: "", icon: TablerList },
+    { label: "Web", value: "web", icon: TablerWorld },
+    { label: "API", value: "api", icon: TablerKey },
 ];

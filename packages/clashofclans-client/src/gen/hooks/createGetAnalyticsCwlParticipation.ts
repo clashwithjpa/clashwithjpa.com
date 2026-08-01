@@ -38,7 +38,7 @@ export function getAnalyticsCwlParticipationQueryOptions(
 }
 
 /**
- * @description [Reviewer] Participating users vs total users for a CWL season.
+ * @description Participating users vs total users for a CWL season.
  * {@link /analytics/cwl-participation}
  */
 export function createGetAnalyticsCwlParticipation<

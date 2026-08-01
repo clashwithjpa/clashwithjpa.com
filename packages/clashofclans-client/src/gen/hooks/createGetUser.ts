@@ -24,7 +24,7 @@ export function getUserQueryOptions(config: Partial<RequestConfig> & { client?: 
 }
 
 /**
- * @description [Authenticated] Fetches the current user's data.
+ * @description Fetches the current user's data.
  * {@link /user}
  */
 export function createGetUser<TData = GetUserQueryResponse, TQueryData = GetUserQueryResponse, TQueryKey extends QueryKey = GetUserQueryKey>(

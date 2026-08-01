@@ -21,6 +21,10 @@
             files?: FileList;
             min?: string | number | Date | null;
             max?: string | number | Date | null;
+            // Radio only. `bind:group` can't cross a component boundary, so the
+            // selected value is passed in and written back here instead:
+            // `<Input type="radio" value={x} bind:group={sel} />`.
+            group?: any;
         }
     >;
 
@@ -28,6 +32,7 @@
         ref = $bindable(null),
         value = $bindable(),
         checked = $bindable(),
+        group = $bindable(),
         type,
         files = $bindable(),
         class: className,
@@ -35,6 +40,11 @@
         max,
         ...restProps
     }: Props = $props();
+
+    function selectRadio(event: Event) {
+        group = value;
+        (restProps.onchange as ((e: Event) => void) | undefined)?.(event);
+    }
 
     let isPasswordVisible = $state(false);
     let currentInputType = $derived(type === "password" ? (isPasswordVisible ? "text" : "password") : type);
@@ -179,6 +189,24 @@
             stroke-width="3"
             class="pointer-events-none absolute size-3.5 scale-50 text-stone-900 opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100 peer-disabled:opacity-50!"
         />
+    </div>
+{:else if type === "radio"}
+    <div class={cn("relative flex size-5 shrink-0 items-center justify-center", className)}>
+        <input
+            bind:this={ref}
+            type="radio"
+            {value}
+            checked={group !== undefined ? group === value : checked}
+            class="peer absolute z-10 m-0 size-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+            {...restProps}
+            onchange={selectRadio}
+        />
+        <div
+            class="pointer-events-none size-full rounded-full border-2 border-stone-700/50 bg-stone-900 transition-all duration-200 peer-checked:border-stone-200 peer-focus-visible:border-stone-700 peer-focus-visible:ring-4 peer-focus-visible:ring-stone-700/50 peer-disabled:opacity-50!"
+        ></div>
+        <div
+            class="pointer-events-none absolute size-2 scale-50 rounded-full bg-stone-200 opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100 peer-disabled:opacity-50!"
+        ></div>
     </div>
 {:else if type === "date"}
     <DateInput.RootProvider value={dateInput} class="w-full">

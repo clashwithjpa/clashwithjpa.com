@@ -29,7 +29,7 @@ export function getCwlSeasonsQueryOptions(config: Partial<RequestConfig> & { cli
 }
 
 /**
- * @description [Manager] Lists all CWL seasons (newest first).
+ * @description Lists all CWL seasons (newest first).
  * {@link /admin/cwl-seasons}
  */
 export function createGetCwlSeasons<

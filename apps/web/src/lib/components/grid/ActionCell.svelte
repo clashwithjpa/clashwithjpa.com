@@ -23,12 +23,11 @@
         }
     }
 
-    async function handleRemove() {
+    // The sidebar is closed by the removal itself, not here — closing up front
+    // would tear it down even when the confirmation is dismissed.
+    function handleRemove() {
         if (params.context?.removeUser && canAct && user) {
-            if (params.context?.isSidebarOpenFor?.(user.id)) {
-                params.context.closeUserSidebar?.();
-            }
-            await params.context.removeUser(user.id);
+            params.context.removeUser(user.id, user.name);
         }
     }
 

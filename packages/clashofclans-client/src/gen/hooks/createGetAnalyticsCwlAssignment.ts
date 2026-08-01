@@ -38,7 +38,7 @@ export function getAnalyticsCwlAssignmentQueryOptions(
 }
 
 /**
- * @description [Reviewer] Assigned vs unassigned CWL application counts for a season.
+ * @description Assigned vs unassigned CWL application counts for a season.
  * {@link /analytics/cwl-assignment}
  */
 export function createGetAnalyticsCwlAssignment<

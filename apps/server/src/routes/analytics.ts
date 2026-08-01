@@ -12,7 +12,8 @@ import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
-import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
+import { describeRoute } from "@/lib/openapi";
+import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
 // Admin dashboard analytics: reviewer-gated, returns only pre-aggregated numbers.
@@ -34,7 +35,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsUserJoins",
-        description: "[Reviewer] Daily count of new users over the requested window.",
+        role: "Reviewer",
+        description: "Daily count of new users over the requested window.",
         tags: ["analytics"],
         responses: {
             200: { description: "User join trend.", content: { "application/json": { schema: resolver(SuccessResponseSchema(dailySeriesData)) } } },
@@ -58,7 +60,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsAuditTrend",
-        description: "[Reviewer] Daily count of audit log actions over the requested window.",
+        role: "Reviewer",
+        description: "Daily count of audit log actions over the requested window.",
         tags: ["analytics"],
         responses: {
             200: { description: "Audit trend.", content: { "application/json": { schema: resolver(SuccessResponseSchema(dailySeriesData)) } } },
@@ -85,7 +88,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsAuditCategories",
-        description: "[Reviewer] Audit log action counts grouped by target type.",
+        role: "Reviewer",
+        description: "Audit log action counts grouped by target type.",
         tags: ["analytics"],
         responses: {
             200: {
@@ -126,7 +130,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsAdminActivity",
-        description: "[Reviewer] Admins ranked by audit log action count, with profile info.",
+        role: "Reviewer",
+        description: "Admins ranked by audit log action count, with profile info.",
         tags: ["analytics"],
         responses: {
             200: {
@@ -163,7 +168,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsCwlAssignment",
-        description: "[Reviewer] Assigned vs unassigned CWL application counts for a season.",
+        role: "Reviewer",
+        description: "Assigned vs unassigned CWL application counts for a season.",
         tags: ["analytics"],
         responses: {
             200: { description: "CWL assignment.", content: { "application/json": { schema: resolver(SuccessResponseSchema(cwlAssignmentData)) } } },
@@ -193,7 +199,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsCwlParticipation",
-        description: "[Reviewer] Participating users vs total users for a CWL season.",
+        role: "Reviewer",
+        description: "Participating users vs total users for a CWL season.",
         tags: ["analytics"],
         responses: {
             200: {
@@ -228,7 +235,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getAnalyticsCwlSeasons",
-        description: "[Reviewer] Lists CWL seasons for the analytics season selector.",
+        role: "Reviewer",
+        description: "Lists CWL seasons for the analytics season selector.",
         tags: ["analytics"],
         responses: {
             200: { description: "Seasons.", content: { "application/json": { schema: resolver(SuccessResponseSchema(cwlSeasonsData)) } } },

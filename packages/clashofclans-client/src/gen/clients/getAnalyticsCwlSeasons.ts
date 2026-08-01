@@ -13,7 +13,7 @@ function getGetAnalyticsCwlSeasonsUrl() {
 }
 
 /**
- * @description [Reviewer] Lists CWL seasons for the analytics season selector.
+ * @description Lists CWL seasons for the analytics season selector.
  * {@link /analytics/cwl-seasons}
  */
 export async function getAnalyticsCwlSeasons(config: Partial<RequestConfig> & { client?: Client } = {}) {

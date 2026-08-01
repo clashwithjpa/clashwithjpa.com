@@ -20,7 +20,7 @@ export const deleteAdminClanMutationKey = () => [{ url: "/admin/clans/:id" }] as
 export type DeleteAdminClanMutationKey = ReturnType<typeof deleteAdminClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Deletes a JPA clan.
+ * @description Deletes a JPA clan.
  * {@link /admin/clans/:id}
  */
 export function createDeleteAdminClan<TContext>(

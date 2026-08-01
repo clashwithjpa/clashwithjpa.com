@@ -18,7 +18,7 @@ function getGetAdminCocAccountsUrl() {
 }
 
 /**
- * @description [Manager] Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.
+ * @description Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.
  * {@link /admin/coc-accounts}
  */
 export async function getAdminCocAccounts(params?: GetAdminCocAccountsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

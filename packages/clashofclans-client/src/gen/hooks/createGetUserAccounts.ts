@@ -29,7 +29,7 @@ export function getUserAccountsQueryOptions(config: Partial<RequestConfig> & { c
 }
 
 /**
- * @description [Verified] Fetches the current user's Clash of Clans accounts.
+ * @description Fetches the current user's Clash of Clans accounts.
  * {@link /user/accounts}
  */
 export function createGetUserAccounts<

@@ -23,7 +23,7 @@ export const updateAdminClanMutationKey = () => [{ url: "/admin/clans/:id" }] as
 export type UpdateAdminClanMutationKey = ReturnType<typeof updateAdminClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Updates a JPA clan.
+ * @description Updates a JPA clan.
  * {@link /admin/clans/:id}
  */
 export function createUpdateAdminClan<TContext>(

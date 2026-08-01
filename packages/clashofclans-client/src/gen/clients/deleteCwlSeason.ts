@@ -19,7 +19,7 @@ function getDeleteCwlSeasonUrl(id: DeleteCwlSeasonPathParams["id"]) {
 }
 
 /**
- * @description [Admin] Deletes a CWL season; cascades to its applications and bonuses.
+ * @description Deletes a CWL season; cascades to its applications and bonuses.
  * {@link /admin/cwl-seasons/:id}
  */
 export async function deleteCwlSeason(id: DeleteCwlSeasonPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {

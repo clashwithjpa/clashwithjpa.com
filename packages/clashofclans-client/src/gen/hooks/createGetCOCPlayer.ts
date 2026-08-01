@@ -25,7 +25,7 @@ export function getCOCPlayerQueryOptions(tag: GetCOCPlayerPathParams["tag"], con
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans player's data by their tag. The tag must start with #.
+ * @description Fetches a Clash of Clans player's data by their tag. The tag must start with #.
  * {@link /coc/player/:tag}
  */
 export function createGetCOCPlayer<

@@ -29,7 +29,7 @@ export function getUserCwlApplicationsQueryOptions(config: Partial<RequestConfig
 }
 
 /**
- * @description [Verified] Fetches the current user's CWL applications.
+ * @description Fetches the current user's CWL applications.
  * {@link /user/cwl}
  */
 export function createGetUserCwlApplications<

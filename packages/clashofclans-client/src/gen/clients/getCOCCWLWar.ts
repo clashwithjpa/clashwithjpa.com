@@ -13,7 +13,7 @@ function getGetCOCCWLWarUrl(warTag: GetCOCCWLWarPathParams["warTag"]) {
 }
 
 /**
- * @description [Authenticated] Fetches a CWL war's details by its war tag. The tag must start with #.
+ * @description Fetches a CWL war's details by its war tag. The tag must start with #.
  * {@link /coc/cwl/wars/:warTag}
  */
 export async function getCOCCWLWar(warTag: GetCOCCWLWarPathParams["warTag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

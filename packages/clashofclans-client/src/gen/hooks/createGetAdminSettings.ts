@@ -29,7 +29,7 @@ export function getAdminSettingsQueryOptions(config: Partial<RequestConfig> & { 
 }
 
 /**
- * @description [Admin/sudo] Fetches the current site settings.
+ * @description Fetches the current site settings.
  * {@link /admin/settings}
  */
 export function createGetAdminSettings<

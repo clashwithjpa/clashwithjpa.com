@@ -21,7 +21,7 @@ function getRenameCwlSeasonUrl(id: RenameCwlSeasonPathParams["id"]) {
 }
 
 /**
- * @description [Admin] Renames a CWL season.
+ * @description Renames a CWL season.
  * {@link /admin/cwl-seasons/:id}
  */
 export async function renameCwlSeason(

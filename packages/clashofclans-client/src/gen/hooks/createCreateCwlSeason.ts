@@ -19,7 +19,7 @@ export const createCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons" }] 
 export type CreateCwlSeasonMutationKey = ReturnType<typeof createCwlSeasonMutationKey>;
 
 /**
- * @description [Admin] Creates a new CWL season.
+ * @description Creates a new CWL season.
  * {@link /admin/cwl-seasons}
  */
 export function createCreateCwlSeason<TContext>(

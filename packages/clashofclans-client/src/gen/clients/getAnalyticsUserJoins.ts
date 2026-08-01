@@ -18,7 +18,7 @@ function getGetAnalyticsUserJoinsUrl() {
 }
 
 /**
- * @description [Reviewer] Daily count of new users over the requested window.
+ * @description Daily count of new users over the requested window.
  * {@link /analytics/user-joins}
  */
 export async function getAnalyticsUserJoins(params?: GetAnalyticsUserJoinsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

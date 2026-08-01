@@ -19,7 +19,7 @@ export const postCOCPlayerVerifyMutationKey = () => [{ url: "/coc/player/:tag/ve
 export type PostCOCPlayerVerifyMutationKey = ReturnType<typeof postCOCPlayerVerifyMutationKey>;
 
 /**
- * @description [Authenticated] Verifies a Clash of Clans player's API token.
+ * @description Verifies a Clash of Clans player's API token.
  * {@link /coc/player/:tag/verifytoken}
  */
 export function createPostCOCPlayerVerify<TContext>(

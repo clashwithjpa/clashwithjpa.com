@@ -29,7 +29,7 @@ export function getAdminClansQueryOptions(config: Partial<RequestConfig> & { cli
 }
 
 /**
- * @description [Manager] Lists all JPA clans with full details.
+ * @description Lists all JPA clans with full details.
  * {@link /admin/clans}
  */
 export function createGetAdminClans<

@@ -17,7 +17,7 @@ function getGetCOCPlayerBattleLogUrl(tag: GetCOCPlayerBattleLogPathParams["tag"]
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.
+ * @description Fetches a Clash of Clans player's battle log by their tag. The tag must start with #.
  * {@link /coc/player/:tag/battlelog}
  */
 export async function getCOCPlayerBattleLog(tag: GetCOCPlayerBattleLogPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

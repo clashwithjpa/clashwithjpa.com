@@ -20,7 +20,7 @@ export const setUserAccountExternalMutationKey = () => [{ url: "/user/accounts/:
 export type SetUserAccountExternalMutationKey = ReturnType<typeof setUserAccountExternalMutationKey>;
 
 /**
- * @description [Verified] Converts one of the current user's own Clash of Clans accounts to external. One-way: members can only mark an account external, not revert it (reverting to a main account is staff-only). War weight is left unchanged.
+ * @description Converts one of the current user's own Clash of Clans accounts to external. One-way — this endpoint cannot revert an account to main; use PUT /admin/coc-accounts/{id}/external for that. War weight is left unchanged.
  * {@link /user/accounts/:id/external}
  */
 export function createSetUserAccountExternal<TContext>(

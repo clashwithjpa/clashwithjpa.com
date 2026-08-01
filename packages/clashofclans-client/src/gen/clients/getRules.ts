@@ -13,7 +13,7 @@ function getGetRulesUrl() {
 }
 
 /**
- * @description [Public] Fetches the current rules content.
+ * @description Fetches the current rules content.
  * {@link /rules}
  */
 export async function getRules(config: Partial<RequestConfig> & { client?: Client } = {}) {

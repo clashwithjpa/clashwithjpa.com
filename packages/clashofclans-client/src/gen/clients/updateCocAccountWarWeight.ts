@@ -20,7 +20,7 @@ function getUpdateCocAccountWarWeightUrl(id: UpdateCocAccountWarWeightPathParams
 }
 
 /**
- * @description [Manager] Updates the war weight of a linked Clash of Clans account.
+ * @description Updates the war weight of a linked Clash of Clans account.
  * {@link /admin/coc-accounts/:id/weight}
  */
 export async function updateCocAccountWarWeight(

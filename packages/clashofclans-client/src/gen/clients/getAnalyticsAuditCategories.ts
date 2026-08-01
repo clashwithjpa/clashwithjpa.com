@@ -17,7 +17,7 @@ function getGetAnalyticsAuditCategoriesUrl() {
 }
 
 /**
- * @description [Reviewer] Audit log action counts grouped by target type.
+ * @description Audit log action counts grouped by target type.
  * {@link /analytics/audit-categories}
  */
 export async function getAnalyticsAuditCategories(config: Partial<RequestConfig> & { client?: Client } = {}) {

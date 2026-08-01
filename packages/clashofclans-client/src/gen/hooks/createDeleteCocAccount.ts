@@ -20,7 +20,7 @@ export const deleteCocAccountMutationKey = () => [{ url: "/admin/coc-accounts/:i
 export type DeleteCocAccountMutationKey = ReturnType<typeof deleteCocAccountMutationKey>;
 
 /**
- * @description [Admin] Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications. Deletion is an admin-only (sudo) power.
+ * @description Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications and cannot be undone.
  * {@link /admin/coc-accounts/:id}
  */
 export function createDeleteCocAccount<TContext>(

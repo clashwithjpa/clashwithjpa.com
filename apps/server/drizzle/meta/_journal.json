@@ -155,6 +155,41 @@
             "when": 1781429964996,
             "tag": "0021_giant_riptide",
             "breakpoints": true
+        },
+        {
+            "idx": 22,
+            "version": "7",
+            "when": 1785502128583,
+            "tag": "0022_premium_blue_marvel",
+            "breakpoints": true
+        },
+        {
+            "idx": 23,
+            "version": "7",
+            "when": 1785520128236,
+            "tag": "0023_workable_shiver_man",
+            "breakpoints": true
+        },
+        {
+            "idx": 24,
+            "version": "7",
+            "when": 1785562666064,
+            "tag": "0024_pretty_tenebrous",
+            "breakpoints": true
+        },
+        {
+            "idx": 25,
+            "version": "7",
+            "when": 1785575760979,
+            "tag": "0025_overjoyed_revanche",
+            "breakpoints": true
+        },
+        {
+            "idx": 26,
+            "version": "7",
+            "when": 1785577686785,
+            "tag": "0026_big_chat",
+            "breakpoints": true
         }
     ]
 }

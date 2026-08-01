@@ -22,7 +22,7 @@ export const createCwlApplicationMutationKey = () => [{ url: "/admin/cwl-applica
 export type CreateCwlApplicationMutationKey = ReturnType<typeof createCwlApplicationMutationKey>;
 
 /**
- * @description [Manager] Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.
+ * @description Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.
  * {@link /admin/cwl-applications}
  */
 export function createCreateCwlApplication<TContext>(

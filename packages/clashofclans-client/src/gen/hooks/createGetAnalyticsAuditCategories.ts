@@ -33,7 +33,7 @@ export function getAnalyticsAuditCategoriesQueryOptions(config: Partial<RequestC
 }
 
 /**
- * @description [Reviewer] Audit log action counts grouped by target type.
+ * @description Audit log action counts grouped by target type.
  * {@link /analytics/audit-categories}
  */
 export function createGetAnalyticsAuditCategories<

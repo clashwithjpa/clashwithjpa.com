@@ -68,6 +68,17 @@ export type {
     CreateAdminCwlClanMutationResponse,
 } from "./CreateAdminCwlClan.ts";
 export type {
+    CreateApiKey200,
+    CreateApiKey401,
+    CreateApiKey403,
+    CreateApiKey404,
+    CreateApiKey500,
+    CreateApiKeyMutation,
+    CreateApiKeyMutationRequest,
+    CreateApiKeyMutationRequestScopeEnumKey,
+    CreateApiKeyMutationResponse,
+} from "./CreateApiKey.ts";
+export type {
     CreateCocAccount200,
     CreateCocAccount400,
     CreateCocAccount401,
@@ -247,8 +258,45 @@ export type {
     GetAnalyticsUserJoinsQueryResponse,
 } from "./GetAnalyticsUserJoins.ts";
 export type {
+    GetApiKeyUsageDaily200,
+    GetApiKeyUsageDaily401,
+    GetApiKeyUsageDaily404,
+    GetApiKeyUsageDaily500,
+    GetApiKeyUsageDailyQuery,
+    GetApiKeyUsageDailyQueryParams,
+    GetApiKeyUsageDailyQueryResponse,
+} from "./GetApiKeyUsageDaily.ts";
+export type {
+    GetApiKeyUsageEndpoints200,
+    GetApiKeyUsageEndpoints401,
+    GetApiKeyUsageEndpoints404,
+    GetApiKeyUsageEndpoints500,
+    GetApiKeyUsageEndpointsQuery,
+    GetApiKeyUsageEndpointsQueryParams,
+    GetApiKeyUsageEndpointsQueryResponse,
+} from "./GetApiKeyUsageEndpoints.ts";
+export type {
+    GetApiKeyUsageStatus200,
+    GetApiKeyUsageStatus401,
+    GetApiKeyUsageStatus404,
+    GetApiKeyUsageStatus500,
+    GetApiKeyUsageStatusQuery,
+    GetApiKeyUsageStatusQueryParams,
+    GetApiKeyUsageStatusQueryResponse,
+} from "./GetApiKeyUsageStatus.ts";
+export type {
+    GetApiKeyUsageSummary200,
+    GetApiKeyUsageSummary401,
+    GetApiKeyUsageSummary404,
+    GetApiKeyUsageSummary500,
+    GetApiKeyUsageSummaryQuery,
+    GetApiKeyUsageSummaryQueryParams,
+    GetApiKeyUsageSummaryQueryResponse,
+} from "./GetApiKeyUsageSummary.ts";
+export type {
     EntriesActionEnumKey,
     EntriesActorCurrentRoleEnumKey,
+    EntriesSourceEnumKey,
     EntriesTargetTypeEnumKey,
     GetAuditLog200,
     GetAuditLog401,
@@ -256,6 +304,7 @@ export type {
     GetAuditLogQuery,
     GetAuditLogQueryParams,
     GetAuditLogQueryParamsActionEnumKey,
+    GetAuditLogQueryParamsSourceEnumKey,
     GetAuditLogQueryParamsTargetTypeEnumKey,
     GetAuditLogQueryResponse,
 } from "./GetAuditLog.ts";
@@ -376,7 +425,6 @@ export type {
     GetJoinApplicationsQueryParamsStatusEnumKey,
     GetJoinApplicationsQueryResponse,
 } from "./GetJoinApplications.ts";
-export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./GetUser.ts";
 export type {
@@ -453,6 +501,16 @@ export type {
     SetUserAccountExternalMutationResponse,
     SetUserAccountExternalPathParams,
 } from "./SetUserAccountExternal.ts";
+export type {
+    SetUserApiAccess200,
+    SetUserApiAccess401,
+    SetUserApiAccess404,
+    SetUserApiAccess500,
+    SetUserApiAccessMutation,
+    SetUserApiAccessMutationRequest,
+    SetUserApiAccessMutationResponse,
+    SetUserApiAccessPathParams,
+} from "./SetUserApiAccess.ts";
 export type {
     SetUserSeasonBonus200,
     SetUserSeasonBonus400,
@@ -569,13 +627,16 @@ export type {
     VerifyAdminClanDiscordMutationRequest,
     VerifyAdminClanDiscordMutationResponse,
 } from "./VerifyAdminClanDiscord.ts";
+export { createApiKeyMutationRequestScopeEnum } from "./CreateApiKey.ts";
 export { applicationStatusEnum2 } from "./DeleteJoinApplication.ts";
 export { getAdminCocAccountsQueryParamsSortDirEnum } from "./GetAdminCocAccounts.ts";
 export { getAdminUsersQueryParamsSortDirectionEnum } from "./GetAdminUsers.ts";
 export { entriesActionEnum } from "./GetAuditLog.ts";
 export { entriesActorCurrentRoleEnum } from "./GetAuditLog.ts";
+export { entriesSourceEnum } from "./GetAuditLog.ts";
 export { entriesTargetTypeEnum } from "./GetAuditLog.ts";
 export { getAuditLogQueryParamsActionEnum } from "./GetAuditLog.ts";
+export { getAuditLogQueryParamsSourceEnum } from "./GetAuditLog.ts";
 export { getAuditLogQueryParamsTargetTypeEnum } from "./GetAuditLog.ts";
 export { warBattleModifierEnum } from "./GetCOCCWLWar.ts";
 export { warStateEnum } from "./GetCOCCWLWar.ts";

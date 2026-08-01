@@ -19,7 +19,7 @@ function getVerifyAdminClanDiscordUrl() {
 }
 
 /**
- * @description [Admin/sudo] Verifies that the provided Discord role/channel/user IDs exist in the configured guild.
+ * @description Verifies that the provided Discord role/channel/user IDs exist in the configured guild.
  * {@link /admin/clans/verify-discord}
  */
 export async function verifyAdminClanDiscord(

@@ -18,7 +18,7 @@ function getGetAnalyticsAuditTrendUrl() {
 }
 
 /**
- * @description [Reviewer] Daily count of audit log actions over the requested window.
+ * @description Daily count of audit log actions over the requested window.
  * {@link /analytics/audit-trend}
  */
 export async function getAnalyticsAuditTrend(params?: GetAnalyticsAuditTrendQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

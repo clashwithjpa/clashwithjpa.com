@@ -18,7 +18,7 @@ function getRefreshDiscordUsernamesUrl() {
 }
 
 /**
- * @description [Superadmin/root] Re-fetches Discord usernames from the guild member list and updates stored values.
+ * @description Re-fetches Discord usernames from the guild member list and updates stored values.
  * {@link /admin/refresh-discord-usernames}
  */
 export async function refreshDiscordUsernames(config: Partial<RequestConfig> & { client?: Client } = {}) {

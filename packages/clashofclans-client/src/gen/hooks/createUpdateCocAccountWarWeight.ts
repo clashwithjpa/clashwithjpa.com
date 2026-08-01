@@ -21,7 +21,7 @@ export const updateCocAccountWarWeightMutationKey = () => [{ url: "/admin/coc-ac
 export type UpdateCocAccountWarWeightMutationKey = ReturnType<typeof updateCocAccountWarWeightMutationKey>;
 
 /**
- * @description [Manager] Updates the war weight of a linked Clash of Clans account.
+ * @description Updates the war weight of a linked Clash of Clans account.
  * {@link /admin/coc-accounts/:id/weight}
  */
 export function createUpdateCocAccountWarWeight<TContext>(

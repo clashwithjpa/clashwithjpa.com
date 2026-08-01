@@ -50,6 +50,11 @@ export const AUDIT_ACTIONS = [
     "user.password_set",
     "user.session_revoked",
     "user.sessions_revoked",
+    "user.api_access_granted",
+    "user.api_access_revoked",
+    "api_key.create",
+    "api_key.update",
+    "api_key.delete",
 ] as const;
 
 export const AUDIT_TARGET_TYPES = [
@@ -63,6 +68,7 @@ export const AUDIT_TARGET_TYPES = [
     "cwl_clan",
     "coc_account",
     "user",
+    "api_key",
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
@@ -80,7 +86,15 @@ export type LogActionInput = {
 
 export type AuditActor = { id?: string | null; name?: string | null } | null | undefined;
 
-function insertAuditLog(actor: AuditActor, input: LogActionInput): void {
+export const AUDIT_SOURCES = ["web", "api"] as const;
+export type AuditSource = (typeof AUDIT_SOURCES)[number];
+
+// The key an action was performed through, when it came in over the API rather
+// than a browser session. `name` is snapshotted alongside the id for the same
+// reason `actorName` is — the log must stay readable after the key is revoked.
+type AuditApiKey = { id?: string | null; name?: string | null } | null | undefined;
+
+function insertAuditLog(actor: AuditActor, input: LogActionInput, apiKey?: AuditApiKey): void {
     db.insert(auditLogTable)
         .values({
             actorId: actor?.id ?? null,
@@ -89,6 +103,9 @@ function insertAuditLog(actor: AuditActor, input: LogActionInput): void {
             targetType: input.targetType ?? null,
             targetId: input.targetId != null ? String(input.targetId) : null,
             metadata: input.metadata ?? null,
+            source: apiKey ? "api" : "web",
+            apiKeyId: apiKey?.id ?? null,
+            apiKeyName: apiKey?.name ?? null,
         })
         .catch((err) => {
             Sentry.captureException(err, { tags: { audit_action: input.action } });
@@ -97,11 +114,15 @@ function insertAuditLog(actor: AuditActor, input: LogActionInput): void {
 
 // Fire-and-forget audit insert. Failures are reported to Sentry but never thrown,
 // so a failing audit insert can't break the user-facing request.
+//
+// Every mutating route already calls this, so API-driven mutations are audited
+// and tagged with no per-route change — the key is read straight off the context.
 export function logAction(c: Context<AppEnv>, input: LogActionInput): void {
-    insertAuditLog(c.get("user"), input);
+    insertAuditLog(c.get("user"), input, c.get("apiKey"));
 }
 
-// For callers without a Hono context (e.g. better-auth hooks).
+// For callers without a Hono context (e.g. better-auth hooks). Always "web":
+// API keys are denied on /api/auth/* before the handler runs.
 export function logActionForActor(actor: AuditActor, input: LogActionInput): void {
     insertAuditLog(actor, input);
 }

@@ -13,7 +13,7 @@ function getGetAuditLogUrl() {
 }
 
 /**
- * @description [Manager] Lists audit log entries with optional filters (actorId, action, targetType, targetId, date range) and pagination.
+ * @description Lists audit log entries with optional filters (actorId, action, targetType, targetId, source, date range) and pagination.
  * {@link /admin/audit-log}
  */
 export async function getAuditLog(params?: GetAuditLogQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -24,7 +24,7 @@ export function getJPACwlClansQueryOptions(config: Partial<RequestConfig> & { cl
 }
 
 /**
- * @description [Authenticated] Fetches all JPA CWL clans with their details.
+ * @description Fetches all JPA CWL clans with their details.
  * {@link /coc/jpa/clans/cwl}
  */
 export function createGetJPACwlClans<

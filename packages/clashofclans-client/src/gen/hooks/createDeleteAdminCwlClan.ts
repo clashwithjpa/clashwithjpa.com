@@ -20,7 +20,7 @@ export const deleteAdminCwlClanMutationKey = () => [{ url: "/admin/cwl-clans/:ta
 export type DeleteAdminCwlClanMutationKey = ReturnType<typeof deleteAdminCwlClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Deletes a CWL clan identified by URL-encoded clan tag.
+ * @description Deletes a CWL clan identified by URL-encoded clan tag.
  * {@link /admin/cwl-clans/:tag}
  */
 export function createDeleteAdminCwlClan<TContext>(

@@ -11,9 +11,22 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
-    import { actionConfig, actorLabel, auditActionOptions, auditTargetOptions, describeAction, type AuditEntry } from "$lib/config/auditLog";
+    import {
+        actionConfig,
+        actorLabel,
+        auditActionOptions,
+        auditSourceOptions,
+        auditTargetOptions,
+        describeAction,
+        type AuditEntry,
+    } from "$lib/config/auditLog";
     import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
-    import { getAuditLog, type GetAuditLogQueryParamsActionEnumKey, type GetAuditLogQueryParamsTargetTypeEnumKey } from "@repo/clashofclans-client";
+    import {
+        getAuditLog,
+        type GetAuditLogQueryParamsActionEnumKey,
+        type GetAuditLogQueryParamsSourceEnumKey,
+        type GetAuditLogQueryParamsTargetTypeEnumKey,
+    } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { PreRendered } from "carta-md";
     import { toast } from "svelte-sonner";
@@ -24,6 +37,7 @@
     import TablerChevronLeft from "~icons/tabler/chevron-left";
     import TablerChevronRight from "~icons/tabler/chevron-right";
     import TablerHistory from "~icons/tabler/history";
+    import TablerKey from "~icons/tabler/key";
 
     const PAGE_SIZE = 50;
 
@@ -40,6 +54,7 @@
     let loading = $state(true);
     let actionFilter = $state<string>("");
     let targetTypeFilter = $state<string>("");
+    let sourceFilter = $state<string>("");
     let actorIdFilter = $state<string>("");
     let page = $state(0);
     let expanded = $state<Record<number, boolean>>({});
@@ -62,6 +77,7 @@
                     offset: page * PAGE_SIZE,
                     action: (actionFilter || undefined) as GetAuditLogQueryParamsActionEnumKey | undefined,
                     targetType: (targetTypeFilter || undefined) as GetAuditLogQueryParamsTargetTypeEnumKey | undefined,
+                    source: (sourceFilter || undefined) as GetAuditLogQueryParamsSourceEnumKey | undefined,
                     actorId: actorIdFilter.trim() || undefined,
                 },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
@@ -82,6 +98,7 @@
     $effect(() => {
         actionFilter;
         targetTypeFilter;
+        sourceFilter;
         page;
         load();
     });
@@ -89,6 +106,7 @@
     function resetFilters() {
         actionFilter = "";
         targetTypeFilter = "";
+        sourceFilter = "";
         actorIdFilter = "";
         page = 0;
     }
@@ -206,6 +224,7 @@
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
             <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Filter action" class="lg:w-56" />
             <Select bind:value={targetTypeFilter} options={auditTargetOptions} placeholder="Filter target" class="lg:w-48" />
+            <Select bind:value={sourceFilter} options={auditSourceOptions} placeholder="Filter source" class="lg:w-40" />
             <Input
                 bind:value={actorIdFilter}
                 placeholder="Filter by actor ID"
@@ -296,6 +315,24 @@
                                         {entry.targetType}{entry.targetId ? `#${entry.targetId}` : ""}
                                     </span>
                                 {/if}
+                                <!--
+                                    Source is a separate axis from the action, so it gets a colour
+                                    the action variants never use. Web entries stay unmarked — the
+                                    badge is there to make the rarer, machine-driven ones stand out.
+                                -->
+                                {#if entry.source === "api"}
+                                    <Tooltip
+                                        title={entry.apiKeyName ? `Performed with the API key "${entry.apiKeyName}"` : "Performed with an API key"}
+                                        placement="top"
+                                    >
+                                        <span
+                                            class="inline-flex cursor-help items-center gap-1.5 rounded border border-purple-700/50 bg-purple-900 px-2 py-0.5 font-mono text-purple-200"
+                                        >
+                                            <TablerKey class="size-3.5 shrink-0" />
+                                            API{entry.apiKeyName ? ` · ${entry.apiKeyName}` : ""}
+                                        </span>
+                                    </Tooltip>
+                                {/if}
                             </div>
                         </div>
 
@@ -331,6 +368,7 @@
             user={selectedSidebarUser}
             onBanToggle={(userId, banned) => toggleBanUser(userId, banned)}
             onRemove={(userId) => removeUser(userId)}
+            onUserUpdated={(userId) => syncSidebarUser(userId)}
             isCurrentUser={selectedSidebarUser.id === $session.data?.user?.id}
             isProcessing={isProcessing === selectedSidebarUser.id}
         />

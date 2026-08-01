@@ -38,7 +38,7 @@ export function getAnalyticsAuditTrendQueryOptions(
 }
 
 /**
- * @description [Reviewer] Daily count of audit log actions over the requested window.
+ * @description Daily count of audit log actions over the requested window.
  * {@link /analytics/audit-trend}
  */
 export function createGetAnalyticsAuditTrend<

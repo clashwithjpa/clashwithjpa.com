@@ -21,7 +21,7 @@ function getApplyUserAccountUrl() {
 }
 
 /**
- * @description [Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.
+ * @description Submits a clan application for a Clash of Clans account after verifying ownership.
  * {@link /user/accounts/apply}
  */
 export async function applyUserAccount(

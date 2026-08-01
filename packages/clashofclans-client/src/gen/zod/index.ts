@@ -61,6 +61,15 @@ export {
     createAdminCwlClanMutationResponseSchema,
 } from "./createAdminCwlClanSchema.ts";
 export {
+    createApiKey200Schema,
+    createApiKey401Schema,
+    createApiKey403Schema,
+    createApiKey404Schema,
+    createApiKey500Schema,
+    createApiKeyMutationRequestSchema,
+    createApiKeyMutationResponseSchema,
+} from "./createApiKeySchema.ts";
+export {
     createCocAccount200Schema,
     createCocAccount400Schema,
     createCocAccount401Schema,
@@ -216,6 +225,38 @@ export {
     getAnalyticsUserJoinsQueryResponseSchema,
 } from "./getAnalyticsUserJoinsSchema.ts";
 export {
+    getApiKeyUsageDaily200Schema,
+    getApiKeyUsageDaily401Schema,
+    getApiKeyUsageDaily404Schema,
+    getApiKeyUsageDaily500Schema,
+    getApiKeyUsageDailyQueryParamsSchema,
+    getApiKeyUsageDailyQueryResponseSchema,
+} from "./getApiKeyUsageDailySchema.ts";
+export {
+    getApiKeyUsageEndpoints200Schema,
+    getApiKeyUsageEndpoints401Schema,
+    getApiKeyUsageEndpoints404Schema,
+    getApiKeyUsageEndpoints500Schema,
+    getApiKeyUsageEndpointsQueryParamsSchema,
+    getApiKeyUsageEndpointsQueryResponseSchema,
+} from "./getApiKeyUsageEndpointsSchema.ts";
+export {
+    getApiKeyUsageStatus200Schema,
+    getApiKeyUsageStatus401Schema,
+    getApiKeyUsageStatus404Schema,
+    getApiKeyUsageStatus500Schema,
+    getApiKeyUsageStatusQueryParamsSchema,
+    getApiKeyUsageStatusQueryResponseSchema,
+} from "./getApiKeyUsageStatusSchema.ts";
+export {
+    getApiKeyUsageSummary200Schema,
+    getApiKeyUsageSummary401Schema,
+    getApiKeyUsageSummary404Schema,
+    getApiKeyUsageSummary500Schema,
+    getApiKeyUsageSummaryQueryParamsSchema,
+    getApiKeyUsageSummaryQueryResponseSchema,
+} from "./getApiKeyUsageSummarySchema.ts";
+export {
     getAuditLog200Schema,
     getAuditLog401Schema,
     getAuditLog500Schema,
@@ -297,7 +338,6 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./getJoinApplicationsSchema.ts";
-export { getRoot200Schema, getRootQueryResponseSchema } from "./getRootSchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
@@ -364,6 +404,15 @@ export {
     setUserAccountExternalMutationResponseSchema,
     setUserAccountExternalPathParamsSchema,
 } from "./setUserAccountExternalSchema.ts";
+export {
+    setUserApiAccess200Schema,
+    setUserApiAccess401Schema,
+    setUserApiAccess404Schema,
+    setUserApiAccess500Schema,
+    setUserApiAccessMutationRequestSchema,
+    setUserApiAccessMutationResponseSchema,
+    setUserApiAccessPathParamsSchema,
+} from "./setUserApiAccessSchema.ts";
 export {
     setUserSeasonBonus200Schema,
     setUserSeasonBonus400Schema,

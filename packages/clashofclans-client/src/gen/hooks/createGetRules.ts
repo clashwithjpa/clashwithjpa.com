@@ -24,7 +24,7 @@ export function getRulesQueryOptions(config: Partial<RequestConfig> & { client?:
 }
 
 /**
- * @description [Public] Fetches the current rules content.
+ * @description Fetches the current rules content.
  * {@link /rules}
  */
 export function createGetRules<TData = GetRulesQueryResponse, TQueryData = GetRulesQueryResponse, TQueryKey extends QueryKey = GetRulesQueryKey>(

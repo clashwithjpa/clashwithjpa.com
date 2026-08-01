@@ -29,7 +29,7 @@ export function getUserFeaturesQueryOptions(config: Partial<RequestConfig> & { c
 }
 
 /**
- * @description [Authenticated] Fetches the site feature flags relevant to the current user.
+ * @description Fetches the site feature flags relevant to the current user.
  * {@link /user/features}
  */
 export function createGetUserFeatures<

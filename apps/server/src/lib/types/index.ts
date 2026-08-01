@@ -1,11 +1,19 @@
-import z4 from "zod/v4";
 import type { auth } from "@lib/auth";
 import type { RequestIdVariables } from "hono/request-id";
+import z4 from "zod/v4";
+
+export type RequestApiKey = {
+    id: string;
+    name: string | null;
+    userId: string;
+    permissions: Record<string, string[]> | null;
+};
 
 export type AppEnv = {
     Variables: {
         user: typeof auth.$Infer.Session.user | null;
         session: typeof auth.$Infer.Session.session | null;
+        apiKey: RequestApiKey | null;
     } & RequestIdVariables;
 };
 

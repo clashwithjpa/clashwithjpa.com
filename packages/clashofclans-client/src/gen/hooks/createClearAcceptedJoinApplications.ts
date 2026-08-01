@@ -18,7 +18,7 @@ export const clearAcceptedJoinApplicationsMutationKey = () => [{ url: "/admin/jo
 export type ClearAcceptedJoinApplicationsMutationKey = ReturnType<typeof clearAcceptedJoinApplicationsMutationKey>;
 
 /**
- * @description [Admin] Deletes all accepted clan join applications. Deletion is an admin-only (sudo) power.
+ * @description Deletes every accepted clan join application. Cannot be undone.
  * {@link /admin/join-applications/accepted}
  */
 export function createClearAcceptedJoinApplications<TContext>(

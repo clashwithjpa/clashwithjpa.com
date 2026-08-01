@@ -22,7 +22,7 @@ export const renameCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons/:id"
 export type RenameCwlSeasonMutationKey = ReturnType<typeof renameCwlSeasonMutationKey>;
 
 /**
- * @description [Admin] Renames a CWL season.
+ * @description Renames a CWL season.
  * {@link /admin/cwl-seasons/:id}
  */
 export function createRenameCwlSeason<TContext>(

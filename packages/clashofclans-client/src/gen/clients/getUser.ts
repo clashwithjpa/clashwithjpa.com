@@ -13,7 +13,7 @@ function getGetUserUrl() {
 }
 
 /**
- * @description [Authenticated] Fetches the current user's data.
+ * @description Fetches the current user's data.
  * {@link /user}
  */
 export async function getUser(config: Partial<RequestConfig> & { client?: Client } = {}) {

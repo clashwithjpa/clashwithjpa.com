@@ -6,7 +6,8 @@ import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
-import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
+import { describeRoute } from "@/lib/openapi";
+import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
 // All routes require manager-level auth
@@ -23,7 +24,8 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "setRules",
-        description: "[Manager] Updates the rules content.",
+        role: "Manager",
+        description: "Updates the rules content.",
         tags: ["manage"],
         responses: {
             200: {

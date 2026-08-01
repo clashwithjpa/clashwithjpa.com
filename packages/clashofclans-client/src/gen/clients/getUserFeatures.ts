@@ -13,7 +13,7 @@ function getGetUserFeaturesUrl() {
 }
 
 /**
- * @description [Authenticated] Fetches the site feature flags relevant to the current user.
+ * @description Fetches the site feature flags relevant to the current user.
  * {@link /user/features}
  */
 export async function getUserFeatures(config: Partial<RequestConfig> & { client?: Client } = {}) {

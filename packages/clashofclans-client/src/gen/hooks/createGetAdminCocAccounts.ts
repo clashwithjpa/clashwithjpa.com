@@ -35,7 +35,7 @@ export function getAdminCocAccountsQueryOptions(params?: GetAdminCocAccountsQuer
 }
 
 /**
- * @description [Manager] Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.
+ * @description Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.
  * {@link /admin/coc-accounts}
  */
 export function createGetAdminCocAccounts<

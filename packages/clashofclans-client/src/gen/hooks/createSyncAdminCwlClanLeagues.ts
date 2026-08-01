@@ -18,7 +18,7 @@ export const syncAdminCwlClanLeaguesMutationKey = () => [{ url: "/admin/cwl-clan
 export type SyncAdminCwlClanLeaguesMutationKey = ReturnType<typeof syncAdminCwlClanLeaguesMutationKey>;
 
 /**
- * @description [Admin/sudo] Refreshes every CWL clan's league from the Clash of Clans API.
+ * @description Refreshes every CWL clan's league from the Clash of Clans API.
  * {@link /admin/cwl-clans/sync-leagues}
  */
 export function createSyncAdminCwlClanLeagues<TContext>(

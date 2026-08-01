@@ -12,6 +12,7 @@ import TablerFileDescription from "~icons/tabler/file-description";
 import TablerFlag from "~icons/tabler/flag";
 import TablerHistory from "~icons/tabler/history";
 import TablerHome from "~icons/tabler/home";
+import TablerKey from "~icons/tabler/key";
 import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerScale from "~icons/tabler/scale";
 import TablerSettings from "~icons/tabler/settings";
@@ -67,6 +68,13 @@ export const load: LayoutLoad = async ({ url }) => {
             requiredFeature: "applicationsEnabled",
         },
         { name: "CWL", icon: TablerSwords, href: "/dashboard/cwl", category: "General", requiredPerm: "cwl", requiredFeature: "cwlEnabled" },
+        // Two gates. The role half is a plain `requiredPerm`, but the grant is a
+        // per-user flag that neither `requiredPerm` nor `requiredFeature` can
+        // express, so the link is appended conditionally rather than widening
+        // NavigationLink for one case.
+        ...(user.apiAccess
+            ? [{ name: "API Keys", icon: TablerKey, href: "/dashboard/api-keys", category: "Account", requiredPerm: "cwl" } satisfies NavigationLink]
+            : []),
         { name: "Settings", icon: TablerSettings, href: "/dashboard/settings", category: "Account" },
         { name: "Leave", icon: TablerLogout2, href: "/", category: "Exit" },
     ];

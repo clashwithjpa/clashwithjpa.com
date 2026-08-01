@@ -10,13 +10,13 @@
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
     import { onMount, setContext, tick } from "svelte";
     import { toast } from "svelte-sonner";
-    import TablerIcons from "~icons/tabler/icons";
     import TablerMaximize from "~icons/tabler/maximize";
     import TablerMinimize from "~icons/tabler/minimize";
     import TablerMusic from "~icons/tabler/music";
     import TablerMusicOff from "~icons/tabler/music-off";
     import TablerPlayerPause from "~icons/tabler/player-pause";
     import TablerPlayerPlay from "~icons/tabler/player-play";
+    import TablerSpaces from "~icons/tabler/spaces";
     import TablerSpyOff from "~icons/tabler/spy-off";
     import TablerTrash from "~icons/tabler/trash";
 
@@ -172,7 +172,7 @@
         {#snippet trigger()}
             <div class="relative transition-[rotate] duration-800 ease-glide" class:rotate-180={open}>
                 <Button class="size-14 rounded-full" size="" variant="ghost">
-                    <TablerIcons class="pointer-events-none size-6" />
+                    <TablerSpaces class="pointer-events-none size-6" />
                 </Button>
                 {#if showRing}
                     <svg class="pointer-events-none absolute inset-0 size-full -rotate-90 overflow-visible" viewBox="0 0 56 56" fill="none">

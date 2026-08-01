@@ -13,7 +13,7 @@ function getGetBonusLedgerUrl() {
 }
 
 /**
- * @description [Manager] Lists every awarded bonus (one row per user per season).
+ * @description Lists every awarded bonus (one row per user per season).
  * {@link /admin/bonus-ledger}
  */
 export async function getBonusLedger(config: Partial<RequestConfig> & { client?: Client } = {}) {

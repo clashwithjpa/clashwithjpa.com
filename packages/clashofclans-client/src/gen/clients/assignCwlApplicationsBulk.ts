@@ -19,7 +19,7 @@ function getAssignCwlApplicationsBulkUrl() {
 }
 
 /**
- * @description [Manager] Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.
+ * @description Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.
  * {@link /admin/cwl-applications/assign-bulk}
  */
 export async function assignCwlApplicationsBulk(

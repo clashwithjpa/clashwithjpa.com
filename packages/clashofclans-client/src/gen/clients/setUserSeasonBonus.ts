@@ -19,7 +19,7 @@ function getSetUserSeasonBonusUrl() {
 }
 
 /**
- * @description [Manager] Awards or removes a user's bonus for a season.
+ * @description Awards or removes a user's bonus for a season.
  * {@link /admin/bonus}
  */
 export async function setUserSeasonBonus(

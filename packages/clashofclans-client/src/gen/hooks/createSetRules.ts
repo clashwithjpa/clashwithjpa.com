@@ -14,7 +14,7 @@ export const setRulesMutationKey = () => [{ url: "/manage/rules" }] as const;
 export type SetRulesMutationKey = ReturnType<typeof setRulesMutationKey>;
 
 /**
- * @description [Manager] Updates the rules content.
+ * @description Updates the rules content.
  * {@link /manage/rules}
  */
 export function createSetRules<TContext>(

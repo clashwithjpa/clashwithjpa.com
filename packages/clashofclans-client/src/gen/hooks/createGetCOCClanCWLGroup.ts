@@ -31,7 +31,7 @@ export function getCOCClanCWLGroupQueryOptions(tag: GetCOCClanCWLGroupPathParams
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar/leaguegroup}
  */
 export function createGetCOCClanCWLGroup<
