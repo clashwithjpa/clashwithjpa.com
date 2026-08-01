@@ -25,7 +25,6 @@
     import TablerKey from "~icons/tabler/key";
     import TablerPlus from "~icons/tabler/plus";
     import TablerShieldLock from "~icons/tabler/shield-lock";
-    import TablerTerminal2 from "~icons/tabler/terminal-2";
 
     let { data } = $props();
 
@@ -170,8 +169,13 @@
             </p>
         </div>
 
-        {#if keys && keys.length > 0}
-            <div class="flex shrink-0 items-center gap-2">
+        <div class="flex shrink-0 items-center gap-2">
+            <Button variant="ghost" size="sm" class="gap-2" href="{PUBLIC_SERVER_URL}/scalar" target="_blank">
+                <TablerBook2 class="size-5" />
+                API Docs
+                <TablerExternalLink class="size-4" />
+            </Button>
+            {#if keys && keys.length > 0}
                 <Tooltip title="{activeCount} active" placement="bottom">
                     <div
                         class="flex cursor-help items-center gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-400"
@@ -191,8 +195,8 @@
                     <TablerPlus class="size-5 shrink-0" />
                     New Key
                 </Button>
-            </div>
-        {/if}
+            {/if}
+        </div>
     </div>
 
     {#snippet stat(label: string, value: string, hint: string, Icon: typeof TablerKey)}
@@ -257,46 +261,6 @@
             {/each}
         </div>
     {/if}
-
-    <div class="stagger-card flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <TablerTerminal2 class="size-6 text-stone-400" />
-                <h2 class="text-lg font-semibold text-stone-50">Using your key</h2>
-            </div>
-            <Button variant="ghost" size="sm" class="gap-2" href="{PUBLIC_SERVER_URL}/scalar" target="_blank">
-                <TablerBook2 class="size-5" />
-                API reference
-                <TablerExternalLink class="size-4" />
-            </Button>
-        </div>
-
-        <div class="flex items-start gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-950 p-4">
-            <pre class="min-w-0 flex-1 overflow-x-auto font-mono text-xs text-stone-200">{SAMPLE_REQUEST}</pre>
-            <Button size="icon" variant={sampleCopied ? "success" : "ghost"} onclick={copySample}>
-                {#if sampleCopied}
-                    <TablerCheck />
-                {:else}
-                    <TablerCopy />
-                {/if}
-            </Button>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 text-sm text-stone-400 sm:grid-cols-3">
-            <div class="flex flex-col gap-1">
-                <span class="font-medium text-stone-200">Scoped, not absolute</span>
-                <span class="text-xs">A key can only reach what you scoped it for, and only while your own role still allows it.</span>
-            </div>
-            <div class="flex flex-col gap-1">
-                <span class="font-medium text-stone-200">Not everything is reachable</span>
-                <span class="text-xs">Account, session and upload endpoints stay browser-only — keys are refused there.</span>
-            </div>
-            <div class="flex flex-col gap-1">
-                <span class="font-medium text-stone-200">Everything is logged</span>
-                <span class="text-xs">Changes made with a key land in the audit log tagged with the key's name.</span>
-            </div>
-        </div>
-    </div>
 </div>
 
 <Dialog
