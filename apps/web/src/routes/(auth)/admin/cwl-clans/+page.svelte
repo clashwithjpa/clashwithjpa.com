@@ -212,7 +212,9 @@
         syncing = true;
         try {
             const resp = (await syncAdminCwlClanLeagues({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof syncAdminCwlClanLeagues>> | SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
+                | Awaited<ReturnType<typeof syncAdminCwlClanLeagues>>
+                | SyncAdminCwlClanLeagues401
+                | SyncAdminCwlClanLeagues500;
             if (resp.success) {
                 clans = resp.data.clans;
                 const { updated, unchanged, failed } = resp.data;
@@ -281,7 +283,10 @@
         removing = tag;
         try {
             const resp = (await deleteAdminCwlClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof deleteAdminCwlClan>> | DeleteAdminCwlClan401 | DeleteAdminCwlClan404 | DeleteAdminCwlClan500;
+                | Awaited<ReturnType<typeof deleteAdminCwlClan>>
+                | DeleteAdminCwlClan401
+                | DeleteAdminCwlClan404
+                | DeleteAdminCwlClan500;
             if (resp.success) {
                 clans = clans.filter((c) => c.cocClanTag !== tag);
                 toast.success("CWL clan removed");

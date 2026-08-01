@@ -354,7 +354,10 @@
         removing = clan.id;
         try {
             const resp = (await deleteAdminClan(clan.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof deleteAdminClan>> | DeleteAdminClan401 | DeleteAdminClan404 | DeleteAdminClan500;
+                | Awaited<ReturnType<typeof deleteAdminClan>>
+                | DeleteAdminClan401
+                | DeleteAdminClan404
+                | DeleteAdminClan500;
             if (resp.success) {
                 clans = clans.filter((c) => c.id !== clan.id);
                 toast.success("Clan removed");
