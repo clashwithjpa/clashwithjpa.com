@@ -2,6 +2,7 @@ import { isApiKeyAllowedPath } from "@/lib/api-access";
 import { apiUsageMiddleware } from "@/lib/api-usage";
 import { config } from "@/lib/config";
 import { betterAuthMiddleware } from "@/lib/middlewares";
+import { describeRoute } from "@/lib/openapi";
 import { getCachedSettings } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { compress } from "@hono/bun-compress";
@@ -11,7 +12,6 @@ import * as Sentry from "@sentry/bun";
 import { createHash } from "crypto";
 import "dotenv/config";
 import { Hono } from "hono";
-import { describeRoute } from "@/lib/openapi";
 import { openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
 import { every } from "hono/combine";
@@ -185,19 +185,16 @@ const SESSION_ONLY_BADGE = { name: "Session only", color: "#f97316" };
 const PROD_SERVER = { url: "https://api.clashwithjpa.com", description: "Production Server" };
 const DEV_SERVERS = [{ url: "http://localhost:3000", description: "Local Server" }, PROD_SERVER];
 
-const INTERNAL_DOC_DESCRIPTION =
-    "API Documentation for ClashWithJPA. This API is used by the frontend hosted at https://clashwithjpa.com. You can find better-auth reference at /api/auth/reference";
 const PUBLIC_DOC_DESCRIPTION =
     "Public API for ClashWithJPA. Authenticate with an `x-api-key` header. Keys are issued from your dashboard at https://clashwithjpa.com/dashboard/api-keys, and each one carries its own scopes. The badge on an operation is the level it requires.";
 
-const docDescription = config.NODE_ENV === "production" ? PUBLIC_DOC_DESCRIPTION : INTERNAL_DOC_DESCRIPTION;
+const docDescription = config.NODE_ENV === "production" ? PUBLIC_DOC_DESCRIPTION : "";
 
 const baseOpenAPIHandler = openAPIRouteHandler(app, {
     documentation: {
         info: {
             title: "ClashWithJPA API",
             version: "1.0.0",
-            description: INTERNAL_DOC_DESCRIPTION,
         },
         servers: DEV_SERVERS,
         externalDocs: {
