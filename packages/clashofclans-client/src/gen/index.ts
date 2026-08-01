@@ -50,7 +50,6 @@ export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanReq
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
 export type { GetJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
-export type { GetRootQueryKey } from "./hooks/createGetRoot.ts";
 export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
@@ -509,7 +508,6 @@ export type {
     GetJoinApplicationsQueryParamsStatusEnumKey,
     GetJoinApplicationsQueryResponse,
 } from "./models/GetJoinApplications.ts";
-export type { GetRoot200, GetRootQuery, GetRootQueryResponse } from "./models/GetRoot.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
 export type {
@@ -764,7 +762,6 @@ export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
 export { getJoinApplications } from "./clients/getJoinApplications.ts";
-export { getRoot } from "./clients/getRoot.ts";
 export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
@@ -928,9 +925,6 @@ export { getJPACwlClansQueryOptions } from "./hooks/createGetJPACwlClans.ts";
 export { createGetJoinApplications } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryOptions } from "./hooks/createGetJoinApplications.ts";
-export { createGetRoot } from "./hooks/createGetRoot.ts";
-export { getRootQueryKey } from "./hooks/createGetRoot.ts";
-export { getRootQueryOptions } from "./hooks/createGetRoot.ts";
 export { createGetRules } from "./hooks/createGetRules.ts";
 export { getRulesQueryKey } from "./hooks/createGetRules.ts";
 export { getRulesQueryOptions } from "./hooks/createGetRules.ts";
@@ -1380,7 +1374,6 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./zod/getJoinApplicationsSchema.ts";
-export { getRoot200Schema, getRootQueryResponseSchema } from "./zod/getRootSchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
 export {
     getUserAccounts200Schema,

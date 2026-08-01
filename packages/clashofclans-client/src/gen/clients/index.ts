@@ -50,7 +50,6 @@ export { getJPAClanRequirements } from "./getJPAClanRequirements.ts";
 export { getJPAClans } from "./getJPAClans.ts";
 export { getJPACwlClans } from "./getJPACwlClans.ts";
 export { getJoinApplications } from "./getJoinApplications.ts";
-export { getRoot } from "./getRoot.ts";
 export { getRules } from "./getRules.ts";
 export { getUser } from "./getUser.ts";
 export { getUserAccounts } from "./getUserAccounts.ts";

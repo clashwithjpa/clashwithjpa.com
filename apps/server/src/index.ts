@@ -119,39 +119,6 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
     return auth.handler(c.req.raw);
 });
 
-const getRootData = z4.object({
-    message: z4.string(),
-});
-app.get(
-    "/",
-    describeRoute({
-        operationId: "getRoot",
-        role: "Public",
-        // No credentials at all: opt out of the document-wide api-key scheme.
-        security: [],
-        description: "Welcome route for the API. This route is used to verify that the API is up and running.",
-        tags: ["root"],
-        responses: {
-            200: {
-                description: "Successful response with a welcome message.",
-                content: {
-                    "application/json": {
-                        schema: resolver(SuccessResponseSchema(getRootData)),
-                    },
-                },
-            },
-        },
-    }),
-    (c) => {
-        return c.json({
-            success: true,
-            data: {
-                message: "Welcome to the ClashWithJPA API! Visit /scalar for API documentation.",
-            },
-        });
-    },
-);
-
 const getRulesData = z4.object({
     rules: z4.string().nullable(),
 });
@@ -221,7 +188,7 @@ const DEV_SERVERS = [{ url: "http://localhost:3000", description: "Local Server"
 const INTERNAL_DOC_DESCRIPTION =
     "API Documentation for ClashWithJPA. This API is used by the frontend hosted at https://clashwithjpa.com. You can find better-auth reference at /api/auth/reference";
 const PUBLIC_DOC_DESCRIPTION =
-    "Public API for ClashWithJPA. Authenticate with an `x-api-key` header. Keys are issued from your dashboard at https://clashwithjpa.com/dashboard/api-keys, and each one carries its own scopes — the badge on an operation is the level it requires.";
+    "Public API for ClashWithJPA. Authenticate with an `x-api-key` header. Keys are issued from your dashboard at https://clashwithjpa.com/dashboard/api-keys, and each one carries its own scopes. The badge on an operation is the level it requires.";
 
 const docDescription = config.NODE_ENV === "production" ? PUBLIC_DOC_DESCRIPTION : INTERNAL_DOC_DESCRIPTION;
 
@@ -255,6 +222,7 @@ app.get("/openapi.json", async (c) => {
         servers?: unknown[];
         components?: Record<string, unknown>;
         security?: unknown[];
+        externalDocs?: unknown;
     };
 
     // Declared in development too, so Scalar offers the key input locally.
@@ -275,6 +243,10 @@ app.get("/openapi.json", async (c) => {
         doc.info.description = PUBLIC_DOC_DESCRIPTION;
         doc.servers = [PROD_SERVER];
         doc.paths = Object.fromEntries(Object.entries(doc.paths ?? {}).filter(([path]) => isApiKeyAllowedPath(path)));
+        // The better-auth reference is a dev-only plugin, so the link is dead in
+        // production, and the session endpoints it documents aren't a key's
+        // business anyway.
+        delete doc.externalDocs;
     }
 
     // Development still lists the endpoints a key is refused on. Point them at the
@@ -296,8 +268,11 @@ app.get("/openapi.json", async (c) => {
     return c.json(doc);
 });
 
+// The docs are the API's root, so a bare `api.clashwithjpa.com` opens them. This
+// has to stay the last `/` registration, since Hono serves whichever handler
+// matched first.
 app.get(
-    "/scalar",
+    "/",
     Scalar((c) => {
         return {
             pageTitle: "ClashWithJPA API Documentation",

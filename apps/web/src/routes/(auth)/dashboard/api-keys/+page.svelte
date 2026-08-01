@@ -170,7 +170,7 @@
         </div>
 
         <div class="flex shrink-0 items-center gap-2">
-            <Button variant="ghost" size="sm" class="gap-2" href="{PUBLIC_SERVER_URL}/scalar" target="_blank">
+            <Button variant="ghost" size="sm" class="gap-2" href={PUBLIC_SERVER_URL} target="_blank">
                 <TablerBook2 class="size-5" />
                 API Docs
                 <TablerExternalLink class="size-4" />

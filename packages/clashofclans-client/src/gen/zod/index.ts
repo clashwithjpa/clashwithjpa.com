@@ -338,7 +338,6 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./getJoinApplicationsSchema.ts";
-export { getRoot200Schema, getRootQueryResponseSchema } from "./getRootSchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./getRulesSchema.ts";
 export {
     getUserAccounts200Schema,

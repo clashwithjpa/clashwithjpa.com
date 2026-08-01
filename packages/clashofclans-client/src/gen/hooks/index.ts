@@ -50,7 +50,6 @@ export type { GetJPAClanRequirementsQueryKey } from "./createGetJPAClanRequireme
 export type { GetJPAClansQueryKey } from "./createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./createGetJPACwlClans.ts";
 export type { GetJoinApplicationsQueryKey } from "./createGetJoinApplications.ts";
-export type { GetRootQueryKey } from "./createGetRoot.ts";
 export type { GetRulesQueryKey } from "./createGetRules.ts";
 export type { GetUserQueryKey } from "./createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./createGetUserAccounts.ts";
@@ -214,9 +213,6 @@ export { getJPACwlClansQueryOptions } from "./createGetJPACwlClans.ts";
 export { createGetJoinApplications } from "./createGetJoinApplications.ts";
 export { getJoinApplicationsQueryKey } from "./createGetJoinApplications.ts";
 export { getJoinApplicationsQueryOptions } from "./createGetJoinApplications.ts";
-export { createGetRoot } from "./createGetRoot.ts";
-export { getRootQueryKey } from "./createGetRoot.ts";
-export { getRootQueryOptions } from "./createGetRoot.ts";
 export { createGetRules } from "./createGetRules.ts";
 export { getRulesQueryKey } from "./createGetRules.ts";
 export { getRulesQueryOptions } from "./createGetRules.ts";
