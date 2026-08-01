@@ -15,7 +15,7 @@ export default defineConfig({
         clean: true,
     },
     hooks: {
-        done: ["prettier --write ./src/gen"],
+        done: ["oxfmt --write ./src/gen"],
     },
     plugins: [
         pluginOas(),

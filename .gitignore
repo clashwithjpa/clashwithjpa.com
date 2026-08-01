@@ -23,8 +23,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 !.env*.example
 
 # caches
-.eslintcache
 .cache
+.oxlintcache
 *.tsbuildinfo
 
 # IntelliJ based IDEs
@@ -40,3 +40,5 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .github/skills.dual-graph/
 .dual-graph/
 .github/skills
+
+.svelte-kit

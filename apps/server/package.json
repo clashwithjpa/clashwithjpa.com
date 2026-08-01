@@ -8,11 +8,8 @@
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:studio": "drizzle-kit studio",
-        "dev": "NODE_ENV=development bun run --hot --no-clear-screen --preload ./src/lib/instrument.ts src/index.ts",
-        "format": "prettier --write . --ignore-path ../../.prettierignore",
-        "format:check": "prettier --check . --ignore-path ../../.prettierignore"
+        "dev": "NODE_ENV=development bun run --hot --no-clear-screen --preload ./src/lib/instrument.ts src/index.ts"
     },
-    "prettier": "@repo/prettier-config",
     "dependencies": {
         "@aws-sdk/client-s3": "^3.1026.0",
         "@better-auth/api-key": "1.5.5",
@@ -35,8 +32,6 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@repo/eslint-config": "workspace:*",
-        "@repo/prettier-config": "workspace:*",
         "@repo/typescript-config": "workspace:*",
         "@types/bun": "latest",
         "@types/pg": "^8.16.0",

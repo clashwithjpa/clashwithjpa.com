@@ -10,9 +10,6 @@
         "build": {
             "outputs": ["dist/**", "build/**", ".svelte-kit/**"],
             "dependsOn": ["^build"]
-        },
-        "format": {
-            "cache": false
         }
     }
 }

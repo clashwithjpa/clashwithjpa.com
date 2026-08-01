@@ -1,5 +1,9 @@
 {
-    // TypeScript (Native Preview) > Use Tsgo
-    // "js/ts.experimental.useTsgo": true,
-    // "typescript.native-preview.tsdk": "/home/mini/projects/clashwithjpa.com/node_modules/@typescript/native-preview"
+    "oxc.enable": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.format.oxc": "always",
+        "source.fixAll.oxc": "always"
+    }
 }
