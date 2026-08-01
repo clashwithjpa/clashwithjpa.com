@@ -19,7 +19,7 @@ function getSyncCocAccountWarWeightsUrl() {
 }
 
 /**
- * @description [Manager] Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.
+ * @description Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.
  * {@link /admin/coc-accounts/sync-war-weights}
  */
 export async function syncCocAccountWarWeights(

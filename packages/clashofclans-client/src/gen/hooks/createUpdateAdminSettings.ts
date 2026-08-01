@@ -19,7 +19,7 @@ export const updateAdminSettingsMutationKey = () => [{ url: "/admin/settings" }]
 export type UpdateAdminSettingsMutationKey = ReturnType<typeof updateAdminSettingsMutationKey>;
 
 /**
- * @description [Admin/sudo] Updates site settings.
+ * @description Updates site settings.
  * {@link /admin/settings}
  */
 export function createUpdateAdminSettings<TContext>(

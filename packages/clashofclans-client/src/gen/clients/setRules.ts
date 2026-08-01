@@ -13,7 +13,7 @@ function getSetRulesUrl() {
 }
 
 /**
- * @description [Manager] Updates the rules content.
+ * @description Updates the rules content.
  * {@link /manage/rules}
  */
 export async function setRules(data: SetRulesMutationRequest, config: Partial<RequestConfig<SetRulesMutationRequest>> & { client?: Client } = {}) {

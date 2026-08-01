@@ -29,7 +29,7 @@ export function getAnalyticsCwlSeasonsQueryOptions(config: Partial<RequestConfig
 }
 
 /**
- * @description [Reviewer] Lists CWL seasons for the analytics season selector.
+ * @description Lists CWL seasons for the analytics season selector.
  * {@link /analytics/cwl-seasons}
  */
 export function createGetAnalyticsCwlSeasons<

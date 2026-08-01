@@ -35,7 +35,7 @@ export function getJoinApplicationsQueryOptions(params?: GetJoinApplicationsQuer
 }
 
 /**
- * @description [Reviewer] Lists clan join applications with optional status filter and pagination.
+ * @description Lists clan join applications with optional status filter and pagination.
  * {@link /admin/join-applications}
  */
 export function createGetJoinApplications<

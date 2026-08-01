@@ -1,4 +1,4 @@
-import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
+import { AUDIT_ACTIONS, AUDIT_SOURCES, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
 import { isAdmin, isManager, isReviewer, isSuperadmin } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
@@ -24,6 +24,7 @@ import {
     deleteCocAccountsBulk,
     deleteCwlApplicationsBulk,
     deleteCwlClan,
+    disableApiKeysForUser,
     getAdminUsers,
     getAllClans,
     getAllCocAccounts,
@@ -38,6 +39,7 @@ import {
     getCwlSeasons,
     getUserNameById,
     getUsersWithDiscordAccounts,
+    setUserApiAccess,
     setUserDiscordUsername,
     getCwlStats,
     createCwlSeason,
@@ -65,7 +67,8 @@ import { ROLES } from "@repo/auth-shared";
 import * as Sentry from "@sentry/bun";
 import { parse } from "csv-parse/sync";
 import { Hono } from "hono";
-import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
+import { describeRoute } from "@/lib/openapi";
+import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
 // Each route specifies its own permission-level middleware (review/manage/sudo)
@@ -76,6 +79,9 @@ const app = new Hono<AppEnv>();
 const listUsersQuerySchema = z4.object({
     search: z4.string().optional(),
     role: z4.string().optional(),
+    // Not `coerce.boolean()` like the other flags here — it reads "false" as true,
+    // which would collapse this tri-state filter into one state.
+    apiAccess: z4.stringbool().optional(),
     limit: z4.coerce.number().int().min(1).max(200).default(50),
     offset: z4.coerce.number().int().min(0).default(0),
     sortBy: z4.string().optional(),
@@ -86,7 +92,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getAdminUsers",
-        description: "[Manager] Lists users with case-insensitive search across name and Discord id.",
+        role: "Manager",
+        description: "Lists users with case-insensitive search across name and Discord id. Filter by role, and by apiAccess=true/false.",
         tags: ["admin"],
         responses: {
             200: {
@@ -95,7 +102,12 @@ app.get(
                     "application/json": {
                         schema: resolver(
                             SuccessResponseSchema(
-                                z4.object({ users: z4.array(z4.unknown()), total: z4.number(), roleCounts: z4.record(z4.string(), z4.number()) }),
+                                z4.object({
+                                    users: z4.array(z4.unknown()),
+                                    total: z4.number(),
+                                    roleCounts: z4.record(z4.string(), z4.number()),
+                                    apiAccessCounts: z4.object({ granted: z4.number(), none: z4.number() }),
+                                }),
                             ),
                         ),
                     },
@@ -113,6 +125,68 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch users" }, 500);
+        }
+    },
+);
+
+// API access grant (for admin user sidebar - sudo perm)
+
+const apiAccessPathSchema = z4.object({
+    userid: z4.string().min(1, "userid is required"),
+});
+const apiAccessBodySchema = z4.object({
+    enabled: z4.boolean(),
+});
+const apiAccessData = z4.object({
+    userId: z4.string(),
+    apiAccess: z4.boolean(),
+    disabledKeys: z4.number(),
+});
+app.put(
+    "/users/:userid/api-access",
+    hasAccessAuthMiddleware(isAdmin),
+    describeRoute({
+        operationId: "setUserApiAccess",
+        role: "Admin",
+        description: "Grants or revokes a user's ability to create API keys. Revoking also disables all of their existing keys.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "API access updated.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(apiAccessData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "User not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", apiAccessPathSchema),
+    zValidator("json", apiAccessBodySchema),
+    async (c) => {
+        try {
+            const { userid } = c.req.valid("param");
+            const { enabled } = c.req.valid("json");
+
+            const updated = await setUserApiAccess(userid, enabled);
+            if (!updated) return c.json({ success: false, error: "User not found" }, 404);
+
+            // Flipping the grant alone would leave working credentials in the
+            // wild — every existing key has to be disabled with it. (The
+            // per-request owner check in `betterAuthMiddleware` is the second
+            // line of defence for the same thing.)
+            const disabledKeys = enabled ? 0 : await disableApiKeysForUser(userid);
+
+            logAction(c, {
+                action: enabled ? "user.api_access_granted" : "user.api_access_revoked",
+                targetType: "user",
+                targetId: userid,
+                metadata: { targetName: updated.name, ...(enabled ? {} : { disabledKeys }) },
+            });
+
+            return c.json({ success: true, data: { userId: userid, apiAccess: enabled, disabledKeys } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update API access" }, 500);
         }
     },
 );
@@ -138,7 +212,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getUserCocAccountsByUserId",
-        description: "[Manager] Fetches the linked Clash of Clans accounts for a user by Better Auth userId.",
+        role: "Manager",
+        description: "Fetches the linked Clash of Clans accounts for a user by Better Auth userId.",
         tags: ["admin"],
         responses: {
             200: {
@@ -189,7 +264,8 @@ app.get(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "getJoinApplications",
-        description: "[Reviewer] Lists clan join applications with optional status filter and pagination.",
+        role: "Reviewer",
+        description: "Lists clan join applications with optional status filter and pagination.",
         tags: ["admin"],
         responses: {
             200: {
@@ -227,7 +303,8 @@ app.put(
     hasAccessAuthMiddleware(isReviewer),
     describeRoute({
         operationId: "updateJoinApplicationStatus",
-        description: "[Reviewer] Updates the status of a clan join application (accept/reject/pending).",
+        role: "Reviewer",
+        description: "Updates the status of a clan join application (accept/reject/pending).",
         tags: ["admin"],
         responses: {
             200: {
@@ -270,7 +347,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "clearAcceptedJoinApplications",
-        description: "[Admin] Deletes all accepted clan join applications. Deletion is an admin-only (sudo) power.",
+        role: "Admin",
+        description: "Deletes every accepted clan join application. Cannot be undone.",
         tags: ["admin"],
         responses: {
             200: {
@@ -303,7 +381,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteJoinApplication",
-        description: "[Admin] Permanently deletes a single clan join application. Deletion is an admin-only (sudo) power.",
+        role: "Admin",
+        description: "Permanently deletes a single clan join application. Cannot be undone.",
         tags: ["admin"],
         responses: {
             200: {
@@ -375,8 +454,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getCwlApplications",
-        description:
-            "[Manager] Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.",
+        role: "Manager",
+        description: "Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.",
         tags: ["admin"],
         responses: {
             200: {
@@ -428,8 +507,9 @@ app.post(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "createCwlApplication",
+        role: "Manager",
         description:
-            "[Manager] Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.",
+            "Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.",
         tags: ["admin"],
         responses: {
             200: {
@@ -518,7 +598,8 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "assignCwlApplication",
-        description: "[Manager] Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.",
+        role: "Manager",
+        description: "Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.",
         tags: ["admin"],
         responses: {
             200: {
@@ -564,7 +645,8 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "updateCwlApplicationNotes",
-        description: "[Manager] Updates the free-text notes/remarks on a CWL application.",
+        role: "Manager",
+        description: "Updates the free-text notes/remarks on a CWL application.",
         tags: ["admin"],
         responses: {
             200: {
@@ -607,7 +689,8 @@ app.post(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "assignCwlApplicationsBulk",
-        description: "[Manager] Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.",
+        role: "Manager",
+        description: "Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.",
         tags: ["admin"],
         responses: {
             200: {
@@ -650,7 +733,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteCwlApplicationsBulk",
-        description: "[Admin] Permanently deletes many CWL applications in one request. Deletion is an admin-only (sudo) power.",
+        role: "Admin",
+        description: "Permanently deletes many CWL applications in one request. Cannot be undone.",
         tags: ["admin"],
         responses: {
             200: {
@@ -721,8 +805,9 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getBonusData",
+        role: "Manager",
         description:
-            "[Manager] Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.",
+            "Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.",
         tags: ["admin"],
         responses: {
             200: {
@@ -761,7 +846,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getCwlSeasons",
-        description: "[Manager] Lists all CWL seasons (newest first).",
+        role: "Manager",
+        description: "Lists all CWL seasons (newest first).",
         tags: ["admin"],
         responses: {
             200: { description: "Seasons.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlSeasonsData)) } } },
@@ -791,7 +877,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "createCwlSeason",
-        description: "[Admin] Creates a new CWL season.",
+        role: "Admin",
+        description: "Creates a new CWL season.",
         tags: ["admin"],
         responses: {
             200: {
@@ -822,7 +909,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteCwlSeason",
-        description: "[Admin] Deletes a CWL season; cascades to its applications and bonuses.",
+        role: "Admin",
+        description: "Deletes a CWL season; cascades to its applications and bonuses.",
         tags: ["admin"],
         responses: {
             200: {
@@ -855,7 +943,8 @@ app.patch(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "renameCwlSeason",
-        description: "[Admin] Renames a CWL season.",
+        role: "Admin",
+        description: "Renames a CWL season.",
         tags: ["admin"],
         responses: {
             200: {
@@ -897,7 +986,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getBonusLedger",
-        description: "[Manager] Lists every awarded bonus (one row per user per season).",
+        role: "Manager",
+        description: "Lists every awarded bonus (one row per user per season).",
         tags: ["admin"],
         responses: {
             200: {
@@ -933,7 +1023,8 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "setUserSeasonBonus",
-        description: "[Manager] Awards or removes a user's bonus for a season.",
+        role: "Manager",
+        description: "Awards or removes a user's bonus for a season.",
         tags: ["admin"],
         responses: {
             200: { description: "Updated bonus.", content: { "application/json": { schema: resolver(SuccessResponseSchema(bonusData)) } } },
@@ -991,8 +1082,9 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getCwlStats",
+        role: "Manager",
         description:
-            "[Manager] Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.",
+            "Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.",
         tags: ["admin"],
         responses: {
             200: { description: "CWL stats.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlStatsResponse)) } } },
@@ -1034,7 +1126,8 @@ app.get(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "getAdminSettings",
-        description: "[Admin/sudo] Fetches the current site settings.",
+        role: "Admin",
+        description: "Fetches the current site settings.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1072,7 +1165,8 @@ app.put(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "updateAdminSettings",
-        description: "[Admin/sudo] Updates site settings.",
+        role: "Admin",
+        description: "Updates site settings.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1143,7 +1237,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getAdminClans",
-        description: "[Manager] Lists all JPA clans with full details.",
+        role: "Manager",
+        description: "Lists all JPA clans with full details.",
         tags: ["admin"],
         responses: {
             200: { description: "Clans.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getAdminClansData)) } } },
@@ -1186,7 +1281,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "createAdminClan",
-        description: "[Admin/sudo] Creates a new JPA clan.",
+        role: "Admin",
+        description: "Creates a new JPA clan.",
         tags: ["admin"],
         responses: {
             200: { description: "Created clan.", content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertClanData)) } } },
@@ -1234,7 +1330,8 @@ app.put(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "updateAdminClan",
-        description: "[Admin/sudo] Updates a JPA clan.",
+        role: "Admin",
+        description: "Updates a JPA clan.",
         tags: ["admin"],
         responses: {
             200: { description: "Updated clan.", content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertClanData)) } } },
@@ -1283,7 +1380,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteAdminClan",
-        description: "[Admin/sudo] Deletes a JPA clan.",
+        role: "Admin",
+        description: "Deletes a JPA clan.",
         tags: ["admin"],
         responses: {
             200: { description: "Deleted clan.", content: { "application/json": { schema: resolver(SuccessResponseSchema(upsertClanData)) } } },
@@ -1336,7 +1434,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "verifyAdminClanDiscord",
-        description: "[Admin/sudo] Verifies that the provided Discord role/channel/user IDs exist in the configured guild.",
+        role: "Admin",
+        description: "Verifies that the provided Discord role/channel/user IDs exist in the configured guild.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1380,7 +1479,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getAdminCwlClans",
-        description: "[Manager] Lists all CWL clans.",
+        role: "Manager",
+        description: "Lists all CWL clans.",
         tags: ["admin"],
         responses: {
             200: { description: "Clans.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getAdminCwlClansData)) } } },
@@ -1411,7 +1511,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "createAdminCwlClan",
-        description: "[Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.",
+        role: "Admin",
+        description: "Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1465,7 +1566,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteAdminCwlClan",
-        description: "[Admin/sudo] Deletes a CWL clan identified by URL-encoded clan tag.",
+        role: "Admin",
+        description: "Deletes a CWL clan identified by URL-encoded clan tag.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1511,7 +1613,8 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "syncAdminCwlClanLeagues",
-        description: "[Admin/sudo] Refreshes every CWL clan's league from the Clash of Clans API.",
+        role: "Admin",
+        description: "Refreshes every CWL clan's league from the Clash of Clans API.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1589,6 +1692,9 @@ const auditLogEntrySchema = z4.object({
     targetType: z4.enum(AUDIT_TARGET_TYPES).nullable(),
     targetId: z4.string().nullable(),
     metadata: z4.unknown().nullable(),
+    source: z4.enum(AUDIT_SOURCES),
+    apiKeyId: z4.string().nullable(),
+    apiKeyName: z4.string().nullable(),
     createdAt: z4.date(),
 });
 
@@ -1597,6 +1703,7 @@ const getAuditLogQuerySchema = z4.object({
     action: z4.enum(AUDIT_ACTIONS).optional(),
     targetType: z4.enum(AUDIT_TARGET_TYPES).optional(),
     targetId: z4.string().optional(),
+    source: z4.enum(AUDIT_SOURCES).optional(),
     before: z4.coerce.date().optional(),
     after: z4.coerce.date().optional(),
     limit: z4.coerce.number().int().min(1).max(200).default(50),
@@ -1611,7 +1718,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getAuditLog",
-        description: "[Manager] Lists audit log entries with optional filters (actorId, action, targetType, targetId, date range) and pagination.",
+        role: "Manager",
+        description: "Lists audit log entries with optional filters (actorId, action, targetType, targetId, source, date range) and pagination.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1672,7 +1780,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getAdminCocAccounts",
-        description: "[Manager] Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.",
+        role: "Manager",
+        description: "Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1709,8 +1818,9 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "createCocAccount",
+        role: "Admin",
         description:
-            "[Admin] Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Skips the API-token ownership check, so it's an admin-only (sudo) power.",
+            "Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Unlike member-initiated linking, no in-game API token is required, so ownership of the tag is not verified.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1777,8 +1887,9 @@ app.post(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "syncCocAccounts",
+        role: "Manager",
         description:
-            "[Manager] Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.",
+            "Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1906,8 +2017,9 @@ app.post(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "syncCocAccountWarWeights",
+        role: "Manager",
         description:
-            "[Manager] Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.",
+            "Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1980,7 +2092,8 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "updateCocAccountWarWeight",
-        description: "[Manager] Updates the war weight of a linked Clash of Clans account.",
+        role: "Manager",
+        description: "Updates the war weight of a linked Clash of Clans account.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2025,8 +2138,9 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "updateCocAccountExternal",
+        role: "Manager",
         description:
-            "[Manager] Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.",
+            "Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2081,8 +2195,9 @@ app.put(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "updateCocAccountStats",
+        role: "Manager",
         description:
-            "[Manager] Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.",
+            "Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2125,8 +2240,8 @@ app.delete(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteCocAccount",
-        description:
-            "[Admin] Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications. Deletion is an admin-only (sudo) power.",
+        role: "Admin",
+        description: "Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications and cannot be undone.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2169,8 +2284,9 @@ app.post(
     hasAccessAuthMiddleware(isAdmin),
     describeRoute({
         operationId: "deleteCocAccountsBulk",
+        role: "Admin",
         description:
-            "[Admin] Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications. Deletion is an admin-only (sudo) power.",
+            "Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications and cannot be undone.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2207,7 +2323,8 @@ app.get(
     hasAccessAuthMiddleware(isManager),
     describeRoute({
         operationId: "getGuildNicknames",
-        description: "[Manager] Live Discord id -> guild nickname map for the configured guild.",
+        role: "Manager",
+        description: "Live Discord id -> guild nickname map for the configured guild.",
         tags: ["admin"],
         responses: {
             200: {
@@ -2242,7 +2359,8 @@ app.post(
     hasAccessAuthMiddleware(isSuperadmin),
     describeRoute({
         operationId: "refreshDiscordUsernames",
-        description: "[Superadmin/root] Re-fetches Discord usernames from the guild member list and updates stored values.",
+        role: "Superadmin",
+        description: "Re-fetches Discord usernames from the guild member list and updates stored values.",
         tags: ["admin"],
         responses: {
             200: {

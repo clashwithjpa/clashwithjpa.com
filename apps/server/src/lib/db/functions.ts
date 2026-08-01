@@ -2,6 +2,8 @@ import { cocClient } from "@/lib/coc";
 import { db } from "@/lib/db";
 import {
     account,
+    apiKeyUsageTable,
+    apikey,
     auditLogTable,
     clanApplicationStatusEnum,
     clanApplicationTable,
@@ -11,6 +13,7 @@ import {
     cwlBonusTable,
     cwlClanInfoTable,
     cwlSeasonTable,
+    session,
     settingsTable,
     user,
 } from "@/lib/db/schema";
@@ -47,6 +50,15 @@ export async function getUserNameById(userId: string): Promise<string | null> {
     return result[0]?.name ?? null;
 }
 
+// Owner of an API key, loaded on every key-authenticated request so the existing
+// role guards can run against a real user. Deliberately re-read per request
+// rather than trusted from the key row: it's what makes a demotion, a ban, or an
+// API-access revocation take effect immediately on keys already in the wild.
+export async function getApiKeyOwner(userId: string) {
+    const result = await db.select().from(user).where(eq(user.id, userId)).limit(1);
+    return result[0] ?? null;
+}
+
 export async function getUsersWithDiscordAccounts(): Promise<{ userId: string; discordId: string; discordUsername: string | null }[]> {
     return db
         .select({ userId: user.id, discordId: account.accountId, discordUsername: user.discordUsername })
@@ -56,6 +68,13 @@ export async function getUsersWithDiscordAccounts(): Promise<{ userId: string; d
 
 export async function setUserDiscordUsername(userId: string, discordUsername: string): Promise<void> {
     await db.update(user).set({ discordUsername }).where(eq(user.id, userId));
+}
+
+// Returns null when no such user exists, so the route can answer 404 instead of
+// silently reporting success on a typo'd id.
+export async function setUserApiAccess(userId: string, apiAccess: boolean) {
+    const rows = await db.update(user).set({ apiAccess }).where(eq(user.id, userId)).returning({ id: user.id, name: user.name });
+    return rows[0] ?? null;
 }
 
 export async function addCocAccount(discordUserId: string, cocAccountTag: string, opts: { warWeight?: number; isExternal?: boolean } = {}) {
@@ -854,9 +873,17 @@ export async function syncCocAccountWarWeights(rows: CocAccountWarWeightRow[]) {
 }
 
 export async function getAdminUsers(
-    opts: { search?: string; limit?: number; offset?: number; sortBy?: string; sortDirection?: "asc" | "desc"; role?: string } = {},
+    opts: {
+        search?: string;
+        limit?: number;
+        offset?: number;
+        sortBy?: string;
+        sortDirection?: "asc" | "desc";
+        role?: string;
+        apiAccess?: boolean;
+    } = {},
 ) {
-    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc", role } = opts;
+    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc", role, apiAccess } = opts;
 
     const sortColumns = {
         name: user.name,
@@ -873,15 +900,26 @@ export async function getAdminUsers(
     // A missing role is bucketed as "unverified" to match the UI's role badges,
     // so filtering by "unverified" must also catch users with a null role.
     const roleClause = role ? (role === "unverified" ? or(eq(user.role, "unverified"), isNull(user.role)) : eq(user.role, role)) : undefined;
-    const whereClause = and(searchClause, roleClause);
+    // `is not true` rather than `= false`: users whose column was never set still
+    // count as lacking access.
+    const apiAccessClause = apiAccess === undefined ? undefined : apiAccess ? eq(user.apiAccess, true) : sql`${user.apiAccess} is not true`;
+    const whereClause = and(searchClause, roleClause, apiAccessClause);
 
-    // Role counts ignore the role filter (but respect search) so the badge bar
-    // stays stable while a single role is selected.
+    // Counts ignore the role and api-access filters (but respect search) so the
+    // badge bar stays stable while one of them is selected.
     const roleExpr = sql<string>`coalesce(${user.role}, 'unverified')`;
 
-    const [rows, countResult, roleCountRows] = await Promise.all([
+    // Not `user.updatedAt` — drizzle's `$onUpdate` stamps that on any write to the
+    // row, so an admin toggling a flag would read as the user being active.
+    // `.mapWith` gives the subquery a selected column's driver mapping; without it
+    // postgres' naive timestamp parses as local rather than UTC.
+    const lastActiveAt = sql<Date | null>`(select max(${session.updatedAt}) from ${session} where ${session.userId} = ${user.id})`.mapWith(
+        session.updatedAt,
+    );
+
+    const [rows, countResult, roleCountRows, apiAccessCountRow] = await Promise.all([
         db
-            .select({ ...getTableColumns(user), discordId: account.accountId })
+            .select({ ...getTableColumns(user), discordId: account.accountId, lastActiveAt })
             .from(user)
             .leftJoin(account, discordJoin)
             .where(whereClause)
@@ -899,10 +937,23 @@ export async function getAdminUsers(
             .leftJoin(account, discordJoin)
             .where(searchClause)
             .groupBy(roleExpr),
+        db
+            .select({
+                granted: sql<number>`(count(*) filter (where ${user.apiAccess} = true))::int`,
+                none: sql<number>`(count(*) filter (where ${user.apiAccess} is not true))::int`,
+            })
+            .from(user)
+            .leftJoin(account, discordJoin)
+            .where(searchClause),
     ]);
 
     const roleCounts = Object.fromEntries(roleCountRows.map((r) => [r.role, r.count]));
-    return { users: rows, total: countResult[0]?.count ?? 0, roleCounts };
+    return {
+        users: rows,
+        total: countResult[0]?.count ?? 0,
+        roleCounts,
+        apiAccessCounts: { granted: apiAccessCountRow[0]?.granted ?? 0, none: apiAccessCountRow[0]?.none ?? 0 },
+    };
 }
 
 export async function updateCocAccountWarWeight(id: number, warWeight: number) {
@@ -971,19 +1022,21 @@ export async function getAuditLog(
         action?: string;
         targetType?: string;
         targetId?: string;
+        source?: string;
         before?: Date;
         after?: Date;
         limit?: number;
         offset?: number;
     } = {},
 ) {
-    const { actorId, action, targetType, targetId, before, after, limit = 50, offset = 0 } = opts;
+    const { actorId, action, targetType, targetId, source, before, after, limit = 50, offset = 0 } = opts;
 
     const conditions = [];
     if (actorId) conditions.push(eq(auditLogTable.actorId, actorId));
     if (action) conditions.push(eq(auditLogTable.action, action));
     if (targetType) conditions.push(eq(auditLogTable.targetType, targetType));
     if (targetId) conditions.push(eq(auditLogTable.targetId, targetId));
+    if (source) conditions.push(eq(auditLogTable.source, source));
     if (after) conditions.push(gte(auditLogTable.createdAt, after));
     if (before) conditions.push(lte(auditLogTable.createdAt, before));
     const whereClause = conditions.length ? and(...conditions) : undefined;
@@ -1003,6 +1056,9 @@ export async function getAuditLog(
                 targetType: auditLogTable.targetType,
                 targetId: auditLogTable.targetId,
                 metadata: auditLogTable.metadata,
+                source: auditLogTable.source,
+                apiKeyId: auditLogTable.apiKeyId,
+                apiKeyName: auditLogTable.apiKeyName,
                 createdAt: auditLogTable.createdAt,
             })
             .from(auditLogTable)
@@ -1193,4 +1249,119 @@ export async function getCwlParticipationStats(seasonId?: number) {
         seasonId: season.id,
         seasonName: season.name,
     };
+}
+
+/* ---------------------------------- API keys --------------------------------- */
+
+// Ownership check for every stats query below. Returns null for a key that
+// doesn't exist *or* isn't the caller's, so the routes can answer 404 either
+// way and key ids stay unenumerable.
+export async function getOwnedApiKey(keyId: string, userId: string) {
+    const rows = await db
+        .select({
+            id: apikey.id,
+            name: apikey.name,
+            start: apikey.start,
+            prefix: apikey.prefix,
+            enabled: apikey.enabled,
+            permissions: apikey.permissions,
+            requestCount: apikey.requestCount,
+            remaining: apikey.remaining,
+            rateLimitEnabled: apikey.rateLimitEnabled,
+            rateLimitMax: apikey.rateLimitMax,
+            rateLimitTimeWindow: apikey.rateLimitTimeWindow,
+            lastRequest: apikey.lastRequest,
+            expiresAt: apikey.expiresAt,
+            createdAt: apikey.createdAt,
+        })
+        .from(apikey)
+        .where(and(eq(apikey.id, keyId), eq(apikey.referenceId, userId)))
+        .limit(1);
+    return rows[0] ?? null;
+}
+
+export async function countApiKeysForUser(userId: string): Promise<number> {
+    const [row] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(apikey)
+        .where(eq(apikey.referenceId, userId));
+    return row?.count ?? 0;
+}
+
+// Disables every key belonging to a user. Called when API access is revoked —
+// without this the grant flag flips but live credentials keep working.
+export async function disableApiKeysForUser(userId: string): Promise<number> {
+    const rows = await db.update(apikey).set({ enabled: false }).where(eq(apikey.referenceId, userId)).returning({ id: apikey.id });
+    return rows.length;
+}
+
+export async function getApiKeyUsageDaily(keyId: string, days: number) {
+    const rows = await db
+        .select({
+            date: sql<string>`to_char(date_trunc('day', ${apiKeyUsageTable.createdAt}), 'YYYY-MM-DD')`,
+            count: sql<number>`count(*)::int`,
+        })
+        .from(apiKeyUsageTable)
+        .where(and(eq(apiKeyUsageTable.keyId, keyId), gte(apiKeyUsageTable.createdAt, utcWindowStart(days))))
+        .groupBy(sql`date_trunc('day', ${apiKeyUsageTable.createdAt})`);
+    return { data: fillDailySeries(rows, days) };
+}
+
+export async function getApiKeyUsageSummary(keyId: string, days: number) {
+    const [row] = await db
+        .select({
+            requests: sql<number>`count(*)::int`,
+            errors: sql<number>`count(*) filter (where ${apiKeyUsageTable.status} >= 400)::int`,
+            p50: sql<number>`coalesce(percentile_cont(0.5) within group (order by ${apiKeyUsageTable.durationMs}), 0)::int`,
+            p95: sql<number>`coalesce(percentile_cont(0.95) within group (order by ${apiKeyUsageTable.durationMs}), 0)::int`,
+        })
+        .from(apiKeyUsageTable)
+        .where(and(eq(apiKeyUsageTable.keyId, keyId), gte(apiKeyUsageTable.createdAt, utcWindowStart(days))));
+
+    const requests = row?.requests ?? 0;
+    const errors = row?.errors ?? 0;
+    return {
+        requests,
+        errors,
+        errorRate: requests > 0 ? errors / requests : 0,
+        p50DurationMs: row?.p50 ?? 0,
+        p95DurationMs: row?.p95 ?? 0,
+    };
+}
+
+export async function getApiKeyUsageEndpoints(keyId: string, days: number, limit: number) {
+    const rows = await db
+        .select({
+            method: apiKeyUsageTable.method,
+            path: apiKeyUsageTable.path,
+            count: sql<number>`count(*)::int`,
+            avgDurationMs: sql<number>`coalesce(avg(${apiKeyUsageTable.durationMs}), 0)::int`,
+        })
+        .from(apiKeyUsageTable)
+        .where(and(eq(apiKeyUsageTable.keyId, keyId), gte(apiKeyUsageTable.createdAt, utcWindowStart(days))))
+        .groupBy(apiKeyUsageTable.method, apiKeyUsageTable.path)
+        .orderBy(desc(sql`count(*)`))
+        .limit(limit);
+    return { data: rows };
+}
+
+export async function getApiKeyUsageStatus(keyId: string, days: number) {
+    // 429 is split out of the 4xx bucket deliberately — "you're being throttled"
+    // is a different problem from "you're sending bad requests", and collapsing
+    // them hides the one a consumer can act on.
+    const statusClassExpr = sql<string>`
+        case
+            when ${apiKeyUsageTable.status} = 429 then '429'
+            when ${apiKeyUsageTable.status} >= 500 then '5xx'
+            when ${apiKeyUsageTable.status} >= 400 then '4xx'
+            when ${apiKeyUsageTable.status} >= 300 then '3xx'
+            else '2xx'
+        end`;
+    const rows = await db
+        .select({ statusClass: statusClassExpr, count: sql<number>`count(*)::int` })
+        .from(apiKeyUsageTable)
+        .where(and(eq(apiKeyUsageTable.keyId, keyId), gte(apiKeyUsageTable.createdAt, utcWindowStart(days))))
+        .groupBy(statusClassExpr)
+        .orderBy(desc(sql`count(*)`));
+    return { data: rows };
 }

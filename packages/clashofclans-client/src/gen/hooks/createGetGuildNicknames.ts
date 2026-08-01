@@ -29,7 +29,7 @@ export function getGuildNicknamesQueryOptions(config: Partial<RequestConfig> & {
 }
 
 /**
- * @description [Manager] Live Discord id -> guild nickname map for the configured guild.
+ * @description Live Discord id -> guild nickname map for the configured guild.
  * {@link /admin/guild-nicknames}
  */
 export function createGetGuildNicknames<

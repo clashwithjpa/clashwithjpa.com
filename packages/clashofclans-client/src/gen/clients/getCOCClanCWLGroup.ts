@@ -13,7 +13,7 @@ function getGetCOCClanCWLGroupUrl(tag: GetCOCClanCWLGroupPathParams["tag"]) {
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar/leaguegroup}
  */
 export async function getCOCClanCWLGroup(tag: GetCOCClanCWLGroupPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

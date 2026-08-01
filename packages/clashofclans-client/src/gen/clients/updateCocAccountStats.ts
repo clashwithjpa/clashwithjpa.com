@@ -21,7 +21,7 @@ function getUpdateCocAccountStatsUrl(id: UpdateCocAccountStatsPathParams["id"]) 
 }
 
 /**
- * @description [Manager] Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.
+ * @description Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.
  * {@link /admin/coc-accounts/:id/stats}
  */
 export async function updateCocAccountStats(

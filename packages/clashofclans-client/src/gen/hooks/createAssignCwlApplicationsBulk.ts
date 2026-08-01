@@ -20,7 +20,7 @@ export const assignCwlApplicationsBulkMutationKey = () => [{ url: "/admin/cwl-ap
 export type AssignCwlApplicationsBulkMutationKey = ReturnType<typeof assignCwlApplicationsBulkMutationKey>;
 
 /**
- * @description [Manager] Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.
+ * @description Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.
  * {@link /admin/cwl-applications/assign-bulk}
  */
 export function createAssignCwlApplicationsBulk<TContext>(

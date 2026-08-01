@@ -1,6 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
-import { account, user } from "./ba-auth";
+import { account, apikey, user } from "./ba-auth";
 
 export const cwlSeasonTable = pgTable("cwl_season_table", {
     id: serial("id").primaryKey(),
@@ -152,16 +152,18 @@ export const cwlApplicationTable = pgTable(
     ],
 );
 
+// A bonus is an award that happened, so it outlives the account it was awarded
+// to — same reasoning as auditLogTable below. No FK on discordUserId or
+// cocAccountTag: `no action` made every past winner undeletable, because
+// removing a user cascades into `account` and the constraint vetoed it.
 export const cwlBonusTable = pgTable(
     "cwl_bonus_table",
     {
-        discordUserId: text("discord_user_id")
-            .notNull()
-            .references(() => account.accountId, { onDelete: "no action" }),
+        discordUserId: text("discord_user_id").notNull(),
         seasonId: integer("season_id")
             .notNull()
             .references(() => cwlSeasonTable.id, { onDelete: "cascade" }),
-        cocAccountTag: text("coc_account_tag").references(() => cocAccountTable.cocAccountTag, { onDelete: "no action" }),
+        cocAccountTag: text("coc_account_tag"),
         awardedAt: timestamp("awarded_at").notNull().defaultNow(),
     },
     (t) => [primaryKey({ columns: [t.discordUserId, t.seasonId] }), index("cwl_bonus_season_id_idx").on(t.seasonId)],
@@ -209,6 +211,11 @@ export const auditLogTable = pgTable(
         targetType: text("target_type"),
         targetId: text("target_id"),
         metadata: jsonb("metadata"),
+        // "web" | "api" — which surface the action came through. Same actions and
+        // target types either way; source is an extra dimension, not a category.
+        source: text("source").notNull().default("web"),
+        apiKeyId: text("api_key_id"),
+        apiKeyName: text("api_key_name"),
         createdAt: timestamp("created_at").notNull().defaultNow(),
     },
     (t) => [
@@ -216,5 +223,23 @@ export const auditLogTable = pgTable(
         index("audit_log_actor_id_idx").on(t.actorId, t.createdAt.desc()),
         index("audit_log_target_idx").on(t.targetType, t.targetId, t.createdAt.desc()),
         index("audit_log_action_idx").on(t.action, t.createdAt.desc()),
+        index("audit_log_source_idx").on(t.source, t.createdAt.desc()),
     ],
+);
+
+export const apiKeyUsageTable = pgTable(
+    "api_key_usage_table",
+    {
+        id: serial("id").primaryKey(),
+        keyId: text("key_id")
+            .notNull()
+            .references(() => apikey.id, { onDelete: "cascade" }),
+        userId: text("user_id"),
+        method: text("method").notNull(),
+        path: text("path").notNull(),
+        status: integer("status").notNull(),
+        durationMs: integer("duration_ms").notNull(),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+    },
+    (t) => [index("api_key_usage_key_created_idx").on(t.keyId, t.createdAt.desc()), index("api_key_usage_created_at_idx").on(t.createdAt.desc())],
 );

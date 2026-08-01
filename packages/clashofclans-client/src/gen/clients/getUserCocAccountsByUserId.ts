@@ -18,7 +18,7 @@ function getGetUserCocAccountsByUserIdUrl(userid: GetUserCocAccountsByUserIdPath
 }
 
 /**
- * @description [Manager] Fetches the linked Clash of Clans accounts for a user by Better Auth userId.
+ * @description Fetches the linked Clash of Clans accounts for a user by Better Auth userId.
  * {@link /admin/users/:userid/coc-accounts}
  */
 export async function getUserCocAccountsByUserId(

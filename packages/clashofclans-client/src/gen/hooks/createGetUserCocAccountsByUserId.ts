@@ -39,7 +39,7 @@ export function getUserCocAccountsByUserIdQueryOptions(
 }
 
 /**
- * @description [Manager] Fetches the linked Clash of Clans accounts for a user by Better Auth userId.
+ * @description Fetches the linked Clash of Clans accounts for a user by Better Auth userId.
  * {@link /admin/users/:userid/coc-accounts}
  */
 export function createGetUserCocAccountsByUserId<

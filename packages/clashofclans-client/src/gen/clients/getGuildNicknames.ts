@@ -13,7 +13,7 @@ function getGetGuildNicknamesUrl() {
 }
 
 /**
- * @description [Manager] Live Discord id -> guild nickname map for the configured guild.
+ * @description Live Discord id -> guild nickname map for the configured guild.
  * {@link /admin/guild-nicknames}
  */
 export async function getGuildNicknames(config: Partial<RequestConfig> & { client?: Client } = {}) {

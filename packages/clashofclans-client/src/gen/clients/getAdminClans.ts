@@ -13,7 +13,7 @@ function getGetAdminClansUrl() {
 }
 
 /**
- * @description [Manager] Lists all JPA clans with full details.
+ * @description Lists all JPA clans with full details.
  * {@link /admin/clans}
  */
 export async function getAdminClans(config: Partial<RequestConfig> & { client?: Client } = {}) {

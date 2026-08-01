@@ -26,7 +26,7 @@ export function getCOCClanMembersQueryOptions(tag: GetCOCClanMembersPathParams["
 }
 
 /**
- * @description [Public] Fetches a Clash of Clans clan's members by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's members by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/members}
  */
 export function createGetCOCClanMembers<

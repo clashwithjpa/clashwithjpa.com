@@ -24,7 +24,7 @@ export function getCwlStatsQueryOptions(params?: GetCwlStatsQueryParams, config:
 }
 
 /**
- * @description [Manager] Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.
+ * @description Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.
  * {@link /admin/cwl-stats}
  */
 export function createGetCwlStats<

@@ -21,7 +21,7 @@ export const updateJoinApplicationStatusMutationKey = () => [{ url: "/admin/join
 export type UpdateJoinApplicationStatusMutationKey = ReturnType<typeof updateJoinApplicationStatusMutationKey>;
 
 /**
- * @description [Reviewer] Updates the status of a clan join application (accept/reject/pending).
+ * @description Updates the status of a clan join application (accept/reject/pending).
  * {@link /admin/join-applications/:id}
  */
 export function createUpdateJoinApplicationStatus<TContext>(

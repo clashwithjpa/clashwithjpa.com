@@ -20,7 +20,7 @@ function getCreateAdminCwlClanUrl() {
 }
 
 /**
- * @description [Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
+ * @description Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
  * {@link /admin/cwl-clans}
  */
 export async function createAdminCwlClan(

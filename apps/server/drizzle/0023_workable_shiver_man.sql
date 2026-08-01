@@ -1,0 +1,1 @@
+ALTER TABLE "audit_log_table" ADD COLUMN "api_key_start" text;

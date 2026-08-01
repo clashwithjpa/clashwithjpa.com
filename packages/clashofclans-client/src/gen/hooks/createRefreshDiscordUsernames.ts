@@ -19,7 +19,7 @@ export const refreshDiscordUsernamesMutationKey = () => [{ url: "/admin/refresh-
 export type RefreshDiscordUsernamesMutationKey = ReturnType<typeof refreshDiscordUsernamesMutationKey>;
 
 /**
- * @description [Superadmin/root] Re-fetches Discord usernames from the guild member list and updates stored values.
+ * @description Re-fetches Discord usernames from the guild member list and updates stored values.
  * {@link /admin/refresh-discord-usernames}
  */
 export function createRefreshDiscordUsernames<TContext>(

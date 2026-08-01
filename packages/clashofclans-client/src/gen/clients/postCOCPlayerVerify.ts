@@ -18,7 +18,7 @@ function getPostCOCPlayerVerifyUrl(tag: PostCOCPlayerVerifyPathParams["tag"]) {
 }
 
 /**
- * @description [Authenticated] Verifies a Clash of Clans player's API token.
+ * @description Verifies a Clash of Clans player's API token.
  * {@link /coc/player/:tag/verifytoken}
  */
 export async function postCOCPlayerVerify(

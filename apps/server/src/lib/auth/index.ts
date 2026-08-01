@@ -1,14 +1,21 @@
 import { config } from "@/lib/config";
 import { logActionForActor, type AuditActor, type LogActionInput } from "@/lib/audit";
+import { countApiKeysForUser } from "@/lib/db/functions";
 import { db } from "@lib/db";
+import { apiKey as apiKeyPlugin } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
-import { ac, admin, manager, reviewer, roleLevel, superadmin, unverified, verified } from "@repo/auth-shared";
+import { ac, admin, jpaPermsForRole, manager, reviewer, ROLE_LEVELS, roleLevel, superadmin, unverified, verified } from "@repo/auth-shared";
 
 const ROLE_MUTATING_PATHS = new Set(["/admin/set-role", "/admin/update-user", "/admin/create-user"]);
 const TARGETED_USER_PATHS = new Set(["/admin/ban-user", "/admin/unban-user", "/admin/remove-user", "/admin/impersonate-user"]);
+// Key scopes are granted here, so both paths need the apiAccess + scope-ceiling
+// gate. Dashboard creation goes via POST /api-keys instead, which re-implements
+// the same three checks.
+const API_KEY_MUTATING_PATHS = new Set(["/api-key/create", "/api-key/update"]);
+export const MAX_API_KEYS_PER_USER = 5;
 
 function normalizeRole(role: unknown): string | string[] | undefined {
     if (typeof role === "string") return role;
@@ -16,11 +23,50 @@ function normalizeRole(role: unknown): string | string[] | undefined {
     return undefined;
 }
 
-function buildAuditFromAdminCall(path: string, body: unknown, returned: unknown): LogActionInput | null {
+// Scopes as stored on a key: { jpa: ["apply", "cwl"] }. Flattened to a plain
+// string array for audit metadata so the log stays readable.
+function scopesFromBody(body: Record<string, unknown>): string[] | undefined {
+    const perms = body.permissions;
+    if (!perms || typeof perms !== "object") return undefined;
+    const jpa = (perms as Record<string, unknown>).jpa;
+    return Array.isArray(jpa) ? jpa.filter((p): p is string => typeof p === "string") : undefined;
+}
+
+function buildAuditFromAuthCall(path: string, body: unknown, returned: unknown): LogActionInput | null {
     const b = (body && typeof body === "object" ? (body as Record<string, unknown>) : {}) as Record<string, unknown>;
     const userId = typeof b.userId === "string" ? b.userId : undefined;
 
     switch (path) {
+        // API key lifecycle. The plaintext key (and its `start` fragment) is a
+        // live credential and must never reach the audit log — name, id and
+        // scopes only.
+        case "/api-key/create": {
+            const created = (returned && typeof returned === "object" ? (returned as { id?: unknown; name?: unknown }) : {}) as Record<
+                string,
+                unknown
+            >;
+            return {
+                action: "api_key.create",
+                targetType: "api_key",
+                targetId: typeof created.id === "string" ? created.id : null,
+                metadata: { name: typeof b.name === "string" ? b.name : undefined, scopes: scopesFromBody(b) },
+            };
+        }
+        case "/api-key/update": {
+            return {
+                action: "api_key.update",
+                targetType: "api_key",
+                targetId: typeof b.keyId === "string" ? b.keyId : null,
+                metadata: {
+                    name: typeof b.name === "string" ? b.name : undefined,
+                    scopes: scopesFromBody(b),
+                    enabled: typeof b.enabled === "boolean" ? b.enabled : undefined,
+                },
+            };
+        }
+        case "/api-key/delete": {
+            return { action: "api_key.delete", targetType: "api_key", targetId: typeof b.keyId === "string" ? b.keyId : null };
+        }
         case "/admin/set-role": {
             if (!userId) return null;
             return { action: "user.role_set", targetType: "user", targetId: userId, metadata: { role: normalizeRole(b.role) } };
@@ -169,6 +215,16 @@ export const auth = betterAuth({
                 required: false,
                 input: false,
             },
+            // Grants the ability to mint API keys. Orthogonal to the role ladder
+            // so a plain member running a bot can have keys without being
+            // promoted. `input: false` keeps it off every user-writable update
+            // path — only PUT /admin/users/:userid/api-access sets it.
+            apiAccess: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
+                input: false,
+            },
         },
     },
     emailAndPassword: {
@@ -206,6 +262,23 @@ export const auth = betterAuth({
             provider: "cloudflare-turnstile",
             secretKey: config.JPA_TURNSTILE_SECRET_KEY,
         }),
+        // Machine-to-machine credentials. Keys are verified by
+        // `betterAuthMiddleware` (see lib/middlewares.ts), which resolves the
+        // owner so the existing role guards apply unchanged. Session creation
+        // stays off: a key must never be mistaken for a real session.
+        apiKeyPlugin({
+            defaultPrefix: "jpa_",
+            defaultKeyLength: 48,
+            enableMetadata: true,
+            // Keys are listed and audited by name, so an unnamed one is a
+            // credential nobody can identify later.
+            requireName: true,
+            rateLimit: {
+                enabled: true,
+                maxRequests: 600,
+                timeWindow: 1000 * 60 * 60,
+            },
+        }),
     ],
     hooks: {
         // Enforce a strict role hierarchy on top of better-auth's permission
@@ -220,11 +293,65 @@ export const auth = betterAuth({
         before: createAuthMiddleware(async (ctx) => {
             const isRoleMutation = ROLE_MUTATING_PATHS.has(ctx.path);
             const isTargetedAction = TARGETED_USER_PATHS.has(ctx.path);
-            if (!isRoleMutation && !isTargetedAction) return;
+            const isApiKeyMutation = API_KEY_MUTATING_PATHS.has(ctx.path);
+            if (!isRoleMutation && !isTargetedAction && !isApiKeyMutation) return;
 
             const session = await getSessionFromCtx(ctx);
             if (!session) return;
             const callerLevel = roleLevel(session.user.role);
+
+            if (isApiKeyMutation) {
+                if (!session.user.apiAccess) {
+                    throw new APIError("FORBIDDEN", {
+                        message: "API access is not enabled for this account.",
+                    });
+                }
+
+                // Matches the guard on /api-keys. An unverified account holds
+                // only `apply`, but that still reaches the member-only reads
+                // (player lookups, battle logs, the clan lists), so a key is
+                // worth something there and shouldn't be mintable unvetted.
+                if (callerLevel < ROLE_LEVELS.verified) {
+                    throw new APIError("FORBIDDEN", {
+                        message: "Your account must be verified to manage API keys.",
+                    });
+                }
+
+                // The plugin has no per-user key cap of its own, so enforce one
+                // here. Without it a single account can mint keys without limit,
+                // and every extra key is another credential to leak.
+                if (ctx.path === "/api-key/create") {
+                    const existing = await countApiKeysForUser(session.user.id);
+                    if (existing >= MAX_API_KEYS_PER_USER) {
+                        throw new APIError("FORBIDDEN", {
+                            message: `You can have at most ${MAX_API_KEYS_PER_USER} API keys. Revoke one before creating another.`,
+                        });
+                    }
+                }
+
+                // A key can never be scoped above what its owner currently holds.
+                // This is a guardrail, not the boundary — `hasAccessAuthMiddleware`
+                // re-checks the owner's role on every request, so a later demotion
+                // narrows existing keys without needing a sweep.
+                const permissions = (ctx.body as { permissions?: Record<string, unknown> } | undefined)?.permissions;
+                if (permissions) {
+                    const foreign = Object.keys(permissions).filter((resource) => resource !== "jpa");
+                    if (foreign.length > 0) {
+                        throw new APIError("BAD_REQUEST", {
+                            message: `API keys can only be scoped with jpa permissions. Unknown resource: ${foreign.join(", ")}`,
+                        });
+                    }
+                    const requested = Array.isArray(permissions.jpa) ? (permissions.jpa as string[]) : [];
+                    const allowed = jpaPermsForRole(session.user.role) as string[];
+                    const over = requested.filter((perm) => !allowed.includes(perm));
+                    if (over.length > 0) {
+                        throw new APIError("FORBIDDEN", {
+                            message: `You cannot grant scopes you do not hold: ${over.join(", ")}`,
+                        });
+                    }
+                }
+                return;
+            }
 
             if (isRoleMutation) {
                 const change = extractRoleChange(ctx.path, ctx.body);
@@ -281,10 +408,17 @@ export const auth = betterAuth({
             const returned = ctx.context.returned;
             if (isAPIError(returned)) return;
 
-            const input = buildAuditFromAdminCall(ctx.path, ctx.body, returned);
+            const input = buildAuditFromAuthCall(ctx.path, ctx.body, returned);
             if (!input) return;
 
-            const identity = await resolveTargetIdentity(ctx, input.targetId, returned);
+            // POST /api-keys reaches the plugin with no session attached and logs
+            // the action itself with the real actor; logging again here would
+            // only add an actor-less duplicate.
+            if (ctx.path.startsWith("/api-key/") && !(await getSessionFromCtx(ctx))) return;
+
+            // Only user targets have a name/Discord id to resolve; skip the two
+            // lookups for api_key rows.
+            const identity = input.targetType === "user" ? await resolveTargetIdentity(ctx, input.targetId, returned) : {};
             const enriched: LogActionInput = {
                 ...input,
                 metadata: { ...identity, ...(input.metadata ?? {}) },

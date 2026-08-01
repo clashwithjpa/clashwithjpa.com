@@ -21,7 +21,7 @@ export const updateCocAccountExternalMutationKey = () => [{ url: "/admin/coc-acc
 export type UpdateCocAccountExternalMutationKey = ReturnType<typeof updateCocAccountExternalMutationKey>;
 
 /**
- * @description [Manager] Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.
+ * @description Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.
  * {@link /admin/coc-accounts/:id/external}
  */
 export function createUpdateCocAccountExternal<TContext>(

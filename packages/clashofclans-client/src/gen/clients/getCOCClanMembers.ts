@@ -13,7 +13,7 @@ function getGetCOCClanMembersUrl(tag: GetCOCClanMembersPathParams["tag"]) {
 }
 
 /**
- * @description [Public] Fetches a Clash of Clans clan's members by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's members by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/members}
  */
 export async function getCOCClanMembers(tag: GetCOCClanMembersPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -26,7 +26,7 @@ export function getCOCCWLWarQueryOptions(warTag: GetCOCCWLWarPathParams["warTag"
 }
 
 /**
- * @description [Authenticated] Fetches a CWL war's details by its war tag. The tag must start with #.
+ * @description Fetches a CWL war's details by its war tag. The tag must start with #.
  * {@link /coc/cwl/wars/:warTag}
  */
 export function createGetCOCCWLWar<

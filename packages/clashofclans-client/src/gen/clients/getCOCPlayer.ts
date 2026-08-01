@@ -13,7 +13,7 @@ function getGetCOCPlayerUrl(tag: GetCOCPlayerPathParams["tag"]) {
 }
 
 /**
- * @description [Authenticated] Fetches a Clash of Clans player's data by their tag. The tag must start with #.
+ * @description Fetches a Clash of Clans player's data by their tag. The tag must start with #.
  * {@link /coc/player/:tag}
  */
 export async function getCOCPlayer(tag: GetCOCPlayerPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

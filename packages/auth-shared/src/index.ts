@@ -90,3 +90,31 @@ export function roleLevel(roleStr: string | null | undefined): number {
     if (!roleStr) return ROLE_LEVELS.unverified;
     return roleStr.split(",").reduce((max, r) => Math.max(max, ROLE_LEVELS[r.trim() as Role] ?? -1), -1);
 }
+
+export type JpaPermission = (typeof statement.jpa)[number];
+
+// API keys are scoped with the same `jpa` permissions the routes are guarded by,
+// so a key's scopes can be bounded by what its owner actually holds. The role
+// ladder is strictly cumulative — each role adds exactly one permission on top
+// of the one below — so a level maps to a prefix of `statement.jpa`. An unknown
+// role string yields `[]` rather than silently granting `apply`.
+export function jpaPermsForRole(roleStr: string | null | undefined): JpaPermission[] {
+    return statement.jpa.slice(0, roleLevel(roleStr) + 1);
+}
+
+// Rung of a single permission on that same ladder. -1 for anything unknown, so
+// a stray scope never outranks a real one.
+export function permLevel(perm: string | null | undefined): number {
+    return perm ? (statement.jpa as readonly string[]).indexOf(perm) : -1;
+}
+
+// The ceiling a set of scopes grants. Because the ladder is cumulative, callers
+// compare levels rather than testing membership.
+export function maxPermLevel(perms: readonly string[] | null | undefined): number {
+    return (perms ?? []).reduce((max, perm) => Math.max(max, permLevel(perm)), -1);
+}
+
+// Expands a ceiling into every permission it implies.
+export function jpaPermsUpTo(perm: string): JpaPermission[] {
+    return statement.jpa.slice(0, permLevel(perm) + 1);
+}

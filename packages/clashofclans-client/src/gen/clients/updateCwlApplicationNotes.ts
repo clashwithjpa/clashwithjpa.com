@@ -20,7 +20,7 @@ function getUpdateCwlApplicationNotesUrl(id: UpdateCwlApplicationNotesPathParams
 }
 
 /**
- * @description [Manager] Updates the free-text notes/remarks on a CWL application.
+ * @description Updates the free-text notes/remarks on a CWL application.
  * {@link /admin/cwl-applications/:id/notes}
  */
 export async function updateCwlApplicationNotes(

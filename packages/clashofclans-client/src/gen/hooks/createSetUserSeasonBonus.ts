@@ -20,7 +20,7 @@ export const setUserSeasonBonusMutationKey = () => [{ url: "/admin/bonus" }] as 
 export type SetUserSeasonBonusMutationKey = ReturnType<typeof setUserSeasonBonusMutationKey>;
 
 /**
- * @description [Manager] Awards or removes a user's bonus for a season.
+ * @description Awards or removes a user's bonus for a season.
  * {@link /admin/bonus}
  */
 export function createSetUserSeasonBonus<TContext>(

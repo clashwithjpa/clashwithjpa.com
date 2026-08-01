@@ -13,7 +13,7 @@ function getGetAdminUsersUrl() {
 }
 
 /**
- * @description [Manager] Lists users with case-insensitive search across name and Discord id.
+ * @description Lists users with case-insensitive search across name and Discord id. Filter by role, and by apiAccess=true/false.
  * {@link /admin/users}
  */
 export async function getAdminUsers(params?: GetAdminUsersQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -21,7 +21,7 @@ function getCreateAdminClanUrl() {
 }
 
 /**
- * @description [Admin/sudo] Creates a new JPA clan.
+ * @description Creates a new JPA clan.
  * {@link /admin/clans}
  */
 export async function createAdminClan(

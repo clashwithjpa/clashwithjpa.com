@@ -19,7 +19,7 @@ export const deleteCwlApplicationsBulkMutationKey = () => [{ url: "/admin/cwl-ap
 export type DeleteCwlApplicationsBulkMutationKey = ReturnType<typeof deleteCwlApplicationsBulkMutationKey>;
 
 /**
- * @description [Admin] Permanently deletes many CWL applications in one request. Deletion is an admin-only (sudo) power.
+ * @description Permanently deletes many CWL applications in one request. Cannot be undone.
  * {@link /admin/cwl-applications/delete-bulk}
  */
 export function createDeleteCwlApplicationsBulk<TContext>(

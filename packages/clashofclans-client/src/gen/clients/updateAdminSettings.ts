@@ -18,7 +18,7 @@ function getUpdateAdminSettingsUrl() {
 }
 
 /**
- * @description [Admin/sudo] Updates site settings.
+ * @description Updates site settings.
  * {@link /admin/settings}
  */
 export async function updateAdminSettings(

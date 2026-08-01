@@ -34,7 +34,7 @@ export function getCOCClanCurrentWarQueryOptions(
 }
 
 /**
- * @description [Public] Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar}
  */
 export function createGetCOCClanCurrentWar<

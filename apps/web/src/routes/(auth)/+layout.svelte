@@ -270,12 +270,21 @@
     {:else}
         <Splitter.Panel id="infosidebar" class="h-full lg:rounded-2xl {!showInfo ? 'hidden' : ''}">
             {#if showInfo && sidebarStore.content}
-                <div class="size-full overflow-y-auto p-4">
-                    <Button size="icon" variant="ghost" class="fixed top-4 right-4" onclick={() => sidebarStore.close()}>
-                        <TablerX />
-                    </Button>
-                    {@render sidebarStore.content()}
-                </div>
+                <!-- Keyed so the entrance replays when the panel swaps to different
+                     content while already open, the same way ContentPanel keys on
+                     the pathname. -->
+                {#key sidebarStore.contentKey}
+                    <!-- The close button anchors to this wrapper, not to the scrolling
+                         element: `fixed` measured from the viewport instead of the panel. -->
+                    <div class="sidebar-enter relative size-full">
+                        <Button size="icon" variant="ghost" class="absolute top-4 right-4 z-20" onclick={() => sidebarStore.close()}>
+                            <TablerX />
+                        </Button>
+                        <div class="size-full overflow-y-auto p-4">
+                            {@render sidebarStore.content()}
+                        </div>
+                    </div>
+                {/key}
             {/if}
         </Splitter.Panel>
     {/if}

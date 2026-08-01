@@ -13,7 +13,7 @@ function getApplyCwlUrl() {
 }
 
 /**
- * @description [Verified] Submits a CWL application for a Clash of Clans account.
+ * @description Submits a CWL application for a Clash of Clans account.
  * {@link /user/cwl/apply}
  */
 export async function applyCwl(data: ApplyCwlMutationRequest, config: Partial<RequestConfig<ApplyCwlMutationRequest>> & { client?: Client } = {}) {

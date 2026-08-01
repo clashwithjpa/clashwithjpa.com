@@ -22,7 +22,7 @@ export const createCocAccountMutationKey = () => [{ url: "/admin/coc-accounts" }
 export type CreateCocAccountMutationKey = ReturnType<typeof createCocAccountMutationKey>;
 
 /**
- * @description [Admin] Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Skips the API-token ownership check, so it's an admin-only (sudo) power.
+ * @description Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Unlike member-initiated linking, no in-game API token is required, so ownership of the tag is not verified.
  * {@link /admin/coc-accounts}
  */
 export function createCreateCocAccount<TContext>(

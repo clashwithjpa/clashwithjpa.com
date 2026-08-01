@@ -22,7 +22,7 @@ function getUpdateAdminClanUrl(id: UpdateAdminClanPathParams["id"]) {
 }
 
 /**
- * @description [Admin/sudo] Updates a JPA clan.
+ * @description Updates a JPA clan.
  * {@link /admin/clans/:id}
  */
 export async function updateAdminClan(

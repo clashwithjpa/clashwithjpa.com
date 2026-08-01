@@ -19,7 +19,7 @@ function getDeleteAdminCwlClanUrl(tag: DeleteAdminCwlClanPathParams["tag"]) {
 }
 
 /**
- * @description [Admin/sudo] Deletes a CWL clan identified by URL-encoded clan tag.
+ * @description Deletes a CWL clan identified by URL-encoded clan tag.
  * {@link /admin/cwl-clans/:tag}
  */
 export async function deleteAdminCwlClan(tag: DeleteAdminCwlClanPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -24,7 +24,7 @@ export function getRootQueryOptions(config: Partial<RequestConfig> & { client?: 
 }
 
 /**
- * @description [Public] Welcome route for the API. This route is used to verify that the API is up and running.
+ * @description Welcome route for the API. This route is used to verify that the API is up and running.
  * {@link /}
  */
 export function createGetRoot<TData = GetRootQueryResponse, TQueryData = GetRootQueryResponse, TQueryKey extends QueryKey = GetRootQueryKey>(

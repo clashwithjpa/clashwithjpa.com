@@ -22,7 +22,7 @@ export const updateCocAccountStatsMutationKey = () => [{ url: "/admin/coc-accoun
 export type UpdateCocAccountStatsMutationKey = ReturnType<typeof updateCocAccountStatsMutationKey>;
 
 /**
- * @description [Manager] Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.
+ * @description Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.
  * {@link /admin/coc-accounts/:id/stats}
  */
 export function createUpdateCocAccountStats<TContext>(

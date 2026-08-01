@@ -21,7 +21,7 @@ export const updateCwlApplicationNotesMutationKey = () => [{ url: "/admin/cwl-ap
 export type UpdateCwlApplicationNotesMutationKey = ReturnType<typeof updateCwlApplicationNotesMutationKey>;
 
 /**
- * @description [Manager] Updates the free-text notes/remarks on a CWL application.
+ * @description Updates the free-text notes/remarks on a CWL application.
  * {@link /admin/cwl-applications/:id/notes}
  */
 export function createUpdateCwlApplicationNotes<TContext>(

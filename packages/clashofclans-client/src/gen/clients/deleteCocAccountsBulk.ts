@@ -18,7 +18,7 @@ function getDeleteCocAccountsBulkUrl() {
 }
 
 /**
- * @description [Admin] Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications. Deletion is an admin-only (sudo) power.
+ * @description Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications and cannot be undone.
  * {@link /admin/coc-accounts/delete-bulk}
  */
 export async function deleteCocAccountsBulk(

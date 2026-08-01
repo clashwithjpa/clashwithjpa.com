@@ -13,7 +13,7 @@ function getGetCwlSeasonsUrl() {
 }
 
 /**
- * @description [Manager] Lists all CWL seasons (newest first).
+ * @description Lists all CWL seasons (newest first).
  * {@link /admin/cwl-seasons}
  */
 export async function getCwlSeasons(config: Partial<RequestConfig> & { client?: Client } = {}) {

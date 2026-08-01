@@ -20,7 +20,7 @@ export const syncCocAccountsMutationKey = () => [{ url: "/admin/coc-accounts/syn
 export type SyncCocAccountsMutationKey = ReturnType<typeof syncCocAccountsMutationKey>;
 
 /**
- * @description [Manager] Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.
+ * @description Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.
  * {@link /admin/coc-accounts/sync}
  */
 export function createSyncCocAccounts<TContext>(

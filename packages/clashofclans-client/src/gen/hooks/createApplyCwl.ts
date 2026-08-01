@@ -14,7 +14,7 @@ export const applyCwlMutationKey = () => [{ url: "/user/cwl/apply" }] as const;
 export type ApplyCwlMutationKey = ReturnType<typeof applyCwlMutationKey>;
 
 /**
- * @description [Verified] Submits a CWL application for a Clash of Clans account.
+ * @description Submits a CWL application for a Clash of Clans account.
  * {@link /user/cwl/apply}
  */
 export function createApplyCwl<TContext>(

@@ -49,6 +49,11 @@ export const getAuditLogQueryParamsActionEnum = {
     "user.password_set": "user.password_set",
     "user.session_revoked": "user.session_revoked",
     "user.sessions_revoked": "user.sessions_revoked",
+    "user.api_access_granted": "user.api_access_granted",
+    "user.api_access_revoked": "user.api_access_revoked",
+    "api_key.create": "api_key.create",
+    "api_key.update": "api_key.update",
+    "api_key.delete": "api_key.delete",
 } as const;
 
 export type GetAuditLogQueryParamsActionEnumKey = (typeof getAuditLogQueryParamsActionEnum)[keyof typeof getAuditLogQueryParamsActionEnum];
@@ -64,10 +69,18 @@ export const getAuditLogQueryParamsTargetTypeEnum = {
     cwl_clan: "cwl_clan",
     coc_account: "coc_account",
     user: "user",
+    api_key: "api_key",
 } as const;
 
 export type GetAuditLogQueryParamsTargetTypeEnumKey =
     (typeof getAuditLogQueryParamsTargetTypeEnum)[keyof typeof getAuditLogQueryParamsTargetTypeEnum];
+
+export const getAuditLogQueryParamsSourceEnum = {
+    web: "web",
+    api: "api",
+} as const;
+
+export type GetAuditLogQueryParamsSourceEnumKey = (typeof getAuditLogQueryParamsSourceEnum)[keyof typeof getAuditLogQueryParamsSourceEnum];
 
 export type GetAuditLogQueryParams = {
     /**
@@ -86,6 +99,10 @@ export type GetAuditLogQueryParams = {
      * @type string | undefined
      */
     targetId?: string;
+    /**
+     * @type string | undefined
+     */
+    source?: GetAuditLogQueryParamsSourceEnumKey;
     /**
      * @type string | undefined, date-time
      */
@@ -167,6 +184,11 @@ export const entriesActionEnum = {
     "user.password_set": "user.password_set",
     "user.session_revoked": "user.session_revoked",
     "user.sessions_revoked": "user.sessions_revoked",
+    "user.api_access_granted": "user.api_access_granted",
+    "user.api_access_revoked": "user.api_access_revoked",
+    "api_key.create": "api_key.create",
+    "api_key.update": "api_key.update",
+    "api_key.delete": "api_key.delete",
 } as const;
 
 export type EntriesActionEnumKey = (typeof entriesActionEnum)[keyof typeof entriesActionEnum];
@@ -182,9 +204,17 @@ export const entriesTargetTypeEnum = {
     cwl_clan: "cwl_clan",
     coc_account: "coc_account",
     user: "user",
+    api_key: "api_key",
 } as const;
 
 export type EntriesTargetTypeEnumKey = (typeof entriesTargetTypeEnum)[keyof typeof entriesTargetTypeEnum];
+
+export const entriesSourceEnum = {
+    web: "web",
+    api: "api",
+} as const;
+
+export type EntriesSourceEnumKey = (typeof entriesSourceEnum)[keyof typeof entriesSourceEnum];
 
 /**
  * @description Audit log entries.
@@ -219,6 +249,12 @@ export type GetAuditLog200 = {
             targetType: EntriesTargetTypeEnumKey | null;
             targetId: string | null;
             metadata: any | null;
+            /**
+             * @type string
+             */
+            source: EntriesSourceEnumKey;
+            apiKeyId: string | null;
+            apiKeyName: string | null;
             /**
              * @type string, date-time
              */

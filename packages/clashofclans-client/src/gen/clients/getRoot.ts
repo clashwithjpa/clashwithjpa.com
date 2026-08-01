@@ -13,7 +13,7 @@ function getGetRootUrl() {
 }
 
 /**
- * @description [Public] Welcome route for the API. This route is used to verify that the API is up and running.
+ * @description Welcome route for the API. This route is used to verify that the API is up and running.
  * {@link /}
  */
 export async function getRoot(config: Partial<RequestConfig> & { client?: Client } = {}) {

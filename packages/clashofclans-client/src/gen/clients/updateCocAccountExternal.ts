@@ -20,7 +20,7 @@ function getUpdateCocAccountExternalUrl(id: UpdateCocAccountExternalPathParams["
 }
 
 /**
- * @description [Manager] Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.
+ * @description Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.
  * {@link /admin/coc-accounts/:id/external}
  */
 export async function updateCocAccountExternal(

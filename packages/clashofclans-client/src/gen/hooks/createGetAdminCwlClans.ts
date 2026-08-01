@@ -29,7 +29,7 @@ export function getAdminCwlClansQueryOptions(config: Partial<RequestConfig> & { 
 }
 
 /**
- * @description [Manager] Lists all CWL clans.
+ * @description Lists all CWL clans.
  * {@link /admin/cwl-clans}
  */
 export function createGetAdminCwlClans<

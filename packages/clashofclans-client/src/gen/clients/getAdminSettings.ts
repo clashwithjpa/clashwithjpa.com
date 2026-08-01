@@ -13,7 +13,7 @@ function getGetAdminSettingsUrl() {
 }
 
 /**
- * @description [Admin/sudo] Fetches the current site settings.
+ * @description Fetches the current site settings.
  * {@link /admin/settings}
  */
 export async function getAdminSettings(config: Partial<RequestConfig> & { client?: Client } = {}) {

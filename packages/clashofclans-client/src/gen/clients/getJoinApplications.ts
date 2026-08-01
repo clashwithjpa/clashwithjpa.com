@@ -18,7 +18,7 @@ function getGetJoinApplicationsUrl() {
 }
 
 /**
- * @description [Reviewer] Lists clan join applications with optional status filter and pagination.
+ * @description Lists clan join applications with optional status filter and pagination.
  * {@link /admin/join-applications}
  */
 export async function getJoinApplications(params?: GetJoinApplicationsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

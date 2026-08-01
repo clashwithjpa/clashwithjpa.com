@@ -18,7 +18,7 @@ function getCreateCwlSeasonUrl() {
 }
 
 /**
- * @description [Admin] Creates a new CWL season.
+ * @description Creates a new CWL season.
  * {@link /admin/cwl-seasons}
  */
 export async function createCwlSeason(

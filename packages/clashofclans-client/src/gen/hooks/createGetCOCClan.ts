@@ -25,7 +25,7 @@ export function getCOCClanQueryOptions(tag: GetCOCClanPathParams["tag"], config:
 }
 
 /**
- * @description [Public] Fetches a Clash of Clans clan's data by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's data by its tag. The tag must start with #.
  * {@link /coc/clan/:tag}
  */
 export function createGetCOCClan<

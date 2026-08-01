@@ -20,7 +20,7 @@ export const deleteCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons/:id"
 export type DeleteCwlSeasonMutationKey = ReturnType<typeof deleteCwlSeasonMutationKey>;
 
 /**
- * @description [Admin] Deletes a CWL season; cascades to its applications and bonuses.
+ * @description Deletes a CWL season; cascades to its applications and bonuses.
  * {@link /admin/cwl-seasons/:id}
  */
 export function createDeleteCwlSeason<TContext>(

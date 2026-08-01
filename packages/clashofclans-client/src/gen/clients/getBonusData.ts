@@ -13,7 +13,7 @@ function getGetBonusDataUrl() {
 }
 
 /**
- * @description [Manager] Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.
+ * @description Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.
  * {@link /admin/bonus}
  */
 export async function getBonusData(params?: GetBonusDataQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

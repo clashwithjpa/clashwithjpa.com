@@ -21,7 +21,7 @@ export const createAdminCwlClanMutationKey = () => [{ url: "/admin/cwl-clans" }]
 export type CreateAdminCwlClanMutationKey = ReturnType<typeof createAdminCwlClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
+ * @description Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
  * {@link /admin/cwl-clans}
  */
 export function createCreateAdminCwlClan<TContext>(

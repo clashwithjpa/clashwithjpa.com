@@ -13,7 +13,7 @@ function getGetCOCClanCurrentWarUrl(tag: GetCOCClanCurrentWarPathParams["tag"]) 
 }
 
 /**
- * @description [Public] Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
+ * @description Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar}
  */
 export async function getCOCClanCurrentWar(tag: GetCOCClanCurrentWarPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {

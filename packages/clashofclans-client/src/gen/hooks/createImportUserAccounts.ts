@@ -14,7 +14,7 @@ export const importUserAccountsMutationKey = () => [{ url: "/user/accounts/impor
 export type ImportUserAccountsMutationKey = ReturnType<typeof importUserAccountsMutationKey>;
 
 /**
- * @description [Authenticated] Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.
+ * @description Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.
  * {@link /user/accounts/import}
  */
 export function createImportUserAccounts<TContext>(

@@ -22,7 +22,7 @@ export const createAdminClanMutationKey = () => [{ url: "/admin/clans" }] as con
 export type CreateAdminClanMutationKey = ReturnType<typeof createAdminClanMutationKey>;
 
 /**
- * @description [Admin/sudo] Creates a new JPA clan.
+ * @description Creates a new JPA clan.
  * {@link /admin/clans}
  */
 export function createCreateAdminClan<TContext>(

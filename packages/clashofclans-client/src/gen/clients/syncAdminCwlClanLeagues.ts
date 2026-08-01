@@ -17,7 +17,7 @@ function getSyncAdminCwlClanLeaguesUrl() {
 }
 
 /**
- * @description [Admin/sudo] Refreshes every CWL clan's league from the Clash of Clans API.
+ * @description Refreshes every CWL clan's league from the Clash of Clans API.
  * {@link /admin/cwl-clans/sync-leagues}
  */
 export async function syncAdminCwlClanLeagues(config: Partial<RequestConfig> & { client?: Client } = {}) {

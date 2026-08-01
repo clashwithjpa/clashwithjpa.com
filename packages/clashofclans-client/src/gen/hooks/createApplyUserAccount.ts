@@ -22,7 +22,7 @@ export const applyUserAccountMutationKey = () => [{ url: "/user/accounts/apply" 
 export type ApplyUserAccountMutationKey = ReturnType<typeof applyUserAccountMutationKey>;
 
 /**
- * @description [Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.
+ * @description Submits a clan application for a Clash of Clans account after verifying ownership.
  * {@link /user/accounts/apply}
  */
 export function createApplyUserAccount<TContext>(

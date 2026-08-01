@@ -20,7 +20,7 @@ export const verifyAdminClanDiscordMutationKey = () => [{ url: "/admin/clans/ver
 export type VerifyAdminClanDiscordMutationKey = ReturnType<typeof verifyAdminClanDiscordMutationKey>;
 
 /**
- * @description [Admin/sudo] Verifies that the provided Discord role/channel/user IDs exist in the configured guild.
+ * @description Verifies that the provided Discord role/channel/user IDs exist in the configured guild.
  * {@link /admin/clans/verify-discord}
  */
 export function createVerifyAdminClanDiscord<TContext>(

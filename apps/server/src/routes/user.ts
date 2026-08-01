@@ -20,7 +20,8 @@ import { ErrorResponseSchema, SessionSchema, SuccessResponseSchema, UserSchema, 
 import { verifyTurnstileToken } from "@/lib/utils/cf";
 import * as Sentry from "@sentry/bun";
 import { Hono } from "hono";
-import { describeRoute, resolver, validator as zValidator } from "hono-openapi";
+import { describeRoute } from "@/lib/openapi";
+import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
 // Each route has some level of auth middleware
@@ -35,7 +36,8 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getUser",
-        description: "[Authenticated] Fetches the current user's data.",
+        role: "Public",
+        description: "Fetches the current user's data.",
         tags: ["user"],
         responses: {
             200: {
@@ -83,7 +85,8 @@ app.get(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "getUserFeatures",
-        description: "[Authenticated] Fetches the site feature flags relevant to the current user.",
+        role: "Public",
+        description: "Fetches the site feature flags relevant to the current user.",
         tags: ["user"],
         responses: {
             200: {
@@ -145,7 +148,8 @@ app.get(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "getUserAccounts",
-        description: "[Verified] Fetches the current user's Clash of Clans accounts.",
+        role: "Verified",
+        description: "Fetches the current user's Clash of Clans accounts.",
         tags: ["user"],
         responses: {
             200: {
@@ -218,8 +222,9 @@ app.post(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "importUserAccounts",
+        role: "Public",
         description:
-            "[Authenticated] Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.",
+            "Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.",
         tags: ["user"],
         responses: {
             200: {
@@ -328,7 +333,8 @@ app.post(
     hasAccessAuthMiddleware(isAuthenticated),
     describeRoute({
         operationId: "applyUserAccount",
-        description: "[Authenticated] Submits a clan application for a Clash of Clans account after verifying ownership.",
+        role: "Public",
+        description: "Submits a clan application for a Clash of Clans account after verifying ownership.",
         tags: ["user"],
         responses: {
             200: {
@@ -504,8 +510,9 @@ app.put(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "setUserAccountExternal",
+        role: "Verified",
         description:
-            "[Verified] Converts one of the current user's own Clash of Clans accounts to external. One-way: members can only mark an account external, not revert it (reverting to a main account is staff-only). War weight is left unchanged.",
+            "Converts one of the current user's own Clash of Clans accounts to external. One-way — this endpoint cannot revert an account to main; use PUT /admin/coc-accounts/{id}/external for that. War weight is left unchanged.",
         tags: ["user"],
         responses: {
             200: {
@@ -606,7 +613,8 @@ app.get(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "getUserCwlApplications",
-        description: "[Verified] Fetches the current user's CWL applications.",
+        role: "Verified",
+        description: "Fetches the current user's CWL applications.",
         tags: ["user"],
         responses: {
             200: {
@@ -682,7 +690,8 @@ app.post(
     hasAccessAuthMiddleware(isVerified),
     describeRoute({
         operationId: "applyCwl",
-        description: "[Verified] Submits a CWL application for a Clash of Clans account.",
+        role: "Verified",
+        description: "Submits a CWL application for a Clash of Clans account.",
         tags: ["user"],
         responses: {
             200: {

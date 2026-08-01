@@ -38,7 +38,7 @@ export function getAnalyticsUserJoinsQueryOptions(
 }
 
 /**
- * @description [Reviewer] Daily count of new users over the requested window.
+ * @description Daily count of new users over the requested window.
  * {@link /analytics/user-joins}
  */
 export function createGetAnalyticsUserJoins<

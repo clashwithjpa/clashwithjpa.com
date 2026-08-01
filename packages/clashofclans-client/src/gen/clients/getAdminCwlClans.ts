@@ -13,7 +13,7 @@ function getGetAdminCwlClansUrl() {
 }
 
 /**
- * @description [Manager] Lists all CWL clans.
+ * @description Lists all CWL clans.
  * {@link /admin/cwl-clans}
  */
 export async function getAdminCwlClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
