@@ -1,7 +1,9 @@
 {
-    "oxc.enable": true,
     "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true,
+    "oxc.enable": true,
+    "oxc.configPath": "./vite.config.ts",
+    "oxc.fmt.configPath": "./vite.config.ts",
     "editor.codeActionsOnSave": {
         "source.format.oxc": "explicit",
         "source.fixAll.oxc": "explicit"
