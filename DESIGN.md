@@ -68,11 +68,11 @@ All hovers, focus states and popovers use `duration-200` for a snappy but smooth
 
 ### Entrances
 
-| What                     | How                                                         |
-| :----------------------- | :---------------------------------------------------------- |
-| One element              | `animate-in fade-in duration-800 ease-glide fill-mode-both` |
-| List, indexed stagger    | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`         |
-| A card, grid or list     | `.stagger-card` on each card + `style="--i:{i}"`            |
+| What                     | How                                                          |
+| :----------------------- | :----------------------------------------------------------- |
+| One element              | `animate-in fade-in duration-800 ease-glide fill-mode-both`  |
+| List, indexed stagger    | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`          |
+| A card, grid or list     | `.stagger-card` on each card + `style="--i:{i}"`             |
 | A single panel's insides | `.stagger-children` on the parent — never on a repeated card |
 
 - `.stagger-fade` fades and slides in `8px` from the left over `200ms`, stepping `30ms` per `--i` and capping at the 9th item. `.stagger-up` fades and rises `100%` over `200ms`, stepping `150ms` per `--i`.
