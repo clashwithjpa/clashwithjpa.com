@@ -1,0 +1,110 @@
+name: 🐛 Bug report
+description: Something is broken or behaving in a way it shouldn't
+title: "[BUG] "
+labels: [bug]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. The more precisely you can describe what happened, the faster it gets fixed.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you start
+      options:
+        - label: I searched the existing issues and this has not been reported yet
+          required: true
+        - label: I can still reproduce this on the latest version of `main`
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does it happen?
+      description: Pick everything that applies.
+      multiple: true
+      options:
+        - Website
+        - Android app
+        - iOS app
+        - API / server
+        - Database or migrations
+        - Docs
+        - Local dev setup
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What went wrong?
+      description: Describe the bug itself. Stick to what you observed, the theory of why can go further down.
+      placeholder: Clicking save on the CWL roster does nothing and the row never updates.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How do we reproduce it?
+      description: Numbered steps someone else can follow from a clean start.
+      value: |
+        1. Go to
+        2. Click on
+        3. Scroll down to
+        4. See the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error output
+      description: Browser console, server logs, or a Sentry link. This is pasted into a code block, no backticks needed.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or recording
+      description: Drag files straight into this box. A short recording beats a paragraph for anything visual.
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Device and browser
+      description: Only needed if you hit this on the website or a mobile app.
+      placeholder: Windows 11, Chrome 141 / iPhone 15, iOS 18.2
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: The commit SHA if you are running it locally, otherwise roughly when you saw it.
+      placeholder: 7778965, or "live site on 3 Aug"
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Workarounds you found, when it started, whether it is intermittent, a guess at the cause.
+    validations:
+      required: false
