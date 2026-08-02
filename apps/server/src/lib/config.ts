@@ -15,6 +15,8 @@ function required(key: string): string {
 export const config = {
     NODE_ENV: process.env.NODE_ENV ?? "development",
 
+    PORT: Number(process.env.PORT ?? 3000),
+
     JPA_DATABASE_URL: required("JPA_DATABASE_URL"),
 
     JPA_REDIS_URL: required("JPA_REDIS_URL"),

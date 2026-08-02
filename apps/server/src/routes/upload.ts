@@ -3,7 +3,7 @@ import { config } from "@/lib/config";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { type AppEnv } from "@/lib/types";
 import { CreateBucketCommand, HeadBucketCommand, PutBucketPolicyCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 

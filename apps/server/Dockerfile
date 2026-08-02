@@ -1,52 +1,79 @@
 # syntax=docker/dockerfile:1.7
 
-ARG BUN_VERSION=1.3.10
-ARG TURBO_VERSION=2.8.17
+ARG NODE_VERSION=24-slim
+ARG TURBO_VERSION=2.10.8
+ARG PNPM_VERSION=11.17.0
 
 # ---- base ----------------------------------------------------------------
-FROM oven/bun:${BUN_VERSION}-alpine AS base
+FROM node:${NODE_VERSION} AS base
+ARG PNPM_VERSION
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 WORKDIR /app
 
 # ---- pruner: emit a workspace subset containing only server's deps -------
 # `turbo prune` walks the workspace graph and emits, under /app/out:
 #   json/  → just the package.jsons of in-graph workspaces (+ root)
 #   full/  → those same workspaces with their source
-#   bun.lock → a lockfile scoped to the pruned graph
-# This replaces the hand-maintained list of `COPY <pkg>/package.json` lines
-# and means the deps layer only invalidates on package.json changes in
-# workspaces server actually depends on.
+#   pnpm-lock.yaml → a lockfile scoped to the pruned graph
 FROM base AS pruner
 ARG TURBO_VERSION
 COPY . .
-RUN bunx turbo@${TURBO_VERSION} prune server --docker
+RUN pnpm dlx turbo@${TURBO_VERSION} prune server --docker
 
-# ---- prod-deps: install only production dependencies ---------------------
-FROM base AS prod-deps
+# ---- deps: install the full graph (dev included) so we can compile -------
+FROM base AS deps
 
 COPY --from=pruner /app/out/json/ ./
-COPY --from=pruner /app/out/bun.lock ./bun.lock
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner /app/out/full/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile --production --ignore-scripts
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# ---- build: compile TypeScript to plain JS -------------------------------
+FROM deps AS build
+
+COPY --from=pruner /app/out/full/ ./
+
+# Builds in-graph workspace packages first (turbo `dependsOn: ["^build"]`),
+# then the server: tsc emits to dist/, tsc-alias rewrites the @/* aliases and
+# appends .js extensions so Node's ESM resolver can follow them.
+RUN pnpm --filter server... run build
+
+# ---- deploy: self-contained production tree ------------------------------
+# `pnpm deploy` resolves the workspace graph into a standalone directory with a
+# real node_modules containing only production dependencies. A plain
+# `pnpm prune --prod` at the workspace root would prune against the *root*
+# package.json (which holds only devDependencies) and strip the server's own
+# runtime deps.
+FROM build AS deploy
+RUN pnpm deploy --filter=server --prod --legacy /app/deploy
 
 # ---- runtime -------------------------------------------------------------
-FROM oven/bun:${BUN_VERSION}-alpine AS runtime
+FROM node:${NODE_VERSION} AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production \
     PORT=3000
 
-# Bring the prod install tree first (root + per-workspace node_modules),
-# then overlay the pruned source — out/full has no node_modules so the
-# install tree is preserved.
-COPY --from=prod-deps /app/ ./
-COPY --from=pruner /app/out/full/ ./
+# Only the production install tree and compiled output are carried over —
+# no TypeScript, no sources, no build tooling in the final image.
+COPY --from=deploy /app/deploy ./apps/server
+
+# Read at runtime by the account-import endpoint. It is a generated artifact
+# and may legitimately be absent — the bracket glob makes this COPY a no-op in
+# that case, and the endpoint already degrades to a warning when the file is
+# missing. A literal path here would hard-fail the build instead.
+COPY --from=pruner /app/out/full/apps/server/scripts/migrations/dataset[s]/ \
+     ./apps/server/scripts/migrations/datasets/
 
 WORKDIR /app/apps/server
 
 RUN chmod +x docker-entrypoint.sh
 
-USER bun
+USER node
 
 EXPOSE 3000
 

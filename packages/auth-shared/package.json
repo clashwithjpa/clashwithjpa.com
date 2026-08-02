@@ -4,12 +4,26 @@
     "private": true,
     "type": "module",
     "exports": {
-        ".": "./src/index.ts"
+        ".": {
+            "types": "./src/index.ts",
+            "import": "./dist/index.js"
+        }
     },
-    "main": "src/index.ts",
-    "types": "src/index.ts",
+    "main": "./dist/index.js",
+    "types": "./src/index.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit"
+    },
     "devDependencies": {
-        "@repo/typescript-config": "workspace:*"
+        "@repo/typescript-config": "workspace:*",
+        "better-auth": "^1.5.5",
+        "tsc-alias": "^1.9.1",
+        "typescript": "^6.0.3"
     },
     "peerDependencies": {
         "better-auth": "^1.5.5"

@@ -2,7 +2,7 @@
 set -e
 
 echo "[entrypoint] running database migrations"
-bun run scripts/migrate-prod.ts
+node dist/migrate-prod.js
 
 echo "[entrypoint] starting server"
-exec bun run --preload ./src/lib/instrument.ts src/index.ts
+exec node --import ./dist/lib/instrument.js dist/index.js

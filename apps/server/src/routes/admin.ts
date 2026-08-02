@@ -64,7 +64,7 @@ import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { ROLES } from "@repo/auth-shared";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { parse } from "csv-parse/sync";
 import { Hono } from "hono";
 import { describeRoute } from "@/lib/openapi";

@@ -76,13 +76,13 @@ show:
 # Run server database migrations
 migrate:
     @printf '\033[43m\033[30m  DB  \033[0m \033[33mRunning migrations\033[0m\n'
-    @bun --filter server db:migrate
+    @pnpm --filter server db:migrate
     @printf '\033[42m\033[30m  OK  \033[0m \033[32mDatabase up to date\033[0m\n'
 
 # Generate server database types
 generate:
     @printf '\033[43m\033[30m  DB  \033[0m \033[33mGenerating types\033[0m\n'
-    @bun --filter server db:generate
+    @pnpm --filter server db:generate
     @printf '\033[42m\033[30m  OK  \033[0m \033[32mTypes generated\033[0m\n'
 
 # Reset server database

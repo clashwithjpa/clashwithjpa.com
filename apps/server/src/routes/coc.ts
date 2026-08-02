@@ -13,7 +13,7 @@ import {
     APIPlayerSchema,
     APIVerifyTokenSchema,
 } from "@repo/clashofclans-api";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono } from "hono";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";

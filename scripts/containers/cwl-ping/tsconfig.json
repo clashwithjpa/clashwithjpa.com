@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
         "lib": ["ESNext"],
-        "module": "ESNext",
+        "module": "NodeNext",
         "target": "ESNext",
-        "moduleResolution": "bundler",
-        "types": ["bun"],
+        "moduleResolution": "NodeNext",
+        "types": ["node"],
         "strict": true,
         "skipLibCheck": true,
-        "noEmit": true
+        "outDir": "dist",
+        "rootDir": "."
     },
     "include": ["main.ts"]
 }

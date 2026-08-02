@@ -1,3 +1,4 @@
+import { readFile } from "fs/promises";
 import { parse } from "csv-parse/sync";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
@@ -6,9 +7,7 @@ import "dotenv/config";
 
 if (!process.env.JPA_DATABASE_URL) throw new Error("JPA_DATABASE_URL is not set");
 
-const pool = new Pool({
-    connectionString: process.env.JPA_DATABASE_URL,
-});
+const pool = new Pool({ connectionString: process.env.JPA_DATABASE_URL });
 
 const db = drizzle({ client: pool });
 
@@ -41,7 +40,7 @@ interface ClanTableRow {
 
 async function migrateBaseInfo() {
     console.log("Reading base_table.csv...");
-    const csvContent = await Bun.file(import.meta.dir + "/datasets/base_table.csv").text();
+    const csvContent = await readFile(import.meta.dirname + "/datasets/base_table.csv", "utf8");
 
     const records = parse(csvContent, {
         columns: true,
@@ -63,7 +62,7 @@ async function migrateBaseInfo() {
 
 async function migrateClanInfo() {
     console.log("Reading clan_table.csv...");
-    const csvContent = await Bun.file(import.meta.dir + "/datasets/clan_table.csv").text();
+    const csvContent = await readFile(import.meta.dirname + "/datasets/clan_table.csv", "utf8");
 
     const records = parse(csvContent, {
         columns: true,

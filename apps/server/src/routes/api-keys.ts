@@ -12,7 +12,7 @@ import {
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { jpaPermsForRole, jpaPermsUpTo, statement } from "@repo/auth-shared";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono, type Context } from "hono";
 import { describeRoute } from "@/lib/openapi";
 import { resolver, validator as zValidator } from "hono-openapi";
