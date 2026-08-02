@@ -15,7 +15,8 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "prepare": "svelte-kit sync || echo ''",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "typecheck": "pnpm run check"
     },
     "dependencies": {
         "@ark-ui/svelte": "^5.22.1",

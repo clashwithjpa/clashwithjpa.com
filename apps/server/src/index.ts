@@ -271,7 +271,7 @@ app.get("/openapi.json", async (c) => {
 // matched first.
 app.get(
     "/",
-    Scalar((c) => {
+    Scalar(() => {
         return {
             pageTitle: "ClashWithJPA API Documentation",
             url: "/openapi.json",

@@ -458,7 +458,7 @@ app.post(
                     success: true,
                     data: { account },
                 });
-            } catch (error: any) {
+            } catch (error) {
                 const { message, constraint, code } = getDbErrorMessage(error);
                 if (code === "23505") {
                     return c.json({ success: false, error: "This account is already linked." }, 409);
@@ -481,7 +481,7 @@ app.post(
                 success: true,
                 data: { application },
             });
-        } catch (error: any) {
+        } catch (error) {
             const { message, constraint, code } = getDbErrorMessage(error);
             if (code === "23505") {
                 return c.json({ success: false, error: "Application already exists for this account." }, 409);
@@ -806,7 +806,7 @@ app.post(
                 success: true,
                 data: { application: { ...application, cocAccountWeight: resolvedWeight } },
             });
-        } catch (error: any) {
+        } catch (error) {
             const { message, constraint, code } = getDbErrorMessage(error);
             if (code === "23505") {
                 const errorMessage =

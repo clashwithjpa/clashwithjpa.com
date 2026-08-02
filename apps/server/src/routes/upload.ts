@@ -33,8 +33,9 @@ const BUCKET_NAME = "uploads";
 async function ensureBucket() {
     try {
         await s3.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
-    } catch (error: any) {
-        if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+    } catch (error) {
+        const { name, $metadata } = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+        if (name === "NotFound" || $metadata?.httpStatusCode === 404) {
             await s3.send(new CreateBucketCommand({ Bucket: BUCKET_NAME }));
         }
     }

@@ -5,8 +5,5 @@ build
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
-bun.lock
-bun.lockb
-*.md
 logs
 .turbo

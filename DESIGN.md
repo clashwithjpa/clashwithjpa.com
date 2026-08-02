@@ -39,6 +39,7 @@ All UI elements use Tailwind's **Stone** palette as the foundation.
 | `rounded-2xl` | Large content panels (admin and dashboard views)   |
 
 **Exceptions:**
+
 - `ControlsPopup.svelte` — the floating trigger button uses `rounded-full`. Inner buttons inside the popup remain `rounded-lg`.
 - `CocBtn` — may use `rounded-xl` or `rounded-[10px]` as it has an independent theme.
 - Floating button container in `<ReadmeEditor />` — uses `rounded-xl`.
@@ -68,11 +69,11 @@ All hovers, focus states and popovers use `duration-200` for a snappy but smooth
 
 ### Entrances
 
-| What                     | How                                                         |
-| :----------------------- | :---------------------------------------------------------- |
-| One element              | `animate-in fade-in duration-800 ease-glide fill-mode-both` |
-| List, indexed stagger    | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`         |
-| A card, grid or list     | `.stagger-card` on each card + `style="--i:{i}"`            |
+| What                     | How                                                          |
+| :----------------------- | :----------------------------------------------------------- |
+| One element              | `animate-in fade-in duration-800 ease-glide fill-mode-both`  |
+| List, indexed stagger    | `.stagger-fade` / `.stagger-up` + `style="--i:{i}"`          |
+| A card, grid or list     | `.stagger-card` on each card + `style="--i:{i}"`             |
 | A single panel's insides | `.stagger-children` on the parent — never on a repeated card |
 
 - `.stagger-fade` fades and slides in `8px` from the left over `200ms`, stepping `30ms` per `--i` and capping at the 9th item. `.stagger-up` fades and rises `100%` over `200ms`, stepping `150ms` per `--i`.
@@ -127,7 +128,7 @@ Use Svelte's built-in transitions (`transition:slide`, etc.) for `{#if}` blocks 
 > [!WARNING]
 > **Never put a class animation on an element that also has a Svelte transition.**
 >
-> Svelte applies its transition as an *inline* `animation`, which wins while the transition runs. The moment it clears that inline style the class animation takes over and replays — so the element slides in correctly, then pops. Exits look fine because the inline style survives until unmount, which makes it read as an in/out mismatch.
+> Svelte applies its transition as an _inline_ `animation`, which wins while the transition runs. The moment it clears that inline style the class animation takes over and replays — so the element slides in correctly, then pops. Exits look fine because the inline style survives until unmount, which makes it read as an in/out mismatch.
 >
 > `animate-none` does not fix it: `.stagger-children > *:nth-child(n)` outranks it, and these rules are unlayered so they beat Tailwind utilities anyway. Restructure instead — move the stagger to an inner wrapper so the transitioning element is a plain sibling.
 
@@ -164,6 +165,7 @@ A fixed z-index scale prevents stacking conflicts. Do not invent values outside 
 
 > [!NOTE]
 > `CocPopup` accepts an `aboveNavbar` prop:
+>
 > - `aboveNavbar={false}` (default): `z-30` — stays below the navbar.
 > - `aboveNavbar={true}`: `z-9999` — appears above the navbar.
 
