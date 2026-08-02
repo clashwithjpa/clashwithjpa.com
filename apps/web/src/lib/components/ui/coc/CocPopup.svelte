@@ -109,7 +109,7 @@
                         {/if}
 
                         <div
-                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} [scrollbar-width:none] shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden`}
                         >
                             <div class={cn("w-full p-4 text-stone-900", contentClass)}>
                                 {@render children()}
@@ -152,7 +152,7 @@
                         {/if}
 
                         <div
-                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} [scrollbar-width:none] shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden`}
                         >
                             <div class={cn("w-full p-4 text-stone-900", maxWidth, contentClass)}>
                                 {@render children()}

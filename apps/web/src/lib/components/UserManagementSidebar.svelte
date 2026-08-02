@@ -291,7 +291,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div class="flex-1 [scrollbar-width:none] overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {#if activeTab === "overview"}
             <div class="space-y-4">
                 <div class="space-y-1">

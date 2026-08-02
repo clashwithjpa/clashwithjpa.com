@@ -89,7 +89,7 @@
                     {/if}
 
                     <div
-                        class="no-drag min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                        class="no-drag min-h-0 flex-1 [scrollbar-width:none] overflow-x-hidden overflow-y-auto p-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                     >
                         {@render children()}
                     </div>

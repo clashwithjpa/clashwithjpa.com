@@ -180,7 +180,7 @@
         class="flex items-center {isMobile ? 'min-h-16 w-full justify-center py-2' : 'h-full flex-col justify-between py-4'}"
     >
         {#if isMobile}
-            <div class="edge-fade w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div class="edge-fade w-full [scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden">
                 <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4">
                     {#each groupedLinks as group, i (group.category)}
                         {#if i > 0}
@@ -196,7 +196,7 @@
             </div>
         {:else}
             <div
-                class="edge-fade flex min-h-0 w-full flex-1 flex-col justify-start gap-6 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                class="edge-fade flex min-h-0 w-full flex-1 [scrollbar-width:none] flex-col justify-start gap-6 overflow-y-auto p-2 [&::-webkit-scrollbar]:hidden"
                 bind:clientWidth={sidebarWidth}
             >
                 {#each groupedLinks as group, i (group.category)}
