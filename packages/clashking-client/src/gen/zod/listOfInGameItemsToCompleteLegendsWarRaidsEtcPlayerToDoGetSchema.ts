@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 import { z } from "zod/v4";
+import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 
 export const listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParamsSchema = z.object({
     player_tags: z.array(z.string()).min(1).max(50),

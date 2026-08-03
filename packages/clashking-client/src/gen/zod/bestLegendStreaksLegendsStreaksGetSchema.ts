@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 import { z } from "zod/v4";
+import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 
 export const bestLegendStreaksLegendsStreaksGetQueryParamsSchema = z.object({
     limit: z.coerce.number().int().min(1).max(500).default(50),

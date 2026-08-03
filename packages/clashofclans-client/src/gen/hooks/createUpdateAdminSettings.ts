@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type {
-    UpdateAdminSettingsMutationRequest,
-    UpdateAdminSettingsMutationResponse,
-    UpdateAdminSettings401,
-    UpdateAdminSettings500,
-} from "../models/UpdateAdminSettings.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { updateAdminSettings } from "../clients/updateAdminSettings.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { updateAdminSettings } from "../clients/updateAdminSettings.ts";
+import type {
+    UpdateAdminSettings401,
+    UpdateAdminSettings500,
+    UpdateAdminSettingsMutationRequest,
+    UpdateAdminSettingsMutationResponse,
+} from "../models/UpdateAdminSettings.ts";
 
 export const updateAdminSettingsMutationKey = () => [{ url: "/admin/settings" }] as const;
 

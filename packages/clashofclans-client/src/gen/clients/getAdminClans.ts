@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminClansQueryResponse, GetAdminClans401, GetAdminClans500 } from "../models/GetAdminClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetAdminClans401, GetAdminClans500, GetAdminClansQueryResponse } from "../models/GetAdminClans.ts";
 
 function getGetAdminClansUrl() {
     const res = { method: "GET", url: `/admin/clans` as const };

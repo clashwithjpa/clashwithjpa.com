@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateCocAccountWarWeightMutationRequest,
-    UpdateCocAccountWarWeightMutationResponse,
-    UpdateCocAccountWarWeightPathParams,
     UpdateCocAccountWarWeight401,
     UpdateCocAccountWarWeight404,
     UpdateCocAccountWarWeight500,
+    UpdateCocAccountWarWeightMutationRequest,
+    UpdateCocAccountWarWeightMutationResponse,
+    UpdateCocAccountWarWeightPathParams,
 } from "../models/UpdateCocAccountWarWeight.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateCocAccountWarWeightUrl(id: UpdateCocAccountWarWeightPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/coc-accounts/${id}/weight` as const };

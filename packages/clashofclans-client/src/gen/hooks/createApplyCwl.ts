@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { ApplyCwlMutationRequest, ApplyCwlMutationResponse, ApplyCwl400, ApplyCwl401, ApplyCwl409, ApplyCwl500 } from "../models/ApplyCwl.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { applyCwl } from "../clients/applyCwl.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { applyCwl } from "../clients/applyCwl.ts";
+import type { ApplyCwl400, ApplyCwl401, ApplyCwl409, ApplyCwl500, ApplyCwlMutationRequest, ApplyCwlMutationResponse } from "../models/ApplyCwl.ts";
 
 export const applyCwlMutationKey = () => [{ url: "/user/cwl/apply" }] as const;
 

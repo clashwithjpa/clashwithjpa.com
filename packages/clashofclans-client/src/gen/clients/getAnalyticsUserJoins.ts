@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsUserJoinsQueryResponse,
-    GetAnalyticsUserJoinsQueryParams,
     GetAnalyticsUserJoins401,
     GetAnalyticsUserJoins500,
+    GetAnalyticsUserJoinsQueryParams,
+    GetAnalyticsUserJoinsQueryResponse,
 } from "../models/GetAnalyticsUserJoins.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsUserJoinsUrl() {
     const res = { method: "GET", url: `/analytics/user-joins` as const };

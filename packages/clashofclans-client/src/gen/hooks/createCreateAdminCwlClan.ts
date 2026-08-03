@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { createAdminCwlClan } from "../clients/createAdminCwlClan.ts";
 import type {
-    CreateAdminCwlClanMutationRequest,
-    CreateAdminCwlClanMutationResponse,
     CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
+    CreateAdminCwlClanMutationRequest,
+    CreateAdminCwlClanMutationResponse,
 } from "../models/CreateAdminCwlClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { createAdminCwlClan } from "../clients/createAdminCwlClan.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const createAdminCwlClanMutationKey = () => [{ url: "/admin/cwl-clans" }] as const;
 

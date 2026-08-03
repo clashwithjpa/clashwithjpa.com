@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetQueryResponse,
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams,
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet422,
-} from "../models/LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet422,
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams,
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetQueryResponse,
+} from "../models/LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
 
 function getLegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetUrl(
     clan_tag: LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams["clan_tag"],

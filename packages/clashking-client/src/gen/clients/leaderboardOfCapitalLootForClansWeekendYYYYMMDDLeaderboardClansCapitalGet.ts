@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryResponse,
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryParams,
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet422,
-} from "../models/LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet422,
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryParams,
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryResponse,
+} from "../models/LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
 
 function getLeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetUrl() {
     const res = { method: "GET", url: `/leaderboard/clans/capital` as const };

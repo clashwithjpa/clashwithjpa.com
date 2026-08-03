@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    GetCOCPlayerBattleLogQueryResponse,
-    GetCOCPlayerBattleLogPathParams,
-    GetCOCPlayerBattleLog500,
-} from "../models/GetCOCPlayerBattleLog.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCPlayerBattleLog } from "../clients/getCOCPlayerBattleLog.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCPlayerBattleLog } from "../clients/getCOCPlayerBattleLog.ts";
+import type {
+    GetCOCPlayerBattleLog500,
+    GetCOCPlayerBattleLogPathParams,
+    GetCOCPlayerBattleLogQueryResponse,
+} from "../models/GetCOCPlayerBattleLog.ts";
 
 export const getCOCPlayerBattleLogQueryKey = (tag: GetCOCPlayerBattleLogPathParams["tag"]) =>
     [{ url: "/coc/player/:tag/battlelog", params: { tag: tag } }] as const;

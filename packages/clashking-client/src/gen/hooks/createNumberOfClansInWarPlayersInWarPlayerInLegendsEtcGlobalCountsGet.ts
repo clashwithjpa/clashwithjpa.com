@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetQueryResponse } from "../models/NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { numberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet } from "../clients/numberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { numberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet } from "../clients/numberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
+import type { NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetQueryResponse } from "../models/NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
 
 export const numberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetQueryKey = () => [{ url: "/global/counts" }] as const;
 

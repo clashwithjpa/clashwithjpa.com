@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCOCClanCWLGroupQueryResponse, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroup500 } from "../models/GetCOCClanCWLGroup.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCClanCWLGroup } from "../clients/getCOCClanCWLGroup.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCClanCWLGroup } from "../clients/getCOCClanCWLGroup.ts";
+import type { GetCOCClanCWLGroup500, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroupQueryResponse } from "../models/GetCOCClanCWLGroup.ts";
 
 export const getCOCClanCWLGroupQueryKey = (tag: GetCOCClanCWLGroupPathParams["tag"]) =>
     [{ url: "/coc/clan/:tag/currentwar/leaguegroup", params: { tag: tag } }] as const;

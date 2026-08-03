@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetAuditLogQueryResponse, GetAuditLogQueryParams, GetAuditLog401, GetAuditLog500 } from "../models/GetAuditLog.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAuditLog } from "../clients/getAuditLog.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAuditLog } from "../clients/getAuditLog.ts";
+import type { GetAuditLog401, GetAuditLog500, GetAuditLogQueryParams, GetAuditLogQueryResponse } from "../models/GetAuditLog.ts";
 
 export const getAuditLogQueryKey = (params?: GetAuditLogQueryParams) => [{ url: "/admin/audit-log" }, ...(params ? [params] : [])] as const;
 

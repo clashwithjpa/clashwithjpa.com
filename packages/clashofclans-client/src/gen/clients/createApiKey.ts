@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateApiKeyMutationRequest,
-    CreateApiKeyMutationResponse,
     CreateApiKey401,
     CreateApiKey403,
     CreateApiKey404,
     CreateApiKey500,
+    CreateApiKeyMutationRequest,
+    CreateApiKeyMutationResponse,
 } from "../models/CreateApiKey.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateApiKeyUrl() {
     const res = { method: "POST", url: `/api-keys` as const };

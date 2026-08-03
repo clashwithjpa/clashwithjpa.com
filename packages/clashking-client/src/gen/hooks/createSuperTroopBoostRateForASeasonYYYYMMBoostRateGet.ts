@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryResponse,
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryParams,
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGet422,
-} from "../models/SuperTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { superTroopBoostRateForASeasonYYYYMMBoostRateGet } from "../clients/superTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { superTroopBoostRateForASeasonYYYYMMBoostRateGet } from "../clients/superTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
+import type {
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGet422,
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryParams,
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryResponse,
+} from "../models/SuperTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
 
 export const superTroopBoostRateForASeasonYYYYMMBoostRateGetQueryKey = (params: SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryParams) =>
     [{ url: "/boost-rate" }, ...(params ? [params] : [])] as const;

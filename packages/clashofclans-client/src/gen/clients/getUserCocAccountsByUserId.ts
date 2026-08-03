@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetUserCocAccountsByUserIdQueryResponse,
-    GetUserCocAccountsByUserIdPathParams,
     GetUserCocAccountsByUserId401,
     GetUserCocAccountsByUserId500,
+    GetUserCocAccountsByUserIdPathParams,
+    GetUserCocAccountsByUserIdQueryResponse,
 } from "../models/GetUserCocAccountsByUserId.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetUserCocAccountsByUserIdUrl(userid: GetUserCocAccountsByUserIdPathParams["userid"]) {
     const res = { method: "GET", url: `/admin/users/${userid}/coc-accounts` as const };

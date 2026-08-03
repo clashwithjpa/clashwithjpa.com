@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { createApiKey } from "../clients/createApiKey.ts";
 import type {
-    CreateApiKeyMutationRequest,
-    CreateApiKeyMutationResponse,
     CreateApiKey401,
     CreateApiKey403,
     CreateApiKey404,
     CreateApiKey500,
+    CreateApiKeyMutationRequest,
+    CreateApiKeyMutationResponse,
 } from "../models/CreateApiKey.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { createApiKey } from "../clients/createApiKey.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const createApiKeyMutationKey = () => [{ url: "/api-keys" }] as const;
 

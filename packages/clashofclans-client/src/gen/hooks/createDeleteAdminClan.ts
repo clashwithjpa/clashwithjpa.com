@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { deleteAdminClan } from "../clients/deleteAdminClan.ts";
 import type {
-    DeleteAdminClanMutationResponse,
-    DeleteAdminClanPathParams,
     DeleteAdminClan401,
     DeleteAdminClan404,
     DeleteAdminClan500,
+    DeleteAdminClanMutationResponse,
+    DeleteAdminClanPathParams,
 } from "../models/DeleteAdminClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteAdminClan } from "../clients/deleteAdminClan.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const deleteAdminClanMutationKey = () => [{ url: "/admin/clans/:id" }] as const;
 

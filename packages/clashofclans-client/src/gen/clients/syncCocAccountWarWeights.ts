@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SyncCocAccountWarWeightsMutationRequest,
-    SyncCocAccountWarWeightsMutationResponse,
     SyncCocAccountWarWeights400,
     SyncCocAccountWarWeights401,
     SyncCocAccountWarWeights500,
+    SyncCocAccountWarWeightsMutationRequest,
+    SyncCocAccountWarWeightsMutationResponse,
 } from "../models/SyncCocAccountWarWeights.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSyncCocAccountWarWeightsUrl() {
     const res = { method: "POST", url: `/admin/coc-accounts/sync-war-weights` as const };

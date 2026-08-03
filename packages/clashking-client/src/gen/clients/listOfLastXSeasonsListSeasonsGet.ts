@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    ListOfLastXSeasonsListSeasonsGetQueryResponse,
-    ListOfLastXSeasonsListSeasonsGetQueryParams,
-    ListOfLastXSeasonsListSeasonsGet422,
-} from "../models/ListOfLastXSeasonsListSeasonsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    ListOfLastXSeasonsListSeasonsGet422,
+    ListOfLastXSeasonsListSeasonsGetQueryParams,
+    ListOfLastXSeasonsListSeasonsGetQueryResponse,
+} from "../models/ListOfLastXSeasonsListSeasonsGet.ts";
 
 function getListOfLastXSeasonsListSeasonsGetUrl() {
     const res = { method: "GET", url: `/list/seasons` as const };

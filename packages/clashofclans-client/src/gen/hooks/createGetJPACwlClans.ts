@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetJPACwlClansQueryResponse, GetJPACwlClans500 } from "../models/GetJPACwlClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getJPACwlClans } from "../clients/getJPACwlClans.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getJPACwlClans } from "../clients/getJPACwlClans.ts";
+import type { GetJPACwlClans500, GetJPACwlClansQueryResponse } from "../models/GetJPACwlClans.ts";
 
 export const getJPACwlClansQueryKey = () => [{ url: "/coc/jpa/clans/cwl" }] as const;
 

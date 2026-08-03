@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetQueryResponse,
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams,
-    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet422,
-} from "../models/LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { legendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet } from "../clients/legendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { legendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet } from "../clients/legendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
+import type {
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet422,
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams,
+    LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetQueryResponse,
+} from "../models/LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGet.ts";
 
 export const legendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetQueryKey = (
     clan_tag: LegendStatsForAMembersInAClanOnADateLegendsClanClanTagDateGetPathParams["clan_tag"],

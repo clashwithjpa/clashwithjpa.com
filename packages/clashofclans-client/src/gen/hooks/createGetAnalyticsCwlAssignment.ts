@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsCwlAssignment } from "../clients/getAnalyticsCwlAssignment.ts";
 import type {
-    GetAnalyticsCwlAssignmentQueryResponse,
-    GetAnalyticsCwlAssignmentQueryParams,
     GetAnalyticsCwlAssignment401,
     GetAnalyticsCwlAssignment500,
+    GetAnalyticsCwlAssignmentQueryParams,
+    GetAnalyticsCwlAssignmentQueryResponse,
 } from "../models/GetAnalyticsCwlAssignment.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsCwlAssignment } from "../clients/getAnalyticsCwlAssignment.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsCwlAssignmentQueryKey = (params?: GetAnalyticsCwlAssignmentQueryParams) =>
     [{ url: "/analytics/cwl-assignment" }, ...(params ? [params] : [])] as const;

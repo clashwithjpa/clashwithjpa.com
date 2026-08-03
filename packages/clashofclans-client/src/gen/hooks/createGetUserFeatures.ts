@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetUserFeaturesQueryResponse, GetUserFeatures401, GetUserFeatures500 } from "../models/GetUserFeatures.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getUserFeatures } from "../clients/getUserFeatures.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getUserFeatures } from "../clients/getUserFeatures.ts";
+import type { GetUserFeatures401, GetUserFeatures500, GetUserFeaturesQueryResponse } from "../models/GetUserFeatures.ts";
 
 export const getUserFeaturesQueryKey = () => [{ url: "/user/features" }] as const;
 

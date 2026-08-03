@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { ReadUsersMeUsersMeGetQueryResponse } from "../models/ReadUsersMeUsersMeGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { ReadUsersMeUsersMeGetQueryResponse } from "../models/ReadUsersMeUsersMeGet.ts";
 
 function getReadUsersMeUsersMeGetUrl() {
     const res = { method: "GET", url: `/users/me` as const };

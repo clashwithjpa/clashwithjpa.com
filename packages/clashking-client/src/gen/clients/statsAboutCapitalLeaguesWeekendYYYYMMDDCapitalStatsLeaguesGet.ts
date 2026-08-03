@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryResponse,
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryParams,
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet422,
-} from "../models/StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet422,
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryParams,
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryResponse,
+} from "../models/StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
 
 function getStatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetUrl() {
     const res = { method: "GET", url: `/capital/stats/leagues` as const };

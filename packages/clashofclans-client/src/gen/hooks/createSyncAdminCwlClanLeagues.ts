@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    SyncAdminCwlClanLeaguesMutationResponse,
-    SyncAdminCwlClanLeagues401,
-    SyncAdminCwlClanLeagues500,
-} from "../models/SyncAdminCwlClanLeagues.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { syncAdminCwlClanLeagues } from "../clients/syncAdminCwlClanLeagues.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { syncAdminCwlClanLeagues } from "../clients/syncAdminCwlClanLeagues.ts";
+import type {
+    SyncAdminCwlClanLeagues401,
+    SyncAdminCwlClanLeagues500,
+    SyncAdminCwlClanLeaguesMutationResponse,
+} from "../models/SyncAdminCwlClanLeagues.ts";
 
 export const syncAdminCwlClanLeaguesMutationKey = () => [{ url: "/admin/cwl-clans/sync-leagues" }] as const;
 

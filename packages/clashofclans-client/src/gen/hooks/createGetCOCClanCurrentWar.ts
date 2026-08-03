@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCOCClanCurrentWarQueryResponse, GetCOCClanCurrentWarPathParams, GetCOCClanCurrentWar500 } from "../models/GetCOCClanCurrentWar.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCClanCurrentWar } from "../clients/getCOCClanCurrentWar.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCClanCurrentWar } from "../clients/getCOCClanCurrentWar.ts";
+import type { GetCOCClanCurrentWar500, GetCOCClanCurrentWarPathParams, GetCOCClanCurrentWarQueryResponse } from "../models/GetCOCClanCurrentWar.ts";
 
 export const getCOCClanCurrentWarQueryKey = (tag: GetCOCClanCurrentWarPathParams["tag"]) =>
     [{ url: "/coc/clan/:tag/currentwar", params: { tag: tag } }] as const;

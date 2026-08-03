@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsCwlParticipationQueryResponse,
-    GetAnalyticsCwlParticipationQueryParams,
     GetAnalyticsCwlParticipation401,
     GetAnalyticsCwlParticipation500,
+    GetAnalyticsCwlParticipationQueryParams,
+    GetAnalyticsCwlParticipationQueryResponse,
 } from "../models/GetAnalyticsCwlParticipation.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsCwlParticipationUrl() {
     const res = { method: "GET", url: `/analytics/cwl-participation` as const };

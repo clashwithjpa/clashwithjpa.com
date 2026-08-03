@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteCocAccountsBulkMutationRequest,
-    DeleteCocAccountsBulkMutationResponse,
     DeleteCocAccountsBulk401,
     DeleteCocAccountsBulk500,
+    DeleteCocAccountsBulkMutationRequest,
+    DeleteCocAccountsBulkMutationResponse,
 } from "../models/DeleteCocAccountsBulk.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteCocAccountsBulkUrl() {
     const res = { method: "POST", url: `/admin/coc-accounts/delete-bulk` as const };

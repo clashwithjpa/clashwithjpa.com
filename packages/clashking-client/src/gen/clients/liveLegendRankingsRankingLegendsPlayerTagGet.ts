@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    LiveLegendRankingsRankingLegendsPlayerTagGetQueryResponse,
-    LiveLegendRankingsRankingLegendsPlayerTagGetPathParams,
-    LiveLegendRankingsRankingLegendsPlayerTagGet422,
-} from "../models/LiveLegendRankingsRankingLegendsPlayerTagGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    LiveLegendRankingsRankingLegendsPlayerTagGet422,
+    LiveLegendRankingsRankingLegendsPlayerTagGetPathParams,
+    LiveLegendRankingsRankingLegendsPlayerTagGetQueryResponse,
+} from "../models/LiveLegendRankingsRankingLegendsPlayerTagGet.ts";
 
 function getLiveLegendRankingsRankingLegendsPlayerTagGetUrl(player_tag: LiveLegendRankingsRankingLegendsPlayerTagGetPathParams["player_tag"]) {
     const res = { method: "GET", url: `/ranking/legends/${player_tag}` as const };

@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { ListOfCurrentTownhallLevelsListTownhallsGetQueryResponse } from "../models/ListOfCurrentTownhallLevelsListTownhallsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { ListOfCurrentTownhallLevelsListTownhallsGetQueryResponse } from "../models/ListOfCurrentTownhallLevelsListTownhallsGet.ts";
 
 function getListOfCurrentTownhallLevelsListTownhallsGetUrl() {
     const res = { method: "GET", url: `/list/townhalls` as const };

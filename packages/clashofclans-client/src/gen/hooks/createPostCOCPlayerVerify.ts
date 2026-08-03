@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { postCOCPlayerVerify } from "../clients/postCOCPlayerVerify.ts";
 import type {
+    PostCOCPlayerVerify500,
     PostCOCPlayerVerifyMutationRequest,
     PostCOCPlayerVerifyMutationResponse,
     PostCOCPlayerVerifyPathParams,
-    PostCOCPlayerVerify500,
 } from "../models/PostCOCPlayerVerify.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { postCOCPlayerVerify } from "../clients/postCOCPlayerVerify.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const postCOCPlayerVerifyMutationKey = () => [{ url: "/coc/player/:tag/verifytoken" }] as const;
 

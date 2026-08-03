@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteJoinApplicationMutationResponse,
-    DeleteJoinApplicationPathParams,
     DeleteJoinApplication401,
     DeleteJoinApplication404,
     DeleteJoinApplication500,
+    DeleteJoinApplicationMutationResponse,
+    DeleteJoinApplicationPathParams,
 } from "../models/DeleteJoinApplication.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteJoinApplicationUrl(id: DeleteJoinApplicationPathParams["id"]) {
     const res = { method: "DELETE", url: `/admin/join-applications/${id}` as const };

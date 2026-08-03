@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { BuilderBaseLeaguesWIconsBuilderbaseleaguesGetQueryResponse } from "../models/BuilderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { builderBaseLeaguesWIconsBuilderbaseleaguesGet } from "../clients/builderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { builderBaseLeaguesWIconsBuilderbaseleaguesGet } from "../clients/builderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
+import type { BuilderBaseLeaguesWIconsBuilderbaseleaguesGetQueryResponse } from "../models/BuilderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
 
 export const builderBaseLeaguesWIconsBuilderbaseleaguesGetQueryKey = () => [{ url: "/builderbaseleagues" }] as const;
 

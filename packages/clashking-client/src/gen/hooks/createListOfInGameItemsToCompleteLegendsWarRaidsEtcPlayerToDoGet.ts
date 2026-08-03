@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryResponse,
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParams,
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet422,
-} from "../models/ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet } from "../clients/listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet } from "../clients/listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
+import type {
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet422,
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParams,
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryResponse,
+} from "../models/ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
 
 export const listOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryKey = (
     params: ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParams,

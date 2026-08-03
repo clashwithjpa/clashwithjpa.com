@@ -3,20 +3,20 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { updateAdminClan } from "../clients/updateAdminClan.ts";
 import type {
-    UpdateAdminClanMutationRequest,
-    UpdateAdminClanMutationResponse,
-    UpdateAdminClanPathParams,
     UpdateAdminClan401,
     UpdateAdminClan404,
     UpdateAdminClan422,
     UpdateAdminClan500,
     UpdateAdminClan503,
+    UpdateAdminClanMutationRequest,
+    UpdateAdminClanMutationResponse,
+    UpdateAdminClanPathParams,
 } from "../models/UpdateAdminClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { updateAdminClan } from "../clients/updateAdminClan.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const updateAdminClanMutationKey = () => [{ url: "/admin/clans/:id" }] as const;
 

@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsCwlParticipation } from "../clients/getAnalyticsCwlParticipation.ts";
 import type {
-    GetAnalyticsCwlParticipationQueryResponse,
-    GetAnalyticsCwlParticipationQueryParams,
     GetAnalyticsCwlParticipation401,
     GetAnalyticsCwlParticipation500,
+    GetAnalyticsCwlParticipationQueryParams,
+    GetAnalyticsCwlParticipationQueryResponse,
 } from "../models/GetAnalyticsCwlParticipation.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsCwlParticipation } from "../clients/getAnalyticsCwlParticipation.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsCwlParticipationQueryKey = (params?: GetAnalyticsCwlParticipationQueryParams) =>
     [{ url: "/analytics/cwl-participation" }, ...(params ? [params] : [])] as const;

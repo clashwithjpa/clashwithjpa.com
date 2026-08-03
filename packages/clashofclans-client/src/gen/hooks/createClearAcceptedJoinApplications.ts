@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    ClearAcceptedJoinApplicationsMutationResponse,
-    ClearAcceptedJoinApplications401,
-    ClearAcceptedJoinApplications500,
-} from "../models/ClearAcceptedJoinApplications.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { clearAcceptedJoinApplications } from "../clients/clearAcceptedJoinApplications.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { clearAcceptedJoinApplications } from "../clients/clearAcceptedJoinApplications.ts";
+import type {
+    ClearAcceptedJoinApplications401,
+    ClearAcceptedJoinApplications500,
+    ClearAcceptedJoinApplicationsMutationResponse,
+} from "../models/ClearAcceptedJoinApplications.ts";
 
 export const clearAcceptedJoinApplicationsMutationKey = () => [{ url: "/admin/join-applications/accepted" }] as const;
 

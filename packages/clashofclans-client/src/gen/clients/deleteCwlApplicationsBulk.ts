@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteCwlApplicationsBulkMutationRequest,
-    DeleteCwlApplicationsBulkMutationResponse,
     DeleteCwlApplicationsBulk401,
     DeleteCwlApplicationsBulk500,
+    DeleteCwlApplicationsBulkMutationRequest,
+    DeleteCwlApplicationsBulkMutationResponse,
 } from "../models/DeleteCwlApplicationsBulk.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteCwlApplicationsBulkUrl() {
     const res = { method: "POST", url: `/admin/cwl-applications/delete-bulk` as const };

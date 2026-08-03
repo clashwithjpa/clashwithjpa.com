@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    JoinLeavesInASeasonClanClanTagJoinLeaveGetQueryResponse,
+    JoinLeavesInASeasonClanClanTagJoinLeaveGet422,
     JoinLeavesInASeasonClanClanTagJoinLeaveGetPathParams,
     JoinLeavesInASeasonClanClanTagJoinLeaveGetQueryParams,
-    JoinLeavesInASeasonClanClanTagJoinLeaveGet422,
+    JoinLeavesInASeasonClanClanTagJoinLeaveGetQueryResponse,
 } from "../models/JoinLeavesInASeasonClanClanTagJoinLeaveGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getJoinLeavesInASeasonClanClanTagJoinLeaveGetUrl(clan_tag: JoinLeavesInASeasonClanClanTagJoinLeaveGetPathParams["clan_tag"]) {
     const res = { method: "GET", url: `/clan/${clan_tag}/join-leave` as const };

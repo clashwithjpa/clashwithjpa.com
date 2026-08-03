@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    BestLegendStreaksLegendsStreaksGetQueryResponse,
-    BestLegendStreaksLegendsStreaksGetQueryParams,
-    BestLegendStreaksLegendsStreaksGet422,
-} from "../models/BestLegendStreaksLegendsStreaksGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { bestLegendStreaksLegendsStreaksGet } from "../clients/bestLegendStreaksLegendsStreaksGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { bestLegendStreaksLegendsStreaksGet } from "../clients/bestLegendStreaksLegendsStreaksGet.ts";
+import type {
+    BestLegendStreaksLegendsStreaksGet422,
+    BestLegendStreaksLegendsStreaksGetQueryParams,
+    BestLegendStreaksLegendsStreaksGetQueryResponse,
+} from "../models/BestLegendStreaksLegendsStreaksGet.ts";
 
 export const bestLegendStreaksLegendsStreaksGetQueryKey = (params?: BestLegendStreaksLegendsStreaksGetQueryParams) =>
     [{ url: "/legends/streaks" }, ...(params ? [params] : [])] as const;

@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCCWLWarQueryResponse, GetCOCCWLWarPathParams, GetCOCCWLWar500 } from "../models/GetCOCCWLWar.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetCOCCWLWar500, GetCOCCWLWarPathParams, GetCOCCWLWarQueryResponse } from "../models/GetCOCCWLWar.ts";
 
 function getGetCOCCWLWarUrl(warTag: GetCOCCWLWarPathParams["warTag"]) {
     const res = { method: "GET", url: `/coc/cwl/wars/${warTag}` as const };

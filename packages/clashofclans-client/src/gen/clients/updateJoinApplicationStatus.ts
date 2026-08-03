@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateJoinApplicationStatusMutationRequest,
-    UpdateJoinApplicationStatusMutationResponse,
-    UpdateJoinApplicationStatusPathParams,
     UpdateJoinApplicationStatus401,
     UpdateJoinApplicationStatus404,
     UpdateJoinApplicationStatus500,
+    UpdateJoinApplicationStatusMutationRequest,
+    UpdateJoinApplicationStatusMutationResponse,
+    UpdateJoinApplicationStatusPathParams,
 } from "../models/UpdateJoinApplicationStatus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateJoinApplicationStatusUrl(id: UpdateJoinApplicationStatusPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/join-applications/${id}` as const };

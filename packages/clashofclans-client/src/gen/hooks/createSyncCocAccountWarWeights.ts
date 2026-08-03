@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { syncCocAccountWarWeights } from "../clients/syncCocAccountWarWeights.ts";
 import type {
-    SyncCocAccountWarWeightsMutationRequest,
-    SyncCocAccountWarWeightsMutationResponse,
     SyncCocAccountWarWeights400,
     SyncCocAccountWarWeights401,
     SyncCocAccountWarWeights500,
+    SyncCocAccountWarWeightsMutationRequest,
+    SyncCocAccountWarWeightsMutationResponse,
 } from "../models/SyncCocAccountWarWeights.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { syncCocAccountWarWeights } from "../clients/syncCocAccountWarWeights.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const syncCocAccountWarWeightsMutationKey = () => [{ url: "/admin/coc-accounts/sync-war-weights" }] as const;
 

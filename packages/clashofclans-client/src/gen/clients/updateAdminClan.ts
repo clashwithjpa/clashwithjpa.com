@@ -4,17 +4,17 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateAdminClanMutationRequest,
-    UpdateAdminClanMutationResponse,
-    UpdateAdminClanPathParams,
     UpdateAdminClan401,
     UpdateAdminClan404,
     UpdateAdminClan422,
     UpdateAdminClan500,
     UpdateAdminClan503,
+    UpdateAdminClanMutationRequest,
+    UpdateAdminClanMutationResponse,
+    UpdateAdminClanPathParams,
 } from "../models/UpdateAdminClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateAdminClanUrl(id: UpdateAdminClanPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/clans/${id}` as const };

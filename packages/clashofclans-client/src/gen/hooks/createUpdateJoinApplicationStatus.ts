@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { updateJoinApplicationStatus } from "../clients/updateJoinApplicationStatus.ts";
 import type {
-    UpdateJoinApplicationStatusMutationRequest,
-    UpdateJoinApplicationStatusMutationResponse,
-    UpdateJoinApplicationStatusPathParams,
     UpdateJoinApplicationStatus401,
     UpdateJoinApplicationStatus404,
     UpdateJoinApplicationStatus500,
+    UpdateJoinApplicationStatusMutationRequest,
+    UpdateJoinApplicationStatusMutationResponse,
+    UpdateJoinApplicationStatusPathParams,
 } from "../models/UpdateJoinApplicationStatus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { updateJoinApplicationStatus } from "../clients/updateJoinApplicationStatus.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const updateJoinApplicationStatusMutationKey = () => [{ url: "/admin/join-applications/:id" }] as const;
 

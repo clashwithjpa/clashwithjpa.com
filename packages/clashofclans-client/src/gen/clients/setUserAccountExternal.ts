@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SetUserAccountExternalMutationResponse,
-    SetUserAccountExternalPathParams,
     SetUserAccountExternal401,
     SetUserAccountExternal404,
     SetUserAccountExternal500,
+    SetUserAccountExternalMutationResponse,
+    SetUserAccountExternalPathParams,
 } from "../models/SetUserAccountExternal.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSetUserAccountExternalUrl(id: SetUserAccountExternalPathParams["id"]) {
     const res = { method: "PUT", url: `/user/accounts/${id}/external` as const };

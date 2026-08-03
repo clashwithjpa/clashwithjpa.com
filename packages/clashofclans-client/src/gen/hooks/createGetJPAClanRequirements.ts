@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetJPAClanRequirementsQueryResponse, GetJPAClanRequirements500 } from "../models/GetJPAClanRequirements.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getJPAClanRequirements } from "../clients/getJPAClanRequirements.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getJPAClanRequirements } from "../clients/getJPAClanRequirements.ts";
+import type { GetJPAClanRequirements500, GetJPAClanRequirementsQueryResponse } from "../models/GetJPAClanRequirements.ts";
 
 export const getJPAClanRequirementsQueryKey = () => [{ url: "/coc/jpa/clans/requirements" }] as const;
 

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetQueryResponse,
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetPathParams,
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet422,
-} from "../models/Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet } from "../clients/top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet } from "../clients/top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet.ts";
+import type {
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet422,
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetPathParams,
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetQueryResponse,
+} from "../models/Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGet.ts";
 
 export const top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetQueryKey = (
     location: Top200DailyLeaderboardHistoryDateYyyyMmDdRankingClanTrophiesLocationDateGetPathParams["location"],

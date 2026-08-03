@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetQueryResponse,
-    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetPathParams,
-    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGet422,
-} from "../models/PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGet422,
+    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetPathParams,
+    PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetQueryResponse,
+} from "../models/PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGet.ts";
 
 function getPreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetUrl(
     clan_tag: PreviousWarAtAnEndtimeForAClanWarClanTagPreviousEndTimeGetPathParams["clan_tag"],

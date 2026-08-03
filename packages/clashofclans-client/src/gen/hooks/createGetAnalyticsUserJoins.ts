@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsUserJoins } from "../clients/getAnalyticsUserJoins.ts";
 import type {
-    GetAnalyticsUserJoinsQueryResponse,
-    GetAnalyticsUserJoinsQueryParams,
     GetAnalyticsUserJoins401,
     GetAnalyticsUserJoins500,
+    GetAnalyticsUserJoinsQueryParams,
+    GetAnalyticsUserJoinsQueryResponse,
 } from "../models/GetAnalyticsUserJoins.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsUserJoins } from "../clients/getAnalyticsUserJoins.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsUserJoinsQueryKey = (params?: GetAnalyticsUserJoinsQueryParams) =>
     [{ url: "/analytics/user-joins" }, ...(params ? [params] : [])] as const;

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetQueryResponse,
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams,
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet422,
-} from "../models/GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getTheWarTimerForAPlayerPlayerPlayerTagWartimerGet } from "../clients/getTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getTheWarTimerForAPlayerPlayerPlayerTagWartimerGet } from "../clients/getTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
+import type {
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet422,
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams,
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetQueryResponse,
+} from "../models/GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
 
 export const getTheWarTimerForAPlayerPlayerPlayerTagWartimerGetQueryKey = (
     player_tag: GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams["player_tag"],

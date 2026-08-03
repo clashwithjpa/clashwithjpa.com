@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryResponse,
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryParams,
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet422,
-} from "../models/StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet422,
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryParams,
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryResponse,
+} from "../models/StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
 
 function getStatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetUrl() {
     const res = { method: "GET", url: `/capital/stats/district` as const };

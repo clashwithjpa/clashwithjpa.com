@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { SetRulesMutationRequest, SetRulesMutationResponse, SetRules500 } from "../models/SetRules.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { setRules } from "../clients/setRules.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { setRules } from "../clients/setRules.ts";
+import type { SetRules500, SetRulesMutationRequest, SetRulesMutationResponse } from "../models/SetRules.ts";
 
 export const setRulesMutationKey = () => [{ url: "/manage/rules" }] as const;
 

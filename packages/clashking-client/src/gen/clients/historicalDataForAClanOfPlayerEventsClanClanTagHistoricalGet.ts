@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetQueryResponse,
+    HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGet422,
     HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetPathParams,
     HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetQueryParams,
-    HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGet422,
+    HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetQueryResponse,
 } from "../models/HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getHistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetUrl(
     clan_tag: HistoricalDataForAClanOfPlayerEventsClanClanTagHistoricalGetPathParams["clan_tag"],

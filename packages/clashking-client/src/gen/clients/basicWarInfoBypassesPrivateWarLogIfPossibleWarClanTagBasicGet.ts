@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetQueryResponse,
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams,
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet422,
-} from "../models/BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet422,
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams,
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetQueryResponse,
+} from "../models/BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
 
 function getBasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetUrl(
     clan_tag: BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams["clan_tag"],

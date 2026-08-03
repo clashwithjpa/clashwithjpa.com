@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetBonusLedgerQueryResponse, GetBonusLedger401, GetBonusLedger500 } from "../models/GetBonusLedger.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getBonusLedger } from "../clients/getBonusLedger.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getBonusLedger } from "../clients/getBonusLedger.ts";
+import type { GetBonusLedger401, GetBonusLedger500, GetBonusLedgerQueryResponse } from "../models/GetBonusLedger.ts";
 
 export const getBonusLedgerQueryKey = () => [{ url: "/admin/bonus-ledger" }] as const;
 

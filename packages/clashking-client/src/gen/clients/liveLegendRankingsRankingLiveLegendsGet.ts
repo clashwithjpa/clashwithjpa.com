@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    LiveLegendRankingsRankingLiveLegendsGetQueryResponse,
-    LiveLegendRankingsRankingLiveLegendsGetQueryParams,
-    LiveLegendRankingsRankingLiveLegendsGet422,
-} from "../models/LiveLegendRankingsRankingLiveLegendsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    LiveLegendRankingsRankingLiveLegendsGet422,
+    LiveLegendRankingsRankingLiveLegendsGetQueryParams,
+    LiveLegendRankingsRankingLiveLegendsGetQueryResponse,
+} from "../models/LiveLegendRankingsRankingLiveLegendsGet.ts";
 
 function getLiveLegendRankingsRankingLiveLegendsGetUrl() {
     const res = { method: "GET", url: `/ranking/live/legends` as const };

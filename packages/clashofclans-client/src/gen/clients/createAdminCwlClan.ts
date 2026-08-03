@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateAdminCwlClanMutationRequest,
-    CreateAdminCwlClanMutationResponse,
     CreateAdminCwlClan400,
     CreateAdminCwlClan401,
     CreateAdminCwlClan409,
     CreateAdminCwlClan500,
+    CreateAdminCwlClanMutationRequest,
+    CreateAdminCwlClanMutationResponse,
 } from "../models/CreateAdminCwlClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateAdminCwlClanUrl() {
     const res = { method: "POST", url: `/admin/cwl-clans` as const };

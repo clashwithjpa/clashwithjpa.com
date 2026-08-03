@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetQueryResponse,
-    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetPathParams,
-    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet422,
-} from "../models/CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { cwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet } from "../clients/cwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { cwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet } from "../clients/cwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet.ts";
+import type {
+    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet422,
+    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetPathParams,
+    CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetQueryResponse,
+} from "../models/CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGet.ts";
 
 export const cwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetQueryKey = (
     clan_tag: CwlInfoForAClanInASeasonYyyyMmCwlClanTagSeasonGetPathParams["clan_tag"],

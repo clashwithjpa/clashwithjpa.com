@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetAuditLogQueryResponse, GetAuditLogQueryParams, GetAuditLog401, GetAuditLog500 } from "../models/GetAuditLog.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetAuditLog401, GetAuditLog500, GetAuditLogQueryParams, GetAuditLogQueryResponse } from "../models/GetAuditLog.ts";
 
 function getGetAuditLogUrl() {
     const res = { method: "GET", url: `/admin/audit-log` as const };

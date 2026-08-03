@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SearchForPlayersByNamePlayerFullSearchNameGetQueryResponse,
+    SearchForPlayersByNamePlayerFullSearchNameGet422,
     SearchForPlayersByNamePlayerFullSearchNameGetPathParams,
     SearchForPlayersByNamePlayerFullSearchNameGetQueryParams,
-    SearchForPlayersByNamePlayerFullSearchNameGet422,
+    SearchForPlayersByNamePlayerFullSearchNameGetQueryResponse,
 } from "../models/SearchForPlayersByNamePlayerFullSearchNameGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSearchForPlayersByNamePlayerFullSearchNameGetUrl(name: SearchForPlayersByNamePlayerFullSearchNameGetPathParams["name"]) {
     const res = { method: "GET", url: `/player/full-search/${name}` as const };

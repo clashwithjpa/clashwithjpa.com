@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { LoginTokenPostMutationRequest, LoginTokenPostMutationResponse, LoginTokenPost422 } from "../models/LoginTokenPost.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { loginTokenPost } from "../clients/loginTokenPost.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { loginTokenPost } from "../clients/loginTokenPost.ts";
+import type { LoginTokenPost422, LoginTokenPostMutationRequest, LoginTokenPostMutationResponse } from "../models/LoginTokenPost.ts";
 
 export const loginTokenPostMutationKey = () => [{ url: "/token" }] as const;
 

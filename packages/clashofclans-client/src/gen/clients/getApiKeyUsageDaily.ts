@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetApiKeyUsageDailyQueryResponse,
-    GetApiKeyUsageDailyQueryParams,
     GetApiKeyUsageDaily401,
     GetApiKeyUsageDaily404,
     GetApiKeyUsageDaily500,
+    GetApiKeyUsageDailyQueryParams,
+    GetApiKeyUsageDailyQueryResponse,
 } from "../models/GetApiKeyUsageDaily.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetApiKeyUsageDailyUrl() {
     const res = { method: "GET", url: `/api-keys/usage/daily` as const };

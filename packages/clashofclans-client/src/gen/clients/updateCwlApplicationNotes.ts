@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateCwlApplicationNotesMutationRequest,
-    UpdateCwlApplicationNotesMutationResponse,
-    UpdateCwlApplicationNotesPathParams,
     UpdateCwlApplicationNotes401,
     UpdateCwlApplicationNotes404,
     UpdateCwlApplicationNotes500,
+    UpdateCwlApplicationNotesMutationRequest,
+    UpdateCwlApplicationNotesMutationResponse,
+    UpdateCwlApplicationNotesPathParams,
 } from "../models/UpdateCwlApplicationNotes.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateCwlApplicationNotesUrl(id: UpdateCwlApplicationNotesPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/cwl-applications/${id}/notes` as const };

@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetAdminUsersQueryResponse, GetAdminUsersQueryParams, GetAdminUsers401, GetAdminUsers500 } from "../models/GetAdminUsers.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAdminUsers } from "../clients/getAdminUsers.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAdminUsers } from "../clients/getAdminUsers.ts";
+import type { GetAdminUsers401, GetAdminUsers500, GetAdminUsersQueryParams, GetAdminUsersQueryResponse } from "../models/GetAdminUsers.ts";
 
 export const getAdminUsersQueryKey = (params?: GetAdminUsersQueryParams) => [{ url: "/admin/users" }, ...(params ? [params] : [])] as const;
 

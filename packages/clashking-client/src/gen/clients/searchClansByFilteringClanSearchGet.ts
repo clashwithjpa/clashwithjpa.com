@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    SearchClansByFilteringClanSearchGetQueryResponse,
-    SearchClansByFilteringClanSearchGetQueryParams,
-    SearchClansByFilteringClanSearchGet422,
-} from "../models/SearchClansByFilteringClanSearchGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    SearchClansByFilteringClanSearchGet422,
+    SearchClansByFilteringClanSearchGetQueryParams,
+    SearchClansByFilteringClanSearchGetQueryResponse,
+} from "../models/SearchClansByFilteringClanSearchGet.ts";
 
 function getSearchClansByFilteringClanSearchGetUrl() {
     const res = { method: "GET", url: `/clan/search` as const };

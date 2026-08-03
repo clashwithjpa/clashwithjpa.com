@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetRulesQueryResponse, GetRules500 } from "../models/GetRules.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getRules } from "../clients/getRules.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getRules } from "../clients/getRules.ts";
+import type { GetRules500, GetRulesQueryResponse } from "../models/GetRules.ts";
 
 export const getRulesQueryKey = () => [{ url: "/rules" }] as const;
 

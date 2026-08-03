@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetQueryResponse } from "../models/NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetQueryResponse } from "../models/NumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGet.ts";
 
 function getNumberOfClansInWarPlayersInWarPlayerInLegendsEtcGlobalCountsGetUrl() {
     const res = { method: "GET", url: `/global/counts` as const };

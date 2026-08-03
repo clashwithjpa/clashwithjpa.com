@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCOCPlayerQueryResponse, GetCOCPlayerPathParams, GetCOCPlayer500 } from "../models/GetCOCPlayer.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCPlayer } from "../clients/getCOCPlayer.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCPlayer } from "../clients/getCOCPlayer.ts";
+import type { GetCOCPlayer500, GetCOCPlayerPathParams, GetCOCPlayerQueryResponse } from "../models/GetCOCPlayer.ts";
 
 export const getCOCPlayerQueryKey = (tag: GetCOCPlayerPathParams["tag"]) => [{ url: "/coc/player/:tag", params: { tag: tag } }] as const;
 

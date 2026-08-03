@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { z } from "zod/v4";
 import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 import { joinLeaveListSchema } from "./joinLeaveListSchema.ts";
-import { z } from "zod/v4";
 
 export const joinLeavesInASeasonClanClanTagJoinLeaveGetPathParamsSchema = z.object({
     clan_tag: z.string(),

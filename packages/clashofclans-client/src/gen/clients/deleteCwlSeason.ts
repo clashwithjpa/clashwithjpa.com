@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteCwlSeasonMutationResponse,
-    DeleteCwlSeasonPathParams,
     DeleteCwlSeason401,
     DeleteCwlSeason404,
     DeleteCwlSeason500,
+    DeleteCwlSeasonMutationResponse,
+    DeleteCwlSeasonPathParams,
 } from "../models/DeleteCwlSeason.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteCwlSeasonUrl(id: DeleteCwlSeasonPathParams["id"]) {
     const res = { method: "DELETE", url: `/admin/cwl-seasons/${id}` as const };

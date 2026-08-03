@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateCwlSeasonMutationRequest,
-    CreateCwlSeasonMutationResponse,
     CreateCwlSeason401,
     CreateCwlSeason500,
+    CreateCwlSeasonMutationRequest,
+    CreateCwlSeasonMutationResponse,
 } from "../models/CreateCwlSeason.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateCwlSeasonUrl() {
     const res = { method: "POST", url: `/admin/cwl-seasons` as const };

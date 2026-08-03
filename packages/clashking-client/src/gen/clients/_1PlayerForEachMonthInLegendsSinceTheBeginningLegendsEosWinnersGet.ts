@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetQueryResponse } from "../models/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetQueryResponse } from "../models/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
 
 function get1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetUrl() {
     const res = { method: "GET", url: `/legends/eos-winners` as const };

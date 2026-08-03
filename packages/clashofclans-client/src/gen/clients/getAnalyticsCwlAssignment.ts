@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsCwlAssignmentQueryResponse,
-    GetAnalyticsCwlAssignmentQueryParams,
     GetAnalyticsCwlAssignment401,
     GetAnalyticsCwlAssignment500,
+    GetAnalyticsCwlAssignmentQueryParams,
+    GetAnalyticsCwlAssignmentQueryResponse,
 } from "../models/GetAnalyticsCwlAssignment.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsCwlAssignmentUrl() {
     const res = { method: "GET", url: `/analytics/cwl-assignment` as const };

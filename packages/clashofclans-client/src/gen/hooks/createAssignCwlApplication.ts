@@ -3,19 +3,19 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { assignCwlApplication } from "../clients/assignCwlApplication.ts";
 import type {
-    AssignCwlApplicationMutationRequest,
-    AssignCwlApplicationMutationResponse,
-    AssignCwlApplicationPathParams,
     AssignCwlApplication400,
     AssignCwlApplication401,
     AssignCwlApplication404,
     AssignCwlApplication500,
+    AssignCwlApplicationMutationRequest,
+    AssignCwlApplicationMutationResponse,
+    AssignCwlApplicationPathParams,
 } from "../models/AssignCwlApplication.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { assignCwlApplication } from "../clients/assignCwlApplication.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const assignCwlApplicationMutationKey = () => [{ url: "/admin/cwl-applications/:id/assign" }] as const;
 

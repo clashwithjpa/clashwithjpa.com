@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetQueryResponse,
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams,
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet422,
-} from "../models/HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet422,
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams,
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetQueryResponse,
+} from "../models/HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
 
 function getHistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetUrl(
     player_tag: HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams["player_tag"],

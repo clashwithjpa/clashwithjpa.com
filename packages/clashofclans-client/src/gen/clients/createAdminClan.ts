@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateAdminClanMutationRequest,
-    CreateAdminClanMutationResponse,
     CreateAdminClan401,
     CreateAdminClan409,
     CreateAdminClan422,
     CreateAdminClan500,
     CreateAdminClan503,
+    CreateAdminClanMutationRequest,
+    CreateAdminClanMutationResponse,
 } from "../models/CreateAdminClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateAdminClanUrl() {
     const res = { method: "POST", url: `/admin/clans` as const };

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetQueryResponse,
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams,
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet422,
-} from "../models/AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { allCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet } from "../clients/allCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { allCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet } from "../clients/allCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
+import type {
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet422,
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams,
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetQueryResponse,
+} from "../models/AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
 
 export const allCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetQueryKey = (
     player_tag: AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams["player_tag"],

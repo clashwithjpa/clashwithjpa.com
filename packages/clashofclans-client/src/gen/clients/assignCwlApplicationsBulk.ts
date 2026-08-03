@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    AssignCwlApplicationsBulkMutationRequest,
-    AssignCwlApplicationsBulkMutationResponse,
     AssignCwlApplicationsBulk400,
     AssignCwlApplicationsBulk401,
     AssignCwlApplicationsBulk500,
+    AssignCwlApplicationsBulkMutationRequest,
+    AssignCwlApplicationsBulkMutationResponse,
 } from "../models/AssignCwlApplicationsBulk.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getAssignCwlApplicationsBulkUrl() {
     const res = { method: "POST", url: `/admin/cwl-applications/assign-bulk` as const };

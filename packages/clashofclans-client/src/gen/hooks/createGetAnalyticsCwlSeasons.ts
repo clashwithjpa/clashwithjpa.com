@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetAnalyticsCwlSeasonsQueryResponse, GetAnalyticsCwlSeasons401, GetAnalyticsCwlSeasons500 } from "../models/GetAnalyticsCwlSeasons.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsCwlSeasons } from "../clients/getAnalyticsCwlSeasons.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsCwlSeasons } from "../clients/getAnalyticsCwlSeasons.ts";
+import type { GetAnalyticsCwlSeasons401, GetAnalyticsCwlSeasons500, GetAnalyticsCwlSeasonsQueryResponse } from "../models/GetAnalyticsCwlSeasons.ts";
 
 export const getAnalyticsCwlSeasonsQueryKey = () => [{ url: "/analytics/cwl-seasons" }] as const;
 

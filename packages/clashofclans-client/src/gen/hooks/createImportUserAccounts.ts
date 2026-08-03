@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { ImportUserAccountsMutationResponse, ImportUserAccounts401, ImportUserAccounts500 } from "../models/ImportUserAccounts.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { importUserAccounts } from "../clients/importUserAccounts.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { importUserAccounts } from "../clients/importUserAccounts.ts";
+import type { ImportUserAccounts401, ImportUserAccounts500, ImportUserAccountsMutationResponse } from "../models/ImportUserAccounts.ts";
 
 export const importUserAccountsMutationKey = () => [{ url: "/user/accounts/import" }] as const;
 

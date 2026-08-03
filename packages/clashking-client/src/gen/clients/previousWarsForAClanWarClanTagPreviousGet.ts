@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    PreviousWarsForAClanWarClanTagPreviousGetQueryResponse,
+    PreviousWarsForAClanWarClanTagPreviousGet422,
     PreviousWarsForAClanWarClanTagPreviousGetPathParams,
     PreviousWarsForAClanWarClanTagPreviousGetQueryParams,
-    PreviousWarsForAClanWarClanTagPreviousGet422,
+    PreviousWarsForAClanWarClanTagPreviousGetQueryResponse,
 } from "../models/PreviousWarsForAClanWarClanTagPreviousGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getPreviousWarsForAClanWarClanTagPreviousGetUrl(clan_tag: PreviousWarsForAClanWarClanTagPreviousGetPathParams["clan_tag"]) {
     const res = { method: "GET", url: `/war/${clan_tag}/previous` as const };

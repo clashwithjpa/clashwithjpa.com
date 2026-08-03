@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { logOfRaidWeekendsCapitalClanTagGet } from "../clients/logOfRaidWeekendsCapitalClanTagGet.ts";
 import type {
-    LogOfRaidWeekendsCapitalClanTagGetQueryResponse,
+    LogOfRaidWeekendsCapitalClanTagGet422,
     LogOfRaidWeekendsCapitalClanTagGetPathParams,
     LogOfRaidWeekendsCapitalClanTagGetQueryParams,
-    LogOfRaidWeekendsCapitalClanTagGet422,
+    LogOfRaidWeekendsCapitalClanTagGetQueryResponse,
 } from "../models/LogOfRaidWeekendsCapitalClanTagGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { logOfRaidWeekendsCapitalClanTagGet } from "../clients/logOfRaidWeekendsCapitalClanTagGet.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const logOfRaidWeekendsCapitalClanTagGetQueryKey = (
     clan_tag: LogOfRaidWeekendsCapitalClanTagGetPathParams["clan_tag"],

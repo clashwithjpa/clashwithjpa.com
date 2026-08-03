@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetBonusLedgerQueryResponse, GetBonusLedger401, GetBonusLedger500 } from "../models/GetBonusLedger.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetBonusLedger401, GetBonusLedger500, GetBonusLedgerQueryResponse } from "../models/GetBonusLedger.ts";
 
 function getGetBonusLedgerUrl() {
     const res = { method: "GET", url: `/admin/bonus-ledger` as const };

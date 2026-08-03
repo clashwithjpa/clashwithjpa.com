@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    RenameCwlSeasonMutationRequest,
-    RenameCwlSeasonMutationResponse,
-    RenameCwlSeasonPathParams,
     RenameCwlSeason401,
     RenameCwlSeason404,
     RenameCwlSeason409,
     RenameCwlSeason500,
+    RenameCwlSeasonMutationRequest,
+    RenameCwlSeasonMutationResponse,
+    RenameCwlSeasonPathParams,
 } from "../models/RenameCwlSeason.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getRenameCwlSeasonUrl(id: RenameCwlSeasonPathParams["id"]) {
     const res = { method: "PATCH", url: `/admin/cwl-seasons/${id}` as const };

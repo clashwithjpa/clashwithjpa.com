@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { updateCocAccountWarWeight } from "../clients/updateCocAccountWarWeight.ts";
 import type {
-    UpdateCocAccountWarWeightMutationRequest,
-    UpdateCocAccountWarWeightMutationResponse,
-    UpdateCocAccountWarWeightPathParams,
     UpdateCocAccountWarWeight401,
     UpdateCocAccountWarWeight404,
     UpdateCocAccountWarWeight500,
+    UpdateCocAccountWarWeightMutationRequest,
+    UpdateCocAccountWarWeightMutationResponse,
+    UpdateCocAccountWarWeightPathParams,
 } from "../models/UpdateCocAccountWarWeight.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { updateCocAccountWarWeight } from "../clients/updateCocAccountWarWeight.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const updateCocAccountWarWeightMutationKey = () => [{ url: "/admin/coc-accounts/:id/weight" }] as const;
 

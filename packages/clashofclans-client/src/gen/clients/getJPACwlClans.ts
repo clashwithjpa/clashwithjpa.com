@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetJPACwlClansQueryResponse, GetJPACwlClans500 } from "../models/GetJPACwlClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetJPACwlClans500, GetJPACwlClansQueryResponse } from "../models/GetJPACwlClans.ts";
 
 function getGetJPACwlClansUrl() {
     const res = { method: "GET", url: `/coc/jpa/clans/cwl` as const };

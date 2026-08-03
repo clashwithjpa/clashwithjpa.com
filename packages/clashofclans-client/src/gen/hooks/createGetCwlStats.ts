@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCwlStatsQueryResponse, GetCwlStatsQueryParams, GetCwlStats401, GetCwlStats500 } from "../models/GetCwlStats.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCwlStats } from "../clients/getCwlStats.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCwlStats } from "../clients/getCwlStats.ts";
+import type { GetCwlStats401, GetCwlStats500, GetCwlStatsQueryParams, GetCwlStatsQueryResponse } from "../models/GetCwlStats.ts";
 
 export const getCwlStatsQueryKey = (params?: GetCwlStatsQueryParams) => [{ url: "/admin/cwl-stats" }, ...(params ? [params] : [])] as const;
 

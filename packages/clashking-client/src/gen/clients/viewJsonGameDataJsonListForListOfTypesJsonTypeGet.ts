@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetQueryResponse,
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams,
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGet422,
-} from "../models/ViewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGet422,
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams,
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetQueryResponse,
+} from "../models/ViewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
 
 function getViewJsonGameDataJsonListForListOfTypesJsonTypeGetUrl(type: ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams["type"]) {
     const res = { method: "GET", url: `/json/${type}` as const };

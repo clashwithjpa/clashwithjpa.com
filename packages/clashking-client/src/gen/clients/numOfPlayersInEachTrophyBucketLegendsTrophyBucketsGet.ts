@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetQueryResponse } from "../models/NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetQueryResponse } from "../models/NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
 
 function getNumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetUrl() {
     const res = { method: "GET", url: `/legends/trophy-buckets` as const };

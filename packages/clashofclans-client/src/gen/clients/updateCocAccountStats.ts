@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateCocAccountStatsMutationRequest,
-    UpdateCocAccountStatsMutationResponse,
-    UpdateCocAccountStatsPathParams,
     UpdateCocAccountStats400,
     UpdateCocAccountStats401,
     UpdateCocAccountStats404,
     UpdateCocAccountStats500,
+    UpdateCocAccountStatsMutationRequest,
+    UpdateCocAccountStatsMutationResponse,
+    UpdateCocAccountStatsPathParams,
 } from "../models/UpdateCocAccountStats.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateCocAccountStatsUrl(id: UpdateCocAccountStatsPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/coc-accounts/${id}/stats` as const };

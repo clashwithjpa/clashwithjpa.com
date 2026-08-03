@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsAdminActivityQueryResponse,
-    GetAnalyticsAdminActivityQueryParams,
     GetAnalyticsAdminActivity401,
     GetAnalyticsAdminActivity500,
+    GetAnalyticsAdminActivityQueryParams,
+    GetAnalyticsAdminActivityQueryResponse,
 } from "../models/GetAnalyticsAdminActivity.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsAdminActivityUrl() {
     const res = { method: "GET", url: `/analytics/admin-activity` as const };

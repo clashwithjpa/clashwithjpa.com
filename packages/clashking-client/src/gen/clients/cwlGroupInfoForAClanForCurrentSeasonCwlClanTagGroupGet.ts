@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetQueryResponse,
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams,
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet422,
-} from "../models/CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet422,
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams,
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetQueryResponse,
+} from "../models/CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
 
 function getCwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetUrl(
     clan_tag: CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams["clan_tag"],

@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsAuditTrendQueryResponse,
-    GetAnalyticsAuditTrendQueryParams,
     GetAnalyticsAuditTrend401,
     GetAnalyticsAuditTrend500,
+    GetAnalyticsAuditTrendQueryParams,
+    GetAnalyticsAuditTrendQueryResponse,
 } from "../models/GetAnalyticsAuditTrend.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsAuditTrendUrl() {
     const res = { method: "GET", url: `/analytics/audit-trend` as const };

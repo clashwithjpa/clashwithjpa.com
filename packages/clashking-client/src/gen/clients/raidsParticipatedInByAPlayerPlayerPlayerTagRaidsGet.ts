@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetQueryResponse,
+    RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGet422,
     RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetPathParams,
     RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetQueryParams,
-    RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGet422,
+    RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetQueryResponse,
 } from "../models/RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getRaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetUrl(
     player_tag: RaidsParticipatedInByAPlayerPlayerPlayerTagRaidsGetPathParams["player_tag"],

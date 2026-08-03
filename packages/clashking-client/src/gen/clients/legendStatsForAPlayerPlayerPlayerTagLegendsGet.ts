@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    LegendStatsForAPlayerPlayerPlayerTagLegendsGetQueryResponse,
+    LegendStatsForAPlayerPlayerPlayerTagLegendsGet422,
     LegendStatsForAPlayerPlayerPlayerTagLegendsGetPathParams,
     LegendStatsForAPlayerPlayerPlayerTagLegendsGetQueryParams,
-    LegendStatsForAPlayerPlayerPlayerTagLegendsGet422,
+    LegendStatsForAPlayerPlayerPlayerTagLegendsGetQueryResponse,
 } from "../models/LegendStatsForAPlayerPlayerPlayerTagLegendsGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getLegendStatsForAPlayerPlayerPlayerTagLegendsGetUrl(player_tag: LegendStatsForAPlayerPlayerPlayerTagLegendsGetPathParams["player_tag"]) {
     const res = { method: "GET", url: `/player/${player_tag}/legends` as const };

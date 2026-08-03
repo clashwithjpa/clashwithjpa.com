@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetGuildNicknamesQueryResponse, GetGuildNicknames401, GetGuildNicknames500 } from "../models/GetGuildNicknames.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getGuildNicknames } from "../clients/getGuildNicknames.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getGuildNicknames } from "../clients/getGuildNicknames.ts";
+import type { GetGuildNicknames401, GetGuildNicknames500, GetGuildNicknamesQueryResponse } from "../models/GetGuildNicknames.ts";
 
 export const getGuildNicknamesQueryKey = () => [{ url: "/admin/guild-nicknames" }] as const;
 

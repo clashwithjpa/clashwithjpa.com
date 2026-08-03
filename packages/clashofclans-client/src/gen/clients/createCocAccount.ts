@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateCocAccountMutationRequest,
-    CreateCocAccountMutationResponse,
     CreateCocAccount400,
     CreateCocAccount401,
     CreateCocAccount404,
     CreateCocAccount409,
     CreateCocAccount500,
+    CreateCocAccountMutationRequest,
+    CreateCocAccountMutationResponse,
 } from "../models/CreateCocAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateCocAccountUrl() {
     const res = { method: "POST", url: `/admin/coc-accounts` as const };

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    ListOfLastXSeasonsListSeasonsGetQueryResponse,
-    ListOfLastXSeasonsListSeasonsGetQueryParams,
-    ListOfLastXSeasonsListSeasonsGet422,
-} from "../models/ListOfLastXSeasonsListSeasonsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { listOfLastXSeasonsListSeasonsGet } from "../clients/listOfLastXSeasonsListSeasonsGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { listOfLastXSeasonsListSeasonsGet } from "../clients/listOfLastXSeasonsListSeasonsGet.ts";
+import type {
+    ListOfLastXSeasonsListSeasonsGet422,
+    ListOfLastXSeasonsListSeasonsGetQueryParams,
+    ListOfLastXSeasonsListSeasonsGetQueryResponse,
+} from "../models/ListOfLastXSeasonsListSeasonsGet.ts";
 
 export const listOfLastXSeasonsListSeasonsGetQueryKey = (params?: ListOfLastXSeasonsListSeasonsGetQueryParams) =>
     [{ url: "/list/seasons" }, ...(params ? [params] : [])] as const;

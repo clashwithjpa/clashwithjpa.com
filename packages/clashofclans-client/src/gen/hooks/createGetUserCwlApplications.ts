@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetUserCwlApplicationsQueryResponse, GetUserCwlApplications401, GetUserCwlApplications500 } from "../models/GetUserCwlApplications.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getUserCwlApplications } from "../clients/getUserCwlApplications.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getUserCwlApplications } from "../clients/getUserCwlApplications.ts";
+import type { GetUserCwlApplications401, GetUserCwlApplications500, GetUserCwlApplicationsQueryResponse } from "../models/GetUserCwlApplications.ts";
 
 export const getUserCwlApplicationsQueryKey = () => [{ url: "/user/cwl" }] as const;
 

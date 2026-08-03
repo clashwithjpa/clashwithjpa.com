@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationRequest,
-    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationResponse,
-    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost422,
-} from "../models/FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { fetchRaidWeekendsInBulkMax100TagsCapitalBulkPost } from "../clients/fetchRaidWeekendsInBulkMax100TagsCapitalBulkPost.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { fetchRaidWeekendsInBulkMax100TagsCapitalBulkPost } from "../clients/fetchRaidWeekendsInBulkMax100TagsCapitalBulkPost.ts";
+import type {
+    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost422,
+    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationRequest,
+    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationResponse,
+} from "../models/FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost.ts";
 
 export const fetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationKey = () => [{ url: "/capital/bulk" }] as const;
 

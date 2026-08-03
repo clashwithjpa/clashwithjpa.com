@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetQueryResponse,
+    GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGet422,
     GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetPathParams,
     GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetQueryParams,
-    GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGet422,
+    GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetQueryResponse,
 } from "../models/GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetUrl(
     player_tag: GetJoinLeaveHistoryForAPlayerPlayerPlayerTagJoinLeaveGetPathParams["player_tag"],

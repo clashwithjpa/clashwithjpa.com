@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SyncAdminCwlClanLeaguesMutationResponse,
     SyncAdminCwlClanLeagues401,
     SyncAdminCwlClanLeagues500,
+    SyncAdminCwlClanLeaguesMutationResponse,
 } from "../models/SyncAdminCwlClanLeagues.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSyncAdminCwlClanLeaguesUrl() {
     const res = { method: "POST", url: `/admin/cwl-clans/sync-leagues` as const };
