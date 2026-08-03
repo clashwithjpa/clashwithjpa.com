@@ -1,0 +1,94 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:best-practices", "group:allNonMajor", "schedule:weekly"],
+    "labels": ["dependencies"],
+    "postUpdateOptions": ["pnpmDedupe"],
+    "semanticCommits": "enabled",
+    "osvVulnerabilityAlerts": true,
+
+    "packageRules": [
+        {
+            "matchManagers": ["npm"],
+            "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies"],
+            "rangeStrategy": "bump"
+        },
+        {
+            "matchUpdateTypes": ["lockFileMaintenance", "digest", "pin", "pinDigest"],
+            "automerge": true
+        },
+        {
+            "matchPackageNames": ["@types/**", "@iconify-json/**"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "types and icon data",
+            "automerge": true
+        },
+        {
+            "matchPackageNames": ["pnpm", "turbo"],
+            "groupName": "build toolchain"
+        },
+        {
+            "matchDepNames": ["node"],
+            "groupName": "node",
+            "allowedVersions": "/^\\d*[02468](\\D|$)/"
+        },
+        {
+            "matchPackageNames": ["better-auth", "@better-auth/**", "zod"],
+            "matchUpdateTypes": ["major", "minor"],
+            "groupName": "better-auth and zod",
+            "dependencyDashboardApproval": true
+        },
+        {
+            "matchPackageNames": ["svelte", "@sveltejs/**", "svelte-check", "prettier-plugin-svelte"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "svelte"
+        },
+        {
+            "matchPackageNames": ["codemirror", "@codemirror/**", "@uiw/codemirror-**"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "codemirror"
+        },
+        {
+            "matchPackageNames": ["carta-md", "@cartamd/**"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "carta"
+        },
+        {
+            "matchPackageNames": ["hono", "@hono/**", "hono-*"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "hono"
+        },
+        {
+            "matchPackageNames": ["drizzle-orm", "drizzle-kit"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "drizzle"
+        },
+        {
+            "matchPackageNames": ["ag-grid-**", "ag-charts-**"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "ag-grid"
+        }
+    ],
+
+    "customManagers": [
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+            "matchStrings": ["ARG PNPM_VERSION=(?<currentValue>\\S+)"],
+            "depNameTemplate": "pnpm",
+            "datasourceTemplate": "npm"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+            "matchStrings": ["ARG TURBO_VERSION=(?<currentValue>\\S+)"],
+            "depNameTemplate": "turbo",
+            "datasourceTemplate": "npm"
+        }
+    ],
+
+    "vulnerabilityAlerts": {
+        "schedule": ["at any time"],
+        "minimumReleaseAge": null,
+        "dependencyDashboardApproval": false
+    }
+}
