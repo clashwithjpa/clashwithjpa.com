@@ -129,7 +129,7 @@
 
         {#if loading}
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {#each Array(6) as _}
+                {#each Array(6) as _, i (i)}
                     <div class="h-23 animate-pulse rounded-2xl border border-black/60 bg-[#2a1810]/60"></div>
                 {/each}
             </div>

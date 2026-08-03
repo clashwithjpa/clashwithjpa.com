@@ -24,7 +24,7 @@
 
     {#if data.clans?.success && Object.keys(data.clans.data.clans).length > 0}
         <div class="grid animate-in grid-cols-1 gap-6 duration-800 ease-glide fill-mode-both fade-in md:grid-cols-2 lg:grid-cols-3">
-            {#each Object.entries(data.clans.data.clans) as [clanTag, requirements], index}
+            {#each Object.entries(data.clans.data.clans) as [clanTag, requirements], index (clanTag)}
                 <div class="h-full">
                     <ClanCard {clanTag} {requirements} delay={index * 200} class="h-full" />
                 </div>

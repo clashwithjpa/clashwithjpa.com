@@ -72,19 +72,6 @@
         return new Intl.NumberFormat("en-US").format(num);
     };
 
-    const formatWarFrequency = (freq?: string) => {
-        if (!freq) return "Unknown";
-        const map: Record<string, string> = {
-            always: "Always",
-            moreThanOncePerWeek: "> 1/week",
-            oncePerWeek: "1/week",
-            lessThanOncePerWeek: "< 1/week",
-            never: "Never",
-            unknown: "Unknown",
-        };
-        return map[freq] || freq;
-    };
-
     const copyTagToClipboard = async () => {
         try {
             await navigator.clipboard.writeText(clanTag);
@@ -186,100 +173,95 @@
                             <span>Info</span>
                         </CocBtn>
                     {/snippet}
-                    {#snippet children()}
-                        <div class="flex flex-col gap-4">
-                            {#if clanData?.description}
-                                <div class="rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                    <p class="font-coc text-sm leading-relaxed text-stone-900">
-                                        {clanData.description}
-                                    </p>
-                                </div>
-                            {/if}
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Clan Statistics</h4>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                        <Icon name="labels/international" class="size-12" />
-                                        <div class="flex flex-col">
-                                            <span class="font-coc text-xs font-bold text-stone-700">Members</span>
-                                            <span class="font-coc text-base font-black text-stone-900">{clanData?.members}/50</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                        <Icon name="labels/trophypushing" class="size-12" />
-                                        <div class="flex flex-col">
-                                            <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
-                                            <span class="font-coc text-base font-black text-stone-900">{formatNumber(clanData?.clanPoints ?? 0)}</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                        <Icon name="labels/clancapital" class="size-12" />
-                                        <div class="flex flex-col">
-                                            <span class="font-coc text-xs font-bold text-stone-700">War Wins</span>
-                                            <span class="font-coc text-base font-black text-stone-900">{clanData?.warWins}</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                        <Icon name="labels/relaxed" class="size-12" />
-                                        <div class="flex flex-col">
-                                            <span class="font-coc text-xs font-bold text-stone-700">Win Streak</span>
-                                            <span class="font-coc text-base font-black text-stone-900">{clanData?.warWinStreak}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {#if clanData?.warLeague}
-                                    <div
-                                        class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
-                                    >
-                                        <div class="flex items-center gap-1">
-                                            <Icon name="labels/clanwarleague" class="size-8" />
-                                            <span class="font-coc text-sm font-bold text-stone-700">War League</span>
-                                        </div>
-                                        <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
-                                    </div>
-                                {/if}
+                    <div class="flex flex-col gap-4">
+                        {#if clanData?.description}
+                            <div class="rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                <p class="font-coc text-sm leading-relaxed text-stone-900">
+                                    {clanData.description}
+                                </p>
                             </div>
+                        {/if}
 
-                            {#if leader || coLeaders.length > 0}
-                                <div>
-                                    <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Leadership</h4>
-                                    <div class="flex flex-col gap-2">
-                                        {#if leader}
-                                            <div
-                                                class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
-                                            >
-                                                <div class="flex items-center gap-1">
-                                                    <Icon name="labels/trophypushing" class="size-8" />
-                                                    <span class="font-coc text-sm font-bold text-stone-700">Leader</span>
-                                                </div>
-                                                <span class="font-coc text-sm font-black text-stone-900">{leader.name}</span>
-                                            </div>
-                                        {/if}
-                                        {#if coLeaders.length > 0}
-                                            <div class="flex flex-col gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                                <div class="flex items-center gap-1">
-                                                    <Icon name="labels/competitive" class="size-8" />
-                                                    <span class="font-coc text-sm font-bold text-stone-700">Co-Leaders</span>
-                                                    <span class="font-coc text-xs font-bold text-stone-700">({coLeaders.length})</span>
-                                                </div>
-                                                <div class="flex flex-wrap gap-1.5">
-                                                    {#each coLeaders as cl}
-                                                        <span
-                                                            class="rounded bg-stone-900/10 px-2 py-1 font-coc text-xs font-bold text-stone-900 inset-shadow-sm shadow-stone-900"
-                                                        >
-                                                            {cl.name}
-                                                        </span>
-                                                    {/each}
-                                                </div>
-                                            </div>
-                                        {/if}
+                        <div class="flex flex-col gap-2">
+                            <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Clan Statistics</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                    <Icon name="labels/international" class="size-12" />
+                                    <div class="flex flex-col">
+                                        <span class="font-coc text-xs font-bold text-stone-700">Members</span>
+                                        <span class="font-coc text-base font-black text-stone-900">{clanData?.members}/50</span>
                                     </div>
+                                </div>
+                                <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                    <Icon name="labels/trophypushing" class="size-12" />
+                                    <div class="flex flex-col">
+                                        <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
+                                        <span class="font-coc text-base font-black text-stone-900">{formatNumber(clanData?.clanPoints ?? 0)}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                    <Icon name="labels/clancapital" class="size-12" />
+                                    <div class="flex flex-col">
+                                        <span class="font-coc text-xs font-bold text-stone-700">War Wins</span>
+                                        <span class="font-coc text-base font-black text-stone-900">{clanData?.warWins}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                    <Icon name="labels/relaxed" class="size-12" />
+                                    <div class="flex flex-col">
+                                        <span class="font-coc text-xs font-bold text-stone-700">Win Streak</span>
+                                        <span class="font-coc text-base font-black text-stone-900">{clanData?.warWinStreak}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {#if clanData?.warLeague}
+                                <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                    <div class="flex items-center gap-1">
+                                        <Icon name="labels/clanwarleague" class="size-8" />
+                                        <span class="font-coc text-sm font-bold text-stone-700">War League</span>
+                                    </div>
+                                    <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
                                 </div>
                             {/if}
                         </div>
-                    {/snippet}
+
+                        {#if leader || coLeaders.length > 0}
+                            <div>
+                                <h4 class="mb-2 font-coc text-sm font-bold text-stone-800 uppercase">Leadership</h4>
+                                <div class="flex flex-col gap-2">
+                                    {#if leader}
+                                        <div
+                                            class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
+                                        >
+                                            <div class="flex items-center gap-1">
+                                                <Icon name="labels/trophypushing" class="size-8" />
+                                                <span class="font-coc text-sm font-bold text-stone-700">Leader</span>
+                                            </div>
+                                            <span class="font-coc text-sm font-black text-stone-900">{leader.name}</span>
+                                        </div>
+                                    {/if}
+                                    {#if coLeaders.length > 0}
+                                        <div class="flex flex-col gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+                                            <div class="flex items-center gap-1">
+                                                <Icon name="labels/competitive" class="size-8" />
+                                                <span class="font-coc text-sm font-bold text-stone-700">Co-Leaders</span>
+                                                <span class="font-coc text-xs font-bold text-stone-700">({coLeaders.length})</span>
+                                            </div>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                {#each coLeaders as cl (cl.tag)}
+                                                    <span
+                                                        class="rounded bg-stone-900/10 px-2 py-1 font-coc text-xs font-bold text-stone-900 inset-shadow-sm shadow-stone-900"
+                                                    >
+                                                        {cl.name}
+                                                    </span>
+                                                {/each}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
                 </CocPopup>
 
                 <CocBtn

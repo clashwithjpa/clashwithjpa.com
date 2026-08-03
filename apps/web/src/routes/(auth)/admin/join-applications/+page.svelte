@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
@@ -11,7 +12,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
-    import { formatDateTime, formatRelativeTime } from "$lib/utils";
+    import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         clearAcceptedJoinApplications,
         deleteJoinApplication,
@@ -73,8 +74,8 @@
             } else {
                 toast.error("Failed to load applications");
             }
-        } catch (e: any) {
-            toast.error("Failed to load applications", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load applications", { description: errorMessage(e) });
         } finally {
             loading = false;
         }
@@ -99,8 +100,8 @@
             } else {
                 toast.error("Failed to update application");
             }
-        } catch (e: any) {
-            toast.error("Failed to update application", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to update application", { description: errorMessage(e) });
         } finally {
             processingId = null;
         }
@@ -122,8 +123,8 @@
             } else {
                 toast.error("Failed to delete application");
             }
-        } catch (e: any) {
-            toast.error("Failed to delete application", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to delete application", { description: errorMessage(e) });
         } finally {
             processingId = null;
         }
@@ -139,8 +140,8 @@
             } else {
                 toast.error("Failed to clear accepted applications");
             }
-        } catch (e: any) {
-            toast.error("Failed to clear accepted applications", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to clear accepted applications", { description: errorMessage(e) });
         } finally {
             clearingAccepted = false;
         }
@@ -391,6 +392,4 @@
         : ""}
     confirmText="Delete"
     onConfirm={() => deleteTarget && deleteApplication(deleteTarget.id)}
->
-    {#snippet children()}{/snippet}
-</ConfirmationDialog>
+></ConfirmationDialog>

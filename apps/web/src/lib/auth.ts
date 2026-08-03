@@ -1,8 +1,8 @@
 import { PUBLIC_SERVER_URL } from "$env/static/public";
 import { apiKeyClient } from "@better-auth/api-key/client";
+import { ac, admin, manager, reviewer, statement, superadmin, unverified, verified } from "@repo/auth-shared";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";
-import { ac, admin, manager, reviewer, statement, superadmin, unverified, verified } from "@repo/auth-shared";
 
 export const authClient = createAuthClient({
     baseURL: PUBLIC_SERVER_URL,
@@ -37,7 +37,7 @@ export async function hasPermission(userId: string | undefined, requiredPerm?: (
     if (!requiredPerm) return true;
     if (!userId) return false;
 
-    const { data: permsData, error } = await authClient.admin.hasPermission({
+    const { data: permsData } = await authClient.admin.hasPermission({
         userId,
         permissions: {
             jpa: [requiredPerm],

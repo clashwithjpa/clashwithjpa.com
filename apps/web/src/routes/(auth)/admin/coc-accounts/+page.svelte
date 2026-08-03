@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
     import CocAccountCell from "$lib/components/grid/CocAccountCell.svelte";
@@ -837,7 +838,7 @@
                 <p class="text-xs text-stone-400">Linked accounts with no matching row in the sheet.</p>
                 {#if syncResult.notInSheet.length}
                     <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
-                        {#each syncResult.notInSheet as a}
+                        {#each syncResult.notInSheet as a (a.cocAccountTag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{a.ownerName ?? "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{a.cocAccountTag}</span>
@@ -875,7 +876,7 @@
                 <p class="text-xs text-stone-400">Sheet rows whose tag isn’t a linked account in the database.</p>
                 {#if syncResult.notLinked.length}
                     <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
-                        {#each syncResult.notLinked as r}
+                        {#each syncResult.notLinked as r (r.tag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{r.name || "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{r.tag}</span>
@@ -920,7 +921,7 @@
                         Open each link, copy the whole JSON, paste it below and apply. One clan at a time is fine — repeat for each.
                     </p>
                     <div class="flex flex-col gap-1">
-                        {#each warWeightResult.failedClans as clan}
+                        {#each warWeightResult.failedClans as clan (clan.tag)}
                             <a
                                 href={fwaMembersUrl(clan.tag)}
                                 target="_blank"
@@ -975,7 +976,7 @@
                 <p class="text-xs text-stone-400">Linked main accounts with no war weight in any JPA clan's FWA roster.</p>
                 {#if warWeightResult.notInFwa.length}
                     <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
-                        {#each warWeightResult.notInFwa as a}
+                        {#each warWeightResult.notInFwa as a (a.cocAccountTag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{a.ownerName ?? "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{a.cocAccountTag}</span>

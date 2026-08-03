@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import Badge from "$lib/components/ui/Badge.svelte";
     import type { ICellRendererParams } from "ag-grid-community";
 

@@ -2,6 +2,7 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import ReadmeEditor from "$lib/components/ui/ReadmeEditor.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { errorMessage } from "$lib/utils";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { setRules } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -27,8 +28,8 @@
             );
             rulesContent = newRulesResp.data.rules;
             toast.success("Rules updated successfully");
-        } catch (e: any) {
-            toast.error("Failed to update rules", { description: e.message || "An error occurred" });
+        } catch (e) {
+            toast.error("Failed to update rules", { description: errorMessage(e) || "An error occurred" });
         }
     }
 </script>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ICellEditorComp, ICellEditorParams } from "ag-grid-community";
 import { mount, unmount, type Component } from "svelte";
 

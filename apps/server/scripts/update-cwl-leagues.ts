@@ -9,11 +9,11 @@
  * Reads JPA_DATABASE_URL / JPA_REDIS_URL / PUBLIC_COC_API_BASE_URI / JPA_COC_API_TOKEN
  * from .env (+ .env.server-db) via @/lib/config, same as the server.
  */
-import { eq } from "drizzle-orm";
+import { cocClient } from "@/lib/coc";
 import { db } from "@/lib/db";
 import { cwlClanInfoTable } from "@/lib/db/schema";
-import { cocClient } from "@/lib/coc";
 import { ClashAPIError } from "@repo/clashofclans-api";
+import { eq } from "drizzle-orm";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const CONCURRENCY = 10;

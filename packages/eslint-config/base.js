@@ -22,5 +22,13 @@ export const baseConfig = ts.config(
                 ...globals.node,
             },
         },
+        rules: {
+            // Dropping a key by destructuring it out is deliberate, and a leading
+            // underscore is the usual marker for "declared but unused on purpose".
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                { ignoreRestSiblings: true, varsIgnorePattern: "^_", argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+            ],
+        },
     },
 );

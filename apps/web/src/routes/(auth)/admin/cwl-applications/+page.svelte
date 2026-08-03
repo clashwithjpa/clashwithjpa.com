@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
@@ -19,7 +20,7 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
-    import { formatDate, formatDateTime } from "$lib/utils";
+    import { errorMessage, formatDate, formatDateTime } from "$lib/utils";
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,
@@ -58,7 +59,6 @@
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
     let clanNameByTag = $state<Record<string, string>>({});
     let total = $state(0);
-    let loading = $state(true);
     let nicknamesLoading = $state(false);
     let nicknameLoadId = 0;
     let filterMode = $state<string>("all");
@@ -262,7 +262,7 @@
                     }),
                 );
             })
-            .catch((e: any) => toast.error("Failed to load linked accounts", { description: e?.message }))
+            .catch((e: any) => toast.error("Failed to load linked accounts", { description: errorMessage(e) }))
             .finally(() => (loadingAccounts = false));
     });
 
@@ -295,8 +295,8 @@
                 toast.error(typeof err === "string" ? err : "Failed to register application");
                 registerOpen = true;
             }
-        } catch (e: any) {
-            toast.error("Failed to register application", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to register application", { description: errorMessage(e) });
             registerOpen = true;
         } finally {
             registerSubmitting = false;
@@ -357,7 +357,6 @@
     }
 
     async function load() {
-        loading = true;
         try {
             const resp = await getCwlApplications(
                 {
@@ -375,10 +374,8 @@
             } else {
                 toast.error("Failed to load CWL applications");
             }
-        } catch (e: any) {
-            toast.error("Failed to load CWL applications", { description: e?.message });
-        } finally {
-            loading = false;
+        } catch (e) {
+            toast.error("Failed to load CWL applications", { description: errorMessage(e) });
         }
         // Nicknames are fetched separately so the grid isn't blocked on the Discord
         // guild-member walk; the Nickname column shows a skeleton until they arrive.
@@ -409,8 +406,8 @@
                 return resp.data.application.assignedTo ?? "";
             }
             toast.error("Failed to assign application");
-        } catch (e: any) {
-            toast.error("Failed to assign application", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to assign application", { description: errorMessage(e) });
         }
         return null;
     }
@@ -430,8 +427,8 @@
             toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
             clearSelection();
             bulkClan = "";
-        } catch (e: any) {
-            toast.error("Failed to assign applications", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to assign applications", { description: errorMessage(e) });
             load();
         } finally {
             bulkProcessing = false;
@@ -453,8 +450,8 @@
             total = Math.max(0, total - resp.data.count);
             toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} deleted`);
             clearSelection();
-        } catch (e: any) {
-            toast.error("Failed to delete applications", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to delete applications", { description: errorMessage(e) });
             load();
         } finally {
             bulkProcessing = false;
@@ -743,8 +740,8 @@
                             } else {
                                 throw new Error();
                             }
-                        } catch (e: any) {
-                            toast.error("Failed to update weight", { description: e?.message });
+                        } catch (e) {
+                            toast.error("Failed to update weight", { description: errorMessage(e) });
                             event.data.cocAccountWeight = event.oldValue;
                         }
                         event.api.refreshCells({ rowNodes: [event.node], columns: ["cocAccountWeight"], force: true });

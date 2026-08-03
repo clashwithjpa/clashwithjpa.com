@@ -9,6 +9,7 @@
     import { PreRendered } from "carta-md";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import type { PageProps } from "./$types";
+
     let { data }: PageProps = $props();
 
     let activeId = $state("");

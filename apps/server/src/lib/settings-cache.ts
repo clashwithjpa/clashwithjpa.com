@@ -1,6 +1,6 @@
-import { Redis } from "ioredis";
 import { config } from "@/lib/config";
 import { getSettings } from "@/lib/db/functions";
+import { Redis } from "ioredis";
 
 const redis = new Redis(config.JPA_REDIS_URL);
 const CACHE_KEY = "settings:cache";

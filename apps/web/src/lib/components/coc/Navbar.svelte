@@ -41,7 +41,7 @@
     </a>
 
     <div class="hidden **:text-sm md:absolute md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-8">
-        {#each links as link, i}
+        {#each links as link, i (link.href)}
             <Link href={link.href} class="stagger-up" style="--i:{i}">
                 {link.name}
             </Link>
@@ -57,30 +57,28 @@
             {#snippet trigger()}
                 <Avatar src={user.image} name={user.name} {role} size="md" />
             {/snippet}
-            {#snippet children()}
-                <div class="flex min-w-52 flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <Avatar src={user.image} name={user.name} {role} size="lg" />
-                        <div class="flex flex-col gap-0.5">
-                            <span class="font-coc font-bold">{user.name}</span>
-                            {#if role && role in ROLE_CONFIG}
-                                <span class="font-coc text-sm text-stone-700">
-                                    {ROLE_CONFIG[role].label}
-                                </span>
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <CocBtn variant="orange" size="sm" href="/dashboard">Dashboard</CocBtn>
-                        {#await hasPermission(user.id, "review") then canAdmin}
-                            {#if canAdmin}
-                                <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
-                            {/if}
-                        {/await}
-                        <CocBtn variant="red" size="sm" onclick={() => authClient.signOut()}>Logout</CocBtn>
+            <div class="flex min-w-52 flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <Avatar src={user.image} name={user.name} {role} size="lg" />
+                    <div class="flex flex-col gap-0.5">
+                        <span class="font-coc font-bold">{user.name}</span>
+                        {#if role && role in ROLE_CONFIG}
+                            <span class="font-coc text-sm text-stone-700">
+                                {ROLE_CONFIG[role].label}
+                            </span>
+                        {/if}
                     </div>
                 </div>
-            {/snippet}
+                <div class="flex flex-col gap-2">
+                    <CocBtn variant="orange" size="sm" href="/dashboard">Dashboard</CocBtn>
+                    {#await hasPermission(user.id, "review") then canAdmin}
+                        {#if canAdmin}
+                            <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
+                        {/if}
+                    {/await}
+                    <CocBtn variant="red" size="sm" onclick={() => authClient.signOut()}>Logout</CocBtn>
+                </div>
+            </div>
         </CocPopup>
     {:else}
         <CocBtn variant="blurple" onclick={() => authClient.signIn.social({ provider: "discord", callbackURL: window.location.origin })}>

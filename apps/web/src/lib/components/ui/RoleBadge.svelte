@@ -24,6 +24,7 @@
 </script>
 
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import Badge from "$lib/components/ui/Badge.svelte";
     import type { Role } from "$lib/config/roles";
 

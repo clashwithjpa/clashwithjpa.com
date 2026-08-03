@@ -1,18 +1,18 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient } from "$lib/auth";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
-    let session = authClient.useSession();
     let options: (Option & { warWeight: number; clanTag?: string; isExternal: boolean })[] = $state([]);
     let clanOptions: Option[] = $state([]);
 
@@ -70,7 +70,7 @@
                         clanTag: playerData.data.player.clan?.tag,
                         isExternal: acc.isExternal,
                     };
-                } catch (e) {
+                } catch {
                     return {
                         tag: acc.cocAccountTag,
                         name: acc.cocAccountTag,
@@ -143,8 +143,8 @@
                     toast.error("Failed to submit CWL application");
                 }
             }
-        } catch (err: any) {
-            toast.error(err?.message || "Failed to submit CWL application");
+        } catch (err) {
+            toast.error(errorMessage(err) || "Failed to submit CWL application");
             console.error("Submit error:", err);
         } finally {
             isLoading = false;

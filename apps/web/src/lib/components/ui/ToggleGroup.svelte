@@ -82,7 +82,7 @@
         className,
     )}
 >
-    {#each options as option}
+    {#each options as option (option.value)}
         {#if tooltip && option.tooltip}
             <Tooltip
                 title={option.tooltip.slice(0, 1).toUpperCase() + option.tooltip.slice(1)}

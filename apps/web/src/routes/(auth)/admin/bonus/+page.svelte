@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
     import BonusAccountCell from "$lib/components/grid/BonusAccountCell.svelte";

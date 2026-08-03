@@ -395,6 +395,7 @@ export interface APILeagueSeasonResultList {
     items: APILeagueSeasonResult[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the endpoint returns no fields of its own
 export interface APILeagueGroupList {}
 
 // ************* LOCATIONS ************* //

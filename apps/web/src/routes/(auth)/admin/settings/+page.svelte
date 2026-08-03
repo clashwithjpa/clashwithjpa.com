@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { beforeNavigate, goto } from "$app/navigation";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Button from "$lib/components/ui/Button.svelte";
@@ -9,6 +10,7 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
+    import { errorMessage } from "$lib/utils";
     import {
         createCwlSeason,
         deleteCwlSeason,
@@ -97,8 +99,8 @@
             } else {
                 toast.error("Failed to load settings");
             }
-        } catch (e: any) {
-            toast.error("Failed to load settings", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load settings", { description: errorMessage(e) });
         } finally {
             loading = false;
         }
@@ -130,8 +132,8 @@
             } else {
                 toast.error((resp as any).error ?? "Failed to create season");
             }
-        } catch (e: any) {
-            toast.error("Failed to create season", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to create season", { description: errorMessage(e) });
         } finally {
             creatingSeason = false;
         }
@@ -161,8 +163,8 @@
             } else {
                 toast.error((resp as any).error ?? "Failed to rename season");
             }
-        } catch (e: any) {
-            toast.error("Failed to rename season", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to rename season", { description: errorMessage(e) });
         } finally {
             renamingSeason = false;
         }
@@ -178,8 +180,8 @@
             } else {
                 toast.error("Failed to delete season");
             }
-        } catch (e: any) {
-            toast.error("Failed to delete season", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to delete season", { description: errorMessage(e) });
         } finally {
             deletingSeasonId = null;
         }
@@ -205,8 +207,8 @@
             } else {
                 toast.error("Failed to update settings");
             }
-        } catch (e: any) {
-            toast.error("Failed to update settings", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to update settings", { description: errorMessage(e) });
         } finally {
             saving = false;
         }
@@ -221,8 +223,8 @@
             } else {
                 toast.error("Failed to refresh usernames");
             }
-        } catch (e: any) {
-            toast.error("Failed to refresh usernames", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to refresh usernames", { description: errorMessage(e) });
         } finally {
             refreshingUsernames = false;
         }

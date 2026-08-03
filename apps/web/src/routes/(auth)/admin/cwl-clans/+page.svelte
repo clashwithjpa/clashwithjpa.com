@@ -7,6 +7,7 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import { errorMessage } from "$lib/utils";
     import {
         createAdminCwlClan,
         deleteAdminCwlClan,
@@ -201,8 +202,8 @@
             } else {
                 toast.error("Failed to load CWL clans");
             }
-        } catch (e: any) {
-            toast.error("Failed to load CWL clans", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load CWL clans", { description: errorMessage(e) });
         } finally {
             loading = false;
         }
@@ -220,8 +221,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to sync leagues"));
             }
-        } catch (e: any) {
-            toast.error("Failed to sync leagues", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to sync leagues", { description: errorMessage(e) });
         } finally {
             syncing = false;
         }
@@ -270,8 +271,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to add CWL clan"));
             }
-        } catch (e: any) {
-            toast.error("Failed to add CWL clan", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to add CWL clan", { description: errorMessage(e) });
         } finally {
             saving = false;
         }
@@ -288,8 +289,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to remove CWL clan"));
             }
-        } catch (e: any) {
-            toast.error("Failed to remove CWL clan", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to remove CWL clan", { description: errorMessage(e) });
         } finally {
             removing = null;
         }

@@ -1,5 +1,5 @@
-import { ClashOfClansAPI } from "@repo/clashofclans-api";
 import { config } from "@/lib/config";
+import { ClashOfClansAPI } from "@repo/clashofclans-api";
 
 /**
  * Shared Clash of Clans API client instance.

@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <div class="flex-1 [scrollbar-width:none] overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div class="flex flex-col gap-6">
             <!-- Clan details -->
             <section class="flex flex-col gap-3">

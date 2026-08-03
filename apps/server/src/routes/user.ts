@@ -1,5 +1,5 @@
-import { isAuthenticated, isVerified } from "@/lib/auth/functions";
 import { logAction } from "@/lib/audit";
+import { isAuthenticated, isVerified } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { config } from "@/lib/config";
 import { getDbErrorMessage } from "@/lib/db/error";
@@ -14,13 +14,13 @@ import {
     setUserCocAccountExternal,
 } from "@/lib/db/functions";
 import { getImportableAccounts } from "@/lib/import-lookup";
-import { getCachedSettings } from "@/lib/settings-cache";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { describeRoute } from "@/lib/openapi";
+import { getCachedSettings } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SessionSchema, SuccessResponseSchema, UserSchema, type AppEnv } from "@/lib/types";
 import { verifyTurnstileToken } from "@/lib/utils/cf";
 import * as Sentry from "@sentry/node";
 import { Hono } from "hono";
-import { describeRoute } from "@/lib/openapi";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 

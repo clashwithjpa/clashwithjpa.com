@@ -10,18 +10,17 @@
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
-
     import type { Role } from "$lib/config/roles";
     import { formatDate, formatDateTime } from "$lib/utils";
     import {
         getCOCPlayer,
-        type GetCOCPlayer500,
         getJPAClans,
         getJPACwlClans,
         getUserAccounts,
         getUserCwlApplications,
         importUserAccounts,
         setUserAccountExternal,
+        type GetCOCPlayer500,
         type SetUserAccountExternal500,
     } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";

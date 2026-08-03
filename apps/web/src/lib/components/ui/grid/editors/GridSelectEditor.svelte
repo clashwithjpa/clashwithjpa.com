@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import Icon from "$lib/components/ui/Icon.svelte";
     import { cn } from "$lib/utils.js";
     import type { ICellEditorParams } from "ag-grid-community";
@@ -29,7 +30,7 @@
 </script>
 
 <div class="flex max-h-60 w-full min-w-40 flex-col gap-1 overflow-y-auto rounded-lg border border-stone-800 bg-stone-900 p-2 shadow-xl">
-    {#each parsedOptions as option}
+    {#each parsedOptions as option (option.value)}
         <button
             type="button"
             class={cn(

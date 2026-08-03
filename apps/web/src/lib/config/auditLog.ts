@@ -5,13 +5,13 @@ import TablerArrowBackUp from "~icons/tabler/arrow-back-up";
 import TablerArrowRight from "~icons/tabler/arrow-right";
 import TablerArrowsLeft from "~icons/tabler/arrows-left";
 import TablerArrowsRight from "~icons/tabler/arrows-right";
+import TablerBan from "~icons/tabler/ban";
 import TablerCalendarCheck from "~icons/tabler/calendar-check";
 import TablerCalendarMinus from "~icons/tabler/calendar-minus";
 import TablerCalendarX from "~icons/tabler/calendar-x";
-import TablerCoin from "~icons/tabler/coin";
-import TablerBan from "~icons/tabler/ban";
 import TablerCheck from "~icons/tabler/check";
 import TablerClock from "~icons/tabler/clock";
+import TablerCoin from "~icons/tabler/coin";
 import TablerDownload from "~icons/tabler/download";
 import TablerEdit from "~icons/tabler/edit";
 import TablerGavel from "~icons/tabler/gavel";
@@ -42,7 +42,7 @@ export type AuditTargetType = NonNullable<AuditEntry["targetType"]>;
 
 type AuditVariant = "blue" | "green" | "red" | "yellow" | "ghost";
 
-type Meta = Record<string, any>;
+type Meta = Record<string, unknown>;
 
 export interface AuditActionConfig {
     label: string;

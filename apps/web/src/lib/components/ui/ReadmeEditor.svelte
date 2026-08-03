@@ -1,4 +1,5 @@
 <script module lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import * as allThemes from "@uiw/codemirror-themes-all";
 
     // Filter out settings, init functions, styles, and color objects to get only the actual theme extensions
@@ -31,18 +32,32 @@
 </script>
 
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    import { beforeNavigate, goto } from "$app/navigation";
+    import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { carta } from "$lib/carta";
     import Button from "$lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
-    import { type CompletionContext, type CompletionResult, acceptCompletion } from "@codemirror/autocomplete";
+    import { acceptCompletion, type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
     import { indentLess, indentMore } from "@codemirror/commands";
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { indentUnit } from "@codemirror/language";
     import { Compartment, EditorState } from "@codemirror/state";
     import { highlightTrailingWhitespace, keymap, lineNumbers } from "@codemirror/view";
+    import { PreRendered } from "carta-md";
+    import { basicSetup, EditorView } from "codemirror";
     import emojilib from "emojilib";
+    import * as prettierPluginMarkdown from "prettier/plugins/markdown";
+    import * as prettier from "prettier/standalone";
+    import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
+    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import TablerDeviceFloppy from "~icons/tabler/device-floppy";
+    import TablerUpload from "~icons/tabler/upload";
+    import Toolbar from "../Toolbar.svelte";
 
     const emojiCompletions = Object.entries(emojilib).flatMap(([emoji, aliases]) =>
         aliases.map((alias) => ({
@@ -65,20 +80,6 @@
             validFor: /^:\w*$/,
         };
     }
-
-    import { beforeNavigate, goto } from "$app/navigation";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import { PreRendered } from "carta-md";
-    import { basicSetup, EditorView } from "codemirror";
-    import * as prettierPluginMarkdown from "prettier/plugins/markdown";
-    import * as prettier from "prettier/standalone";
-    import { onMount } from "svelte";
-    import { toast } from "svelte-sonner";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
-    import TablerDeviceFloppy from "~icons/tabler/device-floppy";
-    import TablerUpload from "~icons/tabler/upload";
-    import Toolbar from "../Toolbar.svelte";
 
     let { value = $bindable(""), isMobile = false, onSave }: { value?: string; isMobile?: boolean; onSave?: () => Promise<void> | void } = $props();
 

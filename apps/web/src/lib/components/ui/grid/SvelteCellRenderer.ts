@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ICellRendererComp, ICellRendererParams } from "ag-grid-community";
 import { mount, unmount, type Component } from "svelte";
 
@@ -35,7 +36,7 @@ export class SvelteCellRenderer implements ICellRendererComp {
         return this.eGui;
     }
 
-    refresh(params: ICellRendererParams) {
+    refresh() {
         // Returning false makes AG Grid recreate the cell (Svelte 5 props update via `$state`); fine here.
         return false;
     }
