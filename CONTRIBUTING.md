@@ -300,7 +300,7 @@ After `just db-reset` you need to run `just migrate` again, the volume took the 
 
 ## 📝 Commit conventions
 
-Commits follow [Conventional Commits](https://www.conventionalcommits.org), enforced by commitlint through a git hook.
+Commits follow [Conventional Commits](https://www.conventionalcommits.org).
 
 ```
 <type>(<optional scope>): <description>
