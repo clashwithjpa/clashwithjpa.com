@@ -21,11 +21,11 @@
     },
     "devDependencies": {
         "@repo/typescript-config": "workspace:*",
-        "better-auth": "^1.5.5",
+        "better-auth": "^1.6.25",
         "tsc-alias": "^1.9.1",
         "typescript": "^6.0.3"
     },
     "peerDependencies": {
-        "better-auth": "^1.5.5"
+        "better-auth": "^1.6.25"
     }
 }

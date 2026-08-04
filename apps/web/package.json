@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@ark-ui/svelte": "^5.22.1",
-        "@better-auth/api-key": "^1.5.5",
+        "@better-auth/api-key": "^1.6.25",
         "@capacitor/android": "^8.5.0",
         "@capacitor/core": "^8.5.0",
         "@capacitor/ios": "^8.5.0",
@@ -40,7 +40,7 @@
         "@tanstack/svelte-query": "^5.90.2",
         "ag-charts-community": "^14.0.2",
         "ag-grid-community": "^36.0.2",
-        "better-auth": "^1.5.5",
+        "better-auth": "^1.6.25",
         "carta-md": "^4.11.2",
         "codemirror": "^6.0.2",
         "emojilib": "^4.0.3",
