@@ -28,6 +28,12 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
+      - name: Create env files
+        run: |
+          cp apps/web/.env.example apps/web/.env
+          cp apps/server/.env.example apps/server/.env
+          cp apps/server/.env.server-db.example apps/server/.env.server-db
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
