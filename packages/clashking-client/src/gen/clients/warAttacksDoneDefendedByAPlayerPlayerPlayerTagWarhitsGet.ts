@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetQueryResponse,
+    WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGet422,
     WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetPathParams,
     WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetQueryParams,
-    WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGet422,
+    WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetQueryResponse,
 } from "../models/WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getWarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetUrl(
     player_tag: WarAttacksDoneDefendedByAPlayerPlayerPlayerTagWarhitsGetPathParams["player_tag"],

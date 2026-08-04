@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    LogOfRaidWeekendsCapitalClanTagGetQueryResponse,
+    LogOfRaidWeekendsCapitalClanTagGet422,
     LogOfRaidWeekendsCapitalClanTagGetPathParams,
     LogOfRaidWeekendsCapitalClanTagGetQueryParams,
-    LogOfRaidWeekendsCapitalClanTagGet422,
+    LogOfRaidWeekendsCapitalClanTagGetQueryResponse,
 } from "../models/LogOfRaidWeekendsCapitalClanTagGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getLogOfRaidWeekendsCapitalClanTagGetUrl(clan_tag: LogOfRaidWeekendsCapitalClanTagGetPathParams["clan_tag"]) {
     const res = { method: "GET", url: `/capital/${clan_tag}` as const };

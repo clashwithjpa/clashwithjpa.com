@@ -26,7 +26,6 @@
 **/LICENSE
 .claude
 .commandcode
-.husky
 
 # logs
 **/logs
@@ -39,3 +38,5 @@ apps/server/scripts/migrations/datasets
 .backups
 .claude
 .github/skills
+# pnpm
+.pnpm-store

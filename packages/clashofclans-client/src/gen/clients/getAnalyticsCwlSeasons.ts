@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetAnalyticsCwlSeasonsQueryResponse, GetAnalyticsCwlSeasons401, GetAnalyticsCwlSeasons500 } from "../models/GetAnalyticsCwlSeasons.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetAnalyticsCwlSeasons401, GetAnalyticsCwlSeasons500, GetAnalyticsCwlSeasonsQueryResponse } from "../models/GetAnalyticsCwlSeasons.ts";
 
 function getGetAnalyticsCwlSeasonsUrl() {
     const res = { method: "GET", url: `/analytics/cwl-seasons` as const };

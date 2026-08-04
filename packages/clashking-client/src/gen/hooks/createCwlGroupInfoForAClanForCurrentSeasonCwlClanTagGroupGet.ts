@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetQueryResponse,
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams,
-    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet422,
-} from "../models/CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { cwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet } from "../clients/cwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { cwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet } from "../clients/cwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
+import type {
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet422,
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams,
+    CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetQueryResponse,
+} from "../models/CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGet.ts";
 
 export const cwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetQueryKey = (
     clan_tag: CwlGroupInfoForAClanForCurrentSeasonCwlClanTagGroupGetPathParams["clan_tag"],

@@ -1,3 +1,5 @@
+import { readFile, writeFile } from "fs/promises";
+
 interface CocRow {
     id: number;
     user_id: string;
@@ -14,11 +16,11 @@ interface UserRow {
 type Lookup = Record<string, { tag: string; weight: number }[]>;
 
 async function build() {
-    const datasetsDir = import.meta.dir + "/datasets";
+    const datasetsDir = import.meta.dirname + "/datasets";
 
     const [cocRows, userRows] = await Promise.all([
-        Bun.file(`${datasetsDir}/coc_table.json`).json() as Promise<CocRow[]>,
-        Bun.file(`${datasetsDir}/user_table.json`).json() as Promise<UserRow[]>,
+        readFile(`${datasetsDir}/coc_table.json`, "utf8").then((t) => JSON.parse(t) as CocRow[]),
+        readFile(`${datasetsDir}/user_table.json`, "utf8").then((t) => JSON.parse(t) as UserRow[]),
     ]);
 
     const activeDiscordIds = new Set<string>();
@@ -37,7 +39,7 @@ async function build() {
     }
 
     const outputPath = `${datasetsDir}/import_lookup.json`;
-    await Bun.write(outputPath, JSON.stringify(lookup, null, 2));
+    await writeFile(outputPath, JSON.stringify(lookup, null, 2));
 
     console.log(`Active discord users: ${activeDiscordIds.size}`);
     console.log(`Coc rows imported:    ${cocRows.length - skipped}`);

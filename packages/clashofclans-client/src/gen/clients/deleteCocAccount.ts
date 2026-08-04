@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteCocAccountMutationResponse,
-    DeleteCocAccountPathParams,
     DeleteCocAccount401,
     DeleteCocAccount404,
     DeleteCocAccount500,
+    DeleteCocAccountMutationResponse,
+    DeleteCocAccountPathParams,
 } from "../models/DeleteCocAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteCocAccountUrl(id: DeleteCocAccountPathParams["id"]) {
     const res = { method: "DELETE", url: `/admin/coc-accounts/${id}` as const };

@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsAdminActivity } from "../clients/getAnalyticsAdminActivity.ts";
 import type {
-    GetAnalyticsAdminActivityQueryResponse,
-    GetAnalyticsAdminActivityQueryParams,
     GetAnalyticsAdminActivity401,
     GetAnalyticsAdminActivity500,
+    GetAnalyticsAdminActivityQueryParams,
+    GetAnalyticsAdminActivityQueryResponse,
 } from "../models/GetAnalyticsAdminActivity.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsAdminActivity } from "../clients/getAnalyticsAdminActivity.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsAdminActivityQueryKey = (params?: GetAnalyticsAdminActivityQueryParams) =>
     [{ url: "/analytics/admin-activity" }, ...(params ? [params] : [])] as const;

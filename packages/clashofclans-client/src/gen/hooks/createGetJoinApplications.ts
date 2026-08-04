@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getJoinApplications } from "../clients/getJoinApplications.ts";
 import type {
-    GetJoinApplicationsQueryResponse,
-    GetJoinApplicationsQueryParams,
     GetJoinApplications401,
     GetJoinApplications500,
+    GetJoinApplicationsQueryParams,
+    GetJoinApplicationsQueryResponse,
 } from "../models/GetJoinApplications.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getJoinApplications } from "../clients/getJoinApplications.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getJoinApplicationsQueryKey = (params?: GetJoinApplicationsQueryParams) =>
     [{ url: "/admin/join-applications" }, ...(params ? [params] : [])] as const;

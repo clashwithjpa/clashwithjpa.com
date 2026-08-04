@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
+    PostCOCPlayerVerify500,
     PostCOCPlayerVerifyMutationRequest,
     PostCOCPlayerVerifyMutationResponse,
     PostCOCPlayerVerifyPathParams,
-    PostCOCPlayerVerify500,
 } from "../models/PostCOCPlayerVerify.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getPostCOCPlayerVerifyUrl(tag: PostCOCPlayerVerifyPathParams["tag"]) {
     const res = { method: "POST", url: `/coc/player/${tag}/verifytoken` as const };

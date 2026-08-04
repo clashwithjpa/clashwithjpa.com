@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { setUserSeasonBonus } from "../clients/setUserSeasonBonus.ts";
 import type {
-    SetUserSeasonBonusMutationRequest,
-    SetUserSeasonBonusMutationResponse,
     SetUserSeasonBonus400,
     SetUserSeasonBonus401,
     SetUserSeasonBonus500,
+    SetUserSeasonBonusMutationRequest,
+    SetUserSeasonBonusMutationResponse,
 } from "../models/SetUserSeasonBonus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { setUserSeasonBonus } from "../clients/setUserSeasonBonus.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const setUserSeasonBonusMutationKey = () => [{ url: "/admin/bonus" }] as const;
 

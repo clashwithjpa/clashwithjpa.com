@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { SetRulesMutationRequest, SetRulesMutationResponse, SetRules500 } from "../models/SetRules.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { SetRules500, SetRulesMutationRequest, SetRulesMutationResponse } from "../models/SetRules.ts";
 
 function getSetRulesUrl() {
     const res = { method: "PUT", url: `/manage/rules` as const };

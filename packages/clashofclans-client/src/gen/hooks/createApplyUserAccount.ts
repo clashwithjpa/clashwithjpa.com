@@ -3,19 +3,19 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { applyUserAccount } from "../clients/applyUserAccount.ts";
 import type {
-    ApplyUserAccountMutationRequest,
-    ApplyUserAccountMutationResponse,
     ApplyUserAccount400,
     ApplyUserAccount401,
     ApplyUserAccount403,
     ApplyUserAccount409,
     ApplyUserAccount500,
+    ApplyUserAccountMutationRequest,
+    ApplyUserAccountMutationResponse,
 } from "../models/ApplyUserAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { applyUserAccount } from "../clients/applyUserAccount.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const applyUserAccountMutationKey = () => [{ url: "/user/accounts/apply" }] as const;
 

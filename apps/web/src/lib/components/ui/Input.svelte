@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { cn, fromArkValue, type WithElementRef } from "$lib/utils";
     import { DateInput, useDateInput } from "@ark-ui/svelte/date-input";
     import { DatePicker, parseDate, useDatePicker } from "@ark-ui/svelte/date-picker";
@@ -262,7 +263,7 @@
                                         <DatePicker.Table class="w-full border-collapse">
                                             <DatePicker.TableHead class="border-b-2 border-stone-700/50">
                                                 <DatePicker.TableRow class="flex w-full justify-between pb-2">
-                                                    {#each datePicker().weekDays as weekDay}
+                                                    {#each datePicker().weekDays as weekDay (weekDay.short)}
                                                         <DatePicker.TableHeader class="w-8 text-center text-xs font-medium text-stone-400">
                                                             {weekDay.short}
                                                         </DatePicker.TableHeader>
@@ -270,9 +271,9 @@
                                                 </DatePicker.TableRow>
                                             </DatePicker.TableHead>
                                             <DatePicker.TableBody class="flex flex-col gap-2 pt-2">
-                                                {#each datePicker().weeks as week}
+                                                {#each datePicker().weeks as week, wi (wi)}
                                                     <DatePicker.TableRow class="flex w-full justify-between">
-                                                        {#each week as day}
+                                                        {#each week as day (day.toString())}
                                                             <DatePicker.TableCell class="p-0 text-center" value={day}>
                                                                 <DatePicker.TableCellTrigger
                                                                     class="flex size-8 cursor-pointer items-center justify-center rounded-lg text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:text-stone-400 data-disabled:opacity-50 data-outside-range:pointer-events-none data-outside-range:text-stone-400/50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950 data-today:border-2 data-today:border-stone-700/50 data-unavailable:pointer-events-none data-unavailable:text-stone-400 data-unavailable:line-through data-unavailable:opacity-50"
@@ -311,9 +312,9 @@
                                         </DatePicker.ViewControl>
                                         <DatePicker.Table class="w-full border-collapse">
                                             <DatePicker.TableBody class="flex flex-col gap-4">
-                                                {#each datePicker().getMonthsGrid({ columns: 4, format: "short" }) as months}
+                                                {#each datePicker().getMonthsGrid({ columns: 4, format: "short" }) as months, mi (mi)}
                                                     <DatePicker.TableRow class="flex w-full justify-between gap-2">
-                                                        {#each months as month}
+                                                        {#each months as month (month.value.toString())}
                                                             <DatePicker.TableCell class="flex-1 p-0 text-center" value={month.value}>
                                                                 <DatePicker.TableCellTrigger
                                                                     class="flex w-full cursor-pointer items-center justify-center rounded-lg py-2 text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:line-through data-disabled:opacity-50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950"
@@ -350,9 +351,9 @@
                                         </DatePicker.ViewControl>
                                         <DatePicker.Table class="w-full border-collapse">
                                             <DatePicker.TableBody class="flex flex-col gap-4">
-                                                {#each datePicker().getYearsGrid({ columns: 4 }) as years}
+                                                {#each datePicker().getYearsGrid({ columns: 4 }) as years, yi (yi)}
                                                     <DatePicker.TableRow class="flex w-full justify-between gap-2">
-                                                        {#each years as year}
+                                                        {#each years as year (year.value)}
                                                             <DatePicker.TableCell class="flex-1 p-0 text-center" value={year.value}>
                                                                 <DatePicker.TableCellTrigger
                                                                     class="flex w-full cursor-pointer items-center justify-center rounded-lg py-2 text-sm text-stone-200 transition-all duration-200 hover:bg-stone-700 hover:text-stone-50 data-disabled:pointer-events-none data-disabled:line-through data-disabled:opacity-50 data-selected:bg-stone-200 data-selected:font-semibold data-selected:text-stone-950"

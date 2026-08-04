@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    BestLegendStreaksLegendsStreaksGetQueryResponse,
-    BestLegendStreaksLegendsStreaksGetQueryParams,
-    BestLegendStreaksLegendsStreaksGet422,
-} from "../models/BestLegendStreaksLegendsStreaksGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    BestLegendStreaksLegendsStreaksGet422,
+    BestLegendStreaksLegendsStreaksGetQueryParams,
+    BestLegendStreaksLegendsStreaksGetQueryResponse,
+} from "../models/BestLegendStreaksLegendsStreaksGet.ts";
 
 function getBestLegendStreaksLegendsStreaksGetUrl() {
     const res = { method: "GET", url: `/legends/streaks` as const };

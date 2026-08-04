@@ -1,8 +1,7 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
-    import type { Snippet } from "svelte";
-
     import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
+    import type { Snippet } from "svelte";
 
     interface Props {
         children: Snippet;

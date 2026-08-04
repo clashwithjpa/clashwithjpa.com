@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    BasicClanObjectClanClanTagBasicGetQueryResponse,
-    BasicClanObjectClanClanTagBasicGetPathParams,
-    BasicClanObjectClanClanTagBasicGet422,
-} from "../models/BasicClanObjectClanClanTagBasicGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    BasicClanObjectClanClanTagBasicGet422,
+    BasicClanObjectClanClanTagBasicGetPathParams,
+    BasicClanObjectClanClanTagBasicGetQueryResponse,
+} from "../models/BasicClanObjectClanClanTagBasicGet.ts";
 
 function getBasicClanObjectClanClanTagBasicGetUrl(clan_tag: BasicClanObjectClanClanTagBasicGetPathParams["clan_tag"]) {
     const res = { method: "GET", url: `/clan/${clan_tag}/basic` as const };

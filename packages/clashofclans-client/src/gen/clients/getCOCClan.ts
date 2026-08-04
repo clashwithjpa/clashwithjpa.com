@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClanQueryResponse, GetCOCClanPathParams, GetCOCClan500 } from "../models/GetCOCClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetCOCClan500, GetCOCClanPathParams, GetCOCClanQueryResponse } from "../models/GetCOCClan.ts";
 
 function getGetCOCClanUrl(tag: GetCOCClanPathParams["tag"]) {
     const res = { method: "GET", url: `/coc/clan/${tag}` as const };

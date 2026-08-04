@@ -1,9 +1,7 @@
-#!/usr/bin/env bun
-
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
-const schemaPath = resolve(import.meta.dir, "../src/lib/db/schema/ba-auth.ts");
+const schemaPath = resolve(import.meta.dirname, "../src/lib/db/schema/ba-auth.ts");
 
 // Re-applied after every `ba:generate`, which rewrites the schema wholesale.
 // Neither patch can be expressed through better-auth's own config, so the file

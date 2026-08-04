@@ -3,7 +3,7 @@ import { config } from "@/lib/config";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { type AppEnv } from "@/lib/types";
 import { CreateBucketCommand, HeadBucketCommand, PutBucketPolicyCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
@@ -33,8 +33,9 @@ const BUCKET_NAME = "uploads";
 async function ensureBucket() {
     try {
         await s3.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
-    } catch (error: any) {
-        if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+    } catch (error) {
+        const { name, $metadata } = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+        if (name === "NotFound" || $metadata?.httpStatusCode === 404) {
             await s3.send(new CreateBucketCommand({ Bucket: BUCKET_NAME }));
         }
     }

@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    AssignCwlApplicationMutationRequest,
-    AssignCwlApplicationMutationResponse,
-    AssignCwlApplicationPathParams,
     AssignCwlApplication400,
     AssignCwlApplication401,
     AssignCwlApplication404,
     AssignCwlApplication500,
+    AssignCwlApplicationMutationRequest,
+    AssignCwlApplicationMutationResponse,
+    AssignCwlApplicationPathParams,
 } from "../models/AssignCwlApplication.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getAssignCwlApplicationUrl(id: AssignCwlApplicationPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/cwl-applications/${id}/assign` as const };

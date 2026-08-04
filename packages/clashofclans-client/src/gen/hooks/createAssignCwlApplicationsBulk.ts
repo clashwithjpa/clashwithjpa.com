@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { assignCwlApplicationsBulk } from "../clients/assignCwlApplicationsBulk.ts";
 import type {
-    AssignCwlApplicationsBulkMutationRequest,
-    AssignCwlApplicationsBulkMutationResponse,
     AssignCwlApplicationsBulk400,
     AssignCwlApplicationsBulk401,
     AssignCwlApplicationsBulk500,
+    AssignCwlApplicationsBulkMutationRequest,
+    AssignCwlApplicationsBulkMutationResponse,
 } from "../models/AssignCwlApplicationsBulk.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { assignCwlApplicationsBulk } from "../clients/assignCwlApplicationsBulk.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const assignCwlApplicationsBulkMutationKey = () => [{ url: "/admin/cwl-applications/assign-bulk" }] as const;
 

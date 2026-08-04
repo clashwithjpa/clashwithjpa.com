@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetAdminClansQueryResponse, GetAdminClans401, GetAdminClans500 } from "../models/GetAdminClans.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAdminClans } from "../clients/getAdminClans.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAdminClans } from "../clients/getAdminClans.ts";
+import type { GetAdminClans401, GetAdminClans500, GetAdminClansQueryResponse } from "../models/GetAdminClans.ts";
 
 export const getAdminClansQueryKey = () => [{ url: "/admin/clans" }] as const;
 

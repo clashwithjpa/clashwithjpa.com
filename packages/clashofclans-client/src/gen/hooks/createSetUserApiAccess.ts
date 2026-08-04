@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { setUserApiAccess } from "../clients/setUserApiAccess.ts";
 import type {
-    SetUserApiAccessMutationRequest,
-    SetUserApiAccessMutationResponse,
-    SetUserApiAccessPathParams,
     SetUserApiAccess401,
     SetUserApiAccess404,
     SetUserApiAccess500,
+    SetUserApiAccessMutationRequest,
+    SetUserApiAccessMutationResponse,
+    SetUserApiAccessPathParams,
 } from "../models/SetUserApiAccess.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { setUserApiAccess } from "../clients/setUserApiAccess.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const setUserApiAccessMutationKey = () => [{ url: "/admin/users/:userid/api-access" }] as const;
 

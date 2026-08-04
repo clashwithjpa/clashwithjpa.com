@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryResponse,
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryParams,
-    SuperTroopBoostRateForASeasonYYYYMMBoostRateGet422,
-} from "../models/SuperTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGet422,
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryParams,
+    SuperTroopBoostRateForASeasonYYYYMMBoostRateGetQueryResponse,
+} from "../models/SuperTroopBoostRateForASeasonYYYYMMBoostRateGet.ts";
 
 function getSuperTroopBoostRateForASeasonYYYYMMBoostRateGetUrl() {
     const res = { method: "GET", url: `/boost-rate` as const };

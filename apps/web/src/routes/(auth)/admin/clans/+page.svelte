@@ -8,6 +8,7 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import { errorMessage } from "$lib/utils";
     import {
         createAdminClan,
         deleteAdminClan,
@@ -135,8 +136,8 @@
             }
             toast.error(errMsg(resp.error, "Failed to verify Discord IDs"));
             return false;
-        } catch (e: any) {
-            toast.error("Failed to verify Discord IDs", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to verify Discord IDs", { description: errorMessage(e) });
             return false;
         } finally {
             verifying = false;
@@ -165,8 +166,8 @@
             } else {
                 toast.error("Failed to load clans");
             }
-        } catch (e: any) {
-            toast.error("Failed to load clans", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load clans", { description: errorMessage(e) });
         } finally {
             loading = false;
         }
@@ -297,8 +298,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to add clan"));
             }
-        } catch (e: any) {
-            toast.error("Failed to add clan", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to add clan", { description: errorMessage(e) });
         } finally {
             saving = false;
         }
@@ -343,8 +344,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to update clan"));
             }
-        } catch (e: any) {
-            toast.error("Failed to update clan", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to update clan", { description: errorMessage(e) });
         } finally {
             saving = false;
         }
@@ -361,8 +362,8 @@
             } else {
                 toast.error(errMsg(resp.error, "Failed to remove clan"));
             }
-        } catch (e: any) {
-            toast.error("Failed to remove clan", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to remove clan", { description: errorMessage(e) });
         } finally {
             removing = null;
         }

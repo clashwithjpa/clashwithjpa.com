@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import Input from "$lib/components/ui/Input.svelte";
     import type { ICellEditorParams } from "ag-grid-community";
 

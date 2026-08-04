@@ -4,8 +4,6 @@ import { statement } from "@repo/auth-shared";
 import { getUserFeatures } from "@repo/clashofclans-client";
 import { redirect } from "@sveltejs/kit";
 import type { Component } from "svelte";
-import type { LayoutLoad } from "./$types";
-
 import TablerAward from "~icons/tabler/award";
 import TablerBook2 from "~icons/tabler/book-2";
 import TablerFileDescription from "~icons/tabler/file-description";
@@ -19,6 +17,7 @@ import TablerSettings from "~icons/tabler/settings";
 import TablerShield from "~icons/tabler/shield";
 import TablerSwords from "~icons/tabler/swords";
 import TablerUser from "~icons/tabler/user";
+import type { LayoutLoad } from "./$types";
 
 export type FeatureFlag = "applicationsEnabled" | "cwlEnabled";
 

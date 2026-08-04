@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetWarTimelineClanTagGetQueryResponse,
+    GetWarTimelineClanTagGet422,
     GetWarTimelineClanTagGetPathParams,
     GetWarTimelineClanTagGetQueryParams,
-    GetWarTimelineClanTagGet422,
+    GetWarTimelineClanTagGetQueryResponse,
 } from "../models/GetWarTimelineClanTagGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetWarTimelineClanTagGetUrl(clan_tag: GetWarTimelineClanTagGetPathParams["clan_tag"]) {
     const res = { method: "GET", url: `/timeline/${clan_tag}` as const };

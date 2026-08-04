@@ -20,7 +20,7 @@
         describeAction,
         type AuditEntry,
     } from "$lib/config/auditLog";
-    import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
+    import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         getAuditLog,
         type GetAuditLogQueryParamsActionEnumKey,
@@ -88,8 +88,8 @@
             } else {
                 toast.error("Failed to load audit log");
             }
-        } catch (e: any) {
-            toast.error("Failed to load audit log", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load audit log", { description: errorMessage(e) });
         } finally {
             loading = false;
         }
@@ -123,8 +123,8 @@
             }
             selectedSidebarUser = { ...(data as UserWithRole), discordId: entry.actorDiscordId ?? undefined };
             userSidebar?.open(entry.actorId);
-        } catch (e: any) {
-            toast.error("Failed to load user", { description: e?.message });
+        } catch (e) {
+            toast.error("Failed to load user", { description: errorMessage(e) });
         } finally {
             openingEntryId = null;
         }

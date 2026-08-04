@@ -9,10 +9,10 @@ import {
     getUserJoinTrend,
 } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
-import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
-import * as Sentry from "@sentry/bun";
-import { Hono } from "hono";
 import { describeRoute } from "@/lib/openapi";
+import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
+import * as Sentry from "@sentry/node";
+import { Hono } from "hono";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 

@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCOCClanQueryResponse, GetCOCClanPathParams, GetCOCClan500 } from "../models/GetCOCClan.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCClan } from "../clients/getCOCClan.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCClan } from "../clients/getCOCClan.ts";
+import type { GetCOCClan500, GetCOCClanPathParams, GetCOCClanQueryResponse } from "../models/GetCOCClan.ts";
 
 export const getCOCClanQueryKey = (tag: GetCOCClanPathParams["tag"]) => [{ url: "/coc/clan/:tag", params: { tag: tag } }] as const;
 

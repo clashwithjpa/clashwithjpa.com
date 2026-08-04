@@ -1,0 +1,19 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  "@sentry/cli": true
+  es5-ext: true
+  esbuild: true
+
+# better-auth 1.5.5 declares `permission: z.undefined()` in its has-permission
+# body schema. zod >= 4.4 treats z.undefined() as nonoptional, so a request that
+# simply omits the key is rejected as "[body] Invalid input". Bun resolved 4.3.6;
+# pin it so the transitive copy matches.
+overrides:
+  zod: 4.3.6
+  # 1.6.x changes the admin access-control types so the custom `jpa` statement
+  # is rejected. Keep core and the api-key plugin on the same exact version —
+  # under pnpm's strict layout a split resolves them to two incompatible copies.
+  better-auth: 1.5.5
+  "@better-auth/api-key": 1.5.5

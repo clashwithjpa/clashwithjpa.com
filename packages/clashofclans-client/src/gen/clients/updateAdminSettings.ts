@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateAdminSettingsMutationRequest,
-    UpdateAdminSettingsMutationResponse,
     UpdateAdminSettings401,
     UpdateAdminSettings500,
+    UpdateAdminSettingsMutationRequest,
+    UpdateAdminSettingsMutationResponse,
 } from "../models/UpdateAdminSettings.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateAdminSettingsUrl() {
     const res = { method: "PUT", url: `/admin/settings` as const };

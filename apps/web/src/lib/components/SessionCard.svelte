@@ -1,19 +1,11 @@
 <script lang="ts">
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { formatDateTime, formatRelativeTime } from "$lib/utils";
     import { UAParser } from "ua-parser-js";
-
-    import TablerCalendarClock from "~icons/tabler/calendar-clock";
-    import TablerCalendarX from "~icons/tabler/calendar-x";
-    import TablerClock from "~icons/tabler/clock";
-    import TablerDeviceDesktop from "~icons/tabler/device-desktop";
-    import TablerDeviceMobile from "~icons/tabler/device-mobile";
-    import TablerPointFilled from "~icons/tabler/point-filled";
-    import TablerTrash from "~icons/tabler/trash";
-
     import LogosChrome from "~icons/logos/chrome";
     import LogosFirefox from "~icons/logos/firefox";
     import LogosInternetexplorer from "~icons/logos/internetexplorer";
@@ -22,6 +14,13 @@
     import LogosSafari from "~icons/logos/safari";
     import LogosVivaldiIcon from "~icons/logos/vivaldi-icon";
     import TablerBrowser from "~icons/tabler/browser";
+    import TablerCalendarClock from "~icons/tabler/calendar-clock";
+    import TablerCalendarX from "~icons/tabler/calendar-x";
+    import TablerClock from "~icons/tabler/clock";
+    import TablerDeviceDesktop from "~icons/tabler/device-desktop";
+    import TablerDeviceMobile from "~icons/tabler/device-mobile";
+    import TablerPointFilled from "~icons/tabler/point-filled";
+    import TablerTrash from "~icons/tabler/trash";
 
     let {
         sessionData,

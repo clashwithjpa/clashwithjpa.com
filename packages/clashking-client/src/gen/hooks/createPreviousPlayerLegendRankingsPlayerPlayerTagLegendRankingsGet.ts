@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { previousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet } from "../clients/previousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet.ts";
 import type {
-    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryResponse,
+    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet422,
     PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetPathParams,
     PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryParams,
-    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet422,
+    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryResponse,
 } from "../models/PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { previousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet } from "../clients/previousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const previousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryKey = (
     player_tag: PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetPathParams["player_tag"],

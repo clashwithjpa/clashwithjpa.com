@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type {
-    CreateCwlSeasonMutationRequest,
-    CreateCwlSeasonMutationResponse,
-    CreateCwlSeason401,
-    CreateCwlSeason500,
-} from "../models/CreateCwlSeason.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { createCwlSeason } from "../clients/createCwlSeason.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { createCwlSeason } from "../clients/createCwlSeason.ts";
+import type {
+    CreateCwlSeason401,
+    CreateCwlSeason500,
+    CreateCwlSeasonMutationRequest,
+    CreateCwlSeasonMutationResponse,
+} from "../models/CreateCwlSeason.ts";
 
 export const createCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons" }] as const;
 

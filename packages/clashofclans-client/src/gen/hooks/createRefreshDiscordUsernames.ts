@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { refreshDiscordUsernames } from "../clients/refreshDiscordUsernames.ts";
 import type {
-    RefreshDiscordUsernamesMutationResponse,
     RefreshDiscordUsernames401,
     RefreshDiscordUsernames500,
     RefreshDiscordUsernames503,
+    RefreshDiscordUsernamesMutationResponse,
 } from "../models/RefreshDiscordUsernames.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { refreshDiscordUsernames } from "../clients/refreshDiscordUsernames.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const refreshDiscordUsernamesMutationKey = () => [{ url: "/admin/refresh-discord-usernames" }] as const;
 

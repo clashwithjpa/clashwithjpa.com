@@ -1,4 +1,3 @@
-#!/usr/bin/env bun
 /**
  *
  * Tables (see apps/server/src/lib/db/schema/coc.ts):
@@ -19,7 +18,22 @@
  *   CWL_PING_INTERVAL_MINUTES Gap between ping passes (default 30).
  *   CWL_PING_DRY_RUN          "1"/"true" to skip the Discord post (logs only).
  */
-import { SQL } from "bun";
+import { Pool } from "pg";
+
+/**
+ * Minimal tagged-template query helper over `pg`, mirroring the ergonomics of
+ * Bun's built-in `sql` tag: interpolated values become numbered placeholders
+ * so they stay parameterised rather than concatenated into the statement.
+ */
+type Sql = <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T[]>;
+
+function createSql(pool: Pool): Sql {
+    return async <T>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T[]> => {
+        const text = strings.reduce((acc, part, i) => acc + part + (i < values.length ? `$${i + 1}` : ""), "");
+        const result = await pool.query(text, values);
+        return result.rows as T[];
+    };
+}
 
 function requireEnv(name: string): string {
     const value = process.env[name];
@@ -180,7 +194,7 @@ interface AppRow {
     assigned_to: string;
 }
 
-async function resolveSeasonId(sql: SQL): Promise<number | null> {
+async function resolveSeasonId(sql: Sql): Promise<number | null> {
     const settings = (await sql`
         SELECT current_cwl_season_id
         FROM settings_table
@@ -198,7 +212,7 @@ async function resolveSeasonId(sql: SQL): Promise<number | null> {
     return latest[0]?.id ?? null;
 }
 
-async function runOnce(sql: SQL) {
+async function runOnce(sql: Sql) {
     const seasonId = await resolveSeasonId(sql);
     if (seasonId == null) {
         log("No current CWL season configured and no seasons exist. Nothing to do.");
@@ -276,7 +290,8 @@ async function main() {
 
     log(`CWL Ping starting — ${config.pingCount} ping pass(es), ${config.intervalMinutes}m apart` + `${config.dryRun ? " (DRY RUN)" : ""}.`);
 
-    const sql = new SQL(config.databaseUrl);
+    const pool = new Pool({ connectionString: config.databaseUrl });
+    const sql = createSql(pool);
 
     try {
         for (let run = 1; run <= config.pingCount; run++) {
@@ -295,7 +310,7 @@ async function main() {
         }
         log("Schedule complete. Exiting.");
     } finally {
-        await sql.end();
+        await pool.end();
     }
 }
 

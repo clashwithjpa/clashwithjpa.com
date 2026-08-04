@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SetUserApiAccessMutationRequest,
-    SetUserApiAccessMutationResponse,
-    SetUserApiAccessPathParams,
     SetUserApiAccess401,
     SetUserApiAccess404,
     SetUserApiAccess500,
+    SetUserApiAccessMutationRequest,
+    SetUserApiAccessMutationResponse,
+    SetUserApiAccessPathParams,
 } from "../models/SetUserApiAccess.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSetUserApiAccessUrl(userid: SetUserApiAccessPathParams["userid"]) {
     const res = { method: "PUT", url: `/admin/users/${userid}/api-access` as const };

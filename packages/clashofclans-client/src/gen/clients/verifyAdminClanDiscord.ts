@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    VerifyAdminClanDiscordMutationRequest,
-    VerifyAdminClanDiscordMutationResponse,
     VerifyAdminClanDiscord401,
     VerifyAdminClanDiscord500,
     VerifyAdminClanDiscord503,
+    VerifyAdminClanDiscordMutationRequest,
+    VerifyAdminClanDiscordMutationResponse,
 } from "../models/VerifyAdminClanDiscord.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getVerifyAdminClanDiscordUrl() {
     const res = { method: "POST", url: `/admin/clans/verify-discord` as const };

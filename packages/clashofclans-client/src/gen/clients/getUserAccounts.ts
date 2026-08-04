@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetUserAccountsQueryResponse, GetUserAccounts401, GetUserAccounts500 } from "../models/GetUserAccounts.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetUserAccounts401, GetUserAccounts500, GetUserAccountsQueryResponse } from "../models/GetUserAccounts.ts";
 
 function getGetUserAccountsUrl() {
     const res = { method: "GET", url: `/user/accounts` as const };

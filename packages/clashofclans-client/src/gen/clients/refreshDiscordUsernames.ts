@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    RefreshDiscordUsernamesMutationResponse,
     RefreshDiscordUsernames401,
     RefreshDiscordUsernames500,
     RefreshDiscordUsernames503,
+    RefreshDiscordUsernamesMutationResponse,
 } from "../models/RefreshDiscordUsernames.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getRefreshDiscordUsernamesUrl() {
     const res = { method: "POST", url: `/admin/refresh-discord-usernames` as const };

@@ -4,15 +4,15 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    UpdateCocAccountExternalMutationRequest,
-    UpdateCocAccountExternalMutationResponse,
-    UpdateCocAccountExternalPathParams,
     UpdateCocAccountExternal401,
     UpdateCocAccountExternal404,
     UpdateCocAccountExternal500,
+    UpdateCocAccountExternalMutationRequest,
+    UpdateCocAccountExternalMutationResponse,
+    UpdateCocAccountExternalPathParams,
 } from "../models/UpdateCocAccountExternal.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getUpdateCocAccountExternalUrl(id: UpdateCocAccountExternalPathParams["id"]) {
     const res = { method: "PUT", url: `/admin/coc-accounts/${id}/external` as const };

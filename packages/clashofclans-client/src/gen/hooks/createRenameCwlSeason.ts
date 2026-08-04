@@ -3,19 +3,19 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { renameCwlSeason } from "../clients/renameCwlSeason.ts";
 import type {
-    RenameCwlSeasonMutationRequest,
-    RenameCwlSeasonMutationResponse,
-    RenameCwlSeasonPathParams,
     RenameCwlSeason401,
     RenameCwlSeason404,
     RenameCwlSeason409,
     RenameCwlSeason500,
+    RenameCwlSeasonMutationRequest,
+    RenameCwlSeasonMutationResponse,
+    RenameCwlSeasonPathParams,
 } from "../models/RenameCwlSeason.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { renameCwlSeason } from "../clients/renameCwlSeason.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const renameCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons/:id" }] as const;
 

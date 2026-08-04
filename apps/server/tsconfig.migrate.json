@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "outDir": "dist",
+        "rootDir": "scripts"
+    },
+    "include": ["scripts/migrate-prod.ts"],
+    "exclude": ["node_modules", "dist"],
+    "tsc-alias": {
+        "resolveFullPaths": true
+    }
+}

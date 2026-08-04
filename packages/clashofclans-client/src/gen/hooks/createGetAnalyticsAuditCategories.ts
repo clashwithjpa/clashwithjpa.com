@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsAuditCategories } from "../clients/getAnalyticsAuditCategories.ts";
 import type {
-    GetAnalyticsAuditCategoriesQueryResponse,
     GetAnalyticsAuditCategories401,
     GetAnalyticsAuditCategories500,
+    GetAnalyticsAuditCategoriesQueryResponse,
 } from "../models/GetAnalyticsAuditCategories.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsAuditCategories } from "../clients/getAnalyticsAuditCategories.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsAuditCategoriesQueryKey = () => [{ url: "/analytics/audit-categories" }] as const;
 

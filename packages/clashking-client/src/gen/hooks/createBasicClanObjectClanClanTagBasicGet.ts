@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    BasicClanObjectClanClanTagBasicGetQueryResponse,
-    BasicClanObjectClanClanTagBasicGetPathParams,
-    BasicClanObjectClanClanTagBasicGet422,
-} from "../models/BasicClanObjectClanClanTagBasicGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { basicClanObjectClanClanTagBasicGet } from "../clients/basicClanObjectClanClanTagBasicGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { basicClanObjectClanClanTagBasicGet } from "../clients/basicClanObjectClanClanTagBasicGet.ts";
+import type {
+    BasicClanObjectClanClanTagBasicGet422,
+    BasicClanObjectClanClanTagBasicGetPathParams,
+    BasicClanObjectClanClanTagBasicGetQueryResponse,
+} from "../models/BasicClanObjectClanClanTagBasicGet.ts";
 
 export const basicClanObjectClanClanTagBasicGetQueryKey = (clan_tag: BasicClanObjectClanClanTagBasicGetPathParams["clan_tag"]) =>
     [{ url: "/clan/:clan_tag/basic", params: { clan_tag: clan_tag } }] as const;

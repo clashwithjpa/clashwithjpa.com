@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    DeleteAdminCwlClanMutationResponse,
-    DeleteAdminCwlClanPathParams,
     DeleteAdminCwlClan401,
     DeleteAdminCwlClan404,
     DeleteAdminCwlClan500,
+    DeleteAdminCwlClanMutationResponse,
+    DeleteAdminCwlClanPathParams,
 } from "../models/DeleteAdminCwlClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getDeleteAdminCwlClanUrl(tag: DeleteAdminCwlClanPathParams["tag"]) {
     const res = { method: "DELETE", url: `/admin/cwl-clans/${tag}` as const };

@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { verifyAdminClanDiscord } from "../clients/verifyAdminClanDiscord.ts";
 import type {
-    VerifyAdminClanDiscordMutationRequest,
-    VerifyAdminClanDiscordMutationResponse,
     VerifyAdminClanDiscord401,
     VerifyAdminClanDiscord500,
     VerifyAdminClanDiscord503,
+    VerifyAdminClanDiscordMutationRequest,
+    VerifyAdminClanDiscordMutationResponse,
 } from "../models/VerifyAdminClanDiscord.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { verifyAdminClanDiscord } from "../clients/verifyAdminClanDiscord.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const verifyAdminClanDiscordMutationKey = () => [{ url: "/admin/clans/verify-discord" }] as const;
 

@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetQueryResponse } from "../models/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet } from "../clients/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet } from "../clients/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
+import type { _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetQueryResponse } from "../models/_1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGet.ts";
 
 export const _1PlayerForEachMonthInLegendsSinceTheBeginningLegendsEosWinnersGetQueryKey = () => [{ url: "/legends/eos-winners" }] as const;
 

@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetQueryResponse,
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams,
-    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet422,
-} from "../models/AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet422,
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams,
+    AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetQueryResponse,
+} from "../models/AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGet.ts";
 
 function getAllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetUrl(
     player_tag: AllCollectedStatsForAPlayerClanGamesLootedActivityEtcPlayerPlayerTagStatsGetPathParams["player_tag"],

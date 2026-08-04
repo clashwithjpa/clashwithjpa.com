@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { syncCocAccounts } from "../clients/syncCocAccounts.ts";
 import type {
-    SyncCocAccountsMutationRequest,
-    SyncCocAccountsMutationResponse,
     SyncCocAccounts400,
     SyncCocAccounts401,
     SyncCocAccounts500,
+    SyncCocAccountsMutationRequest,
+    SyncCocAccountsMutationResponse,
 } from "../models/SyncCocAccounts.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { syncCocAccounts } from "../clients/syncCocAccounts.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const syncCocAccountsMutationKey = () => [{ url: "/admin/coc-accounts/sync" }] as const;
 

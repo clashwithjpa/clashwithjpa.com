@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    GetWarTimelineClanTagTimestampGetQueryResponse,
-    GetWarTimelineClanTagTimestampGetPathParams,
-    GetWarTimelineClanTagTimestampGet422,
-} from "../models/GetWarTimelineClanTagTimestampGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getWarTimelineClanTagTimestampGet } from "../clients/getWarTimelineClanTagTimestampGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getWarTimelineClanTagTimestampGet } from "../clients/getWarTimelineClanTagTimestampGet.ts";
+import type {
+    GetWarTimelineClanTagTimestampGet422,
+    GetWarTimelineClanTagTimestampGetPathParams,
+    GetWarTimelineClanTagTimestampGetQueryResponse,
+} from "../models/GetWarTimelineClanTagTimestampGet.ts";
 
 export const getWarTimelineClanTagTimestampGetQueryKey = (
     clan_tag: GetWarTimelineClanTagTimestampGetPathParams["clan_tag"],

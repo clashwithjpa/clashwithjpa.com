@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { auditLogTable } from "@/lib/db/schema";
 import type { AppEnv } from "@/lib/types";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import type { Context } from "hono";
 
 export const AUDIT_ACTIONS = [

@@ -3,6 +3,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
     import { toast } from "svelte-sonner";
@@ -100,8 +101,8 @@
                     toast.error("Failed to submit application");
                 }
             }
-        } catch (err: any) {
-            toast.error(err?.message || "Failed to submit application");
+        } catch (err) {
+            toast.error(errorMessage(err) || "Failed to submit application");
             console.error("Submit error:", err);
         } finally {
             captchaToken = null;

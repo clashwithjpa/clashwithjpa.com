@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { apikey, apiKeyUsageTable } from "@/lib/db/schema";
 import type { AppEnv } from "@/lib/types";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { lt, sql } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
 import { routePath } from "hono/route";

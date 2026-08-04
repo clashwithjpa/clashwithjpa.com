@@ -1,30 +1,31 @@
 {
-	"name": "@repo/prettier-config",
-	"version": "0.0.0",
-	"description": "Shared Prettier configuration for the monorepo",
-	"type": "module",
-	"exports": {
-		".": "./index.js",
-		"./svelte-tailwind": "./svelte-tailwind.js"
-	},
-	"license": "MIT",
-	"publishConfig": {
-		"access": "public"
-	},
-	"dependencies": {
-		"prettier-plugin-svelte": "^3.4.1",
-		"prettier-plugin-tailwindcss": "^0.7.2"
-	},
-	"peerDependencies": {
-		"prettier": "^3.8.0"
-	},
-	"devDependencies": {
-		"prettier": "^3.8.1"
-	},
-	"keywords": [
-		"prettier",
-		"config",
-		"svelte",
-		"tailwindcss"
-	]
+    "name": "@repo/prettier-config",
+    "version": "0.0.0",
+    "description": "Shared Prettier configuration for the monorepo",
+    "keywords": [
+        "prettier",
+        "config",
+        "svelte",
+        "tailwindcss"
+    ],
+    "license": "MIT",
+    "type": "module",
+    "exports": {
+        ".": "./index.js",
+        "./svelte-tailwind": "./svelte-tailwind.js"
+    },
+    "dependencies": {
+        "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+        "prettier-plugin-svelte": "^4.1.1",
+        "prettier-plugin-tailwindcss": "^0.8.1"
+    },
+    "devDependencies": {
+        "prettier": "^3.9.6"
+    },
+    "peerDependencies": {
+        "prettier": "^3.9.6"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
 }

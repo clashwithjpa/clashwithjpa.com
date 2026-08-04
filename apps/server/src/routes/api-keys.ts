@@ -1,6 +1,6 @@
+import { logAction } from "@/lib/audit";
 import { auth, MAX_API_KEYS_PER_USER } from "@/lib/auth";
 import { isVerified } from "@/lib/auth/functions";
-import { logAction } from "@/lib/audit";
 import {
     countApiKeysForUser,
     getApiKeyUsageDaily,
@@ -10,11 +10,11 @@ import {
     getOwnedApiKey,
 } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { describeRoute } from "@/lib/openapi";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { jpaPermsForRole, jpaPermsUpTo, statement } from "@repo/auth-shared";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono, type Context } from "hono";
-import { describeRoute } from "@/lib/openapi";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 

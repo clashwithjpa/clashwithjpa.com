@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetCOCPlayerBattleLogQueryResponse,
-    GetCOCPlayerBattleLogPathParams,
-    GetCOCPlayerBattleLog500,
-} from "../models/GetCOCPlayerBattleLog.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    GetCOCPlayerBattleLog500,
+    GetCOCPlayerBattleLogPathParams,
+    GetCOCPlayerBattleLogQueryResponse,
+} from "../models/GetCOCPlayerBattleLog.ts";
 
 function getGetCOCPlayerBattleLogUrl(tag: GetCOCPlayerBattleLogPathParams["tag"]) {
     const res = { method: "GET", url: `/coc/player/${tag}/battlelog` as const };

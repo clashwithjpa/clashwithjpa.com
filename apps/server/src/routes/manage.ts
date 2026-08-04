@@ -1,12 +1,12 @@
-import { isManager } from "@/lib/auth/functions";
 import { logAction } from "@/lib/audit";
+import { isManager } from "@/lib/auth/functions";
 import { setRules } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { describeRoute } from "@/lib/openapi";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { Hono } from "hono";
-import { describeRoute } from "@/lib/openapi";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 

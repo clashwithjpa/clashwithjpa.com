@@ -140,7 +140,7 @@
             <p class="font-coc text-xs text-stone-700 md:text-sm">{activeMode.hint}</p>
         </div>
         <div class="flex justify-center gap-1 rounded-xl border border-black/10 bg-stone-900/10 p-1 inset-shadow-sm shadow-stone-900">
-            {#each modes as m}
+            {#each modes as m (m.id)}
                 <button
                     type="button"
                     onclick={() => (mode = m.id)}

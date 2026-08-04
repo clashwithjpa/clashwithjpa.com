@@ -11,8 +11,19 @@
             "outputs": ["dist/**", "build/**", ".svelte-kit/**"],
             "dependsOn": ["^build"]
         },
-        "format": {
+        "typecheck": {
+            "dependsOn": ["^build"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "lint:fix": {
+            "dependsOn": ["^lint:fix"],
             "cache": false
-        }
+        },
+        "//#format": {
+            "cache": false
+        },
+        "//#format:check": {}
     }
 }

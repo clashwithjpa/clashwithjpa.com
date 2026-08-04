@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryResponse,
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParams,
-    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet422,
-} from "../models/ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet422,
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryParams,
+    ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetQueryResponse,
+} from "../models/ListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGet.ts";
 
 function getListOfInGameItemsToCompleteLegendsWarRaidsEtcPlayerToDoGetUrl() {
     const res = { method: "GET", url: `/player/to-do` as const };

@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getApiKeyUsageStatus } from "../clients/getApiKeyUsageStatus.ts";
 import type {
-    GetApiKeyUsageStatusQueryResponse,
-    GetApiKeyUsageStatusQueryParams,
     GetApiKeyUsageStatus401,
     GetApiKeyUsageStatus404,
     GetApiKeyUsageStatus500,
+    GetApiKeyUsageStatusQueryParams,
+    GetApiKeyUsageStatusQueryResponse,
 } from "../models/GetApiKeyUsageStatus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getApiKeyUsageStatus } from "../clients/getApiKeyUsageStatus.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getApiKeyUsageStatusQueryKey = (params: GetApiKeyUsageStatusQueryParams) =>
     [{ url: "/api-keys/usage/status" }, ...(params ? [params] : [])] as const;

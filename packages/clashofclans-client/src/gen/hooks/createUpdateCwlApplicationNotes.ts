@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { updateCwlApplicationNotes } from "../clients/updateCwlApplicationNotes.ts";
 import type {
-    UpdateCwlApplicationNotesMutationRequest,
-    UpdateCwlApplicationNotesMutationResponse,
-    UpdateCwlApplicationNotesPathParams,
     UpdateCwlApplicationNotes401,
     UpdateCwlApplicationNotes404,
     UpdateCwlApplicationNotes500,
+    UpdateCwlApplicationNotesMutationRequest,
+    UpdateCwlApplicationNotesMutationResponse,
+    UpdateCwlApplicationNotesPathParams,
 } from "../models/UpdateCwlApplicationNotes.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { updateCwlApplicationNotes } from "../clients/updateCwlApplicationNotes.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const updateCwlApplicationNotesMutationKey = () => [{ url: "/admin/cwl-applications/:id/notes" }] as const;
 

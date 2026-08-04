@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryResponse,
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryParams,
-    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet422,
-} from "../models/StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { statsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet } from "../clients/statsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { statsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet } from "../clients/statsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
+import type {
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet422,
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryParams,
+    StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryResponse,
+} from "../models/StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGet.ts";
 
 export const statsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryKey = (
     params: StatsAboutCapitalLeaguesWeekendYYYYMMDDCapitalStatsLeaguesGetQueryParams,

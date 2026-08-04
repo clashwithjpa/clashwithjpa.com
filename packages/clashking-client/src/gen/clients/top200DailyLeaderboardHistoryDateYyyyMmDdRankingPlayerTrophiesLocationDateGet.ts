@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetQueryResponse,
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetPathParams,
-    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGet422,
-} from "../models/Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGet422,
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetPathParams,
+    Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetQueryResponse,
+} from "../models/Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGet.ts";
 
 function getTop200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetUrl(
     location: Top200DailyLeaderboardHistoryDateYyyyMmDdRankingPlayerTrophiesLocationDateGetPathParams["location"],

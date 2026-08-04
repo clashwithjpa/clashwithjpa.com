@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    SearchClansByFilteringClanSearchGetQueryResponse,
-    SearchClansByFilteringClanSearchGetQueryParams,
-    SearchClansByFilteringClanSearchGet422,
-} from "../models/SearchClansByFilteringClanSearchGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { searchClansByFilteringClanSearchGet } from "../clients/searchClansByFilteringClanSearchGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { searchClansByFilteringClanSearchGet } from "../clients/searchClansByFilteringClanSearchGet.ts";
+import type {
+    SearchClansByFilteringClanSearchGet422,
+    SearchClansByFilteringClanSearchGetQueryParams,
+    SearchClansByFilteringClanSearchGetQueryResponse,
+} from "../models/SearchClansByFilteringClanSearchGet.ts";
 
 export const searchClansByFilteringClanSearchGetQueryKey = (params?: SearchClansByFilteringClanSearchGetQueryParams) =>
     [{ url: "/clan/search" }, ...(params ? [params] : [])] as const;

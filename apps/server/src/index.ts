@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { isApiKeyAllowedPath } from "@/lib/api-access";
 import { apiUsageMiddleware } from "@/lib/api-usage";
 import { config } from "@/lib/config";
@@ -5,16 +6,16 @@ import { betterAuthMiddleware } from "@/lib/middlewares";
 import { describeRoute } from "@/lib/openapi";
 import { getCachedSettings } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
-import { compress } from "@hono/bun-compress";
+import { serve } from "@hono/node-server";
 import { auth } from "@lib/auth";
 import { Scalar } from "@scalar/hono-api-reference";
-import * as Sentry from "@sentry/bun";
-import { createHash } from "crypto";
+import * as Sentry from "@sentry/node";
 import "dotenv/config";
 import { Hono } from "hono";
 import { openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
 import { every } from "hono/combine";
+import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 import { createMiddleware } from "hono/factory";
@@ -270,7 +271,7 @@ app.get("/openapi.json", async (c) => {
 // matched first.
 app.get(
     "/",
-    Scalar((c) => {
+    Scalar(() => {
         return {
             pageTitle: "ClashWithJPA API Documentation",
             url: "/openapi.json",
@@ -294,5 +295,9 @@ app.get(
         };
     }),
 );
+
+serve({ fetch: app.fetch, port: config.PORT }, (info) => {
+    console.log(`Started server: http://localhost:${info.port}`);
+});
 
 export default app;

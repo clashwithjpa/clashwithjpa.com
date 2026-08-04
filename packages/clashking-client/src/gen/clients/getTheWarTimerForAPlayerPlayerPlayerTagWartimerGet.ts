@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetQueryResponse,
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams,
-    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet422,
-} from "../models/GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet422,
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams,
+    GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetQueryResponse,
+} from "../models/GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGet.ts";
 
 function getGetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetUrl(
     player_tag: GetTheWarTimerForAPlayerPlayerPlayerTagWartimerGetPathParams["player_tag"],

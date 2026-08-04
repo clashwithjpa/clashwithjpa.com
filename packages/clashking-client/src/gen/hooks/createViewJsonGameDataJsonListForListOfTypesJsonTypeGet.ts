@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetQueryResponse,
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams,
-    ViewJsonGameDataJsonListForListOfTypesJsonTypeGet422,
-} from "../models/ViewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { viewJsonGameDataJsonListForListOfTypesJsonTypeGet } from "../clients/viewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { viewJsonGameDataJsonListForListOfTypesJsonTypeGet } from "../clients/viewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
+import type {
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGet422,
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams,
+    ViewJsonGameDataJsonListForListOfTypesJsonTypeGetQueryResponse,
+} from "../models/ViewJsonGameDataJsonListForListOfTypesJsonTypeGet.ts";
 
 export const viewJsonGameDataJsonListForListOfTypesJsonTypeGetQueryKey = (
     type: ViewJsonGameDataJsonListForListOfTypesJsonTypeGetPathParams["type"],

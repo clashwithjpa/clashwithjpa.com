@@ -3,7 +3,7 @@
   Modified: Added code to the return type and the handler functions
 */
 
-import { DrizzleQueryError, DrizzleError } from "drizzle-orm";
+import { DrizzleError, DrizzleQueryError } from "drizzle-orm";
 import { DatabaseError } from "pg";
 
 type ErrorHandler = (error: DatabaseError) => { message: string; constraint: string | null; code: string | null };

@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetUserCwlApplicationsQueryResponse, GetUserCwlApplications401, GetUserCwlApplications500 } from "../models/GetUserCwlApplications.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetUserCwlApplications401, GetUserCwlApplications500, GetUserCwlApplicationsQueryResponse } from "../models/GetUserCwlApplications.ts";
 
 function getGetUserCwlApplicationsUrl() {
     const res = { method: "GET", url: `/user/cwl` as const };

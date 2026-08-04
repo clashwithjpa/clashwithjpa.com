@@ -6,7 +6,7 @@ import baseConfig from "./index.js";
  */
 const config = {
     ...baseConfig,
-    plugins: ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    plugins: ["prettier-plugin-svelte", "@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
     overrides: [
         {
             files: "*.svelte",

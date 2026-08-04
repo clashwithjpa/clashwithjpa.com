@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetApiKeyUsageStatusQueryResponse,
-    GetApiKeyUsageStatusQueryParams,
     GetApiKeyUsageStatus401,
     GetApiKeyUsageStatus404,
     GetApiKeyUsageStatus500,
+    GetApiKeyUsageStatusQueryParams,
+    GetApiKeyUsageStatusQueryResponse,
 } from "../models/GetApiKeyUsageStatus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetApiKeyUsageStatusUrl() {
     const res = { method: "GET", url: `/api-keys/usage/status` as const };

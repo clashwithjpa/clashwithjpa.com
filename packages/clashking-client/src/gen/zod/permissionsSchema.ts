@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { permissionsSplitSchema } from "./permissionsSplitSchema.ts";
 import { z } from "zod/v4";
+import { permissionsSplitSchema } from "./permissionsSplitSchema.ts";
 
 export const permissionsSchema = z.object({
     get rosters() {

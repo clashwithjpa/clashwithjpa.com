@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetGuildNicknamesQueryResponse, GetGuildNicknames401, GetGuildNicknames500 } from "../models/GetGuildNicknames.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetGuildNicknames401, GetGuildNicknames500, GetGuildNicknamesQueryResponse } from "../models/GetGuildNicknames.ts";
 
 function getGetGuildNicknamesUrl() {
     const res = { method: "GET", url: `/admin/guild-nicknames` as const };

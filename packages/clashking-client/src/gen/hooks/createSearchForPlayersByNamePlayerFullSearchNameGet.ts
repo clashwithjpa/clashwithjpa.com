@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { searchForPlayersByNamePlayerFullSearchNameGet } from "../clients/searchForPlayersByNamePlayerFullSearchNameGet.ts";
 import type {
-    SearchForPlayersByNamePlayerFullSearchNameGetQueryResponse,
+    SearchForPlayersByNamePlayerFullSearchNameGet422,
     SearchForPlayersByNamePlayerFullSearchNameGetPathParams,
     SearchForPlayersByNamePlayerFullSearchNameGetQueryParams,
-    SearchForPlayersByNamePlayerFullSearchNameGet422,
+    SearchForPlayersByNamePlayerFullSearchNameGetQueryResponse,
 } from "../models/SearchForPlayersByNamePlayerFullSearchNameGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { searchForPlayersByNamePlayerFullSearchNameGet } from "../clients/searchForPlayersByNamePlayerFullSearchNameGet.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const searchForPlayersByNamePlayerFullSearchNameGetQueryKey = (
     name: SearchForPlayersByNamePlayerFullSearchNameGetPathParams["name"],

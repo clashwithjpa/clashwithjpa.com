@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { ApplyCwlMutationRequest, ApplyCwlMutationResponse, ApplyCwl400, ApplyCwl401, ApplyCwl409, ApplyCwl500 } from "../models/ApplyCwl.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { ApplyCwl400, ApplyCwl401, ApplyCwl409, ApplyCwl500, ApplyCwlMutationRequest, ApplyCwlMutationResponse } from "../models/ApplyCwl.ts";
 
 function getApplyCwlUrl() {
     const res = { method: "POST", url: `/user/cwl/apply` as const };

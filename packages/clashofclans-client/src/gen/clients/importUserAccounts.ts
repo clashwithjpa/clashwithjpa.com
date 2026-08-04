@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { ImportUserAccountsMutationResponse, ImportUserAccounts401, ImportUserAccounts500 } from "../models/ImportUserAccounts.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { ImportUserAccounts401, ImportUserAccounts500, ImportUserAccountsMutationResponse } from "../models/ImportUserAccounts.ts";
 
 function getImportUserAccountsUrl() {
     const res = { method: "POST", url: `/user/accounts/import` as const };

@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 import { z } from "zod/v4";
+import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 
 export const liveLegendRankingsRankingLiveLegendsGetQueryParamsSchema = z.object({
     top_ranking: z.coerce.number().int().default(1),

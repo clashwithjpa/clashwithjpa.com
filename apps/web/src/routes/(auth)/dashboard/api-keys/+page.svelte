@@ -7,8 +7,8 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { SELECTABLE_SCOPES, type ApiKeyRow } from "$lib/config/apiKeys";
     import { formatRelativeTime } from "$lib/utils";
     import { type JpaPermission } from "@repo/auth-shared";
@@ -32,9 +32,6 @@
     // The generated client types only the 200 body, but returns whatever the
     // server sent — a refusal arrives as a value, not a throw.
     type CreateApiKeyResult = CreateApiKey200 | CreateApiKey403;
-    const SAMPLE_URL = `${PUBLIC_SERVER_URL}/coc/jpa/clans`;
-    const SAMPLE_REQUEST = `curl -H "x-api-key: jpa_****" \\\n  ${SAMPLE_URL}`;
-    const SAMPLE_REQUEST_FLAT = `curl -H "x-api-key: jpa_****" ${SAMPLE_URL}`;
 
     let keys = $state<ApiKeyRow[] | null>(null);
     let loading = $state(true);
@@ -46,7 +43,6 @@
     // it closes itself, and an unbound value drifts and never reopens.
     let revealOpen = $state(false);
     let copied = $state(false);
-    let sampleCopied = $state(false);
 
     let statsSidebar = $state<Sidebar | null>(null);
     let createSidebar = $state<Sidebar | null>(null);
@@ -139,14 +135,6 @@
         toast.success("API key copied to clipboard");
         setTimeout(() => {
             copied = false;
-        }, 2000);
-    }
-
-    async function copySample() {
-        await navigator.clipboard.writeText(SAMPLE_REQUEST_FLAT);
-        sampleCopied = true;
-        setTimeout(() => {
-            sampleCopied = false;
         }, 2000);
     }
 

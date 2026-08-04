@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { deleteCwlSeason } from "../clients/deleteCwlSeason.ts";
 import type {
-    DeleteCwlSeasonMutationResponse,
-    DeleteCwlSeasonPathParams,
     DeleteCwlSeason401,
     DeleteCwlSeason404,
     DeleteCwlSeason500,
+    DeleteCwlSeasonMutationResponse,
+    DeleteCwlSeasonPathParams,
 } from "../models/DeleteCwlSeason.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteCwlSeason } from "../clients/deleteCwlSeason.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const deleteCwlSeasonMutationKey = () => [{ url: "/admin/cwl-seasons/:id" }] as const;
 

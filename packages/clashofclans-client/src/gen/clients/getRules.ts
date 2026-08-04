@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetRulesQueryResponse, GetRules500 } from "../models/GetRules.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetRules500, GetRulesQueryResponse } from "../models/GetRules.ts";
 
 function getGetRulesUrl() {
     const res = { method: "GET", url: `/rules` as const };

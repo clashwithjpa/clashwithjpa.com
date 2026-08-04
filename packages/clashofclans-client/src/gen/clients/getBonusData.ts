@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetBonusDataQueryResponse, GetBonusDataQueryParams, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetBonusData401, GetBonusData500, GetBonusDataQueryParams, GetBonusDataQueryResponse } from "../models/GetBonusData.ts";
 
 function getGetBonusDataUrl() {
     const res = { method: "GET", url: `/admin/bonus` as const };

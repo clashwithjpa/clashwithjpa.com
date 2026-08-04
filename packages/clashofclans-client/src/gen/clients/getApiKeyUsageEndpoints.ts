@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetApiKeyUsageEndpointsQueryResponse,
-    GetApiKeyUsageEndpointsQueryParams,
     GetApiKeyUsageEndpoints401,
     GetApiKeyUsageEndpoints404,
     GetApiKeyUsageEndpoints500,
+    GetApiKeyUsageEndpointsQueryParams,
+    GetApiKeyUsageEndpointsQueryResponse,
 } from "../models/GetApiKeyUsageEndpoints.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetApiKeyUsageEndpointsUrl() {
     const res = { method: "GET", url: `/api-keys/usage/endpoints` as const };

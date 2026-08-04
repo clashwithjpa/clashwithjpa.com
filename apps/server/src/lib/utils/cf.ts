@@ -12,7 +12,7 @@ export async function verifyTurnstileToken(token: string): Promise<boolean> {
         });
         const data = (await response.json()) as { success: boolean };
         return data.success;
-    } catch (error) {
+    } catch {
         return false;
     }
 }

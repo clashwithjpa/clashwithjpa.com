@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { deleteCocAccount } from "../clients/deleteCocAccount.ts";
 import type {
-    DeleteCocAccountMutationResponse,
-    DeleteCocAccountPathParams,
     DeleteCocAccount401,
     DeleteCocAccount404,
     DeleteCocAccount500,
+    DeleteCocAccountMutationResponse,
+    DeleteCocAccountPathParams,
 } from "../models/DeleteCocAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteCocAccount } from "../clients/deleteCocAccount.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const deleteCocAccountMutationKey = () => [{ url: "/admin/coc-accounts/:id" }] as const;
 

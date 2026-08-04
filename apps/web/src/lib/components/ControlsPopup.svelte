@@ -192,58 +192,56 @@
             </div>
         {/snippet}
 
-        {#snippet children()}
-            {#if isImpersonating}
-                <Button
-                    tooltip={`Stop impersonating ${$session.data?.user.name ?? "user"}`}
-                    variant="orange"
-                    class="size-12 rounded-full"
-                    size=""
-                    disabled={stoppingImpersonation}
-                    onclick={stopImpersonating}
-                >
-                    <TablerSpyOff class="size-6" />
-                </Button>
-            {/if}
-
-            <ConfirmationDialog
-                title="Clear Site Cache"
-                description="Are you sure you want to clear the website cache and reload? You may need to log back in."
-                confirmText="Clear Cache"
-                onConfirm={clearSiteCache}
+        {#if isImpersonating}
+            <Button
+                tooltip={`Stop impersonating ${$session.data?.user.name ?? "user"}`}
+                variant="orange"
+                class="size-12 rounded-full"
+                size=""
+                disabled={stoppingImpersonation}
+                onclick={stopImpersonating}
             >
-                <Button tooltip="Clear Website Cache" class="size-12 rounded-full" size="">
-                    <TablerTrash class="size-6" />
-                </Button>
-            </ConfirmationDialog>
-
-            <CustomizePopup />
-
-            <Button tooltip="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
-                {#if isFullscreen}
-                    <TablerMinimize class="size-6" />
-                {:else}
-                    <TablerMaximize class="size-6" />
-                {/if}
+                <TablerSpyOff class="size-6" />
             </Button>
+        {/if}
 
-            {#if hasVideo}
-                <Button tooltip="Toggle Background Video" class="size-12 rounded-full" size="" onclick={toggleVideo}>
-                    {#if isVideoPlaying}
-                        <TablerPlayerPause class="size-6" />
-                    {:else}
-                        <TablerPlayerPlay class="size-6" />
-                    {/if}
-                </Button>
+        <ConfirmationDialog
+            title="Clear Site Cache"
+            description="Are you sure you want to clear the website cache and reload? You may need to log back in."
+            confirmText="Clear Cache"
+            onConfirm={clearSiteCache}
+        >
+            <Button tooltip="Clear Website Cache" class="size-12 rounded-full" size="">
+                <TablerTrash class="size-6" />
+            </Button>
+        </ConfirmationDialog>
+
+        <CustomizePopup />
+
+        <Button tooltip="Toggle Fullscreen" class="size-12 rounded-full" size="" onclick={toggleFullscreen}>
+            {#if isFullscreen}
+                <TablerMinimize class="size-6" />
+            {:else}
+                <TablerMaximize class="size-6" />
             {/if}
+        </Button>
 
-            <Button tooltip="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
-                {#if isMusicPlaying}
-                    <TablerMusic class="size-6 animate-spin animation-duration-8000" />
+        {#if hasVideo}
+            <Button tooltip="Toggle Background Video" class="size-12 rounded-full" size="" onclick={toggleVideo}>
+                {#if isVideoPlaying}
+                    <TablerPlayerPause class="size-6" />
                 {:else}
-                    <TablerMusicOff class="size-6" />
+                    <TablerPlayerPlay class="size-6" />
                 {/if}
             </Button>
-        {/snippet}
+        {/if}
+
+        <Button tooltip="Toggle Lofi Music" class="size-12 rounded-full" size="" onclick={toggleMusic}>
+            {#if isMusicPlaying}
+                <TablerMusic class="size-6 animate-spin animation-duration-8000" />
+            {:else}
+                <TablerMusicOff class="size-6" />
+            {/if}
+        </Button>
     </RawPopup>
 </div>

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    LiveLegendRankingsRankingLiveLegendsGetQueryResponse,
-    LiveLegendRankingsRankingLiveLegendsGetQueryParams,
-    LiveLegendRankingsRankingLiveLegendsGet422,
-} from "../models/LiveLegendRankingsRankingLiveLegendsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { liveLegendRankingsRankingLiveLegendsGet } from "../clients/liveLegendRankingsRankingLiveLegendsGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { liveLegendRankingsRankingLiveLegendsGet } from "../clients/liveLegendRankingsRankingLiveLegendsGet.ts";
+import type {
+    LiveLegendRankingsRankingLiveLegendsGet422,
+    LiveLegendRankingsRankingLiveLegendsGetQueryParams,
+    LiveLegendRankingsRankingLiveLegendsGetQueryResponse,
+} from "../models/LiveLegendRankingsRankingLiveLegendsGet.ts";
 
 export const liveLegendRankingsRankingLiveLegendsGetQueryKey = (params?: LiveLegendRankingsRankingLiveLegendsGetQueryParams) =>
     [{ url: "/ranking/live/legends" }, ...(params ? [params] : [])] as const;

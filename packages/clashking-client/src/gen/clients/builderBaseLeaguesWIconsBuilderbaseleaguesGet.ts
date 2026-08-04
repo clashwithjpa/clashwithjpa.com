@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { BuilderBaseLeaguesWIconsBuilderbaseleaguesGetQueryResponse } from "../models/BuilderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { BuilderBaseLeaguesWIconsBuilderbaseleaguesGetQueryResponse } from "../models/BuilderBaseLeaguesWIconsBuilderbaseleaguesGet.ts";
 
 function getBuilderBaseLeaguesWIconsBuilderbaseleaguesGetUrl() {
     const res = { method: "GET", url: `/builderbaseleagues` as const };

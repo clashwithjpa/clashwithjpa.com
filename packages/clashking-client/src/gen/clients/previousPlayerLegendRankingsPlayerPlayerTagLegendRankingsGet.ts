@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryResponse,
+    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet422,
     PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetPathParams,
     PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryParams,
-    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet422,
+    PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetQueryResponse,
 } from "../models/PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getPreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetUrl(
     player_tag: PreviousPlayerLegendRankingsPlayerPlayerTagLegendRankingsGetPathParams["player_tag"],

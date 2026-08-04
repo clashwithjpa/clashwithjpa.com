@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCwlApplications } from "../clients/getCwlApplications.ts";
 import type {
-    GetCwlApplicationsQueryResponse,
-    GetCwlApplicationsQueryParams,
     GetCwlApplications401,
     GetCwlApplications500,
+    GetCwlApplicationsQueryParams,
+    GetCwlApplicationsQueryResponse,
 } from "../models/GetCwlApplications.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCwlApplications } from "../clients/getCwlApplications.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getCwlApplicationsQueryKey = (params?: GetCwlApplicationsQueryParams) =>
     [{ url: "/admin/cwl-applications" }, ...(params ? [params] : [])] as const;

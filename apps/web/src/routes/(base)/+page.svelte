@@ -54,7 +54,7 @@
 
     <!-- HERO -->
     <section class="relative flex min-h-[calc(100dvh-5rem)] flex-col items-center justify-center gap-6 px-4 py-16 text-center">
-        {#each floatingSprites as sprite}
+        {#each floatingSprites as sprite (sprite.src)}
             <img
                 src="/sprites/{sprite.src}.webp"
                 alt=""
@@ -66,7 +66,7 @@
         <H1 class="text-5xl font-bold md:text-7xl lg:text-8xl">
             <span class="animate-in duration-800 ease-glide fill-mode-both fade-in">Clash With</span>
             <span class="inline-flex">
-                {#each "JPA" as char, i}
+                {#each "JPA" as char, i (i)}
                     <span class="inline-block overflow-hidden">
                         <span class="glide-char inline-block" style="--i:{i}">{char}</span>
                     </span>
@@ -119,7 +119,7 @@
                     <h2 class="font-coc text-3xl font-black text-stone-100 md:text-5xl">Built for war-farmers</h2>
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {#each features as feature}
+                    {#each features as feature (feature.title)}
                         <CocCard variant="dark" class="h-full" contentClass="flex flex-col gap-3 p-5">
                             <Icon name={feature.icon} class="size-14 drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]" />
                             <h3 class="font-coc text-lg font-black text-stone-900">{feature.title}</h3>

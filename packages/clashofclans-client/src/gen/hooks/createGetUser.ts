@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetUserQueryResponse, GetUser401, GetUser500 } from "../models/GetUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getUser } from "../clients/getUser.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getUser } from "../clients/getUser.ts";
+import type { GetUser401, GetUser500, GetUserQueryResponse } from "../models/GetUser.ts";
 
 export const getUserQueryKey = () => [{ url: "/user" }] as const;
 

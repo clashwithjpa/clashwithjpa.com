@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminSettingsQueryResponse, GetAdminSettings401, GetAdminSettings500 } from "../models/GetAdminSettings.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetAdminSettings401, GetAdminSettings500, GetAdminSettingsQueryResponse } from "../models/GetAdminSettings.ts";
 
 function getGetAdminSettingsUrl() {
     const res = { method: "GET", url: `/admin/settings` as const };

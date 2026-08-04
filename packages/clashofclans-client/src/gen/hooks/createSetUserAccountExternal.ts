@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { setUserAccountExternal } from "../clients/setUserAccountExternal.ts";
 import type {
-    SetUserAccountExternalMutationResponse,
-    SetUserAccountExternalPathParams,
     SetUserAccountExternal401,
     SetUserAccountExternal404,
     SetUserAccountExternal500,
+    SetUserAccountExternalMutationResponse,
+    SetUserAccountExternalPathParams,
 } from "../models/SetUserAccountExternal.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { setUserAccountExternal } from "../clients/setUserAccountExternal.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const setUserAccountExternalMutationKey = () => [{ url: "/user/accounts/:id/external" }] as const;
 

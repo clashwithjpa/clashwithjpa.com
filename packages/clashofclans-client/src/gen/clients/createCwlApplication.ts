@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    CreateCwlApplicationMutationRequest,
-    CreateCwlApplicationMutationResponse,
     CreateCwlApplication400,
     CreateCwlApplication401,
     CreateCwlApplication404,
     CreateCwlApplication409,
     CreateCwlApplication500,
+    CreateCwlApplicationMutationRequest,
+    CreateCwlApplicationMutationResponse,
 } from "../models/CreateCwlApplication.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getCreateCwlApplicationUrl() {
     const res = { method: "POST", url: `/admin/cwl-applications` as const };

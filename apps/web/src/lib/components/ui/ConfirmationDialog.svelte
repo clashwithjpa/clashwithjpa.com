@@ -19,7 +19,7 @@
         class: className = "",
     }: {
         open?: boolean;
-        children: Snippet;
+        children?: Snippet;
         title: string;
         description: string;
         confirmText?: string;
@@ -51,7 +51,7 @@
     <MobileDrawer bind:open {title}>
         {#snippet trigger()}
             <div class={cn("m-0 flex cursor-pointer items-center justify-center border-none bg-transparent p-0 outline-none", className)}>
-                {@render children()}
+                {@render children?.()}
             </div>
         {/snippet}
         <div class="flex flex-col gap-4">
@@ -67,7 +67,7 @@
 {:else}
     <Dialog.Root bind:open>
         <Dialog.Trigger class={cn("m-0 flex cursor-pointer items-center justify-center border-none bg-transparent p-0 outline-none", className)}>
-            {@render children()}
+            {@render children?.()}
         </Dialog.Trigger>
         <Portal>
             <Dialog.Backdrop

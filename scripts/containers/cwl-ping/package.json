@@ -3,12 +3,18 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dry-run": "CWL_PING_DRY_RUN=1 bun run main.ts",
-        "start": "bun run main.ts",
-        "typecheck": "bunx tsc --noEmit"
+        "build": "tsc",
+        "dry-run": "CWL_PING_DRY_RUN=1 tsx main.ts",
+        "start": "node dist/main.js",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "pg": "^8.22.0"
     },
     "devDependencies": {
-        "@types/bun": "latest",
-        "typescript": "^5.9.3"
+        "@types/node": "^26.1.2",
+        "@types/pg": "^8.20.3",
+        "tsx": "^4.23.1",
+        "typescript": "^6.0.3"
     }
 }

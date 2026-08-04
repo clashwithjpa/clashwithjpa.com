@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryResponse,
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryParams,
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet422,
-} from "../models/CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { capitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet } from "../clients/capitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { capitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet } from "../clients/capitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
+import type {
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet422,
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryParams,
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryResponse,
+} from "../models/CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
 
 export const capitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryKey = (
     params: CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryParams,

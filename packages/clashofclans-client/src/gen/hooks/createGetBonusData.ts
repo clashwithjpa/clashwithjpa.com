@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetBonusDataQueryResponse, GetBonusDataQueryParams, GetBonusData401, GetBonusData500 } from "../models/GetBonusData.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getBonusData } from "../clients/getBonusData.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getBonusData } from "../clients/getBonusData.ts";
+import type { GetBonusData401, GetBonusData500, GetBonusDataQueryParams, GetBonusDataQueryResponse } from "../models/GetBonusData.ts";
 
 export const getBonusDataQueryKey = (params?: GetBonusDataQueryParams) => [{ url: "/admin/bonus" }, ...(params ? [params] : [])] as const;
 

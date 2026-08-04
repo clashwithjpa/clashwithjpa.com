@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetQueryResponse } from "../models/NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { numOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet } from "../clients/numOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { numOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet } from "../clients/numOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
+import type { NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetQueryResponse } from "../models/NumOfPlayersInEachTrophyBucketLegendsTrophyBucketsGet.ts";
 
 export const numOfPlayersInEachTrophyBucketLegendsTrophyBucketsGetQueryKey = () => [{ url: "/legends/trophy-buckets" }] as const;
 

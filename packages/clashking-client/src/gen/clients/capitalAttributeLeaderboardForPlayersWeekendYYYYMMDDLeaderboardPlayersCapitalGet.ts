@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type {
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryResponse,
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryParams,
-    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet422,
-} from "../models/CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type {
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet422,
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryParams,
+    CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetQueryResponse,
+} from "../models/CapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGet.ts";
 
 function getCapitalAttributeLeaderboardForPlayersWeekendYYYYMMDDLeaderboardPlayersCapitalGetUrl() {
     const res = { method: "GET", url: `/leaderboard/players/capital` as const };

@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryResponse,
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryParams,
-    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet422,
-} from "../models/LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { leaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet } from "../clients/leaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { leaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet } from "../clients/leaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
+import type {
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet422,
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryParams,
+    LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryResponse,
+} from "../models/LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGet.ts";
 
 export const leaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryKey = (
     params: LeaderboardOfCapitalLootForClansWeekendYYYYMMDDLeaderboardClansCapitalGetQueryParams,

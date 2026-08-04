@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetCOCCWLWarQueryResponse, GetCOCCWLWarPathParams, GetCOCCWLWar500 } from "../models/GetCOCCWLWar.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getCOCCWLWar } from "../clients/getCOCCWLWar.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getCOCCWLWar } from "../clients/getCOCCWLWar.ts";
+import type { GetCOCCWLWar500, GetCOCCWLWarPathParams, GetCOCCWLWarQueryResponse } from "../models/GetCOCCWLWar.ts";
 
 export const getCOCCWLWarQueryKey = (warTag: GetCOCCWLWarPathParams["warTag"]) =>
     [{ url: "/coc/cwl/wars/:warTag", params: { warTag: warTag } }] as const;

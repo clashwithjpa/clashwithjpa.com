@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    LiveLegendRankingsRankingLegendsPlayerTagGetQueryResponse,
-    LiveLegendRankingsRankingLegendsPlayerTagGetPathParams,
-    LiveLegendRankingsRankingLegendsPlayerTagGet422,
-} from "../models/LiveLegendRankingsRankingLegendsPlayerTagGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { liveLegendRankingsRankingLegendsPlayerTagGet } from "../clients/liveLegendRankingsRankingLegendsPlayerTagGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { liveLegendRankingsRankingLegendsPlayerTagGet } from "../clients/liveLegendRankingsRankingLegendsPlayerTagGet.ts";
+import type {
+    LiveLegendRankingsRankingLegendsPlayerTagGet422,
+    LiveLegendRankingsRankingLegendsPlayerTagGetPathParams,
+    LiveLegendRankingsRankingLegendsPlayerTagGetQueryResponse,
+} from "../models/LiveLegendRankingsRankingLegendsPlayerTagGet.ts";
 
 export const liveLegendRankingsRankingLegendsPlayerTagGetQueryKey = (
     player_tag: LiveLegendRankingsRankingLegendsPlayerTagGetPathParams["player_tag"],

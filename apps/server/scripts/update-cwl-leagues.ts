@@ -1,20 +1,19 @@
-#!/usr/bin/env bun
 /**
  * Refresh `coc_clan_league` for every clan in `cwl_clan_info_table` by fetching
  * each clan's current war league from the Clash of Clans API.
  *
  * Run from apps/server:
- *   bun run scripts/update-cwl-leagues.ts            # apply updates
- *   bun run scripts/update-cwl-leagues.ts --dry-run  # preview only, no writes
+ *   pnpm exec tsx scripts/update-cwl-leagues.ts            # apply updates
+ *   pnpm exec tsx scripts/update-cwl-leagues.ts --dry-run  # preview only, no writes
  *
  * Reads JPA_DATABASE_URL / JPA_REDIS_URL / PUBLIC_COC_API_BASE_URI / JPA_COC_API_TOKEN
  * from .env (+ .env.server-db) via @/lib/config, same as the server.
  */
-import { eq } from "drizzle-orm";
+import { cocClient } from "@/lib/coc";
 import { db } from "@/lib/db";
 import { cwlClanInfoTable } from "@/lib/db/schema";
-import { cocClient } from "@/lib/coc";
 import { ClashAPIError } from "@repo/clashofclans-api";
+import { eq } from "drizzle-orm";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const CONCURRENCY = 10;

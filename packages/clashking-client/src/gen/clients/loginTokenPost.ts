@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { LoginTokenPostMutationRequest, LoginTokenPostMutationResponse, LoginTokenPost422 } from "../models/LoginTokenPost.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { LoginTokenPost422, LoginTokenPostMutationRequest, LoginTokenPostMutationResponse } from "../models/LoginTokenPost.ts";
 
 function getLoginTokenPostUrl() {
     const res = { method: "POST", url: `/token` as const };

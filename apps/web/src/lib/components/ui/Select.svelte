@@ -142,7 +142,7 @@
     {/snippet}
 
     <div bind:this={listRef} class="flex flex-col gap-1">
-        {#each filteredOptions as option, i}
+        {#each filteredOptions as option, i (option.value)}
             <button
                 type="button"
                 class={cn(

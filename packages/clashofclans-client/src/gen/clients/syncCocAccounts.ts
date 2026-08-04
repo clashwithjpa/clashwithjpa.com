@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SyncCocAccountsMutationRequest,
-    SyncCocAccountsMutationResponse,
     SyncCocAccounts400,
     SyncCocAccounts401,
     SyncCocAccounts500,
+    SyncCocAccountsMutationRequest,
+    SyncCocAccountsMutationResponse,
 } from "../models/SyncCocAccounts.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSyncCocAccountsUrl() {
     const res = { method: "POST", url: `/admin/coc-accounts/sync` as const };

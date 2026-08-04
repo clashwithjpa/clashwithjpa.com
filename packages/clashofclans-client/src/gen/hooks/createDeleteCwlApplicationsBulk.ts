@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type {
-    DeleteCwlApplicationsBulkMutationRequest,
-    DeleteCwlApplicationsBulkMutationResponse,
-    DeleteCwlApplicationsBulk401,
-    DeleteCwlApplicationsBulk500,
-} from "../models/DeleteCwlApplicationsBulk.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteCwlApplicationsBulk } from "../clients/deleteCwlApplicationsBulk.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { deleteCwlApplicationsBulk } from "../clients/deleteCwlApplicationsBulk.ts";
+import type {
+    DeleteCwlApplicationsBulk401,
+    DeleteCwlApplicationsBulk500,
+    DeleteCwlApplicationsBulkMutationRequest,
+    DeleteCwlApplicationsBulkMutationResponse,
+} from "../models/DeleteCwlApplicationsBulk.ts";
 
 export const deleteCwlApplicationsBulkMutationKey = () => [{ url: "/admin/cwl-applications/delete-bulk" }] as const;
 

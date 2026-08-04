@@ -86,11 +86,10 @@
     let targetCanUseApiKeys = $derived(roleLevel(user.role) >= ROLE_LEVELS.verified);
     // Tracked locally so the switch reflects the change immediately; the grid
     // row is refreshed by the parent through onUserUpdated.
-    let apiAccess = $state(false);
+    // Writable derived: reads through to the prop, but the toggle below can still
+    // assign to it so the switch flips immediately.
+    let apiAccess = $derived(!!(user as { apiAccess?: boolean }).apiAccess);
     let togglingApiAccess = $state(false);
-    $effect(() => {
-        apiAccess = !!(user as { apiAccess?: boolean }).apiAccess;
-    });
 
     async function toggleApiAccess(next: boolean) {
         togglingApiAccess = true;
@@ -291,7 +290,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {#if activeTab === "overview"}
             <div class="space-y-4">
                 <div class="space-y-1">

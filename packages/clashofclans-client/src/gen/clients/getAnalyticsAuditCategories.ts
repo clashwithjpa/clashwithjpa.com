@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetAnalyticsAuditCategoriesQueryResponse,
     GetAnalyticsAuditCategories401,
     GetAnalyticsAuditCategories500,
+    GetAnalyticsAuditCategoriesQueryResponse,
 } from "../models/GetAnalyticsAuditCategories.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetAnalyticsAuditCategoriesUrl() {
     const res = { method: "GET", url: `/analytics/audit-categories` as const };

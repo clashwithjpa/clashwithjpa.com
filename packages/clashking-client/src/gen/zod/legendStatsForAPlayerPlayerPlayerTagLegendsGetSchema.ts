@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 import { z } from "zod/v4";
+import { HTTPValidationErrorSchema } from "./HTTPValidationErrorSchema.ts";
 
 export const legendStatsForAPlayerPlayerPlayerTagLegendsGetPathParamsSchema = z.object({
     player_tag: z.string(),

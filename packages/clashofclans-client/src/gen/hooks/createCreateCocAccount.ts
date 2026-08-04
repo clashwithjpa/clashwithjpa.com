@@ -3,19 +3,19 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { createCocAccount } from "../clients/createCocAccount.ts";
 import type {
-    CreateCocAccountMutationRequest,
-    CreateCocAccountMutationResponse,
     CreateCocAccount400,
     CreateCocAccount401,
     CreateCocAccount404,
     CreateCocAccount409,
     CreateCocAccount500,
+    CreateCocAccountMutationRequest,
+    CreateCocAccountMutationResponse,
 } from "../models/CreateCocAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { createCocAccount } from "../clients/createCocAccount.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const createCocAccountMutationKey = () => [{ url: "/admin/coc-accounts" }] as const;
 

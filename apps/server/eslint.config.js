@@ -1,3 +1,4 @@
-import { config } from "@repo/eslint-config/index.js";
+import { baseConfig } from "@repo/eslint-config/base";
 
-export default config;
+/** @type {import("eslint").Linter.Config[]} */
+export default [...baseConfig, { ignores: ["drizzle/**"] }];

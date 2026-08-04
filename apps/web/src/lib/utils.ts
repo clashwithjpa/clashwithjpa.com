@@ -65,12 +65,35 @@ export function formatRelativeTime(dateStr?: string | undefined | null | Date) {
     return formatDate(date);
 }
 
-export function fromArkValue(val: any) {
+/** Ark UI date pickers hand back their own value objects, which expose `toDate()`. */
+function toDate(value: unknown): Date {
+    if (value && typeof value === "object" && "toDate" in value) {
+        const fn = (value as { toDate?: unknown }).toDate;
+        if (typeof fn === "function") return (fn as () => Date).call(value);
+    }
+    return new Date(value as string | number | Date);
+}
+
+export function fromArkValue(val: unknown): Date | Date[] | null {
     if (!val) return null;
 
     if (Array.isArray(val)) {
-        return val.map((v) => v.toDate?.() ?? new Date(v));
+        return val.map(toDate);
     }
 
-    return val.toDate?.() ?? new Date(val);
+    return toDate(val);
+}
+
+/**
+ * Pull a displayable message off an unknown caught value. `catch` binds `unknown`,
+ * and everything thrown here ends up in a toast description.
+ */
+export function errorMessage(error: unknown): string | undefined {
+    if (error instanceof Error) return error.message;
+    if (typeof error === "string") return error;
+    if (error && typeof error === "object" && "message" in error) {
+        const { message } = error as { message?: unknown };
+        if (typeof message === "string") return message;
+    }
+    return undefined;
 }

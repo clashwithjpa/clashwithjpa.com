@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { GetAdminSettingsQueryResponse, GetAdminSettings401, GetAdminSettings500 } from "../models/GetAdminSettings.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAdminSettings } from "../clients/getAdminSettings.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAdminSettings } from "../clients/getAdminSettings.ts";
+import type { GetAdminSettings401, GetAdminSettings500, GetAdminSettingsQueryResponse } from "../models/GetAdminSettings.ts";
 
 export const getAdminSettingsQueryKey = () => [{ url: "/admin/settings" }] as const;
 

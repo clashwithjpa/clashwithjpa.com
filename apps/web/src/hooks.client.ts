@@ -1,6 +1,6 @@
+import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_SPOTLIGHT } from "$env/static/public";
 import * as Sentry from "@sentry/sveltekit";
 import type { HandleServerError } from "@sveltejs/kit";
-import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_SPOTLIGHT } from "$env/static/public";
 
 Sentry.init({
     dsn: PUBLIC_SENTRY_SPOTLIGHT === "1" ? undefined : PUBLIC_SENTRY_DSN,
@@ -12,7 +12,7 @@ Sentry.init({
     debug: false,
 });
 
-export const handleError: HandleServerError = async ({ error, event, status, message }) => {
+export const handleError: HandleServerError = async ({ error, event, status }) => {
     const errorId = crypto.randomUUID();
 
     Sentry.captureException(error, {

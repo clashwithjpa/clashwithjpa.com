@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    ClearAcceptedJoinApplicationsMutationResponse,
     ClearAcceptedJoinApplications401,
     ClearAcceptedJoinApplications500,
+    ClearAcceptedJoinApplicationsMutationResponse,
 } from "../models/ClearAcceptedJoinApplications.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getClearAcceptedJoinApplicationsUrl() {
     const res = { method: "DELETE", url: `/admin/join-applications/accepted` as const };

@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
+    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost422,
     FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationRequest,
     FetchRaidWeekendsInBulkMax100TagsCapitalBulkPostMutationResponse,
-    FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost422,
 } from "../models/FetchRaidWeekendsInBulkMax100TagsCapitalBulkPost.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getFetchRaidWeekendsInBulkMax100TagsCapitalBulkPostUrl() {
     const res = { method: "POST", url: `/capital/bulk` as const };

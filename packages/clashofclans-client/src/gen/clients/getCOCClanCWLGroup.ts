@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClanCWLGroupQueryResponse, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroup500 } from "../models/GetCOCClanCWLGroup.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetCOCClanCWLGroup500, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroupQueryResponse } from "../models/GetCOCClanCWLGroup.ts";
 
 function getGetCOCClanCWLGroupUrl(tag: GetCOCClanCWLGroupPathParams["tag"]) {
     const res = { method: "GET", url: `/coc/clan/${tag}/currentwar/leaguegroup` as const };

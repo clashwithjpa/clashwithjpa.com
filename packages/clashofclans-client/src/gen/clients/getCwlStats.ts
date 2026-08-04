@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetCwlStatsQueryResponse, GetCwlStatsQueryParams, GetCwlStats401, GetCwlStats500 } from "../models/GetCwlStats.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetCwlStats401, GetCwlStats500, GetCwlStatsQueryParams, GetCwlStatsQueryResponse } from "../models/GetCwlStats.ts";
 
 function getGetCwlStatsUrl() {
     const res = { method: "GET", url: `/admin/cwl-stats` as const };

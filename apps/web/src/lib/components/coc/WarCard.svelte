@@ -276,7 +276,7 @@
                 <div>
                     <h4 class="mb-2 font-coc text-xs font-bold tracking-wide text-stone-800 uppercase">Our Town Halls</h4>
                     <div class="grid grid-cols-2 gap-2">
-                        {#each townHallBreakdown as [th, count]}
+                        {#each townHallBreakdown as [th, count] (th)}
                             <div
                                 class="flex items-center justify-between gap-1 rounded-lg bg-stone-900/10 px-2 py-1.5 inset-shadow-sm shadow-stone-900"
                             >
@@ -308,16 +308,14 @@
                             <span>Points</span>
                         </CocBtn>
                     {/snippet}
-                    {#snippet children()}
-                        <div class="h-96 w-full overflow-hidden rounded-lg">
-                            <iframe
-                                src="https://points.fwafarm.com/clan?tag={encodedClanTag}"
-                                title="War Points"
-                                class="size-full border-none"
-                                loading="lazy"
-                            ></iframe>
-                        </div>
-                    {/snippet}
+                    <div class="h-96 w-full overflow-hidden rounded-lg">
+                        <iframe
+                            src="https://points.fwafarm.com/clan?tag={encodedClanTag}"
+                            title="War Points"
+                            class="size-full border-none"
+                            loading="lazy"
+                        ></iframe>
+                    </div>
                 </CocPopup>
             </div>
         </div>

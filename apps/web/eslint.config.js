@@ -1,8 +1,4 @@
-import { config } from "@repo/eslint-config/index.js";
+import { svelteConfig } from "@repo/eslint-config/svelte";
 
-export default [
-    ...config,
-    {
-        ignores: [".svelte-kit/*"],
-    },
-];
+/** @type {import("eslint").Linter.Config[]} */
+export default [...svelteConfig, { ignores: [".svelte-kit/**"] }];

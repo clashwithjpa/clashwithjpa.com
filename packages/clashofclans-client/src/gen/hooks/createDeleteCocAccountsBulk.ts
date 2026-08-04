@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type {
-    DeleteCocAccountsBulkMutationRequest,
-    DeleteCocAccountsBulkMutationResponse,
-    DeleteCocAccountsBulk401,
-    DeleteCocAccountsBulk500,
-} from "../models/DeleteCocAccountsBulk.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteCocAccountsBulk } from "../clients/deleteCocAccountsBulk.ts";
 import { createMutation } from "@tanstack/svelte-query";
+import { deleteCocAccountsBulk } from "../clients/deleteCocAccountsBulk.ts";
+import type {
+    DeleteCocAccountsBulk401,
+    DeleteCocAccountsBulk500,
+    DeleteCocAccountsBulkMutationRequest,
+    DeleteCocAccountsBulkMutationResponse,
+} from "../models/DeleteCocAccountsBulk.ts";
 
 export const deleteCocAccountsBulkMutationKey = () => [{ url: "/admin/coc-accounts/delete-bulk" }] as const;
 

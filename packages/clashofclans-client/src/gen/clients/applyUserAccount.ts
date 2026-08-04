@@ -4,16 +4,16 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    ApplyUserAccountMutationRequest,
-    ApplyUserAccountMutationResponse,
     ApplyUserAccount400,
     ApplyUserAccount401,
     ApplyUserAccount403,
     ApplyUserAccount409,
     ApplyUserAccount500,
+    ApplyUserAccountMutationRequest,
+    ApplyUserAccountMutationResponse,
 } from "../models/ApplyUserAccount.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getApplyUserAccountUrl() {
     const res = { method: "POST", url: `/user/accounts/apply` as const };

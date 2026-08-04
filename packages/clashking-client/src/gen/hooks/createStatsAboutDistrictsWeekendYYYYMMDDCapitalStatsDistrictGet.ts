@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryResponse,
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryParams,
-    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet422,
-} from "../models/StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { statsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet } from "../clients/statsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { statsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet } from "../clients/statsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
+import type {
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet422,
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryParams,
+    StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryResponse,
+} from "../models/StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGet.ts";
 
 export const statsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryKey = (
     params: StatsAboutDistrictsWeekendYYYYMMDDCapitalStatsDistrictGetQueryParams,

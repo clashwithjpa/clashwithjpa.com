@@ -4,8 +4,8 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCPlayerQueryResponse, GetCOCPlayerPathParams, GetCOCPlayer500 } from "../models/GetCOCPlayer.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import type { GetCOCPlayer500, GetCOCPlayerPathParams, GetCOCPlayerQueryResponse } from "../models/GetCOCPlayer.ts";
 
 function getGetCOCPlayerUrl(tag: GetCOCPlayerPathParams["tag"]) {
     const res = { method: "GET", url: `/coc/player/${tag}` as const };

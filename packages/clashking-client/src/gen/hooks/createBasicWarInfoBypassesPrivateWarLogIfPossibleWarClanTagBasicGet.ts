@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetQueryResponse,
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams,
-    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet422,
-} from "../models/BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { basicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet } from "../clients/basicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { basicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet } from "../clients/basicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
+import type {
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet422,
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams,
+    BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetQueryResponse,
+} from "../models/BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGet.ts";
 
 export const basicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetQueryKey = (
     clan_tag: BasicWarInfoBypassesPrivateWarLogIfPossibleWarClanTagBasicGetPathParams["clan_tag"],

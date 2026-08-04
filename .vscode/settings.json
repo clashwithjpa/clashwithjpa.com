@@ -1,5 +1,12 @@
 {
-    // TypeScript (Native Preview) > Use Tsgo
-    // "js/ts.experimental.useTsgo": true,
-    // "typescript.native-preview.tsdk": "/home/mini/projects/clashwithjpa.com/node_modules/@typescript/native-preview"
+    "js/ts.tsdk.path": "./node_modules/typescript/lib",
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    }
 }

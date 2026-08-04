@@ -3,17 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
+import { createMutation } from "@tanstack/svelte-query";
+import { deleteAdminCwlClan } from "../clients/deleteAdminCwlClan.ts";
 import type {
-    DeleteAdminCwlClanMutationResponse,
-    DeleteAdminCwlClanPathParams,
     DeleteAdminCwlClan401,
     DeleteAdminCwlClan404,
     DeleteAdminCwlClan500,
+    DeleteAdminCwlClanMutationResponse,
+    DeleteAdminCwlClanPathParams,
 } from "../models/DeleteAdminCwlClan.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CreateMutationOptions, QueryClient } from "@tanstack/svelte-query";
-import { deleteAdminCwlClan } from "../clients/deleteAdminCwlClan.ts";
-import { createMutation } from "@tanstack/svelte-query";
 
 export const deleteAdminCwlClanMutationKey = () => [{ url: "/admin/cwl-clans/:tag" }] as const;
 

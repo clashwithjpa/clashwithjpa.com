@@ -3,20 +3,13 @@ import { isAdmin, isManager, isReviewer, isSuperadmin } from "@/lib/auth/functio
 import { cocClient } from "@/lib/coc";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
-    assertClanDiscordIds,
-    DiscordRateLimitError,
-    DiscordUnavailableError,
-    getGuildNicknames,
-    getGuildUsernames,
-    verifyClanDiscordIds,
-} from "@/lib/discord";
-import {
     addCocAccount,
     addCwlApplication,
     assignCwlApplication,
     assignCwlApplicationsBulk,
     createClan,
     createCwlClan,
+    createCwlSeason,
     deleteAcceptedClanApplications,
     deleteClan,
     deleteClanApplication,
@@ -24,7 +17,9 @@ import {
     deleteCocAccountsBulk,
     deleteCwlApplicationsBulk,
     deleteCwlClan,
+    deleteCwlSeason,
     disableApiKeysForUser,
+    DuplicateSeasonNameError,
     getAdminUsers,
     getAllClans,
     getAllCocAccounts,
@@ -35,19 +30,16 @@ import {
     getBonusLedger,
     getClanApplications,
     getCocAccountsForUser,
-    getDiscordAccountId,
     getCwlSeasons,
+    getCwlStats,
+    getDiscordAccountId,
+    getSettings,
     getUserNameById,
     getUsersWithDiscordAccounts,
+    MissingDiscordAccountError,
+    renameCwlSeason,
     setUserApiAccess,
     setUserDiscordUsername,
-    getCwlStats,
-    createCwlSeason,
-    renameCwlSeason,
-    deleteCwlSeason,
-    DuplicateSeasonNameError,
-    getSettings,
-    MissingDiscordAccountError,
     setUserSeasonBonus,
     syncCocAccountStats,
     syncCocAccountWarWeights,
@@ -60,14 +52,22 @@ import {
     updateCwlClan,
     updateSettings,
 } from "@/lib/db/functions";
+import {
+    assertClanDiscordIds,
+    DiscordRateLimitError,
+    DiscordUnavailableError,
+    getGuildNicknames,
+    getGuildUsernames,
+    verifyClanDiscordIds,
+} from "@/lib/discord";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
+import { describeRoute } from "@/lib/openapi";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
 import { ROLES } from "@repo/auth-shared";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import { parse } from "csv-parse/sync";
 import { Hono } from "hono";
-import { describeRoute } from "@/lib/openapi";
 import { resolver, validator as zValidator } from "hono-openapi";
 import z4 from "zod/v4";
 
@@ -569,7 +569,7 @@ app.post(
                 metadata: { cocAccountTag: tag, seasonId, preferenceNum, manual: true },
             });
             return c.json({ success: true, data: { application } });
-        } catch (error: any) {
+        } catch (error) {
             const { constraint, code } = getDbErrorMessage(error);
             if (code === "23505") {
                 const errorMessage =
@@ -629,7 +629,7 @@ app.put(
                     : { cocAccountTag: application.cocAccountTag },
             });
             return c.json({ success: true, data: { application } });
-        } catch (error: any) {
+        } catch (error) {
             const { code } = getDbErrorMessage(error);
             if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
             Sentry.captureException(error);
@@ -713,7 +713,7 @@ app.post(
                 metadata: { count: result.count, assignedClanTag: clanTag, ids: result.ids },
             });
             return c.json({ success: true, data: { count: result.count, assignedTo: clanTag } });
-        } catch (error: any) {
+        } catch (error) {
             const { code } = getDbErrorMessage(error);
             if (code === "23503") return c.json({ success: false, error: "CWL clan with this tag does not exist." }, 400);
             Sentry.captureException(error);
@@ -1045,7 +1045,7 @@ app.put(
                 metadata: { seasonId, cocAccountTag },
             });
             return c.json({ success: true, data: { bonus } });
-        } catch (error: any) {
+        } catch (error) {
             const { code } = getDbErrorMessage(error);
             if (code === "23503") return c.json({ success: false, error: "Unknown user, account, or season." }, 400);
             Sentry.captureException(error);
@@ -1315,7 +1315,7 @@ app.post(
                 metadata: { cocClanCode: clan.cocClanCode, cocClanTag: clan.cocClanTag },
             });
             return c.json({ success: true, data: { clan } });
-        } catch (error: any) {
+        } catch (error) {
             const { code } = getDbErrorMessage(error);
             if (code === "23505") return c.json({ success: false, error: "A clan with this code or tag already exists." }, 409);
             Sentry.captureException(error);
@@ -1551,7 +1551,7 @@ app.post(
                 metadata: { cocClanTag: clan.cocClanTag, cocClanName: clan.cocClanName },
             });
             return c.json({ success: true, data: { clan } });
-        } catch (error: any) {
+        } catch (error) {
             const { code } = getDbErrorMessage(error);
             if (code === "23505") return c.json({ success: false, error: "A CWL clan with this tag already exists." }, 409);
             Sentry.captureException(error);
@@ -1860,7 +1860,7 @@ app.post(
                 metadata: { cocAccountTag: account!.cocAccountTag, warWeight, isExternal, manual: true },
             });
             return c.json({ success: true, data: { account } });
-        } catch (error: any) {
+        } catch (error) {
             const { message, constraint, code } = getDbErrorMessage(error);
             if (code === "23505") return c.json({ success: false, error: "This account is already linked." }, 409);
             Sentry.captureException(error, { extra: { message, constraint, code } });

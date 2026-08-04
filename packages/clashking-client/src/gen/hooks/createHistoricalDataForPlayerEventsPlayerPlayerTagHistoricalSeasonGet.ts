@@ -3,15 +3,15 @@
  * Do not edit manually.
  */
 
-import type {
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetQueryResponse,
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams,
-    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet422,
-} from "../models/HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { historicalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet } from "../clients/historicalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
 import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { historicalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet } from "../clients/historicalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
+import type {
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet422,
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams,
+    HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetQueryResponse,
+} from "../models/HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGet.ts";
 
 export const historicalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetQueryKey = (
     player_tag: HistoricalDataForPlayerEventsPlayerPlayerTagHistoricalSeasonGetPathParams["player_tag"],

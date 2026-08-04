@@ -4,13 +4,13 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    GetJoinApplicationsQueryResponse,
-    GetJoinApplicationsQueryParams,
     GetJoinApplications401,
     GetJoinApplications500,
+    GetJoinApplicationsQueryParams,
+    GetJoinApplicationsQueryResponse,
 } from "../models/GetJoinApplications.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getGetJoinApplicationsUrl() {
     const res = { method: "GET", url: `/admin/join-applications` as const };

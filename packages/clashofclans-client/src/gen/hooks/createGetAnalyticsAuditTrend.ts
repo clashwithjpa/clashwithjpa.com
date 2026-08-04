@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CreateBaseQueryOptions, CreateQueryResult, QueryClient, QueryKey } from "@tanstack/svelte-query";
+import { createQuery, queryOptions } from "@tanstack/svelte-query";
+import { getAnalyticsAuditTrend } from "../clients/getAnalyticsAuditTrend.ts";
 import type {
-    GetAnalyticsAuditTrendQueryResponse,
-    GetAnalyticsAuditTrendQueryParams,
     GetAnalyticsAuditTrend401,
     GetAnalyticsAuditTrend500,
+    GetAnalyticsAuditTrendQueryParams,
+    GetAnalyticsAuditTrendQueryResponse,
 } from "../models/GetAnalyticsAuditTrend.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, CreateBaseQueryOptions, CreateQueryResult } from "@tanstack/svelte-query";
-import { getAnalyticsAuditTrend } from "../clients/getAnalyticsAuditTrend.ts";
-import { createQuery, queryOptions } from "@tanstack/svelte-query";
 
 export const getAnalyticsAuditTrendQueryKey = (params?: GetAnalyticsAuditTrendQueryParams) =>
     [{ url: "/analytics/audit-trend" }, ...(params ? [params] : [])] as const;

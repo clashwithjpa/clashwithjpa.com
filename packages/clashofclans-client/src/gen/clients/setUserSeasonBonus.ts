@@ -4,14 +4,14 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/fetch";
+import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 import type {
-    SetUserSeasonBonusMutationRequest,
-    SetUserSeasonBonusMutationResponse,
     SetUserSeasonBonus400,
     SetUserSeasonBonus401,
     SetUserSeasonBonus500,
+    SetUserSeasonBonusMutationRequest,
+    SetUserSeasonBonusMutationResponse,
 } from "../models/SetUserSeasonBonus.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
 
 function getSetUserSeasonBonusUrl() {
     const res = { method: "PUT", url: `/admin/bonus` as const };

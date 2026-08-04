@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { permissionsSchema } from "./permissionsSchema.ts";
 import { z } from "zod/v4";
+import { permissionsSchema } from "./permissionsSchema.ts";
 
 export const userSchema = z.object({
     username: z.string(),
