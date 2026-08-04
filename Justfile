@@ -93,10 +93,27 @@ db-reset:
 
 # ── Deploy ────────────────────────────────────────────────────────────────────
 
-# Stop, pull latest, then rebuild and redeploy the prod stack
+# Pull, build and swap the prod stack without taking the site down  →  just prod
 prod:
-    @printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
-    @git pull
-    @printf '\033[42m\033[30m PULL \033[0m \033[32mRepository up to date\033[0m\n'
-    @just run prod --build --force-recreate
-    @printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed\033[0m\n'
+    #!/usr/bin/env bash
+    set -euo pipefail
+    compose=(docker compose -f docker-compose.yaml -f docker-compose.prod.yaml)
+    for f in ./apps/*/.env; do [[ -e $f ]] && compose+=(--env-file "$f"); done
+    compose+=(--profile prod)
+
+    printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
+    git pull --ff-only
+
+    printf '\033[43m\033[30m BUILD\033[0m \033[33mBuilding images (site stays up)\033[0m\n'
+    "${compose[@]}" build
+
+    # `up -d` recreates only what changed, so db, redis and minio never stop.
+    printf '\033[43m\033[30m SWAP \033[0m \033[33mSwapping containers\033[0m\n'
+    "${compose[@]}" up -d --remove-orphans
+
+    printf '\033[43m\033[30m CLEAN\033[0m \033[33mPruning build cache\033[0m\n'
+    docker builder prune -f --filter until=168h >/dev/null
+    docker image prune -f >/dev/null
+
+    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed\033[0m\n'
+    just show
