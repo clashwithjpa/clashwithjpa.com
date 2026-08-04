@@ -1,0 +1,92 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  prod:
+    name: Build prod images
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Compose resolves `env_file:` paths while loading, so these have to exist
+      # even though nothing reads their values at build time.
+      - name: Create env files
+        run: |
+          cp apps/web/.env.example apps/web/.env
+          cp apps/server/.env.example apps/server/.env
+          cp apps/server/.env.server-db.example apps/server/.env.server-db
+
+      # Built through compose so args, contexts and tags match what prod deploys.
+      # docker-compose.prod.yaml is not passed: it only attaches the external
+      # pangolin network, which applies at `up`, not at build.
+      - name: Build images
+        run: docker compose --profile prod --env-file ./apps/web/.env build
+
+      # `pnpm deploy` decides which files reach the runtime image, so what the entrypoint needs at boot is checked rather than assumed.
+      - name: Verify server image
+        run: |
+          set -euo pipefail
+          img=clashwithjpa/server:latest
+
+          for f in dist/index.js dist/migrate-prod.js dist/lib/instrument.js docker-entrypoint.sh; do
+            if docker run --rm --entrypoint sh "$img" -c "test -f '/app/apps/server/$f'"; then
+              echo "ok       $f"
+            else
+              echo "MISSING  $f"
+              exit 1
+            fi
+          done
+
+          # Exact match: one missing migration boots against a half-migrated DB.
+          # The -gt 0 stops a moved drizzle/ making this pass vacuously at 0 == 0.
+          expected=$(find apps/server/drizzle -maxdepth 1 -name '*.sql' | wc -l)
+          actual=$(docker run --rm --entrypoint sh "$img" \
+            -c "find /app/apps/server/drizzle -maxdepth 1 -name '*.sql' | wc -l")
+          echo "migrations: repo=$expected image=$actual"
+          test "$expected" -gt 0
+          test "$expected" -eq "$actual"
+
+          docker run --rm --entrypoint sh "$img" \
+            -c "test -f /app/apps/server/drizzle/meta/_journal.json"
+          echo "ok       drizzle/meta/_journal.json"
+
+      - name: Verify web image
+        run: |
+          set -euo pipefail
+          img=clashwithjpa/web:latest
+
+          # An empty html root builds green and serves 404s.
+          docker run --rm --entrypoint sh "$img" -c "test -s /usr/share/nginx/html/index.html"
+          echo "ok       index.html"
+
+          docker run --rm --entrypoint sh "$img" -c "test -s /etc/nginx/conf.d/default.conf"
+          echo "ok       nginx.conf"
+
+  cwl-ping:
+    name: Build cwl-ping image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Create env file
+        run: cp .env.example .env
+        working-directory: ./scripts/containers/cwl-ping
+
+      - name: Build image
+        run: docker compose build
+        working-directory: ./scripts/containers/cwl-ping
