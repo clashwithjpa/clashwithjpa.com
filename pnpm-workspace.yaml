@@ -15,5 +15,5 @@ overrides:
   # 1.6.x changes the admin access-control types so the custom `jpa` statement
   # is rejected. Keep core and the api-key plugin on the same exact version —
   # under pnpm's strict layout a split resolves them to two incompatible copies.
-  better-auth: 1.5.5
+  better-auth: 1.6.22
   "@better-auth/api-key": 1.5.5
