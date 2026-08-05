@@ -14,13 +14,13 @@ import type {
     GetUserCocAccountsByUserIdQueryResponse,
 } from "../models/GetUserCocAccountsByUserId.ts";
 
-export const getUserCocAccountsByUserIdQueryKey = (userid: GetUserCocAccountsByUserIdPathParams["userid"]) =>
+export const getUserCocAccountsByUserIdQueryKey = (userid: GetUserCocAccountsByUserIdPathParams["userid"] | undefined) =>
     [{ url: "/admin/users/:userid/coc-accounts", params: { userid: userid } }] as const;
 
 export type GetUserCocAccountsByUserIdQueryKey = ReturnType<typeof getUserCocAccountsByUserIdQueryKey>;
 
 export function getUserCocAccountsByUserIdQueryOptions(
-    userid: GetUserCocAccountsByUserIdPathParams["userid"],
+    userid: GetUserCocAccountsByUserIdPathParams["userid"] | undefined,
     config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
     const queryKey = getUserCocAccountsByUserIdQueryKey(userid);
@@ -33,7 +33,7 @@ export function getUserCocAccountsByUserIdQueryOptions(
         enabled: !!userid,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getUserCocAccountsByUserId(userid, { ...config, signal: config.signal ?? signal });
+            return getUserCocAccountsByUserId(userid!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -47,7 +47,7 @@ export function createGetUserCocAccountsByUserId<
     TQueryData = GetUserCocAccountsByUserIdQueryResponse,
     TQueryKey extends QueryKey = GetUserCocAccountsByUserIdQueryKey,
 >(
-    userid: GetUserCocAccountsByUserIdPathParams["userid"],
+    userid: GetUserCocAccountsByUserIdPathParams["userid"] | undefined,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<

@@ -13,13 +13,13 @@ import type {
     GetCOCPlayerBattleLogQueryResponse,
 } from "../models/GetCOCPlayerBattleLog.ts";
 
-export const getCOCPlayerBattleLogQueryKey = (tag: GetCOCPlayerBattleLogPathParams["tag"]) =>
+export const getCOCPlayerBattleLogQueryKey = (tag: GetCOCPlayerBattleLogPathParams["tag"] | undefined) =>
     [{ url: "/coc/player/:tag/battlelog", params: { tag: tag } }] as const;
 
 export type GetCOCPlayerBattleLogQueryKey = ReturnType<typeof getCOCPlayerBattleLogQueryKey>;
 
 export function getCOCPlayerBattleLogQueryOptions(
-    tag: GetCOCPlayerBattleLogPathParams["tag"],
+    tag: GetCOCPlayerBattleLogPathParams["tag"] | undefined,
     config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
     const queryKey = getCOCPlayerBattleLogQueryKey(tag);
@@ -32,7 +32,7 @@ export function getCOCPlayerBattleLogQueryOptions(
         enabled: !!tag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCPlayerBattleLog(tag, { ...config, signal: config.signal ?? signal });
+            return getCOCPlayerBattleLog(tag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -46,7 +46,7 @@ export function createGetCOCPlayerBattleLog<
     TQueryData = GetCOCPlayerBattleLogQueryResponse,
     TQueryKey extends QueryKey = GetCOCPlayerBattleLogQueryKey,
 >(
-    tag: GetCOCPlayerBattleLogPathParams["tag"],
+    tag: GetCOCPlayerBattleLogPathParams["tag"] | undefined,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<GetCOCPlayerBattleLogQueryResponse, ResponseErrorConfig<GetCOCPlayerBattleLog500>, TData, TQueryData, TQueryKey>

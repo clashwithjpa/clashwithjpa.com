@@ -9,12 +9,15 @@ import { createQuery, queryOptions } from "@tanstack/svelte-query";
 import { getCOCClanCWLGroup } from "../clients/getCOCClanCWLGroup.ts";
 import type { GetCOCClanCWLGroup500, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroupQueryResponse } from "../models/GetCOCClanCWLGroup.ts";
 
-export const getCOCClanCWLGroupQueryKey = (tag: GetCOCClanCWLGroupPathParams["tag"]) =>
+export const getCOCClanCWLGroupQueryKey = (tag: GetCOCClanCWLGroupPathParams["tag"] | undefined) =>
     [{ url: "/coc/clan/:tag/currentwar/leaguegroup", params: { tag: tag } }] as const;
 
 export type GetCOCClanCWLGroupQueryKey = ReturnType<typeof getCOCClanCWLGroupQueryKey>;
 
-export function getCOCClanCWLGroupQueryOptions(tag: GetCOCClanCWLGroupPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getCOCClanCWLGroupQueryOptions(
+    tag: GetCOCClanCWLGroupPathParams["tag"] | undefined,
+    config: Partial<RequestConfig> & { client?: Client } = {},
+) {
     const queryKey = getCOCClanCWLGroupQueryKey(tag);
     return queryOptions<
         GetCOCClanCWLGroupQueryResponse,
@@ -25,7 +28,7 @@ export function getCOCClanCWLGroupQueryOptions(tag: GetCOCClanCWLGroupPathParams
         enabled: !!tag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCClanCWLGroup(tag, { ...config, signal: config.signal ?? signal });
+            return getCOCClanCWLGroup(tag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -39,7 +42,7 @@ export function createGetCOCClanCWLGroup<
     TQueryData = GetCOCClanCWLGroupQueryResponse,
     TQueryKey extends QueryKey = GetCOCClanCWLGroupQueryKey,
 >(
-    tag: GetCOCClanCWLGroupPathParams["tag"],
+    tag: GetCOCClanCWLGroupPathParams["tag"] | undefined,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<GetCOCClanCWLGroupQueryResponse, ResponseErrorConfig<GetCOCClanCWLGroup500>, TData, TQueryData, TQueryKey>

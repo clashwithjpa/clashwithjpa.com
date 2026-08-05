@@ -129,7 +129,7 @@ app.get(
     },
 );
 
-// API access grant (for admin user sidebar - sudo perm)
+// API access grant (for admin user sidebar - root perm)
 
 const apiAccessPathSchema = z4.object({
     userid: z4.string().min(1, "userid is required"),
@@ -144,10 +144,10 @@ const apiAccessData = z4.object({
 });
 app.put(
     "/users/:userid/api-access",
-    hasAccessAuthMiddleware(isAdmin),
+    hasAccessAuthMiddleware(isSuperadmin),
     describeRoute({
         operationId: "setUserApiAccess",
-        role: "Admin",
+        role: "Superadmin",
         description: "Grants or revokes a user's ability to create API keys. Revoking also disables all of their existing keys.",
         tags: ["admin"],
         responses: {

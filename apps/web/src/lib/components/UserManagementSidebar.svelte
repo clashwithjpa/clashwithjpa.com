@@ -25,6 +25,7 @@
     import TablerHash from "~icons/tabler/hash";
     import TablerIdBadge from "~icons/tabler/id-badge";
     import TablerKey from "~icons/tabler/key";
+    import TablerKeyOff from "~icons/tabler/key-off";
     import TablerLogin2 from "~icons/tabler/login-2";
     import TablerQuestionMark from "~icons/tabler/question-mark";
     import TablerShieldCheck from "~icons/tabler/shield-check";
@@ -80,8 +81,12 @@
     // has expired and been swept.
     let lastActiveAt = $derived((user as { lastActiveAt?: string | Date | null }).lastActiveAt);
 
-    // Mirrors the server's isAdmin (sudo) gate on PUT /admin/users/:userid/api-access.
-    let canGrantApiAccess = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Reading the grant keeps the old sudo gate — admins still filter the users
+    // grid by API access, so the per-user status has to stay legible to them.
+    let canViewApiAccess = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.admin);
+    // Flipping it mirrors the server's isSuperadmin (root) gate on
+    // PUT /admin/users/:userid/api-access; everyone below sees a status badge.
+    let canGrantApiAccess = $derived(roleLevel($currentSession.data?.user?.role) >= ROLE_LEVELS.superadmin);
     // Minting a key needs verified, so the grant does nothing below that.
     let targetCanUseApiKeys = $derived(roleLevel(user.role) >= ROLE_LEVELS.verified);
     // Tracked locally so the switch reflects the change immediately; the grid
@@ -403,7 +408,7 @@
                 <!-- Hidden for unverified accounts, which can't mint a key whatever
                      the grant says. Still shown if one somehow holds the grant, so a
                      stale flag left by a demotion can always be cleared. -->
-                {#if canGrantApiAccess && (targetCanUseApiKeys || apiAccess)}
+                {#if canViewApiAccess && (targetCanUseApiKeys || apiAccess)}
                     <div class="space-y-1">
                         <div class="flex items-center gap-1 text-xs font-medium text-stone-400">
                             <TablerKey class="size-4" />
@@ -414,11 +419,21 @@
                                 {apiAccess ? "Can create API keys" : "Cannot create API keys"}
                                 {#if !targetCanUseApiKeys}
                                     <span class="block text-xs text-yellow-200">Unverified, so this grant does nothing until they're verified.</span>
-                                {:else if !apiAccess}
+                                {:else if canGrantApiAccess && !apiAccess}
                                     <span class="block text-xs text-stone-400">Revoking also disables every key they already hold.</span>
                                 {/if}
                             </p>
-                            <Toggle checked={apiAccess} disabled={togglingApiAccess} onCheckedChange={toggleApiAccess} />
+                            {#if canGrantApiAccess}
+                                <Toggle checked={apiAccess} disabled={togglingApiAccess} onCheckedChange={toggleApiAccess} />
+                            {:else}
+                                <Badge
+                                    icon={apiAccess ? TablerKey : TablerKeyOff}
+                                    content={apiAccess ? "Granted" : "Not granted"}
+                                    variant={apiAccess ? "purple" : "ghost"}
+                                    size="button"
+                                    iconSize="size-4"
+                                />
+                            {/if}
                         </div>
                     </div>
                 {/if}

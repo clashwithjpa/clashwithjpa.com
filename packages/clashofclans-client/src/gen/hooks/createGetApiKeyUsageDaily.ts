@@ -28,7 +28,6 @@ export function getApiKeyUsageDailyQueryOptions(params: GetApiKeyUsageDailyQuery
         GetApiKeyUsageDailyQueryResponse,
         typeof queryKey
     >({
-        enabled: !!params,
         queryKey,
         queryFn: async ({ signal }) => {
             return getApiKeyUsageDaily(params, { ...config, signal: config.signal ?? signal });

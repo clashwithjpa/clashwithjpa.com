@@ -9,13 +9,13 @@ import { createQuery, queryOptions } from "@tanstack/svelte-query";
 import { getCOCClanCurrentWar } from "../clients/getCOCClanCurrentWar.ts";
 import type { GetCOCClanCurrentWar500, GetCOCClanCurrentWarPathParams, GetCOCClanCurrentWarQueryResponse } from "../models/GetCOCClanCurrentWar.ts";
 
-export const getCOCClanCurrentWarQueryKey = (tag: GetCOCClanCurrentWarPathParams["tag"]) =>
+export const getCOCClanCurrentWarQueryKey = (tag: GetCOCClanCurrentWarPathParams["tag"] | undefined) =>
     [{ url: "/coc/clan/:tag/currentwar", params: { tag: tag } }] as const;
 
 export type GetCOCClanCurrentWarQueryKey = ReturnType<typeof getCOCClanCurrentWarQueryKey>;
 
 export function getCOCClanCurrentWarQueryOptions(
-    tag: GetCOCClanCurrentWarPathParams["tag"],
+    tag: GetCOCClanCurrentWarPathParams["tag"] | undefined,
     config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
     const queryKey = getCOCClanCurrentWarQueryKey(tag);
@@ -28,7 +28,7 @@ export function getCOCClanCurrentWarQueryOptions(
         enabled: !!tag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCClanCurrentWar(tag, { ...config, signal: config.signal ?? signal });
+            return getCOCClanCurrentWar(tag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -42,7 +42,7 @@ export function createGetCOCClanCurrentWar<
     TQueryData = GetCOCClanCurrentWarQueryResponse,
     TQueryKey extends QueryKey = GetCOCClanCurrentWarQueryKey,
 >(
-    tag: GetCOCClanCurrentWarPathParams["tag"],
+    tag: GetCOCClanCurrentWarPathParams["tag"] | undefined,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<GetCOCClanCurrentWarQueryResponse, ResponseErrorConfig<GetCOCClanCurrentWar500>, TData, TQueryData, TQueryKey>

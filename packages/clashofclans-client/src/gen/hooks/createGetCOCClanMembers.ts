@@ -9,18 +9,21 @@ import { createQuery, queryOptions } from "@tanstack/svelte-query";
 import { getCOCClanMembers } from "../clients/getCOCClanMembers.ts";
 import type { GetCOCClanMembers500, GetCOCClanMembersPathParams, GetCOCClanMembersQueryResponse } from "../models/GetCOCClanMembers.ts";
 
-export const getCOCClanMembersQueryKey = (tag: GetCOCClanMembersPathParams["tag"]) =>
+export const getCOCClanMembersQueryKey = (tag: GetCOCClanMembersPathParams["tag"] | undefined) =>
     [{ url: "/coc/clan/:tag/members", params: { tag: tag } }] as const;
 
 export type GetCOCClanMembersQueryKey = ReturnType<typeof getCOCClanMembersQueryKey>;
 
-export function getCOCClanMembersQueryOptions(tag: GetCOCClanMembersPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getCOCClanMembersQueryOptions(
+    tag: GetCOCClanMembersPathParams["tag"] | undefined,
+    config: Partial<RequestConfig> & { client?: Client } = {},
+) {
     const queryKey = getCOCClanMembersQueryKey(tag);
     return queryOptions<GetCOCClanMembersQueryResponse, ResponseErrorConfig<GetCOCClanMembers500>, GetCOCClanMembersQueryResponse, typeof queryKey>({
         enabled: !!tag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCClanMembers(tag, { ...config, signal: config.signal ?? signal });
+            return getCOCClanMembers(tag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -34,7 +37,7 @@ export function createGetCOCClanMembers<
     TQueryData = GetCOCClanMembersQueryResponse,
     TQueryKey extends QueryKey = GetCOCClanMembersQueryKey,
 >(
-    tag: GetCOCClanMembersPathParams["tag"],
+    tag: GetCOCClanMembersPathParams["tag"] | undefined,
     options: {
         query?: Partial<
             CreateBaseQueryOptions<GetCOCClanMembersQueryResponse, ResponseErrorConfig<GetCOCClanMembers500>, TData, TQueryData, TQueryKey>

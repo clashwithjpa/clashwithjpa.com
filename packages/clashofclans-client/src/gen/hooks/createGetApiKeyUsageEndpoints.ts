@@ -31,7 +31,6 @@ export function getApiKeyUsageEndpointsQueryOptions(
         GetApiKeyUsageEndpointsQueryResponse,
         typeof queryKey
     >({
-        enabled: !!params,
         queryKey,
         queryFn: async ({ signal }) => {
             return getApiKeyUsageEndpoints(params, { ...config, signal: config.signal ?? signal });

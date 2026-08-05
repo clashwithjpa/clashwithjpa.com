@@ -9,18 +9,21 @@ import { createQuery, queryOptions } from "@tanstack/svelte-query";
 import { getCOCCWLWar } from "../clients/getCOCCWLWar.ts";
 import type { GetCOCCWLWar500, GetCOCCWLWarPathParams, GetCOCCWLWarQueryResponse } from "../models/GetCOCCWLWar.ts";
 
-export const getCOCCWLWarQueryKey = (warTag: GetCOCCWLWarPathParams["warTag"]) =>
+export const getCOCCWLWarQueryKey = (warTag: GetCOCCWLWarPathParams["warTag"] | undefined) =>
     [{ url: "/coc/cwl/wars/:warTag", params: { warTag: warTag } }] as const;
 
 export type GetCOCCWLWarQueryKey = ReturnType<typeof getCOCCWLWarQueryKey>;
 
-export function getCOCCWLWarQueryOptions(warTag: GetCOCCWLWarPathParams["warTag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getCOCCWLWarQueryOptions(
+    warTag: GetCOCCWLWarPathParams["warTag"] | undefined,
+    config: Partial<RequestConfig> & { client?: Client } = {},
+) {
     const queryKey = getCOCCWLWarQueryKey(warTag);
     return queryOptions<GetCOCCWLWarQueryResponse, ResponseErrorConfig<GetCOCCWLWar500>, GetCOCCWLWarQueryResponse, typeof queryKey>({
         enabled: !!warTag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCCWLWar(warTag, { ...config, signal: config.signal ?? signal });
+            return getCOCCWLWar(warTag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -34,7 +37,7 @@ export function createGetCOCCWLWar<
     TQueryData = GetCOCCWLWarQueryResponse,
     TQueryKey extends QueryKey = GetCOCCWLWarQueryKey,
 >(
-    warTag: GetCOCCWLWarPathParams["warTag"],
+    warTag: GetCOCCWLWarPathParams["warTag"] | undefined,
     options: {
         query?: Partial<CreateBaseQueryOptions<GetCOCCWLWarQueryResponse, ResponseErrorConfig<GetCOCCWLWar500>, TData, TQueryData, TQueryKey>> & {
             client?: QueryClient;

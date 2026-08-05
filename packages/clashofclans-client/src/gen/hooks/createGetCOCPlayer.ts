@@ -9,17 +9,17 @@ import { createQuery, queryOptions } from "@tanstack/svelte-query";
 import { getCOCPlayer } from "../clients/getCOCPlayer.ts";
 import type { GetCOCPlayer500, GetCOCPlayerPathParams, GetCOCPlayerQueryResponse } from "../models/GetCOCPlayer.ts";
 
-export const getCOCPlayerQueryKey = (tag: GetCOCPlayerPathParams["tag"]) => [{ url: "/coc/player/:tag", params: { tag: tag } }] as const;
+export const getCOCPlayerQueryKey = (tag: GetCOCPlayerPathParams["tag"] | undefined) => [{ url: "/coc/player/:tag", params: { tag: tag } }] as const;
 
 export type GetCOCPlayerQueryKey = ReturnType<typeof getCOCPlayerQueryKey>;
 
-export function getCOCPlayerQueryOptions(tag: GetCOCPlayerPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getCOCPlayerQueryOptions(tag: GetCOCPlayerPathParams["tag"] | undefined, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const queryKey = getCOCPlayerQueryKey(tag);
     return queryOptions<GetCOCPlayerQueryResponse, ResponseErrorConfig<GetCOCPlayer500>, GetCOCPlayerQueryResponse, typeof queryKey>({
         enabled: !!tag,
         queryKey,
         queryFn: async ({ signal }) => {
-            return getCOCPlayer(tag, { ...config, signal: config.signal ?? signal });
+            return getCOCPlayer(tag!, { ...config, signal: config.signal ?? signal });
         },
     });
 }
@@ -33,7 +33,7 @@ export function createGetCOCPlayer<
     TQueryData = GetCOCPlayerQueryResponse,
     TQueryKey extends QueryKey = GetCOCPlayerQueryKey,
 >(
-    tag: GetCOCPlayerPathParams["tag"],
+    tag: GetCOCPlayerPathParams["tag"] | undefined,
     options: {
         query?: Partial<CreateBaseQueryOptions<GetCOCPlayerQueryResponse, ResponseErrorConfig<GetCOCPlayer500>, TData, TQueryData, TQueryKey>> & {
             client?: QueryClient;

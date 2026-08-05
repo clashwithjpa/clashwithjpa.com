@@ -31,7 +31,6 @@ export function getApiKeyUsageSummaryQueryOptions(
         GetApiKeyUsageSummaryQueryResponse,
         typeof queryKey
     >({
-        enabled: !!params,
         queryKey,
         queryFn: async ({ signal }) => {
             return getApiKeyUsageSummary(params, { ...config, signal: config.signal ?? signal });

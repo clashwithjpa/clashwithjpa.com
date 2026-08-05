@@ -28,7 +28,6 @@ export function getApiKeyUsageStatusQueryOptions(params: GetApiKeyUsageStatusQue
         GetApiKeyUsageStatusQueryResponse,
         typeof queryKey
     >({
-        enabled: !!params,
         queryKey,
         queryFn: async ({ signal }) => {
             return getApiKeyUsageStatus(params, { ...config, signal: config.signal ?? signal });
