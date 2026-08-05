@@ -228,11 +228,17 @@ app.get("/openapi.json", async (c) => {
     // query credential — and Scalar labels them "<scheme name> <type>". Naming
     // them after the credential itself keeps that readable; calling one `apiKey`
     // would render as "apiKey apiKey".
+    //
+    // `session_token` is dev-only. Production filters the paths down to the
+    // api-key surface, so no operation there references it — but Scalar builds
+    // its auth picker from `securitySchemes`, not from what the operations use,
+    // so declaring it would still offer the cookie as "available authentication"
+    // on a document where nothing accepts it.
     doc.components = {
         ...(doc.components ?? {}),
         securitySchemes: {
             "x-api-key": { type: "apiKey", in: "header", name: "x-api-key" },
-            session_token: { type: "apiKey", in: "cookie", name: "jpa.session_token" },
+            ...(config.NODE_ENV !== "production" ? { session_token: { type: "apiKey", in: "cookie", name: "jpa.session_token" } } : {}),
         },
     };
     doc.security = [{ "x-api-key": [] }];
