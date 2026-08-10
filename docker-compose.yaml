@@ -61,7 +61,7 @@ services:
 
   drizzle-gateway:
     container_name: drizzle-gateway
-    image: ghcr.io/drizzle-team/gateway:latest
+    image: ghcr.io/drizzle-team/gateway:latest@sha256:547b89d55127deb6c5b21ba9ed2397be07affc300da9d0ec6d7ed1290687b4dc
     restart: unless-stopped
     ports:
       - 7103:4983
@@ -73,7 +73,7 @@ services:
 
   redis-insight:
     container_name: redis-insight
-    image: redis/redisinsight:latest
+    image: redis/redisinsight:latest@sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84
     restart: unless-stopped
     ports:
       - 7104:5540
@@ -89,7 +89,7 @@ services:
 
   spotlight:
     container_name: spotlight
-    image: ghcr.io/getsentry/spotlight:latest
+    image: ghcr.io/getsentry/spotlight:latest@sha256:daba2de5136fc8db0a0cde45280aa4d369b5ea0a394fe762c86aa42294a11d4d
     restart: unless-stopped
     ports:
       - 8969:8969
