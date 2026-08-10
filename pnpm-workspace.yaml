@@ -1,6 +1,8 @@
 packages:
   - "apps/*"
   - "packages/*"
+# Required for `pnpm deploy` in apps/server/Dockerfile to produce a self-contained node_modules.
+injectWorkspacePackages: true
 allowBuilds:
   "@sentry/cli": true
   es5-ext: true

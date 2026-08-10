@@ -47,9 +47,10 @@ RUN pnpm --filter server... run build
 # real node_modules containing only production dependencies. A plain
 # `pnpm prune --prod` at the workspace root would prune against the *root*
 # package.json (which holds only devDependencies) and strip the server's own
-# runtime deps.
+# runtime deps. Requires `injectWorkspacePackages: true` in pnpm-workspace.yaml.
 FROM build AS deploy
-RUN pnpm deploy --filter=server --prod --legacy /app/deploy
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm deploy --filter=server --prod /app/deploy
 
 # ---- runtime -------------------------------------------------------------
 FROM node:${NODE_VERSION} AS runtime
