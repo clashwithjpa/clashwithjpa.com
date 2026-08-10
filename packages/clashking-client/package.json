@@ -12,17 +12,17 @@
         "generate": "kubb generate"
     },
     "dependencies": {
-        "@kubb/plugin-client": "^4.39.2",
+        "@kubb/plugin-client": "^4.39.3",
         "@tanstack/svelte-query": "^5.90.2",
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@kubb/cli": "^4.39.2",
-        "@kubb/core": "^4.39.2",
-        "@kubb/plugin-oas": "^4.39.2",
-        "@kubb/plugin-svelte-query": "^4.39.2",
-        "@kubb/plugin-ts": "^4.39.2",
-        "@kubb/plugin-zod": "^4.39.2",
+        "@kubb/cli": "^4.39.3",
+        "@kubb/core": "^4.39.3",
+        "@kubb/plugin-oas": "^4.39.3",
+        "@kubb/plugin-svelte-query": "^4.39.3",
+        "@kubb/plugin-ts": "^4.39.3",
+        "@kubb/plugin-zod": "^4.39.3",
         "@types/node": "^26.1.2",
         "prettier": "^3.9.6",
         "typescript": "^6.0.3"
