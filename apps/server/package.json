@@ -43,7 +43,7 @@
         "@repo/prettier-config": "workspace:*",
         "@repo/typescript-config": "workspace:*",
         "@types/node": "^26.1.2",
-        "@types/pg": "^8.20.3",
+        "@types/pg": "^8.20.4",
         "discord-api-types": "^0.38.52",
         "drizzle-kit": "^0.31.10",
         "eslint": "^10.8.0",
