@@ -1,6 +1,6 @@
 services:
   jpa-db:
-    image: postgres:18-alpine
+    image: postgres:18-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
     container_name: jpa-db
     shm_size: 2G
     restart: unless-stopped
@@ -16,7 +16,7 @@ services:
       retries: 5
 
   jpa-redis:
-    image: redis:8-alpine
+    image: redis:8-alpine@sha256:978f0e01593e65eed801f2402944efcd936d43b5027e4908a7897baf88ed6241
     container_name: jpa-redis
     restart: unless-stopped
     volumes:
@@ -30,7 +30,7 @@ services:
       retries: 5
 
   jpa-minio:
-    image: minio/minio:latest
+    image: minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: jpa-minio
     restart: unless-stopped
     env_file: .env.server-db
