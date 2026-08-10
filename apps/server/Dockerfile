@@ -2,7 +2,7 @@
 
 ARG NODE_VERSION=24-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03
 ARG TURBO_VERSION=2.10.8
-ARG PNPM_VERSION=11.17.0
+ARG PNPM_VERSION=11.20.0
 
 # ---- base ----------------------------------------------------------------
 FROM node:${NODE_VERSION} AS base
