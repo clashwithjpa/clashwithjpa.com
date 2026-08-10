@@ -7,7 +7,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
-    import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
+    import { Draggable } from "@neodrag/svelte";
     import { onMount, setContext, tick } from "svelte";
     import { toast } from "svelte-sonner";
     import TablerMaximize from "~icons/tabler/maximize";
@@ -161,10 +161,12 @@
     });
 
     setContext("render-inline", true);
+
+    const drag = new Draggable({ bounds: "viewport", onDragStart: () => (open = false), onDragEnd: handleDragEnd });
 </script>
 
 <div
-    {@attach draggable([events({ onDragStart: () => (open = false), onDragEnd: handleDragEnd }), bounds(BoundsFrom.viewport())])}
+    {...drag.attach}
     class="fixed right-4 bottom-4 z-60 active:cursor-grabbing"
     class:bottom-20={(page.url.pathname.startsWith("/admin") || page.url.pathname.startsWith("/dashboard")) && isMobile}
 >

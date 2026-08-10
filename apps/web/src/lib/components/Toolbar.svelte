@@ -1,6 +1,6 @@
 <script lang="ts">
     import { cn } from "$lib/utils";
-    import { bounds, BoundsFrom, draggable, events } from "@neodrag/svelte";
+    import { Draggable } from "@neodrag/svelte";
     import type { Snippet } from "svelte";
 
     interface Props {
@@ -10,11 +10,21 @@
         class?: string;
     }
     let { children, onDragStart, onDragEnd, class: className = "" }: Props = $props();
+
+    const drag = new Draggable({
+        bounds: "parent",
+        get onDragStart() {
+            return onDragStart;
+        },
+        get onDragEnd() {
+            return onDragEnd;
+        },
+    });
 </script>
 
 <div class="pointer-events-none absolute inset-0 z-10 flex items-end justify-center overflow-hidden px-4 pb-6">
     <div
-        {@attach draggable([bounds(BoundsFrom.parent()), events({ onDragStart, onDragEnd })])}
+        {...drag.attach}
         class={cn(
             "pointer-events-auto flex max-w-full cursor-grab items-center justify-center gap-2 rounded-xl bg-stone-900 p-2 drop-shadow-2xl active:cursor-grabbing",
             className,
