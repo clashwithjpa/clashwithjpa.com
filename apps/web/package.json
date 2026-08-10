@@ -37,7 +37,7 @@
         "@repo/auth-shared": "workspace:*",
         "@repo/clashofclans-client": "workspace:*",
         "@sentry/sveltekit": "^10.69.0",
-        "@tanstack/svelte-query": "^5.90.2",
+        "@tanstack/svelte-query": "^6.1.38",
         "ag-charts-community": "^14.1.0",
         "ag-grid-community": "^36.1.0",
         "better-auth": "^1.6.26",
