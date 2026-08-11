@@ -1,1 +1,0 @@
-ALTER TABLE "settings_table" ALTER COLUMN "cwl_ping_interval_minutes" SET DEFAULT 5;

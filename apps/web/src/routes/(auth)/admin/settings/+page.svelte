@@ -516,7 +516,7 @@
                                     <div class="min-w-0">
                                         <h3 class="font-semibold text-stone-50">CWL Pinger</h3>
                                         <p class="text-xs text-stone-400">
-                                            Periodically pings CWL applicants who haven't joined their assigned clan yet. Requires root.
+                                            Periodically pings CWL applicants who haven't joined their assigned clan yet.
                                         </p>
                                     </div>
                                 </div>
