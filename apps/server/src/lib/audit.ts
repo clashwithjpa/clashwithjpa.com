@@ -24,6 +24,8 @@ export const AUDIT_ACTIONS = [
     "cwl_season.rename",
     "cwl_season.delete",
     "settings.update",
+    "cwl_ping.settings_update",
+    "cwl_ping.manual_run",
     "rules.update",
     "clan.create",
     "clan.update",

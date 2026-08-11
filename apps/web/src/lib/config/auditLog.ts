@@ -6,6 +6,7 @@ import TablerArrowRight from "~icons/tabler/arrow-right";
 import TablerArrowsLeft from "~icons/tabler/arrows-left";
 import TablerArrowsRight from "~icons/tabler/arrows-right";
 import TablerBan from "~icons/tabler/ban";
+import TablerBellRinging from "~icons/tabler/bell-ringing";
 import TablerCalendarCheck from "~icons/tabler/calendar-check";
 import TablerCalendarMinus from "~icons/tabler/calendar-minus";
 import TablerCalendarX from "~icons/tabler/calendar-x";
@@ -20,6 +21,7 @@ import TablerKeyOff from "~icons/tabler/key-off";
 import TablerList from "~icons/tabler/list";
 import TablerLogout from "~icons/tabler/logout";
 import TablerLogout2 from "~icons/tabler/logout-2";
+import TablerPlayerPlay from "~icons/tabler/player-play";
 import TablerPlus from "~icons/tabler/plus";
 import TablerRefresh from "~icons/tabler/refresh";
 import TablerSend from "~icons/tabler/send";
@@ -189,6 +191,19 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
             if (Array.isArray(m.fields) && m.fields.length) parts.push(`updated ${m.fields.join(", ")}`);
             return parts.length ? `changed settings: ${parts.join("; ")}` : "updated the settings";
         },
+    },
+    "cwl_ping.settings_update": {
+        label: "CWL ping · settings updated",
+        icon: TablerBellRinging,
+        variant: "yellow",
+        describe: (m) =>
+            Array.isArray(m.fields) && m.fields.length ? `updated CWL ping settings (${m.fields.join(", ")})` : "updated CWL ping settings",
+    },
+    "cwl_ping.manual_run": {
+        label: "CWL ping · manual run",
+        icon: TablerPlayerPlay,
+        variant: "blue",
+        describe: (m) => `ran CWL ping (${m.usersPinged ?? 0} pinged across ${m.clansPinged ?? 0} clan(s), ${m.clansChecked ?? 0} checked)`,
     },
     "rules.update": {
         label: "Rules · updated",

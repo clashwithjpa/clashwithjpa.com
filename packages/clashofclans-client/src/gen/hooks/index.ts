@@ -43,6 +43,7 @@ export type { GetCOCClanMembersQueryKey } from "./createGetCOCClanMembers.ts";
 export type { GetCOCPlayerQueryKey } from "./createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./createGetCOCPlayerBattleLog.ts";
 export type { GetCwlApplicationsQueryKey } from "./createGetCwlApplications.ts";
+export type { GetCwlPingSettingsQueryKey } from "./createGetCwlPingSettings.ts";
 export type { GetCwlSeasonsQueryKey } from "./createGetCwlSeasons.ts";
 export type { GetCwlStatsQueryKey } from "./createGetCwlStats.ts";
 export type { GetGuildNicknamesQueryKey } from "./createGetGuildNicknames.ts";
@@ -60,6 +61,7 @@ export type { ImportUserAccountsMutationKey } from "./createImportUserAccounts.t
 export type { PostCOCPlayerVerifyMutationKey } from "./createPostCOCPlayerVerify.ts";
 export type { RefreshDiscordUsernamesMutationKey } from "./createRefreshDiscordUsernames.ts";
 export type { RenameCwlSeasonMutationKey } from "./createRenameCwlSeason.ts";
+export type { RunCwlPingNowMutationKey } from "./createRunCwlPingNow.ts";
 export type { SetRulesMutationKey } from "./createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./createSetUserAccountExternal.ts";
 export type { SetUserApiAccessMutationKey } from "./createSetUserApiAccess.ts";
@@ -67,12 +69,14 @@ export type { SetUserSeasonBonusMutationKey } from "./createSetUserSeasonBonus.t
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountWarWeightsMutationKey } from "./createSyncCocAccountWarWeights.ts";
 export type { SyncCocAccountsMutationKey } from "./createSyncCocAccounts.ts";
+export type { TestCwlPingWebhookMutationKey } from "./createTestCwlPingWebhook.ts";
 export type { UpdateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./createUpdateAdminSettings.ts";
 export type { UpdateCocAccountExternalMutationKey } from "./createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./createUpdateCocAccountStats.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./createUpdateCocAccountWarWeight.ts";
 export type { UpdateCwlApplicationNotesMutationKey } from "./createUpdateCwlApplicationNotes.ts";
+export type { UpdateCwlPingSettingsMutationKey } from "./createUpdateCwlPingSettings.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./createUpdateJoinApplicationStatus.ts";
 export type { VerifyAdminClanDiscordMutationKey } from "./createVerifyAdminClanDiscord.ts";
 export { applyCwlMutationKey } from "./createApplyCwl.ts";
@@ -192,6 +196,9 @@ export { getCOCPlayerBattleLogQueryOptions } from "./createGetCOCPlayerBattleLog
 export { createGetCwlApplications } from "./createGetCwlApplications.ts";
 export { getCwlApplicationsQueryKey } from "./createGetCwlApplications.ts";
 export { getCwlApplicationsQueryOptions } from "./createGetCwlApplications.ts";
+export { createGetCwlPingSettings } from "./createGetCwlPingSettings.ts";
+export { getCwlPingSettingsQueryKey } from "./createGetCwlPingSettings.ts";
+export { getCwlPingSettingsQueryOptions } from "./createGetCwlPingSettings.ts";
 export { createGetCwlSeasons } from "./createGetCwlSeasons.ts";
 export { getCwlSeasonsQueryKey } from "./createGetCwlSeasons.ts";
 export { getCwlSeasonsQueryOptions } from "./createGetCwlSeasons.ts";
@@ -239,6 +246,8 @@ export { createRefreshDiscordUsernames } from "./createRefreshDiscordUsernames.t
 export { refreshDiscordUsernamesMutationKey } from "./createRefreshDiscordUsernames.ts";
 export { createRenameCwlSeason } from "./createRenameCwlSeason.ts";
 export { renameCwlSeasonMutationKey } from "./createRenameCwlSeason.ts";
+export { createRunCwlPingNow } from "./createRunCwlPingNow.ts";
+export { runCwlPingNowMutationKey } from "./createRunCwlPingNow.ts";
 export { createSetRules } from "./createSetRules.ts";
 export { setRulesMutationKey } from "./createSetRules.ts";
 export { createSetUserAccountExternal } from "./createSetUserAccountExternal.ts";
@@ -253,6 +262,8 @@ export { createSyncCocAccountWarWeights } from "./createSyncCocAccountWarWeights
 export { syncCocAccountWarWeightsMutationKey } from "./createSyncCocAccountWarWeights.ts";
 export { createSyncCocAccounts } from "./createSyncCocAccounts.ts";
 export { syncCocAccountsMutationKey } from "./createSyncCocAccounts.ts";
+export { createTestCwlPingWebhook } from "./createTestCwlPingWebhook.ts";
+export { testCwlPingWebhookMutationKey } from "./createTestCwlPingWebhook.ts";
 export { createUpdateAdminClan } from "./createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./createUpdateAdminClan.ts";
 export { createUpdateAdminSettings } from "./createUpdateAdminSettings.ts";
@@ -265,6 +276,8 @@ export { createUpdateCocAccountWarWeight } from "./createUpdateCocAccountWarWeig
 export { updateCocAccountWarWeightMutationKey } from "./createUpdateCocAccountWarWeight.ts";
 export { createUpdateCwlApplicationNotes } from "./createUpdateCwlApplicationNotes.ts";
 export { updateCwlApplicationNotesMutationKey } from "./createUpdateCwlApplicationNotes.ts";
+export { createUpdateCwlPingSettings } from "./createUpdateCwlPingSettings.ts";
+export { updateCwlPingSettingsMutationKey } from "./createUpdateCwlPingSettings.ts";
 export { createUpdateJoinApplicationStatus } from "./createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./createUpdateJoinApplicationStatus.ts";
 export { createVerifyAdminClanDiscord } from "./createVerifyAdminClanDiscord.ts";

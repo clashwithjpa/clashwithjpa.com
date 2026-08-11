@@ -43,6 +43,7 @@ export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.
 export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
 export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
 export type { GetCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
+export type { GetCwlPingSettingsQueryKey } from "./hooks/createGetCwlPingSettings.ts";
 export type { GetCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
 export type { GetCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
 export type { GetGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
@@ -60,6 +61,7 @@ export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAcco
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
 export type { RenameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
+export type { RunCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SetUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
@@ -67,12 +69,14 @@ export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonB
 export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
 export type { SyncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
 export type { SyncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
+export type { TestCwlPingWebhookMutationKey } from "./hooks/createTestCwlPingWebhook.ts";
 export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
 export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export type { UpdateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
+export type { UpdateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type { VerifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
 export type {
@@ -474,6 +478,13 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./models/GetCwlApplications.ts";
+export type {
+    GetCwlPingSettings200,
+    GetCwlPingSettings401,
+    GetCwlPingSettings500,
+    GetCwlPingSettingsQuery,
+    GetCwlPingSettingsQueryResponse,
+} from "./models/GetCwlPingSettings.ts";
 export type { GetCwlSeasons200, GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQuery, GetCwlSeasonsQueryResponse } from "./models/GetCwlSeasons.ts";
 export type {
     GetCwlStats200,
@@ -574,6 +585,7 @@ export type {
     RenameCwlSeasonMutationResponse,
     RenameCwlSeasonPathParams,
 } from "./models/RenameCwlSeason.ts";
+export type { RunCwlPingNow200, RunCwlPingNow401, RunCwlPingNowMutation, RunCwlPingNowMutationResponse } from "./models/RunCwlPingNow.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -628,6 +640,15 @@ export type {
     SyncCocAccountsMutationRequest,
     SyncCocAccountsMutationResponse,
 } from "./models/SyncCocAccounts.ts";
+export type {
+    TestCwlPingWebhook200,
+    TestCwlPingWebhook400,
+    TestCwlPingWebhook401,
+    TestCwlPingWebhook502,
+    TestCwlPingWebhookMutation,
+    TestCwlPingWebhookMutationRequest,
+    TestCwlPingWebhookMutationResponse,
+} from "./models/TestCwlPingWebhook.ts";
 export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
@@ -689,6 +710,15 @@ export type {
     UpdateCwlApplicationNotesMutationResponse,
     UpdateCwlApplicationNotesPathParams,
 } from "./models/UpdateCwlApplicationNotes.ts";
+export type {
+    UpdateCwlPingSettings200,
+    UpdateCwlPingSettings400,
+    UpdateCwlPingSettings401,
+    UpdateCwlPingSettings500,
+    UpdateCwlPingSettingsMutation,
+    UpdateCwlPingSettingsMutationRequest,
+    UpdateCwlPingSettingsMutationResponse,
+} from "./models/UpdateCwlPingSettings.ts";
 export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,
@@ -755,6 +785,7 @@ export { getCOCClanMembers } from "./clients/getCOCClanMembers.ts";
 export { getCOCPlayer } from "./clients/getCOCPlayer.ts";
 export { getCOCPlayerBattleLog } from "./clients/getCOCPlayerBattleLog.ts";
 export { getCwlApplications } from "./clients/getCwlApplications.ts";
+export { getCwlPingSettings } from "./clients/getCwlPingSettings.ts";
 export { getCwlSeasons } from "./clients/getCwlSeasons.ts";
 export { getCwlStats } from "./clients/getCwlStats.ts";
 export { getGuildNicknames } from "./clients/getGuildNicknames.ts";
@@ -772,6 +803,7 @@ export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
 export { renameCwlSeason } from "./clients/renameCwlSeason.ts";
+export { runCwlPingNow } from "./clients/runCwlPingNow.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { setUserApiAccess } from "./clients/setUserApiAccess.ts";
@@ -779,12 +811,14 @@ export { setUserSeasonBonus } from "./clients/setUserSeasonBonus.ts";
 export { syncAdminCwlClanLeagues } from "./clients/syncAdminCwlClanLeagues.ts";
 export { syncCocAccountWarWeights } from "./clients/syncCocAccountWarWeights.ts";
 export { syncCocAccounts } from "./clients/syncCocAccounts.ts";
+export { testCwlPingWebhook } from "./clients/testCwlPingWebhook.ts";
 export { updateAdminClan } from "./clients/updateAdminClan.ts";
 export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
 export { updateCwlApplicationNotes } from "./clients/updateCwlApplicationNotes.ts";
+export { updateCwlPingSettings } from "./clients/updateCwlPingSettings.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { verifyAdminClanDiscord } from "./clients/verifyAdminClanDiscord.ts";
 export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
@@ -904,6 +938,9 @@ export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBat
 export { createGetCwlApplications } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
 export { getCwlApplicationsQueryOptions } from "./hooks/createGetCwlApplications.ts";
+export { createGetCwlPingSettings } from "./hooks/createGetCwlPingSettings.ts";
+export { getCwlPingSettingsQueryKey } from "./hooks/createGetCwlPingSettings.ts";
+export { getCwlPingSettingsQueryOptions } from "./hooks/createGetCwlPingSettings.ts";
 export { createGetCwlSeasons } from "./hooks/createGetCwlSeasons.ts";
 export { getCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
 export { getCwlSeasonsQueryOptions } from "./hooks/createGetCwlSeasons.ts";
@@ -951,6 +988,8 @@ export { createRefreshDiscordUsernames } from "./hooks/createRefreshDiscordUsern
 export { refreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
 export { createRenameCwlSeason } from "./hooks/createRenameCwlSeason.ts";
 export { renameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
+export { createRunCwlPingNow } from "./hooks/createRunCwlPingNow.ts";
+export { runCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
@@ -965,6 +1004,8 @@ export { createSyncCocAccountWarWeights } from "./hooks/createSyncCocAccountWarW
 export { syncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
 export { createSyncCocAccounts } from "./hooks/createSyncCocAccounts.ts";
 export { syncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
+export { createTestCwlPingWebhook } from "./hooks/createTestCwlPingWebhook.ts";
+export { testCwlPingWebhookMutationKey } from "./hooks/createTestCwlPingWebhook.ts";
 export { createUpdateAdminClan } from "./hooks/createUpdateAdminClan.ts";
 export { updateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
 export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts";
@@ -977,6 +1018,8 @@ export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountW
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { createUpdateCwlApplicationNotes } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export { updateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
+export { createUpdateCwlPingSettings } from "./hooks/createUpdateCwlPingSettings.ts";
+export { updateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export { createVerifyAdminClanDiscord } from "./hooks/createVerifyAdminClanDiscord.ts";
@@ -1342,6 +1385,12 @@ export {
     getCwlApplicationsQueryResponseSchema,
 } from "./zod/getCwlApplicationsSchema.ts";
 export {
+    getCwlPingSettings200Schema,
+    getCwlPingSettings401Schema,
+    getCwlPingSettings500Schema,
+    getCwlPingSettingsQueryResponseSchema,
+} from "./zod/getCwlPingSettingsSchema.ts";
+export {
     getCwlSeasons200Schema,
     getCwlSeasons401Schema,
     getCwlSeasons500Schema,
@@ -1431,6 +1480,7 @@ export {
     renameCwlSeasonMutationResponseSchema,
     renameCwlSeasonPathParamsSchema,
 } from "./zod/renameCwlSeasonSchema.ts";
+export { runCwlPingNow200Schema, runCwlPingNow401Schema, runCwlPingNowMutationResponseSchema } from "./zod/runCwlPingNowSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,
@@ -1479,6 +1529,14 @@ export {
     syncCocAccountsMutationRequestSchema,
     syncCocAccountsMutationResponseSchema,
 } from "./zod/syncCocAccountsSchema.ts";
+export {
+    testCwlPingWebhook200Schema,
+    testCwlPingWebhook400Schema,
+    testCwlPingWebhook401Schema,
+    testCwlPingWebhook502Schema,
+    testCwlPingWebhookMutationRequestSchema,
+    testCwlPingWebhookMutationResponseSchema,
+} from "./zod/testCwlPingWebhookSchema.ts";
 export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
@@ -1534,6 +1592,14 @@ export {
     updateCwlApplicationNotesMutationResponseSchema,
     updateCwlApplicationNotesPathParamsSchema,
 } from "./zod/updateCwlApplicationNotesSchema.ts";
+export {
+    updateCwlPingSettings200Schema,
+    updateCwlPingSettings400Schema,
+    updateCwlPingSettings401Schema,
+    updateCwlPingSettings500Schema,
+    updateCwlPingSettingsMutationRequestSchema,
+    updateCwlPingSettingsMutationResponseSchema,
+} from "./zod/updateCwlPingSettingsSchema.ts";
 export {
     updateJoinApplicationStatus200Schema,
     updateJoinApplicationStatus401Schema,

@@ -78,7 +78,7 @@
         {/if}
     {/if}
     {#if props.content}
-        <span class="font-rubik text-xs capitalize select-none">{props.content}</span>
+        <span class="font-rubik text-xs select-none">{props.content}</span>
     {/if}
 {/snippet}
 

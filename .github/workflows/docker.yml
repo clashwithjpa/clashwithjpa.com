@@ -74,19 +74,3 @@ jobs:
 
           docker run --rm --entrypoint sh "$img" -c "test -s /etc/nginx/conf.d/default.conf"
           echo "ok       nginx.conf"
-
-  cwl-ping:
-    name: Build cwl-ping image
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - name: Create env file
-        run: cp .env.example .env
-        working-directory: ./scripts/containers/cwl-ping
-
-      - name: Build image
-        run: docker compose build
-        working-directory: ./scripts/containers/cwl-ping

@@ -1,7 +1,7 @@
 <script lang="ts">
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     import { beforeNavigate, goto } from "$app/navigation";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
+    import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
@@ -10,16 +10,22 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
-    import { errorMessage } from "$lib/utils";
+    import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         createCwlSeason,
         deleteCwlSeason,
         getAdminSettings,
+        getCwlPingSettings,
         getCwlSeasons,
         refreshDiscordUsernames,
         renameCwlSeason,
+        runCwlPingNow,
+        testCwlPingWebhook,
         updateAdminSettings,
+        updateCwlPingSettings,
         type GetAdminSettings200,
+        type GetCwlPingSettings200,
         type GetCwlSeasons200,
     } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -27,11 +33,16 @@
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import TablerBellRinging from "~icons/tabler/bell-ringing";
     import TablerCalendarEvent from "~icons/tabler/calendar-event";
+    import TablerClock from "~icons/tabler/clock";
     import TablerFileDescription from "~icons/tabler/file-description";
+    import TablerInfoCircle from "~icons/tabler/info-circle";
     import TablerPencil from "~icons/tabler/pencil";
+    import TablerPlayerPlay from "~icons/tabler/player-play";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
+    import TablerSend from "~icons/tabler/send";
     import TablerSwords from "~icons/tabler/swords";
     import TablerTool from "~icons/tabler/tool";
     import TablerTrash from "~icons/tabler/trash";
@@ -40,18 +51,26 @@
     let { data }: PageProps = $props();
 
     type Settings = GetAdminSettings200["data"]["settings"];
+    type CwlPingSettings = GetCwlPingSettings200["data"]["settings"];
     type Season = GetCwlSeasons200["data"]["seasons"][number];
 
     let settings = $state<Settings>(null);
+    let cwlPingSettings = $state<CwlPingSettings>(null);
     let loading = $state(true);
     let saving = $state(false);
     let refreshingUsernames = $state(false);
+    let testingWebhook = $state(false);
+    let runningPingNow = $state(false);
 
     let applicationsEnabled = $state(false);
     let cwlEnabled = $state(false);
     let siteMaintenanceMode = $state(false);
     let guildId = $state("");
     let currentSeasonValue = $state("");
+
+    let cwlPingEnabled = $state(false);
+    let cwlPingWebhookUrl = $state("");
+    let cwlPingIntervalMinutes = $state("30");
 
     let seasons = $state<Season[]>([]);
     let seasonOptions = $derived<Option[]>([{ label: "None", value: "" }, ...seasons.map((s) => ({ label: s.name, value: String(s.id) }))]);
@@ -80,6 +99,12 @@
         currentSeasonValue = settings?.currentCwlSeasonId != null ? String(settings.currentCwlSeasonId) : "";
     }
 
+    function syncFromCwlPingSettings() {
+        cwlPingEnabled = cwlPingSettings?.enabled ?? false;
+        cwlPingWebhookUrl = cwlPingSettings?.webhookUrl ?? "";
+        cwlPingIntervalMinutes = String(cwlPingSettings?.intervalMinutes ?? 5);
+    }
+
     async function loadSeasons() {
         try {
             const resp = await getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
@@ -89,10 +114,27 @@
         }
     }
 
+    async function loadCwlPingSettings() {
+        if (!data.isSuperadmin) return;
+        try {
+            const resp = await getCwlPingSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                cwlPingSettings = resp.data.settings;
+                syncFromCwlPingSettings();
+            }
+        } catch {
+            // CWL ping panel stays as-is on failure
+        }
+    }
+
     async function load() {
         loading = true;
         try {
-            const [resp] = await Promise.all([getAdminSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }), loadSeasons()]);
+            const [resp] = await Promise.all([
+                getAdminSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
+                loadSeasons(),
+                loadCwlPingSettings(),
+            ]);
             if (resp.success) {
                 settings = resp.data.settings;
                 syncFromSettings();
@@ -104,6 +146,13 @@
         } finally {
             loading = false;
         }
+    }
+
+    // API error responses aren't always a string (zod validation failures come back as an
+    // issue object) — toasting a non-string crashes svelte-sonner's title renderer.
+    function apiErrorMessage(resp: unknown, fallback: string): string {
+        const err = (resp as { error?: unknown } | undefined)?.error;
+        return typeof err === "string" ? err : fallback;
     }
 
     function nextAvailableName(base: string): string {
@@ -130,7 +179,7 @@
                 newName = "";
                 await loadSeasons();
             } else {
-                toast.error((resp as any).error ?? "Failed to create season");
+                toast.error(apiErrorMessage(resp, "Failed to create season"));
             }
         } catch (e) {
             toast.error("Failed to create season", { description: errorMessage(e) });
@@ -161,7 +210,7 @@
                 editDialogOpen = false;
                 await loadSeasons();
             } else {
-                toast.error((resp as any).error ?? "Failed to rename season");
+                toast.error(apiErrorMessage(resp, "Failed to rename season"));
             }
         } catch (e) {
             toast.error("Failed to rename season", { description: errorMessage(e) });
@@ -190,23 +239,45 @@
     async function save() {
         saving = true;
         try {
-            const resp = await updateAdminSettings(
-                {
-                    applicationsEnabled,
-                    cwlEnabled,
-                    siteMaintenanceMode,
-                    guildId: guildId.trim() ? guildId.trim() : null,
-                    currentCwlSeasonId: currentSeasonValue ? Number(currentSeasonValue) : null,
-                },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
+            const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const, headers: { "Content-Type": "application/json" } };
+            const [resp, cwlPingResp] = await Promise.all([
+                updateAdminSettings(
+                    {
+                        applicationsEnabled,
+                        cwlEnabled,
+                        siteMaintenanceMode,
+                        guildId: guildId.trim() ? guildId.trim() : null,
+                        currentCwlSeasonId: currentSeasonValue ? Number(currentSeasonValue) : null,
+                    },
+                    opts,
+                ),
+                data.isSuperadmin
+                    ? updateCwlPingSettings(
+                          {
+                              enabled: cwlPingEnabled,
+                              webhookUrl: cwlPingWebhookUrl.trim() ? cwlPingWebhookUrl.trim() : null,
+                              intervalMinutes: Number(cwlPingIntervalMinutes) || 5,
+                          },
+                          opts,
+                      )
+                    : null,
+            ]);
+
             if (resp.success) {
                 settings = resp.data.settings;
                 syncFromSettings();
-                toast.success("Settings updated");
             } else {
                 toast.error("Failed to update settings");
             }
+            if (cwlPingResp) {
+                if (cwlPingResp.success) {
+                    cwlPingSettings = cwlPingResp.data.settings;
+                    syncFromCwlPingSettings();
+                } else {
+                    toast.error(apiErrorMessage(cwlPingResp, "Failed to update CWL ping settings"));
+                }
+            }
+            if (resp.success && (!cwlPingResp || cwlPingResp.success)) toast.success("Settings updated");
         } catch (e) {
             toast.error("Failed to update settings", { description: errorMessage(e) });
         } finally {
@@ -230,7 +301,48 @@
         }
     }
 
+    async function testWebhook() {
+        testingWebhook = true;
+        try {
+            const resp = await testCwlPingWebhook(
+                { webhookUrl: cwlPingWebhookUrl.trim() || undefined },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (resp.success) toast.success("Test ping sent — check the channel.");
+            else toast.error(apiErrorMessage(resp, "Failed to send test ping"));
+        } catch (e) {
+            toast.error("Failed to send test ping", { description: errorMessage(e) });
+        } finally {
+            testingWebhook = false;
+        }
+    }
+
+    async function runPingNow() {
+        runningPingNow = true;
+        try {
+            const resp = await runCwlPingNow({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                const { usersPinged, clansPinged, skippedReason } = resp.data;
+                toast.success(skippedReason ?? `Pinged ${usersPinged} user(s) across ${clansPinged} clan(s).`);
+                await loadCwlPingSettings();
+            } else {
+                toast.error("Failed to run CWL ping");
+            }
+        } catch (e) {
+            toast.error("Failed to run CWL ping", { description: errorMessage(e) });
+        } finally {
+            runningPingNow = false;
+        }
+    }
+
     load();
+
+    let isCwlPingDirty = $derived(
+        !!cwlPingSettings &&
+            (cwlPingEnabled !== cwlPingSettings.enabled ||
+                (cwlPingWebhookUrl.trim() || null) !== (cwlPingSettings.webhookUrl || null) ||
+                (Number(cwlPingIntervalMinutes) || 5) !== cwlPingSettings.intervalMinutes),
+    );
 
     let isDirty = $derived(
         !!settings &&
@@ -238,7 +350,8 @@
                 cwlEnabled !== settings.cwlEnabled ||
                 siteMaintenanceMode !== settings.siteMaintenanceMode ||
                 (guildId.trim() || null) !== (settings.guildId || null) ||
-                (currentSeasonValue ? Number(currentSeasonValue) : null) !== (settings.currentCwlSeasonId ?? null)),
+                (currentSeasonValue ? Number(currentSeasonValue) : null) !== (settings.currentCwlSeasonId ?? null) ||
+                isCwlPingDirty),
     );
 
     // Warn before leaving with unsaved setting changes (the season list and
@@ -350,7 +463,7 @@
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-semibold text-red-200">Site maintenance mode</h3>
-                                <p class="text-xs text-red-300/70">Restricts site to admins only. Requires sudo.</p>
+                                <p class="text-xs text-red-300/70">Restricts site to admins only.</p>
                             </div>
                         </div>
                         <Toggle bind:checked={siteMaintenanceMode} disabled={saving} />
@@ -363,7 +476,7 @@
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-semibold text-stone-50">Discord Guild ID</h3>
-                                <p class="text-xs text-stone-400">Used for Discord integration. Requires sudo.</p>
+                                <p class="text-xs text-stone-400">Used for Discord integration.</p>
                             </div>
                         </div>
                         <Input bind:value={guildId} placeholder="Discord guild snowflake" disabled={saving} />
@@ -377,7 +490,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <h3 class="font-semibold text-stone-50">Refresh Discord usernames</h3>
-                                    <p class="text-xs text-stone-400">Pulls current usernames from the guild member list. Requires root.</p>
+                                    <p class="text-xs text-stone-400">Pulls current usernames from the guild member list.</p>
                                 </div>
                             </div>
                             <Button onclick={refreshUsernames} disabled={refreshingUsernames} class="shrink-0">
@@ -390,6 +503,89 @@
                         </div>
                     {/if}
                 </section>
+
+                {#if data.isSuperadmin}
+                    <section class="flex flex-col gap-3">
+                        <h2 class="text-xs font-semibold tracking-wide text-stone-400 uppercase">CWL Ping</h2>
+                        <div class="flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex min-w-0 items-start gap-3">
+                                    <div class="shrink-0 rounded-lg border-2 border-stone-700/50 bg-stone-800 p-2">
+                                        <TablerBellRinging class="size-5 text-stone-300" />
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-semibold text-stone-50">CWL Pinger</h3>
+                                        <p class="text-xs text-stone-400">
+                                            Periodically pings CWL applicants who haven't joined their assigned clan yet. Requires root.
+                                        </p>
+                                    </div>
+                                </div>
+                                <Toggle bind:checked={cwlPingEnabled} disabled={saving} />
+                            </div>
+
+                            <Input bind:value={cwlPingWebhookUrl} placeholder="https://discord.com/api/webhooks/..." disabled={saving} />
+
+                            <div class="flex items-center gap-3">
+                                <div class="w-28">
+                                    <Input type="number" bind:value={cwlPingIntervalMinutes} min={1} max={10} disabled={saving} />
+                                </div>
+                                <span class="text-xs text-stone-400">minutes between checks (1–10)</span>
+                            </div>
+
+                            <div class="flex flex-col gap-3 border-t-2 border-stone-700/50 pt-4">
+                                {#if cwlPingSettings?.lastRunAt}
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <Tooltip title={formatDateTime(cwlPingSettings.lastRunAt)} placement="top">
+                                            <Badge
+                                                variant="yellow"
+                                                iconSize="size-4"
+                                                icon={TablerClock}
+                                                content={`Last run ${formatRelativeTime(cwlPingSettings.lastRunAt)}`}
+                                                class="cursor-help"
+                                            />
+                                        </Tooltip>
+                                        {#if cwlPingSettings.lastRunSummary}
+                                            <Badge
+                                                variant="blue"
+                                                icon={TablerInfoCircle}
+                                                iconSize="size-4"
+                                                content={cwlPingSettings.lastRunSummary}
+                                            />
+                                        {/if}
+                                    </div>
+                                {:else}
+                                    <p class="text-xs text-stone-400">Hasn't run yet.</p>
+                                {/if}
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        class="w-full"
+                                        onclick={testWebhook}
+                                        disabled={testingWebhook || !cwlPingWebhookUrl.trim()}
+                                    >
+                                        <span class="flex items-center justify-center gap-1">
+                                            {#if testingWebhook}
+                                                <SvgSpinnersRingResize class="size-4" /> Sending...
+                                            {:else}
+                                                <TablerSend class="size-4" /> Send test ping
+                                            {/if}
+                                        </span>
+                                    </Button>
+                                    <Button variant="ghost" class="w-full" onclick={runPingNow} disabled={runningPingNow}>
+                                        <span class="flex items-center justify-center gap-1">
+                                            {#if runningPingNow}
+                                                <SvgSpinnersRingResize class="size-4" /> Running...
+                                            {:else}
+                                                <TablerPlayerPlay class="size-4" /> Run once
+                                            {/if}
+                                        </span>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {/if}
 
                 <div class="flex items-center justify-end gap-3">
                     {#if isDirty}

@@ -1,6 +1,7 @@
 import { AUDIT_ACTIONS, AUDIT_SOURCES, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
 import { isAdmin, isManager, isReviewer, isSuperadmin } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
+import { runCwlPingCheck, sendTestPing } from "@/lib/cwl-ping";
 import { getDbErrorMessage } from "@/lib/db/error";
 import {
     addCocAccount,
@@ -30,6 +31,7 @@ import {
     getBonusLedger,
     getClanApplications,
     getCocAccountsForUser,
+    getCwlPingSettings,
     getCwlSeasons,
     getCwlStats,
     getDiscordAccountId,
@@ -50,6 +52,7 @@ import {
     updateCocAccountWarWeight,
     updateCwlApplicationNotes,
     updateCwlClan,
+    updateCwlPingSettings,
     updateSettings,
 } from "@/lib/db/functions";
 import {
@@ -1206,6 +1209,152 @@ app.put(
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update settings" }, 500);
         }
+    },
+);
+
+// CWL ping - superadmin-only. Kept off the isAdmin-gated /settings endpoints above so the
+// webhook URL is never returned to a plain sudo-level admin.
+
+const cwlPingSettingsSchema = z4.object({
+    enabled: z4.boolean(),
+    webhookUrl: z4.string().nullable(),
+    intervalMinutes: z4.number(),
+    lastRunAt: z4.date().nullable(),
+    lastRunSummary: z4.string().nullable(),
+});
+const getCwlPingSettingsData = z4.object({ settings: cwlPingSettingsSchema.nullable() });
+app.get(
+    "/settings/cwl-ping",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "getCwlPingSettings",
+        role: "Superadmin",
+        description: "Fetches the CWL ping job's settings (enabled, webhook URL, interval, last run).",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Settings.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlPingSettingsData)) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            c.header("Cache-Control", "no-cache, no-store, must-revalidate");
+            const settings = await getCwlPingSettings();
+            return c.json({ success: true, data: { settings } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch CWL ping settings" }, 500);
+        }
+    },
+);
+
+const discordWebhookUrlSchema = z4
+    .string()
+    .url()
+    .refine((url) => /^https:\/\/(discord|discordapp)\.com\/api\/webhooks\//.test(url), "Must be a discord.com webhook URL");
+const updateCwlPingSettingsBodySchema = z4.object({
+    enabled: z4.boolean().optional(),
+    webhookUrl: discordWebhookUrlSchema.nullable().optional(),
+    intervalMinutes: z4.number().int().min(1).max(10).optional(),
+});
+const updateCwlPingSettingsData = z4.object({ settings: cwlPingSettingsSchema });
+app.put(
+    "/settings/cwl-ping",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "updateCwlPingSettings",
+        role: "Superadmin",
+        description: "Updates the CWL ping job's settings.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Updated settings.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCwlPingSettingsData)) } },
+            },
+            400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", updateCwlPingSettingsBodySchema),
+    async (c) => {
+        try {
+            const body = c.req.valid("json");
+            const settings = await updateCwlPingSettings(body);
+            logAction(c, {
+                action: "cwl_ping.settings_update",
+                targetType: "settings",
+                targetId: settings.id,
+                metadata: { fields: Object.keys(body) },
+            });
+            return c.json({ success: true, data: { settings } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update CWL ping settings" }, 500);
+        }
+    },
+);
+
+const testCwlPingWebhookBodySchema = z4.object({ webhookUrl: discordWebhookUrlSchema.optional() });
+app.post(
+    "/settings/cwl-ping/test",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "testCwlPingWebhook",
+        role: "Superadmin",
+        description: "Sends a minimal test message to the given (or currently saved) CWL ping webhook URL.",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Test message sent.", content: { "application/json": { schema: resolver(SuccessResponseSchema(z4.object({}))) } } },
+            400: { description: "No webhook URL to test.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            502: { description: "Webhook rejected the message.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", testCwlPingWebhookBodySchema),
+    async (c) => {
+        try {
+            const { webhookUrl } = c.req.valid("json");
+            const target = webhookUrl ?? (await getCwlPingSettings())?.webhookUrl;
+            if (!target) return c.json({ success: false, error: "No webhook URL configured." }, 400);
+
+            await sendTestPing(target);
+            return c.json({ success: true, data: {} });
+        } catch (error) {
+            return c.json({ success: false, error: error instanceof Error ? error.message : "Failed to reach the webhook" }, 502);
+        }
+    },
+);
+
+const runCwlPingData = z4.object({
+    seasonId: z4.number().nullable(),
+    clansChecked: z4.number(),
+    clansPinged: z4.number(),
+    usersPinged: z4.number(),
+    skippedReason: z4.string().optional(),
+});
+app.post(
+    "/settings/cwl-ping/run",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "runCwlPingNow",
+        role: "Superadmin",
+        description: "Immediately runs one CWL ping pass, independent of the schedule and the enabled toggle.",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Run summary.", content: { "application/json": { schema: resolver(SuccessResponseSchema(runCwlPingData)) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        const result = await runCwlPingCheck();
+        logAction(c, {
+            action: "cwl_ping.manual_run",
+            targetType: "settings",
+            metadata: { clansChecked: result.clansChecked, clansPinged: result.clansPinged, usersPinged: result.usersPinged },
+        });
+        return c.json({ success: true, data: result });
     },
 );
 

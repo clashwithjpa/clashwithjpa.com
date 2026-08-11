@@ -310,6 +310,12 @@ export {
     getCwlApplicationsQueryParamsSchema,
     getCwlApplicationsQueryResponseSchema,
 } from "./getCwlApplicationsSchema.ts";
+export {
+    getCwlPingSettings200Schema,
+    getCwlPingSettings401Schema,
+    getCwlPingSettings500Schema,
+    getCwlPingSettingsQueryResponseSchema,
+} from "./getCwlPingSettingsSchema.ts";
 export { getCwlSeasons200Schema, getCwlSeasons401Schema, getCwlSeasons500Schema, getCwlSeasonsQueryResponseSchema } from "./getCwlSeasonsSchema.ts";
 export {
     getCwlStats200Schema,
@@ -395,6 +401,7 @@ export {
     renameCwlSeasonMutationResponseSchema,
     renameCwlSeasonPathParamsSchema,
 } from "./renameCwlSeasonSchema.ts";
+export { runCwlPingNow200Schema, runCwlPingNow401Schema, runCwlPingNowMutationResponseSchema } from "./runCwlPingNowSchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,
@@ -443,6 +450,14 @@ export {
     syncCocAccountsMutationRequestSchema,
     syncCocAccountsMutationResponseSchema,
 } from "./syncCocAccountsSchema.ts";
+export {
+    testCwlPingWebhook200Schema,
+    testCwlPingWebhook400Schema,
+    testCwlPingWebhook401Schema,
+    testCwlPingWebhook502Schema,
+    testCwlPingWebhookMutationRequestSchema,
+    testCwlPingWebhookMutationResponseSchema,
+} from "./testCwlPingWebhookSchema.ts";
 export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
@@ -498,6 +513,14 @@ export {
     updateCwlApplicationNotesMutationResponseSchema,
     updateCwlApplicationNotesPathParamsSchema,
 } from "./updateCwlApplicationNotesSchema.ts";
+export {
+    updateCwlPingSettings200Schema,
+    updateCwlPingSettings400Schema,
+    updateCwlPingSettings401Schema,
+    updateCwlPingSettings500Schema,
+    updateCwlPingSettingsMutationRequestSchema,
+    updateCwlPingSettingsMutationResponseSchema,
+} from "./updateCwlPingSettingsSchema.ts";
 export {
     updateJoinApplicationStatus200Schema,
     updateJoinApplicationStatus401Schema,

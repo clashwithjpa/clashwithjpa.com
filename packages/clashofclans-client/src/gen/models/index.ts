@@ -391,6 +391,13 @@ export type {
     GetCwlApplicationsQueryParams,
     GetCwlApplicationsQueryResponse,
 } from "./GetCwlApplications.ts";
+export type {
+    GetCwlPingSettings200,
+    GetCwlPingSettings401,
+    GetCwlPingSettings500,
+    GetCwlPingSettingsQuery,
+    GetCwlPingSettingsQueryResponse,
+} from "./GetCwlPingSettings.ts";
 export type { GetCwlSeasons200, GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQuery, GetCwlSeasonsQueryResponse } from "./GetCwlSeasons.ts";
 export type {
     GetCwlStats200,
@@ -491,6 +498,7 @@ export type {
     RenameCwlSeasonMutationResponse,
     RenameCwlSeasonPathParams,
 } from "./RenameCwlSeason.ts";
+export type { RunCwlPingNow200, RunCwlPingNow401, RunCwlPingNowMutation, RunCwlPingNowMutationResponse } from "./RunCwlPingNow.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -545,6 +553,15 @@ export type {
     SyncCocAccountsMutationRequest,
     SyncCocAccountsMutationResponse,
 } from "./SyncCocAccounts.ts";
+export type {
+    TestCwlPingWebhook200,
+    TestCwlPingWebhook400,
+    TestCwlPingWebhook401,
+    TestCwlPingWebhook502,
+    TestCwlPingWebhookMutation,
+    TestCwlPingWebhookMutationRequest,
+    TestCwlPingWebhookMutationResponse,
+} from "./TestCwlPingWebhook.ts";
 export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
@@ -606,6 +623,15 @@ export type {
     UpdateCwlApplicationNotesMutationResponse,
     UpdateCwlApplicationNotesPathParams,
 } from "./UpdateCwlApplicationNotes.ts";
+export type {
+    UpdateCwlPingSettings200,
+    UpdateCwlPingSettings400,
+    UpdateCwlPingSettings401,
+    UpdateCwlPingSettings500,
+    UpdateCwlPingSettingsMutation,
+    UpdateCwlPingSettingsMutationRequest,
+    UpdateCwlPingSettingsMutationResponse,
+} from "./UpdateCwlPingSettings.ts";
 export type {
     ApplicationStatusEnumKey,
     UpdateJoinApplicationStatus200,

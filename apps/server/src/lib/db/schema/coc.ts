@@ -21,6 +21,12 @@ export const settingsTable = pgTable(
         guildId: text("guild_id"),
         currentCwlSeasonId: integer("current_cwl_season_id").references(() => cwlSeasonTable.id, { onDelete: "set null" }),
         updatedAt: timestamp("updated_at").defaultNow(),
+        // CWL ping: pings applicants who haven't joined their assigned clan yet. Superadmin-only (see routes/admin.ts).
+        cwlPingEnabled: boolean("cwl_ping_enabled").notNull().default(false),
+        cwlPingWebhookUrl: text("cwl_ping_webhook_url"),
+        cwlPingIntervalMinutes: integer("cwl_ping_interval_minutes").notNull().default(5),
+        cwlPingLastRunAt: timestamp("cwl_ping_last_run_at"),
+        cwlPingLastRunSummary: text("cwl_ping_last_run_summary"),
     },
     (t) => [check("settings_table_single_row", sql`${t.id} = 1`)],
 );

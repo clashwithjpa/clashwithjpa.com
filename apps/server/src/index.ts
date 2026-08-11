@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import { isApiKeyAllowedPath } from "@/lib/api-access";
 import { apiUsageMiddleware } from "@/lib/api-usage";
 import { config } from "@/lib/config";
+import { startCwlPingScheduler } from "@/lib/cwl-ping";
 import { betterAuthMiddleware } from "@/lib/middlewares";
 import { describeRoute } from "@/lib/openapi";
 import { getCachedSettings } from "@/lib/settings-cache";
@@ -305,5 +306,7 @@ app.get(
 serve({ fetch: app.fetch, port: config.PORT }, (info) => {
     console.log(`Started server: http://localhost:${info.port}`);
 });
+
+startCwlPingScheduler();
 
 export default app;

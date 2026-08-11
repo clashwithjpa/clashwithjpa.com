@@ -190,6 +190,20 @@
             "when": 1785577686785,
             "tag": "0026_big_chat",
             "breakpoints": true
+        },
+        {
+            "idx": 27,
+            "version": "7",
+            "when": 1786426759400,
+            "tag": "0027_real_marten_broadcloak",
+            "breakpoints": true
+        },
+        {
+            "idx": 28,
+            "version": "7",
+            "when": 1786429970756,
+            "tag": "0028_odd_dakota_north",
+            "breakpoints": true
         }
     ]
 }

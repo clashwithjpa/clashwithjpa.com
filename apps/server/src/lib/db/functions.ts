@@ -651,6 +651,54 @@ export async function updateSettings(values: {
     return result[0]!;
 }
 
+// Scoped to just the CWL ping columns so it never collides with `updateSettings`
+// (the general PUT /settings upsert used by the isAdmin-gated route).
+export async function getCwlPingSettings() {
+    const result = await db
+        .select({
+            id: settingsTable.id,
+            enabled: settingsTable.cwlPingEnabled,
+            webhookUrl: settingsTable.cwlPingWebhookUrl,
+            intervalMinutes: settingsTable.cwlPingIntervalMinutes,
+            lastRunAt: settingsTable.cwlPingLastRunAt,
+            lastRunSummary: settingsTable.cwlPingLastRunSummary,
+        })
+        .from(settingsTable)
+        .limit(1);
+    return result[0] ?? null;
+}
+
+export async function updateCwlPingSettings(values: { enabled?: boolean; webhookUrl?: string | null; intervalMinutes?: number }) {
+    const columns = {
+        ...(values.enabled !== undefined ? { cwlPingEnabled: values.enabled } : {}),
+        ...(values.webhookUrl !== undefined ? { cwlPingWebhookUrl: values.webhookUrl } : {}),
+        ...(values.intervalMinutes !== undefined ? { cwlPingIntervalMinutes: values.intervalMinutes } : {}),
+    };
+    const result = await db
+        .insert(settingsTable)
+        .values({ ...columns, updatedAt: new Date() })
+        .onConflictDoUpdate({
+            target: settingsTable.id,
+            set: columns,
+        })
+        .returning({
+            id: settingsTable.id,
+            enabled: settingsTable.cwlPingEnabled,
+            webhookUrl: settingsTable.cwlPingWebhookUrl,
+            intervalMinutes: settingsTable.cwlPingIntervalMinutes,
+            lastRunAt: settingsTable.cwlPingLastRunAt,
+            lastRunSummary: settingsTable.cwlPingLastRunSummary,
+        });
+    return result[0]!;
+}
+
+// Deliberately bypasses `updateSettings`'s `updatedAt` bump — a scheduled ping
+// run isn't a settings edit, and touching `updatedAt` would make the settings
+// page's dirty-check race against the background job.
+export async function recordCwlPingRun(summary: { ranAt: Date; summary: string }) {
+    await db.update(settingsTable).set({ cwlPingLastRunAt: summary.ranAt, cwlPingLastRunSummary: summary.summary }).where(eq(settingsTable.id, 1));
+}
+
 export async function getAllClans() {
     return db.select().from(clanInfoTable).orderBy(clanInfoTable.cocClanCode);
 }
