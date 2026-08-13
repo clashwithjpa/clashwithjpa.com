@@ -34,7 +34,7 @@ importers:
   apps/server:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.1105.0
+        specifier: ^3.1107.0
         version: 3.1108.0
       '@better-auth/api-key':
         specifier: ^1.6.26
@@ -52,10 +52,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/clashofclans-api
       '@scalar/hono-api-reference':
-        specifier: ^0.11.12
+        specifier: ^0.11.13
         version: 0.11.13(hono@4.13.1)
       '@sentry/node':
-        specifier: ^10.69.0
+        specifier: ^10.70.0
         version: 10.70.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))
       better-auth:
         specifier: ^1.6.26
@@ -85,7 +85,7 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       pg:
-        specifier: ^8.22.0
+        specifier: ^8.23.0
         version: 8.23.0
       rate-limit-redis:
         specifier: ^6.0.1
@@ -113,13 +113,13 @@ importers:
         specifier: ^0.31.10
         version: 0.31.10
       eslint:
-        specifier: ^10.8.0
+        specifier: ^10.8.1
         version: 10.8.1(jiti@2.7.0)
       tsc-alias:
         specifier: ^1.9.1
         version: 1.9.1
       tsx:
-        specifier: ^4.23.10
+        specifier: ^4.23.12
         version: 4.23.12
       typescript:
         specifier: ^6.0.3
@@ -170,8 +170,8 @@ importers:
         specifier: ^6.43.8
         version: 6.43.8
       '@neodrag/svelte':
-        specifier: 3.0.0-next.10
-        version: 3.0.0-next.10(@neodrag/core@3.0.0-next.10)(svelte@5.56.8(@typescript-eslint/types@8.67.0))
+        specifier: 3.0.0-next.12
+        version: 3.0.0-next.12(@neodrag/core@3.0.0-next.12)(svelte@5.56.8(@typescript-eslint/types@8.67.0))
       '@repo/auth-shared':
         specifier: workspace:*
         version: link:../../packages/auth-shared
@@ -179,7 +179,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/clashofclans-client
       '@sentry/sveltekit':
-        specifier: ^10.69.0
+        specifier: ^10.70.0
         version: 10.70.0(@sveltejs/kit@2.70.2(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.3.0(svelte@5.56.8(@typescript-eslint/types@8.67.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)))(svelte@5.56.8(@typescript-eslint/types@8.67.0))(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)))(svelte@5.56.8(@typescript-eslint/types@8.67.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
       '@tanstack/svelte-query':
         specifier: ^5.90.2
@@ -246,7 +246,7 @@ importers:
         specifier: ^2.70.2
         version: 2.70.2(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.3.0(svelte@5.56.8(@typescript-eslint/types@8.67.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)))(svelte@5.56.8(@typescript-eslint/types@8.67.0))(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
       '@sveltejs/vite-plugin-svelte':
-        specifier: ^7.2.0
+        specifier: ^7.3.0
         version: 7.3.0(svelte@5.56.8(@typescript-eslint/types@8.67.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
       '@tailwindcss/forms':
         specifier: ^0.5.11
@@ -267,13 +267,13 @@ importers:
         specifier: ^10.1.0
         version: 10.1.0
       eslint:
-        specifier: ^10.8.0
+        specifier: ^10.8.1
         version: 10.8.1(jiti@2.7.0)
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
       shiki:
-        specifier: ^4.4.2
+        specifier: ^4.4.3
         version: 4.4.3
       svelte:
         specifier: ^5.56.8
@@ -377,7 +377,7 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       eslint:
-        specifier: ^10.8.0
+        specifier: ^10.8.1
         version: 10.8.1(jiti@2.7.0)
       tsc-alias:
         specifier: ^1.9.1
@@ -432,7 +432,7 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.8.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.8.0
+        specifier: ^10.8.1
         version: 10.8.1(jiti@2.7.0)
       eslint-config-prettier:
         specifier: ^10.1.8
@@ -444,7 +444,7 @@ importers:
         specifier: ^17.9.0
         version: 17.10.0
       typescript-eslint:
-        specifier: ^8.66.0
+        specifier: ^8.67.0
         version: 8.67.0(eslint@10.8.1(jiti@2.7.0))(typescript@6.0.3)
 
   packages/prettier-config:
@@ -1633,13 +1633,13 @@ packages:
   '@marijn/find-cluster-break@1.0.3':
     resolution: {integrity: sha512-FY+MKLBoTsLNJF/eLWaOsXGdz6uh3Iu1axjPf6TUq92IYumcTcXWHoS747JARLkcdlJ/Waiaxc5wQfFO8jC6NA==}
 
-  '@neodrag/core@3.0.0-next.10':
-    resolution: {integrity: sha512-Yb6tpgr3XE/5d96NMQqsSRFD+HD37R1LmgjrrAA8Xzd/G9GSqb5kcuYIrOC1i7/nFEaDoI+Lh0KZUiXGfCmbig==}
+  '@neodrag/core@3.0.0-next.12':
+    resolution: {integrity: sha512-NInKt94ePpmwFJZveemnoQYLCL0X8QsdTVTXm/d71SPWitnr8af6fErZMFUCGXJFMEI06JWKgPUjNRMOQDx2Sg==}
 
-  '@neodrag/svelte@3.0.0-next.10':
-    resolution: {integrity: sha512-UEWn5+b5dJuk7+0iQdaHDr4GWWdIeGFTjqhGJIfU35niMlU3EMek+BLL+tpz0W/NQbRqCE+WO6jupMhBHwrSGw==}
+  '@neodrag/svelte@3.0.0-next.12':
+    resolution: {integrity: sha512-Ie10p/izZntnQ4zoZt3a+JA45UYGL5t9x9Efz+by8osx7uzcaVcF4uu4kiMzE4aFi1qaYhcQaQ8yyfL5K6ZzMg==}
     peerDependencies:
-      '@neodrag/core': 3.0.0-next.10
+      '@neodrag/core': 3.0.0-next.12
       svelte: ^3 || ^4 || ^5
 
   '@noble/ciphers@2.3.0':
@@ -7070,11 +7070,11 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.3': {}
 
-  '@neodrag/core@3.0.0-next.10': {}
+  '@neodrag/core@3.0.0-next.12': {}
 
-  '@neodrag/svelte@3.0.0-next.10(@neodrag/core@3.0.0-next.10)(svelte@5.56.8(@typescript-eslint/types@8.67.0))':
+  '@neodrag/svelte@3.0.0-next.12(@neodrag/core@3.0.0-next.12)(svelte@5.56.8(@typescript-eslint/types@8.67.0))':
     dependencies:
-      '@neodrag/core': 3.0.0-next.10
+      '@neodrag/core': 3.0.0-next.12
       svelte: 5.56.8(@typescript-eslint/types@8.67.0)
 
   '@noble/ciphers@2.3.0': {}
