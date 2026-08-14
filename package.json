@@ -11,12 +11,17 @@
         "format:check": "prettier --check .",
         "lint": "turbo run lint",
         "lint:fix": "turbo run lint:fix",
+        "prepare": "husky",
         "typecheck": "turbo run typecheck"
     },
     "prettier": "./packages/prettier-config",
     "devDependencies": {
+        "@commitlint/cli": "^21.2.2",
+        "@commitlint/config-conventional": "^21.2.2",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
         "@types/node": "^26.2.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^17.3.0",
         "prettier": "^3.9.6",
         "prettier-plugin-svelte": "^4.1.1",
         "prettier-plugin-tailwindcss": "^0.8.1",
