@@ -18,14 +18,14 @@
     },
     "prettier": "@repo/prettier-config",
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.1105.0",
+        "@aws-sdk/client-s3": "^3.1107.0",
         "@better-auth/api-key": "^1.6.26",
         "@hono/node-server": "^2.1.0",
         "@hono/standard-validator": "^0.4.0",
         "@repo/auth-shared": "workspace:*",
         "@repo/clashofclans-api": "workspace:*",
-        "@scalar/hono-api-reference": "^0.11.12",
-        "@sentry/node": "^10.69.0",
+        "@scalar/hono-api-reference": "^0.11.13",
+        "@sentry/node": "^10.70.0",
         "better-auth": "^1.6.26",
         "csv-parse": "^7.0.2",
         "discord.js": "^14.27.0",
@@ -35,7 +35,7 @@
         "hono-openapi": "^1.3.1",
         "hono-rate-limiter": "^0.5.3",
         "ioredis": "^6.0.0",
-        "pg": "^8.22.0",
+        "pg": "^8.23.0",
         "rate-limit-redis": "^6.0.1",
         "zod": "^4.4.3"
     },
@@ -46,9 +46,9 @@
         "@types/node": "^26.2.0",
         "@types/pg": "^8.21.0",
         "drizzle-kit": "^0.31.10",
-        "eslint": "^10.8.0",
+        "eslint": "^10.8.1",
         "tsc-alias": "^1.9.1",
-        "tsx": "^4.23.10",
+        "tsx": "^4.23.12",
         "typescript": "^6.0.3"
     },
     "packageManager": "pnpm@11.21.0"
