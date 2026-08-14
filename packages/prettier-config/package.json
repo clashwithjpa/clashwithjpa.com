@@ -15,12 +15,12 @@
         "./svelte-tailwind": "./svelte-tailwind.js"
     },
     "dependencies": {
-        "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-        "prettier-plugin-svelte": "^4.1.1",
-        "prettier-plugin-tailwindcss": "^0.8.1"
+        "@ianvs/prettier-plugin-sort-imports": "catalog:",
+        "prettier-plugin-svelte": "catalog:",
+        "prettier-plugin-tailwindcss": "catalog:"
     },
     "devDependencies": {
-        "prettier": "^3.9.6"
+        "prettier": "catalog:"
     },
     "peerDependencies": {
         "prettier": "^3.9.6"

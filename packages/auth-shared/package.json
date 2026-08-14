@@ -21,9 +21,9 @@
     },
     "devDependencies": {
         "@repo/typescript-config": "workspace:*",
-        "better-auth": "^1.6.26",
-        "tsc-alias": "^1.9.1",
-        "typescript": "^6.0.3"
+        "better-auth": "catalog:",
+        "tsc-alias": "catalog:",
+        "typescript": "catalog:"
     },
     "peerDependencies": {
         "better-auth": "^1.6.25"

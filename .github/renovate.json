@@ -9,7 +9,7 @@
     "packageRules": [
         {
             "matchManagers": ["npm"],
-            "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies"],
+            "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies", "pnpm.catalog.**"],
             "rangeStrategy": "bump"
         },
         {

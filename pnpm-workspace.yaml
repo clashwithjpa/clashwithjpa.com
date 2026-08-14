@@ -1,8 +1,35 @@
 packages:
   - "apps/*"
   - "packages/*"
-# Required for `pnpm deploy` in apps/server/Dockerfile to produce a self-contained node_modules.
+
 injectWorkspacePackages: true
+peerDependencyRules:
+  allowedVersions:
+    "hono-openapi>@hono/standard-validator": ^0.4.0
+
+# Versions shared by two or more workspace packages, referenced as `catalog:`.
+# Bump here once and every package follows; single-consumer deps stay in their own package.json.
+catalog:
+  "@better-auth/api-key": ^1.6.26
+  "@ianvs/prettier-plugin-sort-imports": ^4.7.1
+  "@kubb/cli": ^4.39.3
+  "@kubb/core": ^4.39.3
+  "@kubb/plugin-client": ^4.39.3
+  "@kubb/plugin-oas": ^4.39.3
+  "@kubb/plugin-svelte-query": ^4.39.3
+  "@kubb/plugin-ts": ^4.39.3
+  "@kubb/plugin-zod": ^4.39.3
+  "@tanstack/svelte-query": ^5.90.2
+  "@types/node": ^26.2.0
+  better-auth: ^1.6.26
+  eslint: ^10.8.1
+  ioredis: ^6.0.0
+  prettier: ^3.9.6
+  prettier-plugin-svelte: ^4.1.1
+  prettier-plugin-tailwindcss: ^0.8.1
+  tsc-alias: ^1.9.1
+  typescript: ^6.0.3
+  zod: ^4.4.3
 allowBuilds:
   "@sentry/cli": true
   es5-ext: true
