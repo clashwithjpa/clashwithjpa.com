@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const getAuditLogQueryParamsSchema = z.object({
     actorId: z.optional(z.string()),
@@ -31,6 +31,7 @@ export const getAuditLogQueryParamsSchema = z.object({
             "cwl_ping.settings_update",
             "cwl_ping.manual_run",
             "rules.update",
+            "privacy.update",
             "clan.create",
             "clan.update",
             "clan.delete",
@@ -71,6 +72,7 @@ export const getAuditLogQueryParamsSchema = z.object({
             "cwl_season",
             "settings",
             "rules",
+            "privacy",
             "clan",
             "cwl_clan",
             "coc_account",
@@ -80,8 +82,8 @@ export const getAuditLogQueryParamsSchema = z.object({
     ),
     targetId: z.optional(z.string()),
     source: z.optional(z.enum(["web", "api"])),
-    before: z.optional(z.iso.datetime()),
-    after: z.optional(z.iso.datetime()),
+    before: z.optional(z.string().datetime()),
+    after: z.optional(z.string().datetime()),
     limit: z.coerce.number().int().min(1).max(200).default(50),
     offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
 });
@@ -124,6 +126,7 @@ export const getAuditLog200Schema = z.object({
                     "cwl_ping.settings_update",
                     "cwl_ping.manual_run",
                     "rules.update",
+                    "privacy.update",
                     "clan.create",
                     "clan.update",
                     "clan.delete",
@@ -163,6 +166,7 @@ export const getAuditLog200Schema = z.object({
                         "cwl_season",
                         "settings",
                         "rules",
+                        "privacy",
                         "clan",
                         "cwl_clan",
                         "coc_account",
@@ -176,7 +180,7 @@ export const getAuditLog200Schema = z.object({
                 source: z.enum(["web", "api"]),
                 apiKeyId: z.union([z.string(), z.null()]),
                 apiKeyName: z.union([z.string(), z.null()]),
-                createdAt: z.iso.datetime(),
+                createdAt: z.string().datetime(),
             }),
         ),
         total: z.number(),

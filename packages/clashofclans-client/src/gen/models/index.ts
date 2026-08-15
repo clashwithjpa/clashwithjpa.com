@@ -432,6 +432,7 @@ export type {
     GetJoinApplicationsQueryParamsStatusEnumKey,
     GetJoinApplicationsQueryResponse,
 } from "./GetJoinApplications.ts";
+export type { GetPrivacy200, GetPrivacy500, GetPrivacyQuery, GetPrivacyQueryResponse } from "./GetPrivacy.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./GetUser.ts";
 export type {
@@ -499,6 +500,14 @@ export type {
     RenameCwlSeasonPathParams,
 } from "./RenameCwlSeason.ts";
 export type { RunCwlPingNow200, RunCwlPingNow401, RunCwlPingNowMutation, RunCwlPingNowMutationResponse } from "./RunCwlPingNow.ts";
+export type {
+    SetPrivacy200,
+    SetPrivacy401,
+    SetPrivacy500,
+    SetPrivacyMutation,
+    SetPrivacyMutationRequest,
+    SetPrivacyMutationResponse,
+} from "./SetPrivacy.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./SetRules.ts";
 export type {
     SetUserAccountExternal200,

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const getCwlApplicationsQueryParamsSchema = z
     .object({
@@ -37,7 +37,7 @@ export const getCwlApplications200Schema = z.object({
                 month: z.union([z.string(), z.null()]),
                 year: z.union([z.number(), z.null()]),
                 preferenceNum: z.number(),
-                appliedAt: z.iso.datetime(),
+                appliedAt: z.string().datetime(),
                 assignedTo: z.union([z.string(), z.null()]),
                 cocAccountId: z.number(),
                 ownerRole: z.union([z.string(), z.null()]),

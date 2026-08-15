@@ -17,7 +17,7 @@
  */
 
 // Route prefixes an API key may authenticate against.
-export const API_KEY_ALLOWED_PREFIXES = ["/coc", "/admin", "/analytics", "/manage", "/rules"] as const;
+export const API_KEY_ALLOWED_PREFIXES = ["/coc", "/admin", "/analytics", "/manage", "/rules", "/privacy"] as const;
 
 /**
  * Denials take priority over the allowlist.

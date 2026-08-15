@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description The created key.
@@ -52,7 +52,7 @@ export const createApiKey500Schema = z.object({
 export const createApiKeyMutationRequestSchema = z.object({
     name: z.string().min(1).max(64),
     scope: z.enum(["apply", "cwl", "review", "manage", "sudo", "root"]),
-    expiresIn: z.optional(z.int().min(86400).max(31536000)),
+    expiresIn: z.optional(z.number().int().min(86400).max(31536000)),
 });
 
 export const createApiKeyMutationResponseSchema = z.lazy(() => createApiKey200Schema);

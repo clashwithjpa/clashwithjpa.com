@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Sync result.
@@ -57,7 +57,7 @@ export const syncCocAccountWarWeightsMutationRequestSchema = z.object({
             .array(
                 z.object({
                     tag: z.string().min(1).max(20),
-                    weight: z.int().min(0).max(9007199254740991),
+                    weight: z.number().int().min(0).max(9007199254740991),
                 }),
             )
             .max(50000),

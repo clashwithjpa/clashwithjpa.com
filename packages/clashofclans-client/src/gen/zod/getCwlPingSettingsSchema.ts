@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Settings.
@@ -16,7 +16,7 @@ export const getCwlPingSettings200Schema = z.object({
                 enabled: z.boolean(),
                 webhookUrl: z.union([z.string(), z.null()]),
                 intervalMinutes: z.number(),
-                lastRunAt: z.union([z.iso.datetime(), z.null()]),
+                lastRunAt: z.union([z.string().datetime(), z.null()]),
                 lastRunSummary: z.union([z.string(), z.null()]),
             }),
             z.null(),

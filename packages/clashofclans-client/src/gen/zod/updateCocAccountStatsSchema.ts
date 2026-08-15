@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const updateCocAccountStatsPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
@@ -71,12 +71,12 @@ export const updateCocAccountStats500Schema = z.object({
 
 export const updateCocAccountStatsMutationRequestSchema = z.object({
     currentClan: z.optional(z.union([z.string(), z.null()])),
-    totalDonated: z.optional(z.int().min(0).max(9007199254740991)),
-    totalReceived: z.optional(z.int().min(0).max(9007199254740991)),
-    clanGames: z.optional(z.int().min(0).max(9007199254740991)),
-    capitalGoldLooted: z.optional(z.int().min(0).max(9007199254740991)),
-    capitalGoldContributed: z.optional(z.int().min(0).max(9007199254740991)),
-    activityScore: z.optional(z.int().min(0).max(9007199254740991)),
+    totalDonated: z.optional(z.number().int().min(0).max(9007199254740991)),
+    totalReceived: z.optional(z.number().int().min(0).max(9007199254740991)),
+    clanGames: z.optional(z.number().int().min(0).max(9007199254740991)),
+    capitalGoldLooted: z.optional(z.number().int().min(0).max(9007199254740991)),
+    capitalGoldContributed: z.optional(z.number().int().min(0).max(9007199254740991)),
+    activityScore: z.optional(z.number().int().min(0).max(9007199254740991)),
 });
 
 export const updateCocAccountStatsMutationResponseSchema = z.lazy(() => updateCocAccountStats200Schema);

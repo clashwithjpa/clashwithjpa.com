@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Test message sent.
@@ -38,7 +38,7 @@ export const testCwlPingWebhook502Schema = z.object({
 });
 
 export const testCwlPingWebhookMutationRequestSchema = z.object({
-    webhookUrl: z.optional(z.url()),
+    webhookUrl: z.optional(z.string().url()),
 });
 
 export const testCwlPingWebhookMutationResponseSchema = z.lazy(() => testCwlPingWebhook200Schema);

@@ -163,6 +163,25 @@ export async function setRules(rulesContent: string): Promise<string> {
     return result[0]!.rulesContent!;
 }
 
+export async function getPrivacy(): Promise<string | null> {
+    const result = await db.select({ privacyContent: settingsTable.privacyContent }).from(settingsTable).where(eq(settingsTable.id, 1));
+
+    return result[0]?.privacyContent ?? null;
+}
+
+export async function setPrivacy(privacyContent: string): Promise<string> {
+    const result = await db
+        .insert(settingsTable)
+        .values({ privacyContent, updatedAt: new Date() })
+        .onConflictDoUpdate({
+            target: settingsTable.id,
+            set: { privacyContent, updatedAt: new Date() },
+        })
+        .returning({ privacyContent: settingsTable.privacyContent });
+
+    return result[0]!.privacyContent!;
+}
+
 export async function addCwlApplication(data: {
     discordUserId: string;
     discordUsername: string;
