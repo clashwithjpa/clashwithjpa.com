@@ -4,7 +4,11 @@ import { getRules } from "@repo/clashofclans-client";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async () => {
-    const rules = await getRules({ baseURL: PUBLIC_SERVER_URL });
-    const { intro, sections } = await renderSections((rules.data.rules || "# Enjoy! There are no rules.") as string);
-    return { intro, sections };
+    try {
+        const rules = await getRules({ baseURL: PUBLIC_SERVER_URL });
+        const { intro, sections } = await renderSections((rules.data.rules || "# Enjoy! There are no rules.") as string);
+        return { intro, sections };
+    } catch {
+        return { intro: "", sections: [] };
+    }
 };
