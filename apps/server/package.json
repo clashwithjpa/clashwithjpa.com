@@ -18,7 +18,7 @@
     },
     "prettier": "@repo/prettier-config",
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.1107.0",
+        "@aws-sdk/client-s3": "^3.1108.0",
         "@better-auth/api-key": "catalog:",
         "@hono/node-server": "^2.1.0",
         "@hono/standard-validator": "^0.4.0",

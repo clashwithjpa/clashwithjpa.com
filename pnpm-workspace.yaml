@@ -10,7 +10,7 @@ peerDependencyRules:
 # Versions shared by two or more workspace packages, referenced as `catalog:`.
 # Bump here once and every package follows; single-consumer deps stay in their own package.json.
 catalog:
-  "@better-auth/api-key": ^1.6.26
+  "@better-auth/api-key": ^1.6.27
   "@ianvs/prettier-plugin-sort-imports": ^4.7.1
   "@kubb/cli": ^4.39.3
   "@kubb/core": ^4.39.3
@@ -21,7 +21,7 @@ catalog:
   "@kubb/plugin-zod": ^4.39.3
   "@tanstack/svelte-query": ^5.90.2
   "@types/node": ^26.2.0
-  better-auth: ^1.6.26
+  better-auth: ^1.6.27
   eslint: ^10.8.1
   ioredis: ^6.0.0
   prettier: ^3.9.6
