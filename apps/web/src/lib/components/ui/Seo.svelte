@@ -7,7 +7,7 @@
         image?: string;
         author?: string;
     }
-    let { title = "", description = "", image = "/logo.webp", author = "Team JPA" }: Props = $props();
+    let { title = "", description = "", image = "/logo.webp", author = "JPA" }: Props = $props();
 
     let absoluteImage = $derived(image.startsWith("http") ? image : `${page.url.origin}${image}`);
 </script>

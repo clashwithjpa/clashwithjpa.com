@@ -3,18 +3,12 @@
     import { authClient, hasPermission } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
+    import { NAV_LINKS as links } from "$lib/utils/links";
     import TablerMenu2 from "~icons/tabler/menu-2";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
     import CocPopup from "../ui/coc/CocPopup.svelte";
     import Link from "../ui/Link.svelte";
-
-    let links: { name: string; href: string }[] = [
-        { name: "Home", href: "/" },
-        { name: "Clans", href: "/clans" },
-        { name: "War Details", href: "/wars" },
-        { name: "Rules", href: "/rules" },
-    ];
 
     let scrollY = $state(0);
     let mobileMenuOpen = $state(false);
