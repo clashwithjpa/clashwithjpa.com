@@ -14,7 +14,7 @@
     let chartContainer: HTMLDivElement;
     let chart: AgChartInstance | undefined = $state();
 
-    const fontFamily = "Rubik, sans-serif";
+    const fontFamily = "Rubik Variable, sans-serif";
 
     const theme: AgChartOptions["theme"] = {
         baseTheme: "ag-default-dark",

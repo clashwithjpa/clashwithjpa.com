@@ -4,6 +4,10 @@
     import "@cartamd/plugin-anchor/default.css";
     import "@cartamd/plugin-code/default.css";
     import "@cartamd/plugin-emoji/default.css";
+    import "@fontsource-variable/jetbrains-mono";
+    import "@fontsource-variable/jetbrains-mono/wght-italic.css";
+    import "@fontsource-variable/rubik";
+    import "@fontsource-variable/rubik/wght-italic.css";
     import "carta-md/default.css";
     import { onMount } from "svelte";
     import "./layout.css";

@@ -4,9 +4,9 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-    --font-rubik: Rubik, sans-serif;
+    --font-rubik: "Rubik Variable", sans-serif;
     --font-coc: COC, sans-serif;
-    --font-mono: "JetBrains Mono", monospace;
+    --font-mono: "JetBrains Mono Variable", monospace;
 }
 
 @theme {

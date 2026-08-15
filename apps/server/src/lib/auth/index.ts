@@ -237,7 +237,7 @@ export const auth = betterAuth({
             clientSecret: config.JPA_DISCORD_SECRET,
             overrideUserInfoOnSignIn: true,
             disableDefaultScope: true,
-            scope: ["identify", "email", "guilds", "guilds.members.read"],
+            scope: ["identify", "email"],
             mapProfileToUser: (profile) => ({
                 discordUsername: profile.username,
             }),
