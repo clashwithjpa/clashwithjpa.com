@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const assignCwlApplicationPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
@@ -30,7 +30,7 @@ export const assignCwlApplication200Schema = z.object({
             month: z.union([z.string(), z.null()]),
             year: z.union([z.number(), z.null()]),
             preferenceNum: z.number(),
-            appliedAt: z.iso.datetime(),
+            appliedAt: z.string().datetime(),
             assignedTo: z.union([z.string(), z.null()]),
         }),
     }),

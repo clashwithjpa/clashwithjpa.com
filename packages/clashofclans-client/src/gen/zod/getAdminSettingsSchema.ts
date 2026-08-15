@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Settings.
@@ -18,9 +18,10 @@ export const getAdminSettings200Schema = z.object({
                 cwlEnabled: z.boolean(),
                 siteMaintenanceMode: z.boolean(),
                 rulesContent: z.union([z.string(), z.null()]),
+                privacyContent: z.union([z.string(), z.null()]),
                 guildId: z.union([z.string(), z.null()]),
                 currentCwlSeasonId: z.union([z.number(), z.null()]),
-                updatedAt: z.union([z.iso.datetime(), z.null()]),
+                updatedAt: z.union([z.string().datetime(), z.null()]),
             }),
             z.null(),
         ]),

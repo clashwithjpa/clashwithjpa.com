@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Linked COC account.
@@ -76,7 +76,7 @@ export const createCocAccount500Schema = z.object({
 export const createCocAccountMutationRequestSchema = z.object({
     userId: z.string().min(1),
     tag: z.string().min(1).max(20).regex(/^#.*/),
-    warWeight: z.optional(z.int().min(0).max(9007199254740991).default(0)),
+    warWeight: z.optional(z.number().int().min(0).max(9007199254740991).default(0)),
     isExternal: z.optional(z.boolean().default(false)),
 });
 

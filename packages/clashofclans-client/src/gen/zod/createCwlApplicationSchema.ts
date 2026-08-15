@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Created application.
@@ -18,7 +18,7 @@ export const createCwlApplication200Schema = z.object({
             cocAccountClan: z.union([z.string(), z.null()]),
             preferenceNum: z.number(),
             seasonId: z.number(),
-            appliedAt: z.iso.datetime(),
+            appliedAt: z.string().datetime(),
             assignedTo: z.union([z.string(), z.null()]),
         }),
     }),
@@ -67,8 +67,8 @@ export const createCwlApplication500Schema = z.object({
 export const createCwlApplicationMutationRequestSchema = z.object({
     userId: z.string().min(1),
     tag: z.string().min(1).max(20).regex(/^#.*/),
-    preferenceNum: z.optional(z.int().min(1).max(99).default(1)),
-    seasonId: z.optional(z.int().min(1).max(9007199254740991)),
+    preferenceNum: z.optional(z.number().int().min(1).max(99).default(1)),
+    seasonId: z.optional(z.number().int().min(1).max(9007199254740991)),
 });
 
 export const createCwlApplicationMutationResponseSchema = z.lazy(() => createCwlApplication200Schema);

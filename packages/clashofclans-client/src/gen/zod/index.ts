@@ -344,6 +344,7 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./getJoinApplicationsSchema.ts";
+export { getPrivacy200Schema, getPrivacy500Schema, getPrivacyQueryResponseSchema } from "./getPrivacySchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
@@ -402,6 +403,13 @@ export {
     renameCwlSeasonPathParamsSchema,
 } from "./renameCwlSeasonSchema.ts";
 export { runCwlPingNow200Schema, runCwlPingNow401Schema, runCwlPingNowMutationResponseSchema } from "./runCwlPingNowSchema.ts";
+export {
+    setPrivacy200Schema,
+    setPrivacy401Schema,
+    setPrivacy500Schema,
+    setPrivacyMutationRequestSchema,
+    setPrivacyMutationResponseSchema,
+} from "./setPrivacySchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const updateAdminClanPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
@@ -78,7 +78,7 @@ export const updateAdminClan503Schema = z.object({
 export const updateAdminClanMutationRequestSchema = z.object({
     cocClanCode: z.optional(z.string().min(1)),
     cocClanName: z.optional(z.union([z.string(), z.null()])),
-    cocClanLevel: z.optional(z.union([z.int(), z.null()])),
+    cocClanLevel: z.optional(z.union([z.number().int(), z.null()])),
     cocClanTag: z.optional(z.string().min(1).regex(/^#.*/)),
     discordClanRoleId: z.optional(z.string().min(1)),
     discordClanChannelId: z.optional(z.string().min(1)),
@@ -87,9 +87,9 @@ export const updateAdminClanMutationRequestSchema = z.object({
     discordColeaderRoleId: z.optional(z.string().min(1)),
     discordLeaderRoleId: z.optional(z.string().min(1)),
     discordLeaderId: z.optional(z.string().min(1)),
-    attacksRequirement: z.optional(z.int().min(0).max(9007199254740991)),
-    donationsRequirement: z.optional(z.int().min(0).max(9007199254740991)),
-    clangamesRequirement: z.optional(z.int().min(0).max(9007199254740991)),
+    attacksRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
+    donationsRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
+    clangamesRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
 });
 
 export const updateAdminClanMutationResponseSchema = z.lazy(() => updateAdminClan200Schema);

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const getAnalyticsUserJoinsQueryParamsSchema = z.object({
     days: z.coerce.number().int().min(1).max(90).default(30),

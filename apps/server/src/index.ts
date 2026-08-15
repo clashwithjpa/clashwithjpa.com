@@ -166,6 +166,51 @@ app.get(
     },
 );
 
+const getPrivacyData = z4.object({
+    privacy: z4.string().nullable(),
+});
+app.get(
+    "/privacy",
+    describeRoute({
+        operationId: "getPrivacy",
+        role: "Public",
+        // No credentials at all: opt out of the document-wide api-key scheme.
+        security: [],
+        description: "Fetches the current privacy policy content.",
+        tags: ["root"],
+        responses: {
+            200: {
+                description: "Successful response with the privacy policy content.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getPrivacyData)),
+                    },
+                },
+            },
+            500: {
+                description: "Server error response when fetching the privacy policy fails.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    async (c) => {
+        try {
+            const settings = await getCachedSettings();
+            return c.json({
+                success: true,
+                data: { privacy: settings?.privacyContent ?? null },
+            });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch the privacy policy" }, 500);
+        }
+    },
+);
+
 app.route("/coc", coc);
 app.route("/admin", admin);
 app.route("/analytics", analytics);

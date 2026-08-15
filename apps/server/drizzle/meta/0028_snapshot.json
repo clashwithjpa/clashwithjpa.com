@@ -1,6 +1,6 @@
 {
-    "id": "3dd081da-dbf1-44e9-8d42-63ff008fc1b3",
-    "prevId": "0c58ce33-6a2d-4222-84cf-6c522d8ace9e",
+    "id": "22eb5b1b-0eaa-49b2-bf6c-a017fefbc79c",
+    "prevId": "3dd081da-dbf1-44e9-8d42-63ff008fc1b3",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -1775,6 +1775,18 @@
                 "rules_content": {
                     "name": "rules_content",
                     "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "privacy_content": {
+                    "name": "privacy_content",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "privacy_updated_at": {
+                    "name": "privacy_updated_at",
+                    "type": "timestamp",
                     "primaryKey": false,
                     "notNull": false
                 },

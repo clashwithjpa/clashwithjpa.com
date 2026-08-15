@@ -18,6 +18,7 @@ export const settingsTable = pgTable(
         cwlEnabled: boolean("cwl_enabled").notNull().default(false),
         siteMaintenanceMode: boolean("site_maintenance_mode").notNull().default(false),
         rulesContent: text("rules_content"),
+        privacyContent: text("privacy_content"),
         guildId: text("guild_id"),
         currentCwlSeasonId: integer("current_cwl_season_id").references(() => cwlSeasonTable.id, { onDelete: "set null" }),
         updatedAt: timestamp("updated_at").defaultNow(),

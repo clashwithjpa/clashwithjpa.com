@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Updated bonus.
@@ -48,7 +48,7 @@ export const setUserSeasonBonus500Schema = z.object({
 
 export const setUserSeasonBonusMutationRequestSchema = z.object({
     discordUserId: z.string().min(1),
-    seasonId: z.int().min(-9007199254740991).max(9007199254740991),
+    seasonId: z.number().int().min(-9007199254740991).max(9007199254740991),
     cocAccountTag: z.union([z.string(), z.null()]),
     selected: z.boolean(),
 });

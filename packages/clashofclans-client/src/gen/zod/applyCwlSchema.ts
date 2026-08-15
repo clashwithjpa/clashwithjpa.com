@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description CWL application submitted successfully.
@@ -19,7 +19,7 @@ export const applyCwl200Schema = z.object({
             preferenceNum: z.number(),
             month: z.string(),
             year: z.number(),
-            appliedAt: z.iso.datetime(),
+            appliedAt: z.string().datetime(),
         }),
     }),
 });
@@ -57,7 +57,7 @@ export const applyCwl500Schema = z.object({
 });
 
 export const applyCwlMutationRequestSchema = z.object({
-    preferenceNum: z.int().min(1).max(99),
+    preferenceNum: z.number().int().min(1).max(99),
     tag: z.string().min(1).max(20).regex(/^#.*/),
     accountClan: z.optional(z.union([z.string(), z.null()])),
 });

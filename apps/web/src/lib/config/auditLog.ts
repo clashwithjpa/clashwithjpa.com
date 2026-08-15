@@ -28,6 +28,7 @@ import TablerSend from "~icons/tabler/send";
 import TablerSettings from "~icons/tabler/settings";
 import TablerShieldCheck from "~icons/tabler/shield-check";
 import TablerShieldHalf from "~icons/tabler/shield-half";
+import TablerShieldLock from "~icons/tabler/shield-lock";
 import TablerSwords from "~icons/tabler/swords";
 import TablerTrash from "~icons/tabler/trash";
 import TablerUser from "~icons/tabler/user";
@@ -210,6 +211,12 @@ export const AUDIT_ACTION_CONFIG: Record<AuditAction, AuditActionConfig> = {
         icon: TablerGavel,
         variant: "yellow",
         describe: () => "updated the rules",
+    },
+    "privacy.update": {
+        label: "Privacy policy · updated",
+        icon: TablerShieldLock,
+        variant: "yellow",
+        describe: () => "updated the privacy policy",
     },
     "clan.create": {
         label: "Clan · created",
@@ -432,6 +439,7 @@ export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
     cwl_season: "CWL seasons",
     settings: "Settings",
     rules: "Rules",
+    privacy: "Privacy",
     clan: "Clans",
     cwl_clan: "CWL clans",
     coc_account: "COC accounts",
@@ -446,6 +454,7 @@ export const AUDIT_TARGET_ICONS: Record<AuditTargetType, Component> = {
     cwl_season: TablerCalendarCheck,
     settings: TablerSettings,
     rules: TablerGavel,
+    privacy: TablerShieldLock,
     clan: TablerShieldHalf,
     cwl_clan: TablerSwords,
     coc_account: TablerUser,

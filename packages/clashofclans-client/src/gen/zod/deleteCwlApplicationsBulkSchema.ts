@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Number of applications deleted.
@@ -32,7 +32,7 @@ export const deleteCwlApplicationsBulk500Schema = z.object({
 });
 
 export const deleteCwlApplicationsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(10000),
+    ids: z.array(z.number().int().min(1).max(9007199254740991)).min(1).max(10000),
 });
 
 export const deleteCwlApplicationsBulkMutationResponseSchema = z.lazy(() => deleteCwlApplicationsBulk200Schema);

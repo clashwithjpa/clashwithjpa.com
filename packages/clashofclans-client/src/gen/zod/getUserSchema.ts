@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description User data fetched successfully.
@@ -17,19 +17,19 @@ export const getUser200Schema = z.object({
             email: z.string(),
             emailVerified: z.boolean(),
             image: z.optional(z.union([z.string(), z.null()])),
-            createdAt: z.iso.datetime(),
-            updatedAt: z.iso.datetime(),
+            createdAt: z.string().datetime(),
+            updatedAt: z.string().datetime(),
             role: z.optional(z.union([z.string(), z.null()])),
             banned: z.optional(z.union([z.boolean(), z.null()])),
             banReason: z.optional(z.union([z.string(), z.null()])),
-            banExpires: z.optional(z.union([z.iso.datetime(), z.null()])),
+            banExpires: z.optional(z.union([z.string().datetime(), z.null()])),
         }),
         session: z.object({
             id: z.string(),
-            expiresAt: z.iso.datetime(),
+            expiresAt: z.string().datetime(),
             token: z.string(),
-            createdAt: z.iso.datetime(),
-            updatedAt: z.iso.datetime(),
+            createdAt: z.string().datetime(),
+            updatedAt: z.string().datetime(),
             ipAddress: z.optional(z.union([z.string(), z.null()])),
             userAgent: z.optional(z.union([z.string(), z.null()])),
             userId: z.string(),

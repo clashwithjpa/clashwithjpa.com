@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Updated settings.
@@ -15,7 +15,7 @@ export const updateCwlPingSettings200Schema = z.object({
             enabled: z.boolean(),
             webhookUrl: z.union([z.string(), z.null()]),
             intervalMinutes: z.number(),
-            lastRunAt: z.union([z.iso.datetime(), z.null()]),
+            lastRunAt: z.union([z.string().datetime(), z.null()]),
             lastRunSummary: z.union([z.string(), z.null()]),
         }),
     }),
@@ -47,8 +47,8 @@ export const updateCwlPingSettings500Schema = z.object({
 
 export const updateCwlPingSettingsMutationRequestSchema = z.object({
     enabled: z.optional(z.boolean()),
-    webhookUrl: z.optional(z.union([z.url(), z.null()])),
-    intervalMinutes: z.optional(z.int().min(1).max(10)),
+    webhookUrl: z.optional(z.union([z.string().url(), z.null()])),
+    intervalMinutes: z.optional(z.number().int().min(1).max(10)),
 });
 
 export const updateCwlPingSettingsMutationResponseSchema = z.lazy(() => updateCwlPingSettings200Schema);

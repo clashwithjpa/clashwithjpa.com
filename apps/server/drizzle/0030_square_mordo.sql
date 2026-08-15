@@ -1,0 +1,1 @@
+ALTER TABLE "settings_table" DROP COLUMN "privacy_updated_at";

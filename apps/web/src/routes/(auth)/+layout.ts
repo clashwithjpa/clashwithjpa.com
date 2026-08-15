@@ -15,6 +15,7 @@ import TablerLogout2 from "~icons/tabler/logout-2";
 import TablerScale from "~icons/tabler/scale";
 import TablerSettings from "~icons/tabler/settings";
 import TablerShield from "~icons/tabler/shield";
+import TablerShieldLock from "~icons/tabler/shield-lock";
 import TablerSwords from "~icons/tabler/swords";
 import TablerUser from "~icons/tabler/user";
 import type { LayoutLoad } from "./$types";
@@ -143,6 +144,14 @@ export const load: LayoutLoad = async ({ url }) => {
             category: "System",
             description: "Edit alliance rules",
             requiredPerm: "manage",
+        },
+        {
+            name: "Privacy",
+            icon: TablerShieldLock,
+            href: "/admin/privacy",
+            category: "System",
+            description: "Edit the site privacy policy",
+            requiredPerm: "root",
         },
         {
             name: "Audit Log",
