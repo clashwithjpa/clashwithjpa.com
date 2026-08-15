@@ -67,7 +67,7 @@ import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { describeRoute } from "@/lib/openapi";
 import { invalidateSettingsCache } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
-import { ROLES } from "@repo/auth-shared";
+import { maxPermLevel, permLevel, ROLES } from "@repo/auth-shared";
 import * as Sentry from "@sentry/node";
 import { parse } from "csv-parse/sync";
 import { Hono } from "hono";
@@ -123,7 +123,14 @@ app.get(
     zValidator("query", listUsersQuerySchema),
     async (c) => {
         try {
-            const result = await getAdminUsers(c.req.valid("query"));
+            // Managers and admins run the same page; only the superadmin's copy
+            // carries email addresses. Key requests clear the same two gates
+            // `hasAccessAuthMiddleware` applies, so a narrowly-scoped key held by
+            // the superadmin doesn't widen the field either.
+            const apiKey = c.get("apiKey");
+            const { success: isRoot } = await isSuperadmin(c.get("user")?.id);
+            const canSeeEmail = isRoot && (!apiKey || maxPermLevel(apiKey.permissions?.jpa) >= permLevel(isSuperadmin.perm));
+            const result = await getAdminUsers({ ...c.req.valid("query"), includeEmail: canSeeEmail });
             return c.json({ success: true, data: result });
         } catch (error) {
             Sentry.captureException(error);

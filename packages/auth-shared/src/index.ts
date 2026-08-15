@@ -46,7 +46,11 @@ export const manager = ac.newRole({
     // Read + moderate. No update/impersonate/delete/set-password and no session
     // perms. set-role and ban are further constrained by the strict-hierarchy
     // `before` hook in apps/server/src/lib/auth/index.ts.
-    user: ["create", "list", "get", "set-role", "ban"],
+    //
+    // `list` is withheld: /admin/list-users searches and filters on `email` by
+    // default, which is an enumeration oracle even with the address redacted
+    // from the response. The users page reads GET /admin/users instead.
+    user: ["create", "get", "set-role", "ban"],
 });
 
 export const admin = ac.newRole({
@@ -59,8 +63,9 @@ export const admin = ac.newRole({
     //     Email/password auth is disabled but we keep the perm narrow as
     //     defense-in-depth.
     //   - `impersonate` / `impersonate-admins`: reserved for superadmin.
+    //   - `list`: same email-oracle reason as manager.
     // No session perms.
-    user: ["create", "list", "get", "set-role", "ban", "delete"],
+    user: ["create", "get", "set-role", "ban", "delete"],
 });
 
 export const superadmin = ac.newRole({

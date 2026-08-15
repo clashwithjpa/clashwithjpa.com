@@ -129,6 +129,28 @@ function buildAuditFromAuthCall(path: string, body: unknown, returned: unknown):
     }
 }
 
+// Every /admin/* endpoint that returns a user hands back the full row, email
+// included. Managers and admins hold `user:get`/`set-role`/`ban` so they'd read
+// members' addresses out of those payloads even though no screen renders one.
+// Strip the field on the way out for anyone below superadmin; the same redaction
+// covers list-users, which only superadmin can still reach.
+function redactUserEmail(value: unknown): unknown {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+    const record = value as Record<string, unknown>;
+
+    if (Array.isArray(record.users)) {
+        return { ...record, users: record.users.map((u) => redactUserEmail(u)) };
+    }
+    if (record.user && typeof record.user === "object") {
+        return { ...record, user: redactUserEmail(record.user) };
+    }
+    if ("email" in record) {
+        const { email: _email, emailVerified: _emailVerified, ...rest } = record;
+        return rest;
+    }
+    return value;
+}
+
 type AuthCtxForLookup = {
     context: {
         internalAdapter: {
@@ -407,6 +429,15 @@ export const auth = betterAuth({
         after: createAuthMiddleware(async (ctx) => {
             const returned = ctx.context.returned;
             if (isAPIError(returned)) return;
+
+            // `/admin/stop-impersonating` is the one admin path whose user is the
+            // caller's own (the restored superadmin), so it has nothing to hide.
+            if (ctx.path.startsWith("/admin/") && ctx.path !== "/admin/stop-impersonating" && !(returned instanceof Response)) {
+                const caller = await getSessionFromCtx(ctx);
+                if (roleLevel(caller?.user.role) < ROLE_LEVELS.superadmin) {
+                    ctx.context.returned = redactUserEmail(returned);
+                }
+            }
 
             const input = buildAuditFromAuthCall(ctx.path, ctx.body, returned);
             if (!input) return;

@@ -929,13 +929,13 @@ export async function getAdminUsers(
         sortDirection?: "asc" | "desc";
         role?: string;
         apiAccess?: boolean;
+        includeEmail?: boolean;
     } = {},
 ) {
-    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc", role, apiAccess } = opts;
+    const { search, limit = 50, offset = 0, sortBy, sortDirection = "asc", role, apiAccess, includeEmail = false } = opts;
 
     const sortColumns = {
         name: user.name,
-        email: user.email,
         role: user.role,
         createdAt: user.createdAt,
     } as const;
@@ -965,9 +965,12 @@ export async function getAdminUsers(
         session.updatedAt,
     );
 
+    const { email: emailColumn, emailVerified: emailVerifiedColumn, ...userColumns } = getTableColumns(user);
+    const selection = { ...userColumns, discordId: account.accountId, lastActiveAt };
+
     const [rows, countResult, roleCountRows, apiAccessCountRow] = await Promise.all([
         db
-            .select({ ...getTableColumns(user), discordId: account.accountId, lastActiveAt })
+            .select(includeEmail ? { ...selection, email: emailColumn, emailVerified: emailVerifiedColumn } : selection)
             .from(user)
             .leftJoin(account, discordJoin)
             .where(whereClause)
