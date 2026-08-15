@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Updated settings.
@@ -17,9 +17,10 @@ export const updateAdminSettings200Schema = z.object({
             cwlEnabled: z.boolean(),
             siteMaintenanceMode: z.boolean(),
             rulesContent: z.union([z.string(), z.null()]),
+            privacyContent: z.union([z.string(), z.null()]),
             guildId: z.union([z.string(), z.null()]),
             currentCwlSeasonId: z.union([z.number(), z.null()]),
-            updatedAt: z.union([z.iso.datetime(), z.null()]),
+            updatedAt: z.union([z.string().datetime(), z.null()]),
         }),
     }),
 });
@@ -45,7 +46,7 @@ export const updateAdminSettingsMutationRequestSchema = z.object({
     cwlEnabled: z.optional(z.boolean()),
     siteMaintenanceMode: z.optional(z.boolean()),
     guildId: z.optional(z.union([z.string(), z.null()])),
-    currentCwlSeasonId: z.optional(z.union([z.int(), z.null()])),
+    currentCwlSeasonId: z.optional(z.union([z.number().int(), z.null()])),
 });
 
 export const updateAdminSettingsMutationResponseSchema = z.lazy(() => updateAdminSettings200Schema);

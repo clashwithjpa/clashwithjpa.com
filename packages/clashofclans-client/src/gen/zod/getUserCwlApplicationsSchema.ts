@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description CWL applications fetched successfully.
@@ -26,7 +26,7 @@ export const getUserCwlApplications200Schema = z.object({
                 month: z.string(),
                 year: z.number(),
                 preferenceNum: z.number(),
-                appliedAt: z.iso.datetime(),
+                appliedAt: z.string().datetime(),
                 assignedTo: z.union([z.string(), z.null()]),
             }),
         ),

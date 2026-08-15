@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const renameCwlSeasonPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
@@ -20,7 +20,7 @@ export const renameCwlSeason200Schema = z.object({
             name: z.string(),
             month: z.string(),
             year: z.number(),
-            createdAt: z.union([z.iso.datetime(), z.null()]),
+            createdAt: z.union([z.string().datetime(), z.null()]),
         }),
     }),
 });

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Created season.
@@ -16,7 +16,7 @@ export const createCwlSeason200Schema = z.object({
             name: z.string(),
             month: z.string(),
             year: z.number(),
-            createdAt: z.union([z.iso.datetime(), z.null()]),
+            createdAt: z.union([z.string().datetime(), z.null()]),
         }),
     }),
 });
@@ -40,7 +40,7 @@ export const createCwlSeason500Schema = z.object({
 export const createCwlSeasonMutationRequestSchema = z.object({
     name: z.string().min(1),
     month: z.string().min(1),
-    year: z.int().min(-9007199254740991).max(9007199254740991),
+    year: z.number().int().min(-9007199254740991).max(9007199254740991),
 });
 
 export const createCwlSeasonMutationResponseSchema = z.lazy(() => createCwlSeason200Schema);

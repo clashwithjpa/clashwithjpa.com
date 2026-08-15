@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const setUserApiAccessPathParamsSchema = z.object({
     userid: z.string().min(1),

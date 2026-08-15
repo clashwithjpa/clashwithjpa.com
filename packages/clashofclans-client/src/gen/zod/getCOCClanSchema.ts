@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const getCOCClanPathParamsSchema = z.object({
     tag: z.string().min(1).max(20).regex(/^#.*/),

@@ -36,6 +36,7 @@
         "/dashboard/apply",
         "/dashboard/cwl",
         "/admin/rules",
+        "/admin/privacy",
 
         "/admin/users",
         "/admin/coc-accounts",

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Number of accounts deleted.
@@ -32,7 +32,7 @@ export const deleteCocAccountsBulk500Schema = z.object({
 });
 
 export const deleteCocAccountsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(200),
+    ids: z.array(z.number().int().min(1).max(9007199254740991)).min(1).max(200),
 });
 
 export const deleteCocAccountsBulkMutationResponseSchema = z.lazy(() => deleteCocAccountsBulk200Schema);

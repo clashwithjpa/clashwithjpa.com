@@ -36,6 +36,7 @@ export type UpdateAdminSettings200 = {
              */
             siteMaintenanceMode: boolean;
             rulesContent: string | null;
+            privacyContent: string | null;
             guildId: string | null;
             currentCwlSeasonId: number | null;
             updatedAt: string | null;

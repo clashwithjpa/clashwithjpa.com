@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Sync result.
@@ -53,7 +53,7 @@ export const syncCocAccounts500Schema = z.object({
 });
 
 export const syncCocAccountsMutationRequestSchema = z.object({
-    sheetUrl: z.url(),
+    sheetUrl: z.string().url(),
 });
 
 export const syncCocAccountsMutationResponseSchema = z.lazy(() => syncCocAccounts200Schema);

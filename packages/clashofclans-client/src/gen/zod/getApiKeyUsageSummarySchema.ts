@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const getApiKeyUsageSummaryQueryParamsSchema = z.object({
     keyId: z.string().min(1),
@@ -23,11 +23,11 @@ export const getApiKeyUsageSummary200Schema = z.object({
         p95DurationMs: z.number(),
         windowRequests: z.number(),
         rateLimitRemaining: z.union([z.number(), z.null()]),
-        rateLimitResetAt: z.union([z.iso.datetime(), z.null()]),
+        rateLimitResetAt: z.union([z.string().datetime(), z.null()]),
         remaining: z.union([z.number(), z.null()]),
         rateLimitMax: z.union([z.number(), z.null()]),
         rateLimitTimeWindow: z.union([z.number(), z.null()]),
-        lastRequest: z.union([z.iso.datetime(), z.null()]),
+        lastRequest: z.union([z.string().datetime(), z.null()]),
     }),
 });
 

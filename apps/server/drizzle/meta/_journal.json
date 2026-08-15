@@ -197,6 +197,27 @@
             "when": 1786426759400,
             "tag": "0027_real_marten_broadcloak",
             "breakpoints": true
+        },
+        {
+            "idx": 28,
+            "version": "7",
+            "when": 1786804337472,
+            "tag": "0028_tricky_impossible_man",
+            "breakpoints": true
+        },
+        {
+            "idx": 29,
+            "version": "7",
+            "when": 1786804350606,
+            "tag": "0029_seed_privacy_policy",
+            "breakpoints": true
+        },
+        {
+            "idx": 30,
+            "version": "7",
+            "when": 1786806091396,
+            "tag": "0030_square_mordo",
+            "breakpoints": true
         }
     ]
 }

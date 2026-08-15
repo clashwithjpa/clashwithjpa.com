@@ -51,6 +51,7 @@ export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanReq
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
 export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
 export type { GetJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
+export type { GetPrivacyQueryKey } from "./hooks/createGetPrivacy.ts";
 export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
 export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
 export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
@@ -62,6 +63,7 @@ export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayer
 export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
 export type { RenameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
 export type { RunCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
+export type { SetPrivacyMutationKey } from "./hooks/createSetPrivacy.ts";
 export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
 export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
 export type { SetUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
@@ -519,6 +521,7 @@ export type {
     GetJoinApplicationsQueryParamsStatusEnumKey,
     GetJoinApplicationsQueryResponse,
 } from "./models/GetJoinApplications.ts";
+export type { GetPrivacy200, GetPrivacy500, GetPrivacyQuery, GetPrivacyQueryResponse } from "./models/GetPrivacy.ts";
 export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
 export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
 export type {
@@ -586,6 +589,14 @@ export type {
     RenameCwlSeasonPathParams,
 } from "./models/RenameCwlSeason.ts";
 export type { RunCwlPingNow200, RunCwlPingNow401, RunCwlPingNowMutation, RunCwlPingNowMutationResponse } from "./models/RunCwlPingNow.ts";
+export type {
+    SetPrivacy200,
+    SetPrivacy401,
+    SetPrivacy500,
+    SetPrivacyMutation,
+    SetPrivacyMutationRequest,
+    SetPrivacyMutationResponse,
+} from "./models/SetPrivacy.ts";
 export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
     SetUserAccountExternal200,
@@ -793,6 +804,7 @@ export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
 export { getJPACwlClans } from "./clients/getJPACwlClans.ts";
 export { getJoinApplications } from "./clients/getJoinApplications.ts";
+export { getPrivacy } from "./clients/getPrivacy.ts";
 export { getRules } from "./clients/getRules.ts";
 export { getUser } from "./clients/getUser.ts";
 export { getUserAccounts } from "./clients/getUserAccounts.ts";
@@ -804,6 +816,7 @@ export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { refreshDiscordUsernames } from "./clients/refreshDiscordUsernames.ts";
 export { renameCwlSeason } from "./clients/renameCwlSeason.ts";
 export { runCwlPingNow } from "./clients/runCwlPingNow.ts";
+export { setPrivacy } from "./clients/setPrivacy.ts";
 export { setRules } from "./clients/setRules.ts";
 export { setUserAccountExternal } from "./clients/setUserAccountExternal.ts";
 export { setUserApiAccess } from "./clients/setUserApiAccess.ts";
@@ -962,6 +975,9 @@ export { getJPACwlClansQueryOptions } from "./hooks/createGetJPACwlClans.ts";
 export { createGetJoinApplications } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
 export { getJoinApplicationsQueryOptions } from "./hooks/createGetJoinApplications.ts";
+export { createGetPrivacy } from "./hooks/createGetPrivacy.ts";
+export { getPrivacyQueryKey } from "./hooks/createGetPrivacy.ts";
+export { getPrivacyQueryOptions } from "./hooks/createGetPrivacy.ts";
 export { createGetRules } from "./hooks/createGetRules.ts";
 export { getRulesQueryKey } from "./hooks/createGetRules.ts";
 export { getRulesQueryOptions } from "./hooks/createGetRules.ts";
@@ -990,6 +1006,8 @@ export { createRenameCwlSeason } from "./hooks/createRenameCwlSeason.ts";
 export { renameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
 export { createRunCwlPingNow } from "./hooks/createRunCwlPingNow.ts";
 export { runCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
+export { createSetPrivacy } from "./hooks/createSetPrivacy.ts";
+export { setPrivacyMutationKey } from "./hooks/createSetPrivacy.ts";
 export { createSetRules } from "./hooks/createSetRules.ts";
 export { setRulesMutationKey } from "./hooks/createSetRules.ts";
 export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
@@ -1423,6 +1441,7 @@ export {
     getJoinApplicationsQueryParamsSchema,
     getJoinApplicationsQueryResponseSchema,
 } from "./zod/getJoinApplicationsSchema.ts";
+export { getPrivacy200Schema, getPrivacy500Schema, getPrivacyQueryResponseSchema } from "./zod/getPrivacySchema.ts";
 export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
 export {
     getUserAccounts200Schema,
@@ -1481,6 +1500,13 @@ export {
     renameCwlSeasonPathParamsSchema,
 } from "./zod/renameCwlSeasonSchema.ts";
 export { runCwlPingNow200Schema, runCwlPingNow401Schema, runCwlPingNowMutationResponseSchema } from "./zod/runCwlPingNowSchema.ts";
+export {
+    setPrivacy200Schema,
+    setPrivacy401Schema,
+    setPrivacy500Schema,
+    setPrivacyMutationRequestSchema,
+    setPrivacyMutationResponseSchema,
+} from "./zod/setPrivacySchema.ts";
 export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
     setUserAccountExternal200Schema,

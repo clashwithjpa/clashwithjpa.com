@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Created clan.
@@ -74,7 +74,7 @@ export const createAdminClan503Schema = z.object({
 export const createAdminClanMutationRequestSchema = z.object({
     cocClanCode: z.string().min(1),
     cocClanName: z.optional(z.union([z.string(), z.null()])),
-    cocClanLevel: z.optional(z.union([z.int(), z.null()])),
+    cocClanLevel: z.optional(z.union([z.number().int(), z.null()])),
     cocClanTag: z.string().min(1).regex(/^#.*/),
     discordClanRoleId: z.string().min(1),
     discordClanChannelId: z.string().min(1),
@@ -83,9 +83,9 @@ export const createAdminClanMutationRequestSchema = z.object({
     discordColeaderRoleId: z.string().min(1),
     discordLeaderRoleId: z.string().min(1),
     discordLeaderId: z.string().min(1),
-    attacksRequirement: z.int().min(0).max(9007199254740991),
-    donationsRequirement: z.int().min(0).max(9007199254740991),
-    clangamesRequirement: z.int().min(0).max(9007199254740991),
+    attacksRequirement: z.number().int().min(0).max(9007199254740991),
+    donationsRequirement: z.number().int().min(0).max(9007199254740991),
+    clangamesRequirement: z.number().int().min(0).max(9007199254740991),
 });
 
 export const createAdminClanMutationResponseSchema = z.lazy(() => createAdminClan200Schema);

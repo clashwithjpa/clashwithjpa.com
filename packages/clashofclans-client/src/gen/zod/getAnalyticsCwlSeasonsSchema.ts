@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Seasons.
@@ -17,7 +17,7 @@ export const getAnalyticsCwlSeasons200Schema = z.object({
                 name: z.string(),
                 month: z.string(),
                 year: z.number(),
-                createdAt: z.union([z.iso.datetime(), z.null()]),
+                createdAt: z.union([z.string().datetime(), z.null()]),
             }),
         ),
     }),

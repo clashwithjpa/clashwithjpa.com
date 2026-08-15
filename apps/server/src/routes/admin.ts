@@ -40,6 +40,7 @@ import {
     getUsersWithDiscordAccounts,
     MissingDiscordAccountError,
     renameCwlSeason,
+    setPrivacy,
     setUserApiAccess,
     setUserDiscordUsername,
     setUserSeasonBonus,
@@ -1123,6 +1124,7 @@ const settingsSchema = z4.object({
     cwlEnabled: z4.boolean(),
     siteMaintenanceMode: z4.boolean(),
     rulesContent: z4.string().nullable(),
+    privacyContent: z4.string().nullable(),
     guildId: z4.string().nullable(),
     currentCwlSeasonId: z4.number().nullable(),
     updatedAt: z4.date().nullable(),
@@ -1215,6 +1217,46 @@ app.put(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update settings" }, 500);
+        }
+    },
+);
+
+// Privacy policy - superadmin-only, since it's a legal statement about member data handling.
+
+const setPrivacyBodySchema = z4.object({
+    privacy: z4.string().min(1, "Privacy policy content is required").max(100_000, "Privacy policy content too large"),
+});
+const setPrivacyData = z4.object({
+    privacy: z4.string(),
+});
+app.put(
+    "/privacy",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "setPrivacy",
+        role: "Superadmin",
+        description: "Updates the privacy policy content.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Successful response with the updated privacy policy content.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(setPrivacyData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("json", setPrivacyBodySchema),
+    async (c) => {
+        try {
+            const { privacy } = c.req.valid("json");
+            const updated = await setPrivacy(privacy);
+            await invalidateSettingsCache();
+            logAction(c, { action: "privacy.update", targetType: "privacy" });
+            return c.json({ success: true, data: { privacy: updated } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to update the privacy policy" }, 500);
         }
     },
 );

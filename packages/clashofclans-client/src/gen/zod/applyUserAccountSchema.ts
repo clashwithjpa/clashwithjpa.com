@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 /**
  * @description Application submitted successfully.
@@ -18,7 +18,7 @@ export const applyUserAccount200Schema = z.object({
                 cocAccountData: z.any(),
                 discordUserId: z.string(),
                 status: z.string(),
-                createdAt: z.iso.datetime(),
+                createdAt: z.string().datetime(),
             }),
         ),
         account: z.optional(
@@ -77,7 +77,7 @@ export const applyUserAccountMutationRequestSchema = z.object({
     apiToken: z.string().min(1).max(500),
     captchaToken: z.optional(z.union([z.string(), z.null()])),
     isExternal: z.optional(z.boolean().default(false)),
-    warWeight: z.optional(z.int().min(1).max(9999999)),
+    warWeight: z.optional(z.number().int().min(1).max(9999999)),
 });
 
 export const applyUserAccountMutationResponseSchema = z.lazy(() => applyUserAccount200Schema);

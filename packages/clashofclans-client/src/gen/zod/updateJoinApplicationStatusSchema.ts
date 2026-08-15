@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from "zod/v4";
+import * as z from "zod";
 
 export const updateJoinApplicationStatusPathParamsSchema = z.object({
     id: z.coerce.number().int().min(1).max(9007199254740991),
@@ -21,7 +21,7 @@ export const updateJoinApplicationStatus200Schema = z.object({
             cocAccountData: z.any(),
             discordUserId: z.string(),
             status: z.enum(["pending", "accepted", "rejected"]),
-            createdAt: z.iso.datetime(),
+            createdAt: z.string().datetime(),
             image: z.union([z.string(), z.null()]),
             discordUsername: z.union([z.string(), z.null()]),
             discordRole: z.union([z.string(), z.null()]),
