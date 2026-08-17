@@ -5,7 +5,8 @@
     "tasks": {
         "dev": {
             "cache": false,
-            "persistent": true
+            "persistent": true,
+            "dependsOn": ["^build"]
         },
         "build": {
             "outputs": ["dist/**", "build/**", ".svelte-kit/**"],
