@@ -19,7 +19,7 @@ catalog:
   "@kubb/plugin-svelte-query": ^4.39.3
   "@kubb/plugin-ts": ^4.39.3
   "@kubb/plugin-zod": ^4.39.3
-  "@tanstack/svelte-query": ^5.90.2
+  "@tanstack/svelte-query": ^6.1.38
   "@types/node": ^26.2.0
   better-auth: ^1.6.26
   eslint: ^10.8.1
