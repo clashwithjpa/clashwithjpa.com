@@ -66,6 +66,18 @@
             "matchPackageNames": ["ag-grid-**", "ag-charts-**"],
             "matchUpdateTypes": ["major"],
             "groupName": "ag-grid"
+        },
+        {
+            "matchPackageNames": ["@tanstack/svelte-query"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "tanstack query",
+            "dependencyDashboardApproval": true
+        },
+        {
+            "matchPackageNames": ["typescript"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "typescript",
+            "dependencyDashboardApproval": true
         }
     ],
 
