@@ -57,15 +57,10 @@
     const LAYOUT_CONFIG = {
         content: { min: 30, max: 85, default: 30 },
         infoSidebar: { min: 15, max: 45, default: 30 },
-        mobile: {
-            content: { min: 94, max: 99, default: 94 },
-            sidebar: { min: 6, max: 10, default: 6 },
-        },
     };
 
     let userSidebarWidth = $derived(pxToPct(storage.sidebarSize));
     let userInfoWidth = $state(LAYOUT_CONFIG.infoSidebar.default);
-    let mobileSize = $state([LAYOUT_CONFIG.mobile.content.default, LAYOUT_CONFIG.mobile.sidebar.default]);
 
     let desktopSize = $derived.by(() => {
         if (isMobile) return [0, 0, 0];
@@ -85,17 +80,6 @@
             maxSize: showInfo ? LAYOUT_CONFIG.infoSidebar.max : 0,
         },
     ]);
-
-    const mobilePanels = $derived.by(() => [
-        { id: "content", minSize: LAYOUT_CONFIG.mobile.content.min },
-        { id: "sidebar", maxSize: LAYOUT_CONFIG.mobile.sidebar.max },
-    ]);
-
-    function handleResize(details: Splitter.ResizeDetails) {
-        if (isMobile) {
-            mobileSize = details.size;
-        }
-    }
 
     function handleDragEnd(details: Splitter.ResizeEndDetails) {
         if (isMobile) return;
@@ -176,92 +160,101 @@
     </div>
 {/snippet}
 
-{#snippet SidebarPanel()}
-    <Splitter.Panel
-        id="sidebar"
-        class="flex items-center {isMobile ? 'min-h-16 w-full justify-center py-2' : 'h-full flex-col justify-between py-4'}"
-    >
-        {#if isMobile}
-            <div class="edge-fade w-full scrollbar-none overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4">
-                    {#each groupedLinks as group, i (group.category)}
-                        {#if i > 0}
-                            <div class="stagger-fade h-8 shrink-0 self-center border-l-2 border-stone-700/50" style="--i:{i}"></div>
-                        {/if}
-                        {#each group.links as link (link.href)}
-                            <div class="stagger-fade shrink-0" style="--i:{i}">
-                                {@render button(link)}
-                            </div>
-                        {/each}
-                    {/each}
-                </div>
-            </div>
-        {:else}
-            <div
-                class="edge-fade flex min-h-0 w-full flex-1 scrollbar-none flex-col justify-start gap-6 overflow-y-auto p-2 [&::-webkit-scrollbar]:hidden"
-                bind:clientWidth={sidebarWidth}
-            >
+{#snippet MobileNav()}
+    <nav class="flex w-full shrink-0 items-center justify-center bg-stone-900 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+        <div class="edge-fade w-full scrollbar-none overflow-x-auto [&::-webkit-scrollbar]:hidden">
+            <div class="flex w-max min-w-full items-center justify-evenly gap-6 px-4">
                 {#each groupedLinks as group, i (group.category)}
-                    <div class="stagger-fade flex flex-col gap-4" style="--i:{i}">
-                        {#if isSidebarExpanded}
-                            {#if group.category}
-                                <div class="flex items-center gap-2 px-4">
-                                    <span class="truncate text-[10px] font-semibold tracking-wider text-stone-500 uppercase">
-                                        {group.category}
-                                    </span>
-                                    <div class="h-0 flex-1 border-t-2 border-stone-700/50"></div>
-                                </div>
-                            {/if}
-                        {:else if i > 0}
-                            <div class="mx-auto w-8 border-t-2 border-stone-700/50"></div>
-                        {/if}
-                        {#each group.links as link (link.href)}
+                    {#if i > 0}
+                        <div class="stagger-fade h-8 shrink-0 self-center border-l-2 border-stone-700/50" style="--i:{i}"></div>
+                    {/if}
+                    {#each group.links as link (link.href)}
+                        <div class="stagger-fade shrink-0" style="--i:{i}">
                             {@render button(link)}
-                        {/each}
-                    </div>
+                        </div>
+                    {/each}
                 {/each}
             </div>
-            <div
-                class="flex w-full items-center overflow-hidden {isSidebarExpanded
-                    ? 'justify-start px-6'
-                    : 'justify-center'} pb-4 transition-all duration-200"
-            >
-                {#if $session.data}
-                    <Avatar
-                        src={$session.data?.user.image}
-                        name={$session.data?.user.name || ""}
-                        role={($session.data?.user.role as Role) || "unverified"}
-                    />
-                {:else}
-                    <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
-                {/if}
-                {#if isSidebarExpanded}
-                    <div class="ml-4 flex flex-col overflow-hidden">
-                        <span class="truncate text-sm font-medium text-stone-200">{$session.data?.user.name}</span>
-                        <span class="truncate text-xs text-stone-400 capitalize">{($session.data?.user.role as Role) || "unverified"}</span>
-                    </div>
-                {/if}
-            </div>
-        {/if}
+        </div>
+    </nav>
+{/snippet}
+
+{#snippet SidebarPanel()}
+    <Splitter.Panel id="sidebar" class="flex h-full flex-col items-center justify-between py-4">
+        <div
+            class="edge-fade flex min-h-0 w-full flex-1 scrollbar-none flex-col justify-start gap-6 overflow-y-auto p-2 [&::-webkit-scrollbar]:hidden"
+            bind:clientWidth={sidebarWidth}
+        >
+            {#each groupedLinks as group, i (group.category)}
+                <div class="stagger-fade flex flex-col gap-4" style="--i:{i}">
+                    {#if isSidebarExpanded}
+                        {#if group.category}
+                            <div class="flex items-center gap-2 px-4">
+                                <span class="truncate text-[10px] font-semibold tracking-wider text-stone-500 uppercase">
+                                    {group.category}
+                                </span>
+                                <div class="h-0 flex-1 border-t-2 border-stone-700/50"></div>
+                            </div>
+                        {/if}
+                    {:else if i > 0}
+                        <div class="mx-auto w-8 border-t-2 border-stone-700/50"></div>
+                    {/if}
+                    {#each group.links as link (link.href)}
+                        {@render button(link)}
+                    {/each}
+                </div>
+            {/each}
+        </div>
+        <div
+            class="flex w-full items-center overflow-hidden {isSidebarExpanded
+                ? 'justify-start px-6'
+                : 'justify-center'} pb-4 transition-all duration-200"
+        >
+            {#if $session.data}
+                <Avatar
+                    src={$session.data?.user.image}
+                    name={$session.data?.user.name || ""}
+                    role={($session.data?.user.role as Role) || "unverified"}
+                />
+            {:else}
+                <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+            {/if}
+            {#if isSidebarExpanded}
+                <div class="ml-4 flex flex-col overflow-hidden">
+                    <span class="truncate text-sm font-medium text-stone-200">{$session.data?.user.name}</span>
+                    <span class="truncate text-xs text-stone-400 capitalize">{($session.data?.user.role as Role) || "unverified"}</span>
+                </div>
+            {/if}
+        </div>
     </Splitter.Panel>
 {/snippet}
 
+{#snippet ContentBody()}
+    {#if $session.data}
+        <div class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
+            {#key page.url.pathname}
+                <div class="page-enter {!noPaddingPaths.includes(page.url.pathname) ? 'p-4' : 'size-full'}">
+                    {@render children()}
+                </div>
+            {/key}
+        </div>
+    {:else}
+        <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
+            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet ContentPanel()}
-    <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
-        {#if $session.data}
-            <div class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
-                {#key page.url.pathname}
-                    <div class="page-enter {!noPaddingPaths.includes(page.url.pathname) ? 'p-4' : 'size-full'}">
-                        {@render children()}
-                    </div>
-                {/key}
-            </div>
-        {:else}
-            <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
-                <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
-            </div>
-        {/if}
-    </Splitter.Panel>
+    {#if isMobile}
+        <div class="min-h-0 w-full min-w-0 flex-1 rounded-b-2xl bg-stone-950">
+            {@render ContentBody()}
+        </div>
+    {:else}
+        <Splitter.Panel id="content" class="size-full min-w-0 rounded-b-2xl bg-stone-950 lg:rounded-2xl">
+            {@render ContentBody()}
+        </Splitter.Panel>
+    {/if}
 {/snippet}
 
 {#snippet InfoSidebar()}
@@ -292,22 +285,20 @@
     {/if}
 {/snippet}
 
-<Splitter.Root
-    orientation={isMobile ? "vertical" : "horizontal"}
-    class="flex size-full overflow-hidden! bg-stone-900 lg:p-2"
-    size={isMobile ? mobileSize : desktopSize}
-    onResize={handleResize}
-    onResizeEnd={handleDragEnd}
-    panels={isMobile ? mobilePanels : desktopPanels}
->
-    {#if isMobile}
+{#if isMobile}
+    <div class="flex size-full flex-col overflow-hidden bg-stone-900">
         {@render ContentPanel()}
-        <Splitter.ResizeTrigger id="content:sidebar" disabled class="hidden">
-            <div class="hidden"></div>
-        </Splitter.ResizeTrigger>
-        {@render SidebarPanel()}
+        {@render MobileNav()}
         {@render InfoSidebar()}
-    {:else}
+    </div>
+{:else}
+    <Splitter.Root
+        orientation="horizontal"
+        class="flex size-full overflow-hidden! bg-stone-900 lg:p-2"
+        size={desktopSize}
+        onResizeEnd={handleDragEnd}
+        panels={desktopPanels}
+    >
         {@render SidebarPanel()}
         <Splitter.ResizeTrigger id="sidebar:content" class="group relative flex items-center justify-center outline-none">
             <div class="h-full w-1 rounded-full transition-colors duration-200 group-hover:bg-stone-400"></div>
@@ -323,5 +314,5 @@
             {/if}
         </Splitter.ResizeTrigger>
         {@render InfoSidebar()}
-    {/if}
-</Splitter.Root>
+    </Splitter.Root>
+{/if}

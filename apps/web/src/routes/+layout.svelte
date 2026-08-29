@@ -56,7 +56,7 @@
 
 <svelte:window onmousemove={handleMouseMove} />
 
-<div class="h-screen w-full">
+<div class="h-dvh w-full">
     {@render children()}
 </div>
 
