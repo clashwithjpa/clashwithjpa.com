@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import { clearIdentifiedUser } from "$lib/analytics";
     import { authClient, hasPermission } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
@@ -94,7 +95,16 @@
                                 <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
                             {/if}
                         {/await}
-                        <CocBtn variant="red" size="sm" onclick={() => authClient.signOut()}>Logout</CocBtn>
+                        <CocBtn
+                            variant="red"
+                            size="sm"
+                            onclick={() => {
+                                clearIdentifiedUser();
+                                authClient.signOut();
+                            }}
+                        >
+                            Logout
+                        </CocBtn>
                     </div>
                 </div>
             </CocPopup>

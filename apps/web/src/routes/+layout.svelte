@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { clearIdentifiedUser, identifyUser } from "$lib/analytics";
+    import { authClient } from "$lib/auth";
     import ControlsPopup from "$lib/components/ControlsPopup.svelte";
     import Snowfall from "$lib/components/Snowfall.svelte";
     import "@cartamd/plugin-anchor/default.css";
@@ -13,6 +15,17 @@
     import "./layout.css";
 
     let { children } = $props();
+
+    const session = authClient.useSession();
+
+    $effect(() => {
+        const user = $session.data?.user;
+        if (user) {
+            identifyUser(user);
+        } else if (!$session.isPending) {
+            clearIdentifiedUser();
+        }
+    });
 
     onMount(() => {
         const el = document.getElementById("ls");
