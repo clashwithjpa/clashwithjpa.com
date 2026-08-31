@@ -1305,7 +1305,7 @@ const discordWebhookUrlSchema = z4
 const updateCwlPingSettingsBodySchema = z4.object({
     enabled: z4.boolean().optional(),
     webhookUrl: discordWebhookUrlSchema.nullable().optional(),
-    intervalMinutes: z4.number().int().min(1).max(10).optional(),
+    intervalMinutes: z4.number().int().min(1).max(240).optional(),
 });
 const updateCwlPingSettingsData = z4.object({ settings: cwlPingSettingsSchema });
 app.put(

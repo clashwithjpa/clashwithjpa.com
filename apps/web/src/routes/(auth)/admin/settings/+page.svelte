@@ -527,9 +527,9 @@
 
                             <div class="flex items-center gap-3">
                                 <div class="w-28">
-                                    <Input type="number" bind:value={cwlPingIntervalMinutes} min={1} max={10} disabled={saving} />
+                                    <Input type="number" bind:value={cwlPingIntervalMinutes} min={1} max={240} disabled={saving} />
                                 </div>
-                                <span class="text-xs text-stone-400">minutes between checks (1–10)</span>
+                                <span class="text-xs text-stone-400">minutes between checks (1–240)</span>
                             </div>
 
                             <div class="flex flex-col gap-3 border-t-2 border-stone-700/50 pt-4">

@@ -87,7 +87,7 @@ export type UpdateCwlPingSettingsMutationRequest = {
     webhookUrl?: string | null;
     /**
      * @minLength 1
-     * @maxLength 10
+     * @maxLength 240
      * @type integer | undefined
      */
     intervalMinutes?: number;

@@ -48,7 +48,7 @@ export const updateCwlPingSettings500Schema = z.object({
 export const updateCwlPingSettingsMutationRequestSchema = z.object({
     enabled: z.optional(z.boolean()),
     webhookUrl: z.optional(z.union([z.string().url(), z.null()])),
-    intervalMinutes: z.optional(z.number().int().min(1).max(10)),
+    intervalMinutes: z.optional(z.number().int().min(1).max(240)),
 });
 
 export const updateCwlPingSettingsMutationResponseSchema = z.lazy(() => updateCwlPingSettings200Schema);
