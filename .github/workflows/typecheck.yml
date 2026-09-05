@@ -15,7 +15,7 @@ env:
 jobs:
   typecheck:
     name: Typecheck
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-arm
     timeout-minutes: 15
 
     steps:
