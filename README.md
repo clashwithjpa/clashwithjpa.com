@@ -22,7 +22,7 @@ all documented in the **[wiki](https://github.com/clashwithjpa/clashwithjpa.com/
 ## 🤝 Contributing
 
 Pull requests are welcome, start with the
-[wiki](https://github.com/clashwithjpa/clashwithjpa.com/wiki). Commits follow
+[wiki](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/wiki). Commits follow
 [Conventional Commits](https://www.conventionalcommits.org). Be decent to each other, see the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
