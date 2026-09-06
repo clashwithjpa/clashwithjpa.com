@@ -1,6 +1,7 @@
 {
     "name": "clashwithjpa.com",
     "private": true,
+    "version": "2.0.0",
     "type": "module",
     "scripts": {
         "build": "turbo run build",

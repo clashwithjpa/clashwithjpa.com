@@ -17,26 +17,45 @@ WORKDIR /app
 FROM base AS pruner
 ARG TURBO_VERSION
 COPY . .
-RUN pnpm dlx turbo@${TURBO_VERSION} prune web --docker
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm dlx turbo@${TURBO_VERSION} prune web --docker
 
-# ---- deps: install full workspace dependencies (incl. dev) ---------------
-# Vite needs devDependencies to build, so we install the full graph here.
-FROM base AS deps
+# ---- libs: compile the @repo/* packages web imports ----------------------
+# injectWorkspacePackages (set for the server image's `pnpm deploy`) makes an
+# install *copy* each workspace package into node_modules rather than symlink
+# it, so their dist/ has to exist before the build stage installs.
+FROM base AS libs
 
 COPY --from=pruner /app/out/json/ ./
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/full/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile --filter "web^..."
+
+COPY --from=pruner /app/out/full/packages/ ./packages/
+
+RUN pnpm --filter "web^..." run build \
+    && mkdir /libs \
+    && cp -r --parents packages/*/dist /libs/
 
 # ---- build: produce the static SvelteKit output --------------------------
-FROM deps AS build
+FROM base AS build
 
+COPY --from=pruner /app/out/json/ ./
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner /app/out/full/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=pruner /app/out/full/packages/ ./packages/
+COPY --from=libs /libs/ ./
+
+# Vite needs devDependencies to build, so we install the full graph here.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Last, so that editing web leaves every layer above this one cached.
 COPY --from=pruner /app/out/full/ ./
 
 # PUBLIC_* env vars are embedded at build time by Vite/SvelteKit.
-# Pass them through as build args so the resulting bundle is environment-specific.
 ARG PUBLIC_SERVER_URL
 ARG PUBLIC_SENTRY_DSN
 ARG PUBLIC_SENTRY_SPOTLIGHT
@@ -47,7 +66,7 @@ ENV PUBLIC_SERVER_URL=${PUBLIC_SERVER_URL} \
     PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY} \
     NODE_ENV=production
 
-RUN pnpm --filter web... run build
+RUN pnpm --filter web run build
 
 # ---- runtime: nginx serving the prerendered static output ----------------
 FROM nginx:${NGINX_VERSION} AS runtime

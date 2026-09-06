@@ -93,8 +93,31 @@ db-reset:
 
 # ── Deploy ────────────────────────────────────────────────────────────────────
 
-# Pull, build and swap the prod stack without taking the site down  →  just prod
+# Pull and swap the prod stack without taking the site down  →  just prod
 prod:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    compose=(docker compose -f docker-compose.yaml -f docker-compose.prod.yaml)
+    for f in ./apps/*/.env; do [[ -e $f ]] && compose+=(--env-file "$f"); done
+    compose+=(--profile prod)
+
+    printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
+    git pull --ff-only
+
+
+    printf '\033[43m\033[30m IMG  \033[0m \033[33mPulling images (site stays up)\033[0m\n'
+    "${compose[@]}" pull
+
+    printf '\033[43m\033[30m SWAP \033[0m \033[33mSwapping containers\033[0m\n'
+    "${compose[@]}" up -d --remove-orphans
+
+    printf '\033[43m\033[30m CLN  \033[0m \033[33mPruning superseded images\033[0m\n'
+    docker image prune -f >/dev/null
+
+    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed\033[0m\n'
+    just show
+
+prod-build:
     #!/usr/bin/env bash
     set -euo pipefail
     compose=(docker compose -f docker-compose.yaml -f docker-compose.prod.yaml)
@@ -107,13 +130,12 @@ prod:
     printf '\033[43m\033[30m BLD  \033[0m \033[33mBuilding images (site stays up)\033[0m\n'
     "${compose[@]}" build
 
-    # `up -d` recreates only what changed, so db, redis and minio never stop.
     printf '\033[43m\033[30m SWAP \033[0m \033[33mSwapping containers\033[0m\n'
-    "${compose[@]}" up -d --remove-orphans
+    "${compose[@]}" up -d --remove-orphans --pull never
 
     printf '\033[43m\033[30m CLN  \033[0m \033[33mPruning build cache\033[0m\n'
     docker builder prune -f --filter until=168h >/dev/null
     docker image prune -f >/dev/null
 
-    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed\033[0m\n'
+    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed from local build\033[0m\n'
     just show
