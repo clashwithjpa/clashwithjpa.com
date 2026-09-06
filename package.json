@@ -21,12 +21,12 @@
         "@ianvs/prettier-plugin-sort-imports": "catalog:",
         "@types/node": "catalog:",
         "husky": "^9.1.7",
-        "lint-staged": "^17.3.0",
+        "lint-staged": "^17.4.1",
         "prettier": "catalog:",
         "prettier-plugin-svelte": "catalog:",
         "prettier-plugin-tailwindcss": "catalog:",
-        "turbo": "^2.10.10",
+        "turbo": "^2.10.12",
         "typescript": "catalog:"
     },
-    "packageManager": "pnpm@11.22.0"
+    "packageManager": "pnpm@12.3.4"
 }
