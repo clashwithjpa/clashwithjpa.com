@@ -1,0 +1,212 @@
+# `tag` runs before `pr` so the two can never race: after a release PR merges,
+# `tag` cuts the tag, and `pr` then sees it and finds nothing left to release.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  GITEA_API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+  GIT_CLIFF: git-cliff@2.13.1
+
+jobs:
+  tag:
+    name: Tag release
+    runs-on: ubuntu-latest-arm
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Create tag and release
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          version=$(node -p "require('./package.json').version")
+          if git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
+            echo "v${version} is already tagged — nothing to release"
+            exit 0
+          fi
+
+          node -e '
+            const { writeFileSync } = require("node:fs");
+            const { execFileSync } = require("node:child_process");
+            const version = process.argv[1];
+            const body = execFileSync("node", [".github/scripts/changelog-section.mjs", version], {
+              encoding: "utf8",
+            });
+            writeFileSync("release.json", JSON.stringify({
+              tag_name: `v${version}`,
+              target_commitish: process.argv[2],
+              name: `v${version}`,
+              body,
+            }));
+          ' "$version" "$GITHUB_SHA"
+
+          curl -sSf -X POST "${GITEA_API}/releases" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d @release.json > /dev/null
+
+          echo "released v${version}"
+
+  pr:
+    name: Release PR
+    needs: [tag]
+    runs-on: ubuntu-latest-arm
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .node-version
+
+      - name: Compute next version
+        id: next
+        run: |
+          set -euo pipefail
+
+          # git-cliff derives the bump from conventional commits since the last
+          # tag, matching what commitlint.config.mjs already enforces. With no
+          # releasable commits it echoes the current version back unchanged.
+          next=$(pnpm dlx "$GIT_CLIFF" --bumped-version)
+          version="${next#v}"
+          latest=$(git tag --sort=-v:refname | head -n1)
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if [ "v${version}" = "${latest}" ]; then
+            echo "releasable=false" >> "$GITHUB_OUTPUT"
+            echo "nothing to release since ${latest}"
+          else
+            echo "releasable=true" >> "$GITHUB_OUTPUT"
+            echo "next release would be v${version}"
+          fi
+
+      - name: Update release branch
+        if: steps.next.outputs.releasable == 'true'
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          if [ -f CHANGELOG.md ]; then
+            pnpm dlx "$GIT_CLIFF" --bump --unreleased --prepend CHANGELOG.md
+          else
+            pnpm dlx "$GIT_CLIFF" --bump --unreleased -o CHANGELOG.md
+          fi
+
+          # Hand-edited to preserve the repo's 4-space indent; `npm pkg set`
+          # would reformat to 2 and fail the Format Check on this very PR.
+          sed -i -E 's/^(    "version": ")[^"]*(",)$/\1'"${VERSION}"'\2/' package.json
+
+          git config user.name "gitea-actions"
+          git config user.email "gitea-actions@bymini.dev"
+          git checkout -B chore/release
+          git add CHANGELOG.md package.json
+          git commit -m "chore(release): v${VERSION}"
+          git push --force origin chore/release
+
+      - name: Upsert release PR
+        if: steps.next.outputs.releasable == 'true'
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          node -e '
+            const { writeFileSync } = require("node:fs");
+            const { execFileSync } = require("node:child_process");
+            const version = process.argv[1];
+            const body = execFileSync("node", [".github/scripts/changelog-section.mjs", version], {
+              encoding: "utf8",
+            });
+            const title = `chore(release): v${version}`;
+            writeFileSync("pr-create.json", JSON.stringify({
+              head: "chore/release", base: "main", title, body,
+            }));
+            writeFileSync("pr-edit.json", JSON.stringify({ title, body }));
+          ' "$VERSION"
+
+          code=$(curl -sS -o create.json -w '%{http_code}' -X POST "${GITEA_API}/pulls" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d @pr-create.json)
+
+          if [ "$code" = "201" ]; then
+            echo "opened release PR for v${VERSION}"
+            exit 0
+          fi
+
+          # Anything else almost always means a PR for this branch is already
+          # open. Gitea answers 409, but don't depend on the exact status — look
+          # for the PR and retitle it, and only fail if there genuinely isn't one.
+          number=$(curl -sSf "${GITEA_API}/pulls?state=open&limit=50" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            | node -e '
+              let raw = "";
+              process.stdin.on("data", (d) => (raw += d)).on("end", () => {
+                const pr = JSON.parse(raw).find((p) => p.head?.ref === "chore/release");
+                process.stdout.write(pr ? String(pr.number) : "");
+              });
+            ')
+
+          if [ -z "$number" ]; then
+            echo "POST /pulls returned ${code} and no open chore/release PR exists:" >&2
+            cat create.json >&2
+            exit 1
+          fi
+
+          curl -sSf -X PATCH "${GITEA_API}/pulls/${number}" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d @pr-edit.json > /dev/null
+
+          echo "updated release PR #${number} to v${VERSION}"
+
+      - name: Close stale release PR
+        if: steps.next.outputs.releasable == 'false'
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          number=$(curl -sSf "${GITEA_API}/pulls?state=open&limit=50" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            | node -e '
+              let raw = "";
+              process.stdin.on("data", (d) => (raw += d)).on("end", () => {
+                const pr = JSON.parse(raw).find((p) => p.head?.ref === "chore/release");
+                process.stdout.write(pr ? String(pr.number) : "");
+              });
+            ')
+
+          if [ -z "$number" ]; then
+            echo "no open release PR to close"
+            exit 0
+          fi
+
+          curl -sSf -X PATCH "${GITEA_API}/pulls/${number}" \
+            -H "Authorization: token ${RELEASE_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"state":"closed"}' > /dev/null
+
+          echo "closed stale release PR #${number}"
