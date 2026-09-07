@@ -210,3 +210,79 @@ jobs:
             -d '{"state":"closed"}' > /dev/null
 
           echo "closed stale release PR #${number}"
+
+  github-release:
+    name: Mirror release to GitHub
+    needs: [tag]
+    runs-on: ubuntu-latest-arm
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # The push mirror moves refs only — a Gitea release is a database object
+      # attached to a tag, so GitHub ends up with the tag and no release. This
+      # recreates it through GitHub's own API.
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          api="https://api.github.com/repos/${{ github.repository }}"
+          version=$(node -p "require('./package.json').version")
+
+          gh_api() {
+            curl -sS -o "$1" -w '%{http_code}' \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" "$2"
+          }
+
+          # Idempotent, so re-runs are safe and a release missed earlier — a
+          # mirror outage, a token expiry — is picked up on the next push to main.
+          if [ "$(gh_api /dev/null "${api}/releases/tags/v${version}")" = "200" ]; then
+            echo "GitHub already has v${version}"
+            exit 0
+          fi
+
+          # The mirror syncs on commit, so it is racing this run rather than
+          # trailing it — the SHA is normally there on the first poll. Confirm it
+          # anyway: a release must not point at a commit GitHub has never seen,
+          # and the retries cover a mirror that is briefly down or backed up.
+          code=""
+          for i in $(seq 1 30); do
+            code=$(gh_api /dev/null "${api}/commits/${GITHUB_SHA}")
+            if [ "$code" = "200" ]; then
+              break
+            fi
+            echo "waiting for the mirror to deliver ${GITHUB_SHA} (${i}/30, HTTP ${code})"
+            sleep 10
+          done
+
+          if [ "$code" != "200" ]; then
+            echo "mirror did not deliver ${GITHUB_SHA} within five minutes" >&2
+            exit 1
+          fi
+
+          node -e '
+            const { writeFileSync } = require("node:fs");
+            const { execFileSync } = require("node:child_process");
+            const version = process.argv[1];
+            const body = execFileSync("node", [".github/scripts/changelog-section.mjs", version], {
+              encoding: "utf8",
+            });
+            writeFileSync("gh-release.json", JSON.stringify({
+              tag_name: `v${version}`,
+              target_commitish: process.argv[2],
+              name: `v${version}`,
+              body,
+            }));
+          ' "$version" "$GITHUB_SHA"
+
+          curl -sSf -X POST "${api}/releases" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            -d @gh-release.json > /dev/null
+
+          echo "mirrored v${version} to GitHub"

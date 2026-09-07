@@ -1,6 +1,7 @@
 /**
- * The single source of conventional-commit rules: applied to each commit via
- * .husky/commit-msg, and to PR titles via .github/workflows/semantic-pull-request.yml.
+ * Conventional-commit rules for this repo, applied to each commit by
+ * .husky/commit-msg. git-cliff reads the same commits to derive the next version
+ * and the CHANGELOG section, so a message that fails here is one it will drop.
  *
  * @type {import("@commitlint/types").UserConfig}
  */
