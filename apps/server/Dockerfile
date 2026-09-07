@@ -1,15 +1,19 @@
 # syntax=docker/dockerfile:1.26@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 
 ARG NODE_VERSION=24-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e
-ARG TURBO_VERSION=2.10.10
-ARG PNPM_VERSION=11.22.0
+ARG TURBO_VERSION=2.10.12
+ARG PNPM_VERSION=12.3.4
 
 # ---- base ----------------------------------------------------------------
 FROM node:${NODE_VERSION} AS base
 ARG PNPM_VERSION
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+ENV HUSKY=0
+# `pnpm --version` makes corepack fetch pnpm's native binary now, baking it into
+# this layer instead of leaving every stage that runs pnpm to download its own.
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate \
+    && pnpm --version
 WORKDIR /app
 
 # ---- pruner: emit a workspace subset containing only server's deps -------
@@ -20,7 +24,8 @@ WORKDIR /app
 FROM base AS pruner
 ARG TURBO_VERSION
 COPY . .
-RUN pnpm dlx turbo@${TURBO_VERSION} prune server --docker
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm dlx turbo@${TURBO_VERSION} prune server --docker
 
 # ---- deps: install the full graph (dev included) so we can compile -------
 FROM base AS deps

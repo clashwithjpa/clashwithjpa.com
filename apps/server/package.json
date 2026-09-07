@@ -50,6 +50,5 @@
         "tsc-alias": "catalog:",
         "tsx": "^4.23.12",
         "typescript": "catalog:"
-    },
-    "packageManager": "pnpm@11.22.0"
+    }
 }

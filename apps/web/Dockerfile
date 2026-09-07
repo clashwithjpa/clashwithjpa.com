@@ -2,15 +2,19 @@
 
 ARG NODE_VERSION=24-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e
 ARG NGINX_VERSION=1.31-alpine@sha256:72ba65eb42c10344912a84ff42408db7d34f2feb642204570ab8fc5ffd29f1d3
-ARG TURBO_VERSION=2.10.10
-ARG PNPM_VERSION=11.22.0
+ARG TURBO_VERSION=2.10.12
+ARG PNPM_VERSION=12.3.4
 
 # ---- base ----------------------------------------------------------------
 FROM node:${NODE_VERSION} AS base
 ARG PNPM_VERSION
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+ENV HUSKY=0
+# `pnpm --version` makes corepack fetch pnpm's native binary now, baking it into
+# this layer instead of leaving every stage that runs pnpm to download its own.
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate \
+    && pnpm --version
 WORKDIR /app
 
 # ---- pruner: emit a workspace subset containing only web's deps ----------

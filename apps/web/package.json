@@ -82,6 +82,5 @@
         "typescript": "catalog:",
         "unplugin-icons": "^23.0.1",
         "vite": "^8.2.1"
-    },
-    "packageManager": "pnpm@11.22.0"
+    }
 }

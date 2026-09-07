@@ -1,5 +1,12 @@
 name: Semantic Pull Request
 
+# Validated with commitlint rather than a PR-title action: every such action reads
+# the owner from `pull_request.base.user.login`, a field Gitea's payload does not
+# have (its `base` carries only label/ref/sha/repo/repo_id), so they die on
+# "Cannot read properties of undefined (reading 'login')". commitlint touches no
+# payload internals and reuses commitlint.config.mjs, so titles and commits are
+# held to one set of rules instead of two that can drift apart.
+
 on:
   pull_request_target:
     types: [opened, edited, reopened, synchronize]
@@ -16,10 +23,21 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest-arm
     timeout-minutes: 5
-    permissions:
-      pull-requests: read
 
     steps:
-      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install commitlint
+        run: pnpm install --frozen-lockfile --filter . --ignore-scripts
+
+      - name: Validate PR title
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint
