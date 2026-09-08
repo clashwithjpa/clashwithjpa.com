@@ -16,10 +16,8 @@ jobs:
   format-check:
     name: Format Check
     if: >-
-      !startsWith(github.head_ref, 'renovate/')
-      && github.head_ref != 'chore/release'
+      github.head_ref != 'chore/release'
       && !contains(github.event.head_commit.message, 'chore(release):')
-      && !contains(github.event.head_commit.message, 'chore(deps')
     runs-on: ubuntu-latest-arm
     timeout-minutes: 15
 
