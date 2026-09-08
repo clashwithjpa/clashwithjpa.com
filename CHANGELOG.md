@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.3] - 2026-09-08
+
+### Bug Fixes
+
+- Do not run lint/format/typecheck on release commits/pr ([f5cd58f](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/f5cd58febff97b150a74d8d0eb9e612d038747f3))
+- Do not run lint/format/typecheck on release commits/pr ([1c086d2](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/1c086d2bd38db745b991435c0d3d31cbd8a3e041))
 ## [2.0.2] - 2026-09-07
 
 ### Build
