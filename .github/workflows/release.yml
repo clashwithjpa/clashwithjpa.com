@@ -27,6 +27,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_TOKEN }}
 
+      - name: Import the release signing key
+        env:
+          RELEASE_GPG_KEY: ${{ secrets.RELEASE_GPG_KEY }}
+        run: |
+          set -euo pipefail
+
+          export GNUPGHOME="${RUNNER_TEMP}/gnupg"
+          mkdir -p "$GNUPGHOME"
+          chmod 700 "$GNUPGHOME"
+          printf '%s' "$RELEASE_GPG_KEY" | gpg --batch --quiet --import
+
+          {
+            echo "GNUPGHOME=${GNUPGHOME}"
+            echo "SIGNING_KEY=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/{print $5; exit}')"
+          } >> "$GITHUB_ENV"
+
       - name: Create tag and release
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -38,6 +54,15 @@ jobs:
             echo "v${version} is already tagged — nothing to release"
             exit 0
           fi
+
+          # Gitea can't sign tags, so cut it here rather than let the API mint a
+          # lightweight one. Tagger is GitHub's noreply: only GitHub checks tag
+          # signatures, and only against a verified account email.
+          git config user.name "clashwithjpa-bot"
+          git config user.email "291111551+SeniorCopyPasteEngineer@users.noreply.github.com"
+          git config user.signingkey "$SIGNING_KEY"
+          git tag -s -m "clashwithjpa v${version}" "v${version}" "$GITHUB_SHA"
+          git push origin "refs/tags/v${version}"
 
           node -e '
             const { writeFileSync } = require("node:fs");
