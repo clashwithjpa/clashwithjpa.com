@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.4] - 2026-09-10
+
+### CI
+
+- **release:** Sign and push release tags from the workflow ([fab44ac](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/fab44acee1886b3c2d6dd31fcc0b3c0fc908efc4))
 ## [2.0.3] - 2026-09-08
 
 ### Bug Fixes
