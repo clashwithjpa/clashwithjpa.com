@@ -61,7 +61,7 @@ services:
 
   drizzle-gateway:
     container_name: drizzle-gateway
-    image: ghcr.io/drizzle-team/gateway:latest@sha256:6331ba665773b348638d0542bf78ed8908f7088d7a5811424f1cc0adf64ac8b7
+    image: ghcr.io/drizzle-team/gateway:latest@sha256:db9c50c7aa7553af27e1ee735ea3f41510f25e21fb4e6cdf90669e3d9c6bef01
     restart: unless-stopped
     ports:
       - 7103:4983
