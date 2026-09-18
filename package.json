@@ -26,8 +26,8 @@
         "prettier": "catalog:",
         "prettier-plugin-svelte": "catalog:",
         "prettier-plugin-tailwindcss": "catalog:",
-        "turbo": "^2.10.12",
+        "turbo": "^2.10.13",
         "typescript": "catalog:"
     },
-    "packageManager": "pnpm@12.3.4"
+    "packageManager": "pnpm@12.4.2"
 }
