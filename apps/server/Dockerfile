@@ -27,25 +27,46 @@ COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm dlx turbo@${TURBO_VERSION} prune server --docker
 
-# ---- deps: install the full graph (dev included) so we can compile -------
-FROM base AS deps
+# ---- libs: compile the @repo/* packages the server imports ---------------
+# `@repo/auth-shared` has peer deps, so pnpm *injects* it: node_modules gets a
+# copy of the package as it looked at install time, not a symlink to it. An
+# install that runs before the sources are in place therefore copies nothing but
+# a package.json, and the server build can't resolve the package at all. Build
+# the libraries here, then install in the build stage once dist/ exists.
+FROM base AS libs
 
 COPY --from=pruner /app/out/json/ ./
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/full/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile --filter "server^..."
+
+COPY --from=pruner /app/out/full/packages/ ./packages/
+
+RUN pnpm --filter "server^..." run build \
+    && mkdir /libs \
+    && cp -r --parents packages/*/dist /libs/
 
 # ---- build: compile TypeScript to plain JS -------------------------------
-FROM deps AS build
+FROM base AS build
 
+COPY --from=pruner /app/out/json/ ./
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner /app/out/full/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=pruner /app/out/full/packages/ ./packages/
+COPY --from=libs /libs/ ./
+
+# tsc and the migration tooling are devDependencies, so install the full graph.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Last, so that editing the server leaves every layer above this one cached.
 COPY --from=pruner /app/out/full/ ./
 
-# Builds in-graph workspace packages first (turbo `dependsOn: ["^build"]`),
-# then the server: tsc emits to dist/, tsc-alias rewrites the @/* aliases and
-# appends .js extensions so Node's ESM resolver can follow them.
-RUN pnpm --filter server... run build
+# tsc emits to dist/, tsc-alias rewrites the @/* aliases and appends .js
+# extensions so Node's ESM resolver can follow them.
+RUN pnpm --filter server run build
 
 # ---- deploy: self-contained production tree ------------------------------
 # `pnpm deploy` resolves the workspace graph into a standalone directory with a
