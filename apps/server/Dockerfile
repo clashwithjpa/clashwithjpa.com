@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.26@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 
 ARG NODE_VERSION=24-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
-ARG TURBO_VERSION=2.10.12
-ARG PNPM_VERSION=12.3.4
+ARG TURBO_VERSION=2.10.13
+ARG PNPM_VERSION=12.4.2
 
 # ---- base ----------------------------------------------------------------
 FROM node:${NODE_VERSION} AS base
