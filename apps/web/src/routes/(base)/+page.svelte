@@ -45,7 +45,7 @@
 
 <Seo
     title="Home"
-    description="JPA is a family of ten Fair War Alliance clans running synchronized 50v50 FWA wars and CWL every season. Live clan stats, guaranteed wars, and steady loot. Find your clan today."
+    description="JPA is a family of ten Farm War Alliance clans running synchronized 50v50 FWA wars and CWL every season. Live clan stats, guaranteed wars, and steady loot. Find your clan today."
     buttons={[
         { label: "Explore the clans", url: `${page.url.origin}/clans`, emoji: "⚔️" },
         { label: "Join Discord", url: LINKS.discord!, emoji: "💬" },

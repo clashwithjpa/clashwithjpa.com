@@ -11,7 +11,7 @@
 
 <Seo
     title="Clans"
-    description="Explore our family of Fair War Alliance clans. Join our community and participate in strategic clan wars."
+    description="Explore our family of Farm War Alliance clans. Join our community and participate in strategic clan wars."
     buttons={[{ label: "Join Discord", url: LINKS.discord!, emoji: "💬" }]}
 />
 
@@ -21,7 +21,7 @@
         <p
             class="max-w-2xl animate-in font-coc text-lg text-stone-200 duration-200 ease-glide fill-mode-both fade-in slide-in-from-bottom md:text-xl"
         >
-            Explore our family of Fair War Alliance clans. Join our community and participate in strategic clan wars.
+            Explore our family of Farm War Alliance clans. Join our community and participate in strategic clan wars.
         </p>
     </div>
 
