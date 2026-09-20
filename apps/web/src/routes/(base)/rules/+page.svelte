@@ -53,9 +53,7 @@
 
 <Seo
     title="Rules"
-    description="
-            Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming
-            experience."
+    description="Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming experience."
 />
 
 <div class="container mx-auto flex min-h-screen flex-col gap-8">

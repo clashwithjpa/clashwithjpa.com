@@ -2,13 +2,18 @@
     import ClanCard from "$lib/components/coc/ClanCard.svelte";
     import H1 from "$lib/components/ui/coc/H1.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { LINKS } from "$lib/utils/links";
     import TablerX from "~icons/tabler/x";
     import type { PageProps } from "./$types";
 
     let { data }: PageProps = $props();
 </script>
 
-<Seo title="Clans" description="Explore our family of Fair War Alliance clans. Join our community and participate in strategic clan wars." />
+<Seo
+    title="Clans"
+    description="Explore our family of Fair War Alliance clans. Join our community and participate in strategic clan wars."
+    buttons={[{ label: "Join Discord", url: LINKS.discord!, emoji: "💬" }]}
+/>
 
 <div class="container mx-auto flex min-h-screen flex-col gap-8">
     <div class="flex flex-col items-center gap-4 text-center">

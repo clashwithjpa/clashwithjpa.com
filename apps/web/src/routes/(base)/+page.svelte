@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import FamilyStats from "$lib/components/coc/FamilyStats.svelte";
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
@@ -45,6 +46,10 @@
 <Seo
     title="Home"
     description="JPA is a family of ten Fair War Alliance clans running synchronized 50v50 FWA wars and CWL every season. Live clan stats, guaranteed wars, and steady loot. Find your clan today."
+    buttons={[
+        { label: "Explore the clans", url: `${page.url.origin}/clans`, emoji: "⚔️" },
+        { label: "Join Discord", url: LINKS.discord!, emoji: "💬" },
+    ]}
 />
 
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">
