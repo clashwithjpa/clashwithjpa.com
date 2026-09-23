@@ -5,15 +5,11 @@ services:
       - pangolin
 
   jpa-server:
-    image: ghcr.io/clashwithjpa/server:${JPA_IMAGE_TAG:-latest}
-    pull_policy: always
     networks:
       - default
       - pangolin
 
   jpa-web:
-    image: ghcr.io/clashwithjpa/web:${JPA_IMAGE_TAG:-latest}
-    pull_policy: always
     networks:
       - default
       - pangolin

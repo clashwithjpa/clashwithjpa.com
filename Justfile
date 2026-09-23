@@ -59,7 +59,7 @@ db-reset:
 
 # ── Deploy ────────────────────────────────────────────────────────────────────
 
-# Pull latest and deploy the release images (--build to build them here, --down to stop the stack)
+# Pull latest, rebuild, and deploy the production stack (--down to stop it instead)
 prod *args: _prep
     #!/usr/bin/env bash
     set -euo pipefail
@@ -71,13 +71,8 @@ prod *args: _prep
     fi
     just _say pull "Pulling latest"
     git pull --ff-only
-    if [[ "{{ args }}" == *--build* ]]; then
-        just _say bld "Building images"
-        {{ _prod }} build
-    else
-        just _say pull "Pulling images"
-        {{ _prod }} pull
-    fi
+    just _say bld "Building images"
+    {{ _prod }} build
     just _say boot "Deploying services"
     # --wait fails the deploy when a container never turns healthy.
     {{ _prod }} up -d --remove-orphans --pull missing --wait --wait-timeout 180
