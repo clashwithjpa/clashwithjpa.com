@@ -1,6 +1,10 @@
 {
     "name": "server",
     "type": "module",
+    "files": [
+        "dist",
+        "drizzle"
+    ],
     "scripts": {
         "ba:generate": "pnpm dlx auth@latest generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schema/ba-auth.ts --yes && tsx scripts/fix-ba-schema.ts",
         "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && tsc -p tsconfig.migrate.json && tsc-alias -p tsconfig.migrate.json",

@@ -1,41 +1,30 @@
 **/node_modules
-**/.turbo
 **/dist
 **/build
 **/.svelte-kit
-**/coverage
+**/.turbo
 **/.cache
 **/.eslintcache
 **/*.tsbuildinfo
+**/coverage
+**/*.log
 
-# env / secrets
 **/.env
 **/.env.*
 !**/.env*.example
 
-# git / editor / OS
 .git
-.gitignore
-.idea
-.vscode
-.DS_Store
-
-# project meta
-**/README.md
-**/CHANGELOG.md
-**/LICENSE
+.github
 .claude
 .commandcode
-
-# logs
-**/logs
-**/*.log
-
-# dataset migrations (large, not needed at runtime).
-# Keep the generated import_lookup.json — it's read at runtime by the account-import endpoint.
-apps/server/scripts/migrations/datasets
-!apps/server/scripts/migrations/datasets/import_lookup.json
 .backups
-.github/skills
-# pnpm
-.pnpm-store
+.idea
+.vscode
+**/.DS_Store
+
+apps/web/android
+apps/web/ios
+
+# Only the generated lookup is read at runtime, by the account-import endpoint.
+apps/server/scripts/migrations/datasets/*
+!apps/server/scripts/migrations/datasets/import_lookup.json

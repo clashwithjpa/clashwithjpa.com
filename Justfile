@@ -1,141 +1,85 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+_envs := `for f in apps/*/.env; do [[ -e $f ]] && printf -- '--env-file %s ' "$f"; done; true`
+_compose := "docker compose " + _envs
+_prod := _compose + "-f docker-compose.yaml -f docker-compose.prod.yaml --profile prod"
+
 [private]
 default:
     @just --list --list-heading $'\n\033[1;96mJPA\033[0m \033[2m/ Available Commands\033[0m\n' --list-prefix $'  \033[36m›\033[0m '
 
-# ── Services ──────────────────────────────────────────────────────────────────
+[private]
+_say kind msg:
+    @case '{{ kind }}' in \
+       ok)   printf '\033[42m\033[30m  OK  \033[0m \033[32m%b\033[0m\n' '{{ msg }}' ;; \
+       fail) printf '\033[41m\033[30m FAIL \033[0m \033[31m%b\033[0m\n' '{{ msg }}' ;; \
+       boot) printf '\033[43m\033[30m BOOT \033[0m \033[33m%b\033[0m\n' '{{ msg }}' ;; \
+       pull) printf '\033[43m\033[30m PULL \033[0m \033[33m%b\033[0m\n' '{{ msg }}' ;; \
+       bld)  printf '\033[43m\033[30m BLD  \033[0m \033[33m%b\033[0m\n' '{{ msg }}' ;; \
+       stop) printf '\033[41m\033[30m STOP \033[0m \033[31m%b\033[0m\n' '{{ msg }}' ;; \
+       db)   printf '\033[43m\033[30m  DB  \033[0m \033[33m%b\033[0m\n' '{{ msg }}' ;; \
+       wipe) printf '\033[41m\033[30m  DB  \033[0m \033[31m%b\033[0m\n' '{{ msg }}' ;; \
+     esac
 
-# Stop then start containers  →  just run all  /  just run prod --build
-run *args:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    # Bare words → profiles; `-` flags → forwarded to `docker compose up`
-    profiles=(); upflags=()
-    for a in {{args}}; do
-        if [[ $a == -* ]]; then upflags+=("$a"); else profiles+=("$a"); fi
-    done
-    if [[ ${#profiles[@]} -eq 0 ]]; then
-        printf '\033[41m\033[30m ERR  \033[0m \033[31mNo profiles given.\033[0m Usage: just run <profile1> [profile2 ...] [--flag ...]\n' >&2
-        exit 1
-    fi
-    env_flags=(); for f in ./apps/*/.env; do [[ -e $f ]] && env_flags+=(--env-file "$f"); done
-    profile_flags=(); for p in "${profiles[@]}"; do profile_flags+=(--profile "$p"); done
-    # `prod` profile layers docker-compose.prod.yaml on top of the base file
-    compose_files=()
-    for p in "${profiles[@]}"; do [[ $p == prod ]] && compose_files=(-f docker-compose.yaml -f docker-compose.prod.yaml); done
-    compose=(docker compose "${compose_files[@]}" "${env_flags[@]}" "${profile_flags[@]}")
-    printf '\033[41m\033[30m STOP \033[0m \033[31mStopping services\033[0m\n'
-    "${compose[@]}" down
-    printf '\033[43m\033[30m BOOT \033[0m \033[33mStarting services\033[0m\n'
-    "${compose[@]}" up -d "${upflags[@]}"
-    printf '\033[42m\033[30m  OK  \033[0m \033[32mServices ready\033[0m\n'
-    containers=$("${compose[@]}" ps -q)
-    if [[ -n "$containers" ]]; then
-        printf '\033[44m\033[30m URLS \033[0m \033[34mService endpoints\033[0m\n'
-        docker inspect -f '{{{{.Name}} |{{{{range $p, $conf := .NetworkSettings.Ports}}{{{{if $conf}}  http://localhost:{{{{(index $conf 0).HostPort}}{{{{end}}{{{{end}}' $containers \
-            | sed 's/^\///' \
-            | awk -F'|' '{ printf "        \033[1;32m%-25s\033[0m%s\n", $1, $2 }'
-    fi
+[private]
+_prep:
+    @docker network create clashwithjpa-network >/dev/null 2>&1 || true
 
-# Stop containers  →  just stop all  /  just stop db analytics
-stop *args:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    profiles=()
-    for a in {{args}}; do
-        [[ $a == -* ]] || profiles+=("$a")
-    done
-    if [[ ${#profiles[@]} -eq 0 ]]; then
-        printf '\033[41m\033[30m ERR  \033[0m \033[31mNo profiles given.\033[0m Usage: just stop <profile1> [profile2 ...]\n' >&2
-        exit 1
-    fi
-    env_flags=(); for f in ./apps/*/.env; do [[ -e $f ]] && env_flags+=(--env-file "$f"); done
-    profile_flags=(); for p in "${profiles[@]}"; do profile_flags+=(--profile "$p"); done
-    compose_files=()
-    for p in "${profiles[@]}"; do [[ $p == prod ]] && compose_files=(-f docker-compose.yaml -f docker-compose.prod.yaml); done
-    printf '\033[41m\033[30m STOP \033[0m \033[31mStopping services\033[0m\n'
-    docker compose "${compose_files[@]}" "${env_flags[@]}" "${profile_flags[@]}" down
+# Start local services, e.g. `just up db` (defaults to all)
+up *profiles="all": _prep
+    @just _say boot "Starting services"
+    @{{ _compose }}{{ replace_regex(profiles, '(\S+)', '--profile ${1}') }} up -d --wait
+    @just _say ok "Services ready"
 
-# Show running container URLs
-show:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    printf '\033[44m\033[30m INFO \033[0m \033[34mActive Services\033[0m\n'
-    containers=$(docker ps -q --filter "label=com.docker.compose.project.working_dir=$PWD")
-    if [[ -n "$containers" ]]; then
-        docker inspect -f '{{{{.Name}} |{{{{range $p, $conf := .NetworkSettings.Ports}}{{{{if $conf}}  http://localhost:{{{{(index $conf 0).HostPort}}{{{{end}}{{{{end}}' $containers \
-            | sed 's/^\///' \
-            | awk -F'|' '{ printf "        \033[1;32m%-25s\033[0m%s\n", $1, $2 }'
-    else
-        printf '\033[43m\033[30m WARN \033[0m \033[33mNo services currently running\033[0m\n'
-    fi
+# Stop local services, e.g. `just down db` (defaults to all)
+down *profiles="all":
+    @just _say stop "Stopping services"
+    @{{ _compose }}{{ replace_regex(profiles, '(\S+)', '--profile ${1}') }} down
+    @just _say ok "Services stopped"
 
 # ── Database ──────────────────────────────────────────────────────────────────
 
-# Run server database migrations
-migrate:
-    @printf '\033[43m\033[30m  DB  \033[0m \033[33mRunning migrations\033[0m\n'
+# Generate a migration from schema changes
+db-generate name="":
+    @just _say db "Generating migration"
+    @pnpm --filter server db:generate {{ if name == "" { "" } else { "--name " + name } }}
+    @just _say ok "Migration created"
+
+# Apply all pending migrations
+db-migrate:
+    @just _say db "Applying migrations"
     @pnpm --filter server db:migrate
-    @printf '\033[42m\033[30m  OK  \033[0m \033[32mDatabase up to date\033[0m\n'
+    @just _say ok "Database up to date"
 
-# Generate server database types
-generate:
-    @printf '\033[43m\033[30m  DB  \033[0m \033[33mGenerating types\033[0m\n'
-    @pnpm --filter server db:generate
-    @printf '\033[42m\033[30m  OK  \033[0m \033[32mTypes generated\033[0m\n'
-
-# Reset server database
+# Drop the local database and its volume
 db-reset:
-    @printf '\033[41m\033[30m  DB  \033[0m \033[31mResetting database\033[0m\n'
-    @docker compose --profile db down -v
-    @printf '\033[42m\033[30m  OK  \033[0m \033[32mDatabase reset\033[0m\n'
+    @just _say wipe "Resetting database"
+    @{{ _compose }}--profile db down -v
+    @just _say ok "Database reset"
 
 # ── Deploy ────────────────────────────────────────────────────────────────────
 
-# Pull and swap the prod stack without taking the site down  →  just prod
-prod:
+# Pull latest and deploy the release images (--build to build them here, --down to stop the stack)
+prod *args: _prep
     #!/usr/bin/env bash
     set -euo pipefail
-    compose=(docker compose -f docker-compose.yaml -f docker-compose.prod.yaml)
-    for f in ./apps/*/.env; do [[ -e $f ]] && compose+=(--env-file "$f"); done
-    compose+=(--profile prod)
-
-    printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
+    if [[ "{{ args }}" == *--down* ]]; then
+        just _say stop "Stopping production stack"
+        {{ _prod }} down
+        just _say ok "Production stack stopped"
+        exit 0
+    fi
+    just _say pull "Pulling latest"
     git pull --ff-only
-
-
-    printf '\033[43m\033[30m IMG  \033[0m \033[33mPulling images (site stays up)\033[0m\n'
-    "${compose[@]}" pull
-
-    printf '\033[43m\033[30m SWAP \033[0m \033[33mSwapping containers\033[0m\n'
-    "${compose[@]}" up -d --remove-orphans
-
-    printf '\033[43m\033[30m CLN  \033[0m \033[33mPruning superseded images\033[0m\n'
+    if [[ "{{ args }}" == *--build* ]]; then
+        just _say bld "Building images"
+        {{ _prod }} build
+    else
+        just _say pull "Pulling images"
+        {{ _prod }} pull
+    fi
+    just _say boot "Deploying services"
+    # --wait fails the deploy when a container never turns healthy.
+    {{ _prod }} up -d --remove-orphans --pull missing --wait --wait-timeout 180
     docker image prune -f >/dev/null
-
-    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed\033[0m\n'
-    just show
-
-prod-build:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    compose=(docker compose -f docker-compose.yaml -f docker-compose.prod.yaml)
-    for f in ./apps/*/.env; do [[ -e $f ]] && compose+=(--env-file "$f"); done
-    compose+=(--profile prod)
-
-    printf '\033[43m\033[30m PULL \033[0m \033[33mPulling latest changes\033[0m\n'
-    git pull --ff-only
-
-    printf '\033[43m\033[30m BLD  \033[0m \033[33mBuilding images (site stays up)\033[0m\n'
-    "${compose[@]}" build
-
-    printf '\033[43m\033[30m SWAP \033[0m \033[33mSwapping containers\033[0m\n'
-    "${compose[@]}" up -d --remove-orphans --pull never
-
-    printf '\033[43m\033[30m CLN  \033[0m \033[33mPruning build cache\033[0m\n'
-    docker builder prune -f --filter until=168h >/dev/null
-    docker image prune -f >/dev/null
-
-    printf '\033[42m\033[30m DONE \033[0m \033[32mProd deployed from local build\033[0m\n'
-    just show
+    just _say ok "Deployed"

@@ -81,23 +81,6 @@
         }
     ],
 
-    "customManagers": [
-        {
-            "customType": "regex",
-            "managerFilePatterns": ["/(^|/)Dockerfile$/"],
-            "matchStrings": ["ARG PNPM_VERSION=(?<currentValue>\\S+)"],
-            "depNameTemplate": "pnpm",
-            "datasourceTemplate": "npm"
-        },
-        {
-            "customType": "regex",
-            "managerFilePatterns": ["/(^|/)Dockerfile$/"],
-            "matchStrings": ["ARG TURBO_VERSION=(?<currentValue>\\S+)"],
-            "depNameTemplate": "turbo",
-            "datasourceTemplate": "npm"
-        }
-    ],
-
     "vulnerabilityAlerts": {
         "schedule": ["at any time"],
         "minimumReleaseAge": null,

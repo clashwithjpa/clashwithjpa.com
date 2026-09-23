@@ -348,9 +348,15 @@ app.get(
     }),
 );
 
-serve({ fetch: app.fetch, port: config.PORT }, (info) => {
+const server = serve({ fetch: app.fetch, port: config.PORT }, (info) => {
     console.log(`Started server: http://localhost:${info.port}`);
 });
+
+// As PID 1 in the container, Node ignores SIGTERM unless it is handled, so
+// `docker stop` would wait out its timeout and then SIGKILL mid-request.
+for (const signal of ["SIGTERM", "SIGINT"] as const) {
+    process.once(signal, () => server.close(() => process.exit(0)));
+}
 
 startCwlPingScheduler();
 

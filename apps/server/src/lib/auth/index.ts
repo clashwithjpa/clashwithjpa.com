@@ -462,6 +462,9 @@ export const auth = betterAuth({
     },
     advanced: {
         cookiePrefix: "jpa",
+        database: {
+            joins: true,
+        },
         crossSubDomainCookies: {
             enabled: true,
         },
@@ -483,5 +486,4 @@ export const auth = betterAuth({
         },
     },
     trustedOrigins: config.NODE_ENV === "production" ? [config.JPA_APP_URL] : ["http://localhost:5173", config.JPA_APP_URL],
-    experimental: { joins: true },
 });
