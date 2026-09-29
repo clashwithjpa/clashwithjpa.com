@@ -22,7 +22,7 @@ catalog:
   "@kubb/plugin-ts": ^4.39.3
   "@kubb/plugin-zod": ^4.39.3
   "@tanstack/svelte-query": ^5.90.2
-  "@types/node": ^26.5.1
+  "@types/node": ^26.6.3
   better-auth: ^1.7.5
   eslint: ^10.8.1
   ioredis: ^6.0.0
