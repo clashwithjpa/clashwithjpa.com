@@ -1,18 +1,15 @@
 <script lang="ts">
     import Badge from "$lib/components/ui/Badge.svelte";
-    import type { ICellRendererParams } from "ag-grid-community";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
     import TablerX from "~icons/tabler/x";
 
-    let { params }: { params: ICellRendererParams & { wrongClan?: string } } = $props();
-    let status = $derived(params.value as string);
-    let wrongClan = $derived(params.wrongClan ?? "");
+    let { status, wrongClan = "" }: { status: string; wrongClan?: string } = $props();
 </script>
 
-<div class="flex h-full w-full items-center gap-1.5 px-1" title={status === "wrong-clan" && wrongClan ? `Currently in ${wrongClan}` : undefined}>
+<div class="flex w-full items-center gap-1.5" title={status === "wrong-clan" && wrongClan ? `Currently in ${wrongClan}` : undefined}>
     {#if status === "joined"}
         <Badge variant="green" content="In clan" icon={TablerCheck} />
     {:else if status === "wrong-clan"}

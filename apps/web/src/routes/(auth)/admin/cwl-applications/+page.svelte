@@ -11,13 +11,13 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Grid from "$lib/components/ui/Grid.svelte";
-    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import DataTable from "$lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "$lib/components/ui/table/features";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { errorMessage, formatDate, formatDateTime } from "$lib/utils";
@@ -36,7 +36,7 @@
         updateCocAccountWarWeight,
         type GetCwlApplications200,
     } from "@repo/clashofclans-client";
-    import type { GridApi, ICellRendererParams, IRowNode } from "ag-grid-community";
+    import { renderComponent, renderSnippet, type RowSelectionState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
     import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -52,6 +52,7 @@
     import TablerX from "~icons/tabler/x";
 
     type Application = GetCwlApplications200["data"]["applications"][number] & { discordNickname?: string };
+    type TableRow = Application & { joinedStatus: JoinStatus; wrongClan: string };
 
     let { data }: { data: { canDelete: boolean } } = $props();
 
@@ -76,8 +77,8 @@
         return (tag ?? "").trim().toUpperCase();
     }
 
-    let gridApi = $state<GridApi | null>(null);
-    let selectedIds = $state<number[]>([]);
+    let dataTable = $state<ReturnType<typeof DataTable<TableRow>> | null>(null);
+    let rowSelection = $state<RowSelectionState>({});
     let bulkClan = $state<string>("");
     let bulkProcessing = $state(false);
     let searchText = $state("");
@@ -85,21 +86,19 @@
 
     let accountSidebar: Sidebar | null = $state(null);
     let selectedAccount = $state<Record<string, unknown> | null>(null);
-    const gridContext = {
-        openAccountSidebar: (app: Application) => {
-            selectedAccount = {
-                id: app.cocAccountId,
-                cocAccountTag: app.cocAccountTag,
-                discordUserId: app.discordUserId,
-                isExternal: app.isExternal,
-                warWeight: app.cocAccountWeight,
-                ownerName: app.discordUsername,
-                ownerImage: app.image,
-                ownerRole: app.ownerRole,
-            };
-            accountSidebar?.open(String(app.cocAccountId));
-        },
-    };
+    function openAccountSidebar(app: Application) {
+        selectedAccount = {
+            id: app.cocAccountId,
+            cocAccountTag: app.cocAccountTag,
+            discordUserId: app.discordUserId,
+            isExternal: app.isExternal,
+            warWeight: app.cocAccountWeight,
+            ownerName: app.discordUsername,
+            ownerImage: app.image,
+            ownerRole: app.ownerRole,
+        };
+        accountSidebar?.open(String(app.cocAccountId));
+    }
 
     // Suppress the click that fires at the end of a drag-scroll so badges don't toggle.
     $effect(() => {
@@ -151,9 +150,6 @@
         document.removeEventListener("mouseup", onDragEnd);
     }
 
-    function applySearch() {
-        gridApi?.setGridOption("quickFilterText", searchText);
-    }
     // Exclude the "Unassigned" entry so bulk assign can't accidentally mass-unassign.
     let bulkClanOptions = $derived(clanOptions.filter((o) => o.value !== ""));
     let displayedApplications = $derived(
@@ -164,6 +160,15 @@
               : applications.filter((a) => a.assignedTo === clanFilter),
     );
     let unassignedCount = $derived(displayedApplications.filter((a) => !a.assignedTo).length);
+    // Rows hidden by the clan filter drop out of the selection, so bulk actions
+    // only ever touch what's listed.
+    let selectedIds = $derived.by(() => {
+        const visible = new Set(displayedApplications.map((a) => a.id));
+        return Object.keys(rowSelection)
+            .filter((id) => rowSelection[id])
+            .map(Number)
+            .filter((id) => visible.has(id));
+    });
 
     async function loadClans() {
         try {
@@ -377,7 +382,7 @@
         } catch (e) {
             toast.error("Failed to load CWL applications", { description: errorMessage(e) });
         }
-        // Nicknames are fetched separately so the grid isn't blocked on the Discord
+        // Nicknames are fetched separately so the table isn't blocked on the Discord
         // guild-member walk; the Nickname column shows a skeleton until they arrive.
         void loadNicknames();
     }
@@ -459,25 +464,23 @@
     }
 
     function clearSelection() {
-        gridApi?.deselectAll();
-        selectedIds = [];
+        rowSelection = {};
     }
 
     const AUTO_SELECT_COUNT = 30;
     function selectFirstUnassigned(count = AUTO_SELECT_COUNT) {
-        if (!gridApi) return;
-        const nodes: IRowNode<Application>[] = [];
-        gridApi.forEachNodeAfterFilterAndSort((node) => {
-            if (nodes.length >= count) return;
-            if (node.data && !node.data.assignedTo) nodes.push(node);
-        });
-        gridApi.deselectAll();
-        if (nodes.length === 0) {
+        if (!dataTable) return;
+        const picked = dataTable
+            .getDisplayedRows()
+            .filter((a) => !a.assignedTo)
+            .slice(0, count);
+        if (picked.length === 0) {
+            rowSelection = {};
             toast.info("No unassigned applications to select");
             return;
         }
-        gridApi.setNodesSelected({ nodes, newValue: true });
-        toast.success(`Selected ${nodes.length} unassigned application${nodes.length === 1 ? "" : "s"}`);
+        rowSelection = Object.fromEntries(picked.map((a) => [String(a.id), true]));
+        toast.success(`Selected ${picked.length} unassigned application${picked.length === 1 ? "" : "s"}`);
     }
 
     function clanLabel(clanTag: string | null | undefined): string {
@@ -559,6 +562,116 @@
     let erroredClans = $derived(clanStats.filter((s) => s.state === "error").length);
     let wrongClanCount = $derived(applications.filter((a) => joinedInfo(a).status === "wrong-clan").length);
 
+    // Join status depends on the roster cache, so it's baked into the rows the
+    // table sorts on rather than computed per cell.
+    let tableRows = $derived<TableRow[]>(
+        displayedApplications.map((a) => {
+            const info = joinedInfo(a);
+            return { ...a, joinedStatus: info.status, wrongClan: info.wrongClan };
+        }),
+    );
+
+    async function saveAssignment(app: Application, clanTag: string) {
+        const result = await assign(app.id, clanTag);
+        if (result === null) return;
+        applications = applications.map((a) => (a.id === app.id ? { ...a, assignedTo: result || null } : a));
+    }
+
+    async function saveWeight(app: Application, warWeight: number) {
+        if (!Number.isInteger(warWeight) || warWeight < 0) {
+            toast.error("Weight must be a non-negative whole number");
+            return;
+        }
+        const previous = app.cocAccountWeight;
+        const setWeight = (w: number) =>
+            (applications = applications.map((a) => (a.cocAccountId === app.cocAccountId ? { ...a, cocAccountWeight: w } : a)));
+        setWeight(warWeight);
+        try {
+            const resp = await updateCocAccountWarWeight(
+                app.cocAccountId,
+                { warWeight },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            setWeight(resp.data.account.warWeight);
+            toast.success(`Weight updated for ${app.cocAccountName}`);
+        } catch (e) {
+            setWeight(previous);
+            toast.error("Failed to update weight", { description: errorMessage(e) });
+        }
+    }
+
+    function searchTextFor(a: TableRow): string {
+        return [
+            a.discordUsername,
+            a.discordUserId,
+            a.discordNickname,
+            a.cocAccountName,
+            a.cocAccountTag,
+            a.cocAccountClan,
+            a.preferenceNum,
+            a.cocAccountWeight,
+            a.appliedAt ? formatDate(a.appliedAt) : "",
+            clanLabel(a.assignedTo),
+            a.joinedStatus,
+            a.wrongClan,
+        ]
+            .filter((v) => v != null)
+            .join(" ");
+    }
+
+    const columns: TableColumn<TableRow>[] = [
+        {
+            accessorKey: "discordUsername",
+            header: "Discord",
+            size: 220,
+            cell: ({ row }) => renderComponent(CwlDiscordCell, { app: row.original }),
+        },
+        {
+            accessorKey: "discordNickname",
+            header: "Nickname",
+            size: 150,
+            sortUndefined: "last",
+            cell: ({ getValue }) => renderComponent(CwlNicknameCell, { value: getValue(), loading: nicknamesLoading }),
+        },
+        {
+            accessorKey: "cocAccountName",
+            header: "Account",
+            size: 260,
+            cell: ({ row }) => renderComponent(CwlAccountCell, { account: row.original, onOpen: () => openAccountSidebar(row.original) }),
+        },
+        { accessorKey: "cocAccountClan", header: "Clan", size: 160, cell: ({ getValue }) => getValue() || "—" },
+        { accessorKey: "preferenceNum", header: "Pref.", size: 90 },
+        {
+            accessorKey: "cocAccountWeight",
+            header: "Weight",
+            size: 120,
+            cell: ({ getValue }) => (getValue() != null ? Number(getValue()).toLocaleString() : ""),
+            meta: { edit: { type: "number", commit: saveWeight } },
+        },
+        {
+            accessorKey: "appliedAt",
+            header: "Applied",
+            size: 130,
+            sortFn: "datetime",
+            cell: ({ getValue }) => renderSnippet(appliedCell, getValue()),
+        },
+        {
+            id: "assignedTo",
+            accessorFn: (a) => a.assignedTo ?? "",
+            header: "Assigned clan",
+            size: 260,
+            cell: ({ getValue }) => clanLabel(getValue()),
+            meta: { edit: { type: "select", options: () => clanOptions, commit: saveAssignment } },
+        },
+        {
+            accessorKey: "joinedStatus",
+            header: "Status",
+            size: 150,
+            cell: ({ row }) => renderComponent(CwlStatusCell, { status: row.original.joinedStatus, wrongClan: row.original.wrongClan }),
+        },
+    ];
+
     loadClans();
     loadSeasons();
     $effect(() => {
@@ -571,15 +684,13 @@
         const tags = assignedClanTags; // track
         untrack(() => loadClanRosters(tags));
     });
-    $effect(() => {
-        clanRosters; // track
-        gridApi?.refreshCells({ force: true, columns: ["joinedStatus"] });
-    });
-    $effect(() => {
-        nicknamesLoading; // track
-        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
-    });
 </script>
+
+{#snippet appliedCell(value: string | null | undefined)}
+    {#if value}
+        <span title={formatDateTime(value)}>{formatDate(value)}</span>
+    {/if}
+{/snippet}
 
 <Seo title="CWL Applications" description="Manage CWL applications and assign players to clans" />
 
@@ -603,7 +714,7 @@
                     </div>
                 {/if}
                 <div class="flex items-center gap-2">
-                    <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="w-full lg:w-80" />
+                    <Input placeholder="Search anything..." bind:value={searchText} class="w-full lg:w-80" />
                     <Button
                         variant="base"
                         onclick={openRegister}
@@ -704,135 +815,17 @@
         {/if}
     </div>
 
-    <div class="flex-1">
-        <Grid
-            rowData={displayedApplications}
-            gridOptions={{
-                rowHeight: 56,
-                context: gridContext,
-                getRowId: (p) => String(p.data.id),
-                rowSelection: { mode: "multiRow", checkboxes: true, headerCheckbox: true, enableClickSelection: false },
-                onGridReady: (params) => {
-                    gridApi = params.api;
-                },
-                onSelectionChanged: (event) => {
-                    selectedIds = event.api.getSelectedRows().map((r) => r.id);
-                },
-                onCellValueChanged: async (event) => {
-                    if (event.oldValue === event.newValue) return;
-                    if (event.colDef.field === "cocAccountWeight") {
-                        const warWeight = Number(event.newValue);
-                        if (!Number.isInteger(warWeight) || warWeight < 0) {
-                            toast.error("Weight must be a non-negative whole number");
-                            event.data.cocAccountWeight = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], columns: ["cocAccountWeight"], force: true });
-                            return;
-                        }
-                        try {
-                            const resp = await updateCocAccountWarWeight(
-                                event.data.cocAccountId,
-                                { warWeight },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data.cocAccountWeight = resp.data.account.warWeight;
-                                toast.success(`Weight updated for ${event.data.cocAccountName}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (e) {
-                            toast.error("Failed to update weight", { description: errorMessage(e) });
-                            event.data.cocAccountWeight = event.oldValue;
-                        }
-                        event.api.refreshCells({ rowNodes: [event.node], columns: ["cocAccountWeight"], force: true });
-                        return;
-                    }
-                    if (event.colDef.field !== "assignedTo") return;
-                    const result = await assign(event.data.id, event.newValue || "");
-                    event.data.assignedTo = result ?? event.oldValue;
-                    event.api.refreshCells({ rowNodes: [event.node], columns: ["assignedTo", "joinedStatus"], force: true });
-                },
-            }}
-            columnDefs={[
-                {
-                    headerName: "Discord",
-                    field: "discordUsername",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlDiscordCell),
-                    getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
-                },
-                {
-                    headerName: "Nickname",
-                    field: "discordNickname",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlNicknameCell),
-                    cellRendererParams: () => ({ loading: nicknamesLoading }),
-                },
-                {
-                    headerName: "Account",
-                    field: "cocAccountName",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlAccountCell),
-                    getQuickFilterText: (p) => `${p.data.cocAccountName} ${p.data.cocAccountTag}`,
-                },
-                {
-                    headerName: "Clan",
-                    field: "cocAccountClan",
-                    sortable: true,
-                    filter: false,
-                    valueFormatter: (p) => p.value || "—",
-                },
-                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: false },
-                {
-                    headerName: "Weight",
-                    field: "cocAccountWeight",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
-                },
-                {
-                    headerName: "Applied",
-                    field: "appliedAt",
-                    sortable: true,
-                    sort: "desc",
-                    filter: false,
-                    valueFormatter: (p) => (p.value ? formatDate(p.value) : ""),
-                    tooltipValueGetter: (p) => (p.value ? formatDateTime(p.value) : ""),
-                },
-                {
-                    headerName: "Assigned clan",
-                    field: "assignedTo",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditorPopup: true,
-                    cellEditor: "uiSelectEditor",
-                    cellEditorParams: () => ({ options: clanOptions }),
-                    valueGetter: (p) => p.data?.assignedTo ?? "",
-                    valueFormatter: (p) => clanLabel(p.value),
-                    getQuickFilterText: (p) => clanLabel(p.value),
-                },
-                {
-                    headerName: "Status",
-                    colId: "joinedStatus",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlStatusCell),
-                    cellRendererParams: (p: ICellRendererParams) => ({ wrongClan: joinedInfo(p.data).wrongClan }),
-                    valueGetter: (p) => joinedInfo(p.data).status,
-                    getQuickFilterText: (p) => {
-                        const info = joinedInfo(p.data);
-                        return `${info.status} ${info.wrongClan}`.trim();
-                    },
-                },
-            ]}
+    <div class="min-h-0 flex-1">
+        <DataTable
+            bind:this={dataTable}
+            data={tableRows}
+            {columns}
+            getRowId={(a) => String(a.id)}
+            selectable
+            bind:rowSelection
+            sorting={[{ id: "appliedAt", desc: true }]}
+            search={searchText}
+            searchText={searchTextFor}
         />
     </div>
 

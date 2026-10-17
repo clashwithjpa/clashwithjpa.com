@@ -2,12 +2,13 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
-    import Chart from "$lib/components/ui/Chart.svelte";
+    import ChartPanel from "$lib/components/ui/chart/ChartPanel.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, STATUS_CLASS_COLORS, type ApiKeyRow } from "$lib/config/apiKeys";
     import { formatDateTime, formatRelativeTime } from "$lib/utils";
     import { getApiKeyUsageDaily, getApiKeyUsageEndpoints, getApiKeyUsageStatus, getApiKeyUsageSummary } from "@repo/clashofclans-client";
-    import type { AgCartesianChartOptions, AgPolarChartOptions } from "ag-charts-community";
+    import { curveMonotoneX } from "d3-shape";
+    import { AreaChart, BarChart, PieChart } from "layerchart";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerChartBarPopular from "~icons/tabler/chart-bar-popular";
     import TablerRefresh from "~icons/tabler/refresh";
@@ -85,64 +86,12 @@
         }
     }
 
-    function dailySeries(points: DailyPoint[]) {
-        return points.map((p) => ({
-            label: new Date(p.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-            count: p.count,
-        }));
-    }
-
-    const dailyOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!daily) return null;
-        return {
-            title: { text: `Requests (Last ${WINDOW_DAYS} Days)` },
-            data: dailySeries(daily),
-            series: [
-                {
-                    type: "area",
-                    xKey: "label",
-                    yKey: "count",
-                    yName: "Requests",
-                    fill: "#3b82f6",
-                    stroke: "#3b82f6",
-                    fillOpacity: 0.4,
-                    interpolation: { type: "smooth" },
-                    marker: { enabled: false },
-                },
-            ],
-            axes: { x: { type: "category" }, y: { type: "number", nice: true } },
-        };
-    });
-
-    const endpointOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!endpoints?.length) return null;
-        return {
-            title: { text: "Top Endpoints" },
-            data: endpoints.map((e) => ({ endpoint: `${e.method} ${e.path}`, count: e.count })),
-            series: [{ type: "bar", direction: "horizontal", xKey: "endpoint", yKey: "count", yName: "Requests", cornerRadius: 4 }],
-            axes: { y: { type: "category" }, x: { type: "number", nice: true } },
-        };
-    });
-
-    const statusOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!statuses?.length) return null;
-        const colors = statuses.map((s) => STATUS_CLASS_COLORS[s.statusClass] ?? "#a8a29e");
-        return {
-            title: { text: "Response Status" },
-            data: statuses,
-            series: [
-                {
-                    type: "donut",
-                    angleKey: "count",
-                    legendItemKey: "statusClass",
-                    innerRadiusRatio: 0.6,
-                    fills: colors,
-                    strokes: colors,
-                    calloutLabel: { enabled: false },
-                },
-            ],
-        };
-    });
+    const shortDate = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const dailyData = $derived(daily ? daily.map((p) => ({ date: new Date(p.date), count: p.count })) : null);
+    const endpointData = $derived(endpoints?.length ? endpoints.map((e) => ({ endpoint: `${e.method} ${e.path}`, count: e.count })) : null);
+    const statusData = $derived(statuses?.length ? statuses : null);
+    const statusColors = $derived((statuses ?? []).map((s) => STATUS_CLASS_COLORS[s.statusClass] ?? "var(--color-stone-400)"));
+    const truncate = (text: string, max = 22) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
     // Drives the countdowns below, which would otherwise freeze at whatever they
     // said when the panel loaded.
@@ -277,14 +226,49 @@
                 <span>No requests recorded in the last {WINDOW_DAYS} days.</span>
             </div>
         {:else}
-            {#if dailyOptions}
-                <Chart options={dailyOptions} class="h-64 w-full" />
+            {#if dailyData}
+                <ChartPanel title="Requests (Last {WINDOW_DAYS} Days)" class="h-64">
+                    <AreaChart
+                        data={dailyData}
+                        x="date"
+                        y="count"
+                        series={[{ key: "count", label: "Requests", color: "var(--color-blue-500)" }]}
+                        props={{
+                            area: { curve: curveMonotoneX, fillOpacity: 0.25, line: { curve: curveMonotoneX, strokeWidth: 2 } },
+                            xAxis: { format: shortDate },
+                            tooltip: { header: { format: shortDate } },
+                        }}
+                    />
+                </ChartPanel>
             {/if}
-            {#if endpointOptions}
-                <Chart options={endpointOptions} class="h-72 w-full" />
+            {#if endpointData}
+                <ChartPanel title="Top Endpoints" class="h-72">
+                    <!-- Long paths are cut on the axis; the tooltip shows them in full. -->
+                    <BarChart
+                        data={endpointData}
+                        orientation="horizontal"
+                        x="count"
+                        y="endpoint"
+                        series={[{ key: "count", label: "Requests", color: "var(--color-blue-500)" }]}
+                        padding={{ left: 150 }}
+                        props={{ bars: { radius: 4, rounded: "edge" }, yAxis: { format: (v: string) => truncate(v) } }}
+                    />
+                </ChartPanel>
             {/if}
-            {#if statusOptions}
-                <Chart options={statusOptions} class="h-64 w-full" />
+            {#if statusData}
+                <ChartPanel title="Response Status" class="h-64">
+                    <PieChart
+                        data={statusData}
+                        key="statusClass"
+                        value="count"
+                        c="statusClass"
+                        cRange={statusColors}
+                        innerRadius={0.6}
+                        padAngle={0.02}
+                        cornerRadius={4}
+                        legend
+                    />
+                </ChartPanel>
             {/if}
         {/if}
     {/if}

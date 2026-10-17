@@ -12,6 +12,7 @@
         options = [],
         placeholder = "Select an option",
         class: className = "",
+        triggerClass = "",
         disabled = false,
         open = $bindable(false),
         onValueChange,
@@ -21,6 +22,7 @@
         options: Option[];
         placeholder?: string;
         class?: string;
+        triggerClass?: string;
         disabled?: boolean;
         onValueChange?: (value: string) => void;
     } = $props();
@@ -103,6 +105,7 @@
                 !value && "text-stone-400",
                 open && "border-stone-700 ring-4 ring-stone-700/50",
                 disabled && "cursor-not-allowed opacity-50!",
+                triggerClass,
             )}
         >
             <div class="flex min-w-0 flex-1 items-center gap-2">

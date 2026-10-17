@@ -1,7 +1,7 @@
 <script lang="ts">
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Chart from "$lib/components/ui/Chart.svelte";
+    import ChartPanel from "$lib/components/ui/chart/ChartPanel.svelte";
     import HoverCard from "$lib/components/ui/HoverCard.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
@@ -16,7 +16,8 @@
         getAnalyticsCwlSeasons,
         getAnalyticsUserJoins,
     } from "@repo/clashofclans-client";
-    import type { AgCartesianChartOptions, AgPolarChartOptions } from "ag-charts-community";
+    import { curveMonotoneX } from "d3-shape";
+    import { AreaChart, BarChart, LineChart, PieChart } from "layerchart";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -53,15 +54,14 @@
 
     const USER_JOIN_DAYS = 30;
     const AUDIT_DAYS = 14;
-    const ADMIN_ACTIVITY_LIMIT = 8;
+    // The endpoint's max; the panel shows as many as its width fits.
+    const ADMIN_ACTIVITY_LIMIT = 20;
+    const MIN_ACTIVITY_COLUMNS = 8;
+    const ACTIVITY_COLUMN_PX = 100;
     const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
 
-    function dailySeries(points: DailyPoint[]) {
-        return points.map((p) => ({
-            label: new Date(p.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-            count: p.count,
-        }));
-    }
+    const dailySeries = (points: DailyPoint[]) => points.map((p) => ({ date: new Date(p.date), count: p.count }));
+    const shortDate = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
     async function fetchCwl(seasonId?: number) {
         cwlLoading = true;
@@ -101,123 +101,67 @@
         loading = false;
     });
 
-    const userJoinTrendOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!userJoins) return null;
-        return {
-            title: { text: "Users Joined (Last 30 Days)" },
-            data: dailySeries(userJoins),
-            series: [
-                {
-                    type: "area",
-                    xKey: "label",
-                    yKey: "count",
-                    yName: "Users",
-                    fill: "#22c55e",
-                    stroke: "#22c55e",
-                    fillOpacity: 0.4,
-                    interpolation: { type: "smooth" },
-                    marker: { enabled: false },
-                },
-            ],
-            axes: {
-                x: { type: "category" },
-                y: { type: "number", nice: true },
-            },
-        };
-    });
-
-    const cwlAssignmentOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!cwlAssignment) return null;
-        return {
-            title: { text: "CWL Applications Assignment" },
-            subtitle: cwlAssignment.seasonName ? { text: cwlAssignment.seasonName } : undefined,
-            data: [
-                { state: "Assigned", count: cwlAssignment.assigned },
-                { state: "Unassigned", count: cwlAssignment.unassigned },
-            ],
-            series: [
-                {
-                    type: "donut",
-                    angleKey: "count",
-                    legendItemKey: "state",
-                    innerRadiusRatio: 0.6,
-                    fills: ["#22c55e", "#a8a29e"],
-                    strokes: ["#22c55e", "#a8a29e"],
-                    calloutLabel: { enabled: false },
-                },
-            ],
-        };
-    });
-
-    const cwlParticipationOptions = $derived.by<AgPolarChartOptions | null>(() => {
-        if (!cwlParticipation) return null;
-        const nonParticipatedCount = Math.max(0, cwlParticipation.totalUsers - cwlParticipation.participated);
-        return {
-            title: { text: "CWL Participation Overview" },
-            subtitle: cwlParticipation.seasonName ? { text: cwlParticipation.seasonName } : undefined,
-            data: [
-                { state: "Participated", count: cwlParticipation.participated },
-                { state: "Not Participated", count: nonParticipatedCount },
-            ],
-            series: [
-                {
-                    type: "donut",
-                    angleKey: "count",
-                    legendItemKey: "state",
-                    innerRadiusRatio: 0.6,
-                    fills: ["#3b82f6", "#a8a29e"],
-                    strokes: ["#3b82f6", "#a8a29e"],
-                    calloutLabel: { enabled: false },
-                },
-            ],
-        };
-    });
-
-    const auditTrendOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!auditTrend) return null;
-        return {
-            title: { text: "Server Activity (Last 14 Days)" },
-            data: dailySeries(auditTrend),
-            series: [{ type: "line", xKey: "label", yKey: "count", yName: "Actions", marker: { enabled: true }, interpolation: { type: "smooth" } }],
-            axes: {
-                x: { type: "category" },
-                y: { type: "number", nice: true },
-            },
-        };
-    });
-
-    const auditCategoryOptions = $derived.by<AgCartesianChartOptions | null>(() => {
-        if (!auditCategories) return null;
-        return {
-            title: { text: "Activity by Category" },
-            data: auditCategories,
-            series: [{ type: "bar", xKey: "category", yKey: "count", yName: "Actions", cornerRadius: 4 }],
-            axes: {
-                x: { type: "category" },
-                y: { type: "number", nice: true },
-            },
-        };
-    });
-
-    type ChartCard = { options: AgCartesianChartOptions | AgPolarChartOptions };
-    const charts = $derived(
-        (
-            [
-                { options: cwlAssignmentOptions },
-                { options: cwlParticipationOptions },
-                { options: auditTrendOptions },
-                { options: auditCategoryOptions },
-            ] as { options: AgCartesianChartOptions | AgPolarChartOptions | null }[]
-        ).filter((c): c is ChartCard => c.options !== null),
+    const userJoinData = $derived(userJoins ? dailySeries(userJoins) : null);
+    const auditTrendData = $derived(auditTrend ? dailySeries(auditTrend) : null);
+    const assignmentData = $derived(
+        cwlAssignment
+            ? [
+                  { state: "Assigned", count: cwlAssignment.assigned },
+                  { state: "Unassigned", count: cwlAssignment.unassigned },
+              ]
+            : null,
+    );
+    const participationData = $derived(
+        cwlParticipation
+            ? [
+                  { state: "Participated", count: cwlParticipation.participated },
+                  { state: "Not Participated", count: Math.max(0, cwlParticipation.totalUsers - cwlParticipation.participated) },
+              ]
+            : null,
     );
 
-    const maxActivity = $derived(adminActivity?.length ? Math.max(...adminActivity.map((a) => a.count)) : 0);
+    type CardKey = "assignment" | "participation" | "trend" | "categories";
+    const cards = $derived(
+        (
+            [
+                ["assignment", assignmentData],
+                ["participation", participationData],
+                ["trend", auditTrendData],
+                ["categories", auditCategories],
+            ] as [CardKey, unknown][]
+        )
+            .filter(([, data]) => data !== null)
+            .map(([key]) => key),
+    );
+
+    let activityWidth = $state(0);
+    const visibleActivity = $derived((adminActivity ?? []).slice(0, Math.max(MIN_ACTIVITY_COLUMNS, Math.floor(activityWidth / ACTIVITY_COLUMN_PX))));
+
+    const maxActivity = $derived(visibleActivity.length ? Math.max(...visibleActivity.map((a) => a.count)) : 0);
     const BAR_MAX_PX = 130;
     function barHeight(count: number) {
         return maxActivity > 0 ? Math.max(6, Math.round((count / maxActivity) * BAR_MAX_PX)) : 6;
     }
-    const hasContent = $derived(!!userJoinTrendOptions || (adminActivity?.length ?? 0) > 0 || charts.length > 0);
+    const hasContent = $derived(!!userJoinData || (adminActivity?.length ?? 0) > 0 || cards.length > 0);
 </script>
+
+{#snippet dailyArea(data: { date: Date; count: number }[], label: string, color: string)}
+    <AreaChart
+        {data}
+        x="date"
+        y="count"
+        series={[{ key: "count", label, color }]}
+        props={{
+            area: { curve: curveMonotoneX, fillOpacity: 0.25, line: { curve: curveMonotoneX, strokeWidth: 2 } },
+            xAxis: { format: shortDate },
+            tooltip: { header: { format: shortDate } },
+        }}
+    />
+{/snippet}
+
+{#snippet donut(data: { state: string; count: number }[], colors: string[])}
+    <PieChart {data} key="state" value="count" c="state" cRange={colors} innerRadius={0.6} padAngle={0.02} cornerRadius={4} legend />
+{/snippet}
 
 {#if loading}
     <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
@@ -250,9 +194,11 @@
             </div>
         {:else}
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {#if userJoinTrendOptions}
+                {#if userJoinData}
                     <div class="stagger-card h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 lg:col-span-2" style="--i:0">
-                        <Chart options={userJoinTrendOptions} />
+                        <ChartPanel title="Users Joined (Last {USER_JOIN_DAYS} Days)">
+                            {@render dailyArea(userJoinData, "Users", "var(--color-green-500)")}
+                        </ChartPanel>
                     </div>
                 {/if}
                 {#if adminActivity && adminActivity.length > 0}
@@ -261,8 +207,8 @@
                         style="--i:1"
                     >
                         <h3 class="text-center text-sm font-bold text-stone-200">Top Admin Activity</h3>
-                        <div class="edge-fade flex items-end justify-around gap-2 overflow-x-auto pt-2 sm:gap-4">
-                            {#each adminActivity as actor (actor.actorId)}
+                        <div bind:clientWidth={activityWidth} class="edge-fade flex items-end justify-around gap-2 overflow-x-auto pt-2 sm:gap-4">
+                            {#each visibleActivity as actor (actor.actorId)}
                                 <div class="flex min-w-14 flex-1 flex-col items-center">
                                     <div class="flex flex-col items-center justify-end gap-1.5" style="height: {BAR_MAX_PX + 64}px">
                                         <span class="text-sm font-bold text-stone-100 tabular-nums">{actor.count}</span>
@@ -331,10 +277,45 @@
                         </div>
                     </div>
                 {/if}
-                {#each charts as chart, i (chart.options.title?.text)}
+                {#each cards as card, i (card)}
                     <!-- Offset by the two optional panels above so the sequence keeps running. -->
                     <div class="stagger-card h-72 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4" style="--i:{i + 2}">
-                        <Chart options={chart.options} />
+                        {#if card === "assignment" && assignmentData}
+                            <ChartPanel title="CWL Applications Assignment" subtitle={cwlAssignment?.seasonName}>
+                                {@render donut(assignmentData, ["var(--color-green-500)", "var(--color-stone-500)"])}
+                            </ChartPanel>
+                        {:else if card === "participation" && participationData}
+                            <ChartPanel title="CWL Participation Overview" subtitle={cwlParticipation?.seasonName}>
+                                {@render donut(participationData, ["var(--color-blue-500)", "var(--color-stone-500)"])}
+                            </ChartPanel>
+                        {:else if card === "trend" && auditTrendData}
+                            <ChartPanel title="Server Activity (Last {AUDIT_DAYS} Days)">
+                                <LineChart
+                                    data={auditTrendData}
+                                    x="date"
+                                    y="count"
+                                    series={[{ key: "count", label: "Actions", color: "var(--color-blue-500)" }]}
+                                    points={{ r: 4 }}
+                                    props={{
+                                        spline: { curve: curveMonotoneX, strokeWidth: 2 },
+                                        xAxis: { format: shortDate },
+                                        tooltip: { header: { format: shortDate } },
+                                    }}
+                                />
+                            </ChartPanel>
+                        {:else if card === "categories" && auditCategories}
+                            <ChartPanel title="Activity by Category">
+                                <BarChart
+                                    data={auditCategories}
+                                    orientation="horizontal"
+                                    x="count"
+                                    y="category"
+                                    series={[{ key: "count", label: "Actions", color: "var(--color-blue-500)" }]}
+                                    padding={{ left: 110 }}
+                                    props={{ bars: { radius: 4, rounded: "edge" } }}
+                                />
+                            </ChartPanel>
+                        {/if}
                     </div>
                 {/each}
             </div>

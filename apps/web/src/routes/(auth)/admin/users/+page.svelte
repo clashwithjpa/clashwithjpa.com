@@ -8,19 +8,21 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Grid from "$lib/components/ui/Grid.svelte";
-    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
     import RoleBadge, { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import DataTable from "$lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "$lib/components/ui/table/features";
+    import { InfiniteRows } from "$lib/components/ui/table/infinite.svelte";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { formatDate } from "$lib/utils";
     import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
-    import type { CellValueChangedEvent, GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
+    import { renderComponent, type SortingState } from "@tanstack/svelte-table";
     import type { UserWithRole } from "better-auth/plugins";
+    import { untrack } from "svelte";
     import { toast } from "svelte-sonner";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowRight from "~icons/tabler/arrow-right";
@@ -33,9 +35,7 @@
     let removeUserDialogOpen = $state(false);
     let pendingRemoval = $state<{ userId: string; name: string } | null>(null);
     let roleDialogOpen = $state(false);
-    let pendingRoleChange = $state<{ event: CellValueChangedEvent; oldValue: string; newValue: string } | null>(null);
-    let lastRevert: { id: string; value: string } | null = null;
-    let gridApi: GridApi | null = $state(null);
+    let pendingRoleChange = $state<{ user: User; oldValue: string; newValue: string } | null>(null);
     let guildNicknames: Record<string, string> = {};
     let nicknamesLoading = $state(false);
     let userSidebar: Sidebar | null = $state(null);
@@ -51,9 +51,11 @@
         duration: [],
     });
 
+    type User = UserWithRole & { discordId?: string | null; discordNickname?: string };
+
     const session = authClient.useSession();
     let searchText = $state("");
-    let total = $state(0);
+    let sorting = $state<SortingState>([]);
     let roleFilter = $state<string>("");
     let roleCounts = $state<Record<string, number>>({});
     // null = no preference; it narrows alongside the role filter, not instead of it.
@@ -70,12 +72,12 @@
 
     function handleRoleFilter(role: string) {
         roleFilter = roleFilter === role ? "" : role;
-        gridApi?.setGridOption("datasource", createDatasource());
+        list.reset();
     }
 
     function handleApiAccessFilter(granted: boolean) {
         apiAccessFilter = apiAccessFilter === granted ? null : granted;
-        gridApi?.setGridOption("datasource", createDatasource());
+        list.reset();
     }
 
     // Drag-to-scroll for the role badge bar (mirrors the CWL clan bar).
@@ -140,13 +142,11 @@
         selectedSidebarUser = null;
     }
 
-    function updateGridRow(user: Partial<UserWithRole> & { id: string }) {
-        gridApi?.forEachNode((node) => {
-            if (node.data?.id === user.id) {
-                node.setData({ ...node.data, ...user });
-            }
-        });
-        gridApi?.refreshCells({ force: true });
+    function updateTableRow(user: Partial<UserWithRole> & { id: string }) {
+        list.update(
+            (u) => u.id === user.id,
+            () => user,
+        );
     }
 
     async function syncUserViews(userId: string) {
@@ -156,7 +156,7 @@
             return null;
         }
 
-        updateGridRow(refreshedUser);
+        updateTableRow(refreshedUser);
 
         if (selectedSidebarUser?.id === userId) {
             selectedSidebarUser = { ...selectedSidebarUser, ...refreshedUser };
@@ -165,47 +165,33 @@
         return refreshedUser;
     }
 
-    function createDatasource(): IDatasource {
-        return {
-            async getRows(params: IGetRowsParams) {
-                try {
-                    const skip = params.startRow || 0;
-                    const limit = (params.endRow || 0) - skip;
-                    const sort = params.sortModel?.[0];
-
-                    const queryParams: GetAdminUsersQueryParams = { limit, offset: skip };
-                    if (searchText) queryParams.search = searchText;
-                    if (roleFilter) queryParams.role = roleFilter;
-                    if (apiAccessFilter !== null) queryParams.apiAccess = String(apiAccessFilter);
-                    if (sort) {
-                        queryParams.sortBy = sort.colId;
-                        queryParams.sortDirection = sort.sort ?? "asc";
-                    }
-
-                    const resp = await getAdminUsers(queryParams, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-
-                    if (!resp.success) {
-                        params.failCallback();
-                        return;
-                    }
-
-                    total = resp.data.total;
-                    if (resp.data.roleCounts) roleCounts = resp.data.roleCounts;
-                    if (resp.data.apiAccessCounts) apiAccessCounts = resp.data.apiAccessCounts;
-                    params.successCallback(
-                        resp.data.users.map((u: { discordId?: string | null }) => ({
-                            ...u,
-                            discordNickname: u.discordId ? guildNicknames[u.discordId] : undefined,
-                        })),
-                        resp.data.total,
-                    );
-                } catch (error) {
-                    toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
-                    params.failCallback();
-                }
-            },
-        };
-    }
+    const list = new InfiniteRows<User>(async (offset, limit) => {
+        const sort = sorting[0];
+        const queryParams: GetAdminUsersQueryParams = { limit, offset };
+        if (searchText) queryParams.search = searchText;
+        if (roleFilter) queryParams.role = roleFilter;
+        if (apiAccessFilter !== null) queryParams.apiAccess = String(apiAccessFilter);
+        if (sort) {
+            queryParams.sortBy = sort.id;
+            queryParams.sortDirection = sort.desc ? "desc" : "asc";
+        }
+        try {
+            const resp = await getAdminUsers(queryParams, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (!resp.success) throw new Error();
+            if (resp.data.roleCounts) roleCounts = resp.data.roleCounts;
+            if (resp.data.apiAccessCounts) apiAccessCounts = resp.data.apiAccessCounts;
+            return {
+                rows: (resp.data.users as User[]).map((u) => ({
+                    ...u,
+                    discordNickname: u.discordId ? guildNicknames[u.discordId] : undefined,
+                })),
+                total: resp.data.total,
+            };
+        } catch (error) {
+            toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });
+            return null;
+        }
+    });
 
     async function banUser(userId: string, reason: string, duration: Date[] | []) {
         const { error } = await authClient.admin.banUser({
@@ -226,7 +212,7 @@
                     description: reason,
                 },
             );
-            gridApi?.refreshInfiniteCache();
+            list.refresh();
         }
     }
 
@@ -243,14 +229,9 @@
         } else {
             toast.success(`${target.name} has been removed`);
             if (selectedSidebarUser?.id === target.userId) closeUserSidebar();
-            gridApi?.refreshInfiniteCache();
+            list.refresh();
         }
         isProcessing = null;
-    }
-
-    function revertRoleCell(change: { event: CellValueChangedEvent; oldValue: string }) {
-        lastRevert = { id: change.event.data.id, value: change.oldValue };
-        change.event.node.setDataValue("role", change.oldValue);
     }
 
     async function confirmRoleChange() {
@@ -258,44 +239,30 @@
         if (!change) return;
         pendingRoleChange = null;
 
-        const { event, newValue, oldValue } = change;
-        isProcessing = event.data.id;
+        const { user, newValue, oldValue } = change;
+        isProcessing = user.id;
+        updateTableRow({ id: user.id, role: newValue });
         const { error } = await authClient.admin.setRole({
-            userId: event.data.id,
+            userId: user.id,
             role: newValue as Parameters<typeof authClient.admin.setRole>[0]["role"],
         });
 
         if (error) {
             toast.error("Failed to update role: " + error.message);
-            revertRoleCell({ event, oldValue });
+            updateTableRow({ id: user.id, role: oldValue });
         } else {
             toast.success("Role updated successfully");
-            await syncUserViews(event.data.id);
+            await syncUserViews(user.id);
         }
         isProcessing = null;
     }
 
     function cancelRoleChange() {
-        if (!pendingRoleChange) return;
-        revertRoleCell(pendingRoleChange);
         pendingRoleChange = null;
     }
 
-    const gridContext = {
-        get isProcessing() {
-            return isProcessing;
-        },
-        get currentUserId() {
-            return $session.data?.user?.id;
-        },
-        get currentUserLevel() {
-            return roleLevel($session.data?.user?.role);
-        },
-
-        openUserSidebar,
-        closeUserSidebar,
-
-        // Gated here rather than at each button so both entry points — the grid's
+    const userActions = {
+        // Gated here rather than at each button so both entry points — the table's
         // trash action and the sidebar's Remove User — go through the same prompt.
         removeUser: (userId: string, name?: string) => {
             pendingRemoval = { userId, name: name ?? "this user" };
@@ -311,7 +278,7 @@
                 else {
                     const refreshedUser = await syncUserViews(userId);
                     toast.success(`${refreshedUser?.name ?? "User"} has been unbanned`);
-                    gridApi?.refreshInfiniteCache();
+                    list.refresh();
                 }
             } else {
                 selectedUser = { userId, reason: "", duration: [] };
@@ -322,27 +289,88 @@
     };
 
     function handleSearchChange() {
-        gridApi?.setGridOption("datasource", createDatasource());
+        list.reset();
     }
 
-    // Nicknames are fetched separately from the row datasource so the grid isn't
+    // Nicknames are fetched separately from the row pages so the table isn't
     // blocked on the Discord guild-member walk. Rows already fetched are backfilled.
     async function loadNicknames() {
         nicknamesLoading = true;
         try {
             guildNicknames = await loadGuildNicknames();
-            gridApi?.forEachNode((node) => {
-                if (node.data?.discordId) node.data.discordNickname = guildNicknames[node.data.discordId];
-            });
+            list.update(
+                (u) => !!u.discordId,
+                (u) => ({ discordNickname: guildNicknames[u.discordId!] }),
+            );
         } finally {
             nicknamesLoading = false;
         }
     }
 
+    function canEditRole(user: User) {
+        const me = $session.data?.user;
+        if (!me || user.id === me.id) return false;
+        return roleLevel(user.role) < roleLevel(me.role);
+    }
+
+    const columns: TableColumn<User>[] = [
+        {
+            accessorKey: "name",
+            header: "User",
+            size: 260,
+            cell: ({ row }) => renderComponent(UserCell, { user: row.original }),
+        },
+        {
+            accessorKey: "discordNickname",
+            header: "Nickname",
+            size: 180,
+            enableSorting: false,
+            cell: ({ getValue }) => renderComponent(CwlNicknameCell, { value: getValue(), loading: nicknamesLoading }),
+        },
+        {
+            accessorKey: "role",
+            header: "Role",
+            size: 180,
+            cell: ({ getValue }) => renderComponent(RoleCell, { role: getValue() }),
+            meta: {
+                edit: {
+                    type: "select",
+                    canEdit: canEditRole,
+                    options: () => {
+                        const myLevel = roleLevel($session.data?.user?.role);
+                        return roleOptions.filter((opt) => roleLevel(opt.value) < myLevel);
+                    },
+                    commit: (user: User, newValue: string) => {
+                        pendingRoleChange = { user, oldValue: user.role ?? "", newValue };
+                        roleDialogOpen = true;
+                    },
+                },
+            },
+        },
+        {
+            id: "actions",
+            header: "",
+            size: 160,
+            enableSorting: false,
+            enableResizing: false,
+            cell: ({ row }) =>
+                renderComponent(ActionCell, {
+                    user: row.original,
+                    currentUserId: $session.data?.user?.id,
+                    currentUserLevel: roleLevel($session.data?.user?.role),
+                    processing: isProcessing === row.original.id,
+                    onOpen: () => openUserSidebar({ ...row.original, discordId: row.original.discordId ?? undefined }),
+                    onRemove: () => userActions.removeUser(row.original.id, row.original.name),
+                    onToggleBan: () => userActions.toggleBanUser(row.original.id, !!row.original.banned),
+                }),
+        },
+    ];
+
     $effect(() => {
-        nicknamesLoading; // track
-        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
+        sorting; // track
+        untrack(() => list.reset());
     });
+    loadNicknames();
 
     function getMinDate(): string {
         const tomorrow = new Date();
@@ -361,7 +389,7 @@
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <h1 class="text-2xl font-bold">Users</h1>
-                <p class="text-sm text-stone-400">{total} user{total === 1 ? "" : "s"}</p>
+                <p class="text-sm text-stone-400">{list.total} user{list.total === 1 ? "" : "s"}</p>
             </div>
             <div class="flex items-center gap-2">
                 <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="w-full lg:w-80" />
@@ -416,68 +444,15 @@
         {/if}
     </div>
 
-    <div class="flex-1">
-        <Grid
-            gridOptions={{
-                context: gridContext,
-                rowHeight: 56,
-                rowModelType: "infinite",
-                cacheBlockSize: 50,
-                blockLoadDebounceMillis: 300,
-                onGridReady: (params) => {
-                    gridApi = params.api;
-                    gridApi.setGridOption("datasource", createDatasource());
-                    loadNicknames();
-                },
-                onCellValueChanged: (event) => {
-                    if (event.colDef.field !== "role" || event.oldValue === event.newValue) return;
-                    if (lastRevert && event.data.id === lastRevert.id && event.newValue === lastRevert.value) {
-                        lastRevert = null;
-                        return;
-                    }
-                    pendingRoleChange = { event, oldValue: event.oldValue, newValue: event.newValue };
-                    roleDialogOpen = true;
-                },
-            }}
-            columnDefs={[
-                { headerName: "User", field: "name", sortable: true, filter: false, cellRenderer: svelteRenderer(UserCell) },
-                {
-                    headerName: "Nickname",
-                    field: "discordNickname",
-                    sortable: false,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlNicknameCell),
-                    cellRendererParams: () => ({ loading: nicknamesLoading }),
-                },
-                {
-                    headerName: "Role",
-                    field: "role",
-                    editable: (params) => {
-                        const me = $session.data?.user;
-                        if (!me || params.data.id === me.id) return false;
-                        return roleLevel(params.data.role) < roleLevel(me.role);
-                    },
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(RoleCell),
-                    cellEditorPopup: true,
-                    cellEditor: "uiSelectEditor",
-                    cellEditorParams: () => {
-                        const myLevel = roleLevel($session.data?.user?.role);
-                        return { options: roleOptions.filter((opt) => roleLevel(opt.value) < myLevel) };
-                    },
-                },
-                {
-                    headerName: " ",
-                    field: "id",
-                    cellRenderer: svelteRenderer(ActionCell),
-                    cellStyle: { justifyContent: "center" },
-                    sortable: false,
-                    filter: false,
-                    lockPosition: "right",
-                    suppressSizeToFit: true,
-                },
-            ]}
+    <div class="min-h-0 flex-1">
+        <DataTable
+            data={list.rows}
+            {columns}
+            getRowId={(u) => u.id}
+            loading={list.loading}
+            manualSorting
+            bind:sorting
+            onEndReached={() => list.loadMore()}
         />
     </div>
 </div>
@@ -486,8 +461,8 @@
     {#if selectedSidebarUser}
         <UserManagementSidebar
             user={selectedSidebarUser}
-            onBanToggle={(userId, banned) => gridContext.toggleBanUser(userId, banned)}
-            onRemove={(userId) => gridContext.removeUser(userId, selectedSidebarUser?.name)}
+            onBanToggle={(userId, banned) => userActions.toggleBanUser(userId, banned)}
+            onRemove={(userId) => userActions.removeUser(userId, selectedSidebarUser?.name)}
             onUserUpdated={(userId) => syncUserViews(userId)}
             isCurrentUser={selectedSidebarUser.id === $session.data?.user?.id}
             isProcessing={isProcessing === selectedSidebarUser.id}
@@ -541,7 +516,7 @@
     bind:open={roleDialogOpen}
     title="Change Role"
     description={pendingRoleChange
-        ? `Are you sure you want to change ${pendingRoleChange.event.data.name}'s role?`
+        ? `Are you sure you want to change ${pendingRoleChange.user.name}'s role?`
         : "Are you sure you want to change this user's role?"}
     confirmText="Change role"
     onConfirm={confirmRoleChange}

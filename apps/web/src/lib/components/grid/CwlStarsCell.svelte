@@ -1,6 +1,5 @@
 <script lang="ts">
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
-    import type { ICellRendererParams } from "ag-grid-community";
     import TablerArrowRight from "~icons/tabler/arrow-right";
     import TablerStar from "~icons/tabler/star";
 
@@ -14,11 +13,7 @@
         defenderPosition: number;
     };
 
-    let { params }: { params: ICellRendererParams } = $props();
-
-    let stars = $derived<number | null>(params.data?.cwlStars ?? null);
-    let attacks = $derived<number>(params.data?.cwlAttacks ?? 0);
-    let details = $derived<Detail[]>(params.data?.cwlDetails ?? []);
+    let { stars = null, attacks = 0, details = [] }: { stars?: number | null; attacks?: number; details?: Detail[] } = $props();
 </script>
 
 {#if stars === null}

@@ -63,9 +63,9 @@
             "groupName": "drizzle"
         },
         {
-            "matchPackageNames": ["ag-grid-**", "ag-charts-**"],
+            "matchPackageNames": ["@tanstack/svelte-table", "@tanstack/svelte-virtual"],
             "matchUpdateTypes": ["major"],
-            "groupName": "ag-grid"
+            "groupName": "tanstack table"
         },
         {
             "matchPackageNames": ["@tanstack/svelte-query"],

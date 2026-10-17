@@ -2,19 +2,19 @@
     /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
-    import BonusAccountCell from "$lib/components/grid/BonusAccountCell.svelte";
     import BonusSeasonsCell from "$lib/components/grid/BonusSeasonsCell.svelte";
     import ClanCell from "$lib/components/grid/ClanCell.svelte";
+    import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
     import Button from "$lib/components/ui/Button.svelte";
-    import Grid from "$lib/components/ui/Grid.svelte";
-    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import DataTable from "$lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "$lib/components/ui/table/features";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import {
         assignCwlApplication,
@@ -32,11 +32,10 @@
         type GetCwlSeasons200,
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
-    import type { GridApi, ICellRendererParams } from "ag-grid-community";
+    import { renderComponent, type SortingState } from "@tanstack/svelte-table";
     import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDownload from "~icons/tabler/download";
-    import TablerSearch from "~icons/tabler/search";
     import TablerSwords from "~icons/tabler/swords";
 
     type BonusRow = GetBonusData200["data"]["rows"][number] & { discordNickname?: string };
@@ -63,8 +62,10 @@
     let downloading = $state(false);
     let fetchingCwl = $state(false);
     let searchText = $state("");
-
-    let gridApi = $state<GridApi | null>(null);
+    let dataTable = $state<ReturnType<typeof DataTable<Row>> | null>(null);
+    let displayedCount = $derived(dataTable?.getDisplayedCount() ?? 0);
+    let activeFilters = $derived(dataTable?.getActiveFilterCount() ?? 0);
+    let sorting = $state<SortingState>([{ id: "totalDonated", desc: true }]);
 
     // Tag -> name lookups for the clan cells. The "Clan" column holds the JPA clan
     // the account applied with; the "Assigned clan" column holds a CWL clan.
@@ -75,83 +76,55 @@
     // CoC account detail sidebar (opened from the COC account cell's eye button).
     let accountSidebar: Sidebar | null = $state(null);
     let selectedAccount = $state<Record<string, unknown> | null>(null);
-    const gridContext = {
-        openAccountSidebar: (account: Record<string, unknown>) => {
-            selectedAccount = account;
-            accountSidebar?.open(String(account.cocAccountId));
-        },
-    };
+    function openAccountSidebar(account: Row) {
+        selectedAccount = account;
+        accountSidebar?.open(String(account.cocAccountId));
+    }
 
     const normalizeTag = (tag: string | null | undefined) => (tag ?? "").trim().toUpperCase();
 
     // Stat columns edited inline; mirror the COC accounts admin page (a later
     // Google Sheet sync will overwrite these manual edits).
-    const STAT_FIELDS = ["totalDonated", "totalReceived", "clanGames", "capitalGoldLooted", "capitalGoldContributed", "activityScore"] as const;
+    type StatField = "totalDonated" | "totalReceived" | "clanGames" | "capitalGoldLooted" | "capitalGoldContributed" | "activityScore";
 
     function clanLabel(clanTag: string | null | undefined): string {
         if (!clanTag) return "Unassigned";
         return cwlClanOptions.find((o) => o.value === clanTag)?.label ?? clanTag;
     }
 
-    function applySearch() {
-        gridApi?.setGridOption("quickFilterText", searchText);
+    // Rows are clustered by assigned CWL clan (groups A→Z, unassigned last); the
+    // active sort orders rows within each clan.
+    const groupByClan = (r: Row) => r.assignedTo ?? "";
+    const compareClans = (a: string, b: string) => (a === "" ? 1 : b === "" ? -1 : clanLabel(a).localeCompare(clanLabel(b)));
+
+    function searchTextFor(r: Row): string {
+        return [
+            r.discordUsername,
+            r.discordUserId,
+            r.discordNickname,
+            r.cocAccountName,
+            r.cocAccountTag,
+            clanNameByTag[normalizeTag(r.cocAccountClan)],
+            r.cocAccountClan,
+            r.preferenceNum,
+            r.warWeight,
+            clanLabel(r.assignedTo),
+            r.totalDonated,
+            r.totalReceived,
+            r.clanGames,
+            r.capitalGoldLooted,
+            r.capitalGoldContributed,
+            r.activityScore,
+            r.cwlAttacks,
+            r.cwlStars,
+            r.notes,
+        ]
+            .filter((v) => v != null)
+            .join(" ");
     }
 
-    let displayedCount = $state(0);
-
-    // Rows are grouped by assigned clan; alternate a subtle background band per
-    // contiguous clan group so neighbouring clans are easy to tell apart. The
-    // parity is derived from the *displayed* order, so it stays correct after a
-    // re-sort, filter or edit. Keyed by row id; getRowClass reads it on render.
-    let bandByRowId = new Map<string, number>();
-    // First row id of each clan group (gets a top-border divider).
-    let dividerRowIds = new Set<string>();
-
-    function recomputeBands(api: GridApi): boolean {
-        const order: { id: string; tag: string }[] = [];
-        api.forEachNodeAfterFilterAndSort((node) => {
-            if (node.data) order.push({ id: String(node.id), tag: normalizeTag(node.data.assignedTo) });
-        });
-
-        // Only band when rows are grouped by clan (each tag forms one contiguous
-        // run). When sorted some other way (e.g. by most donated), the banding
-        // would just be noise, so we leave it off.
-        const seen = new Set<string>();
-        let grouped = true;
-        let prev: string | null = null;
-        for (const { tag } of order) {
-            if (tag === prev) continue;
-            if (seen.has(tag)) {
-                grouped = false;
-                break;
-            }
-            seen.add(tag);
-            prev = tag;
-        }
-
-        const next = new Map<string, number>();
-        const nextDividers = new Set<string>();
-        if (grouped) {
-            let band = 0;
-            let prevTag: string | null = null;
-            let first = true;
-            for (const { id, tag } of order) {
-                if (first) first = false;
-                else if (tag !== prevTag) {
-                    band ^= 1;
-                    nextDividers.add(id);
-                }
-                prevTag = tag;
-                next.set(id, band);
-            }
-        }
-
-        const bandsSame = next.size === bandByRowId.size && [...next].every(([k, v]) => bandByRowId.get(k) === v);
-        const dividersSame = nextDividers.size === dividerRowIds.size && [...nextDividers].every((id) => dividerRowIds.has(id));
-        if (bandsSame && dividersSame) return false;
-        bandByRowId = next;
-        dividerRowIds = nextDividers;
-        return true;
+    function patchRows(match: (r: Row) => boolean, patch: (r: Row) => Partial<Row>) {
+        rows = rows.map((r) => (match(r) ? { ...r, ...patch(r) } : r));
     }
 
     async function loadClans() {
@@ -216,7 +189,7 @@
         } finally {
             loading = false;
         }
-        // Nicknames load separately so the grid isn't blocked on the Discord
+        // Nicknames load separately so the table isn't blocked on the Discord
         // guild-member walk; the Nickname column shows a skeleton until they arrive.
         void loadNicknames();
     }
@@ -241,13 +214,10 @@
             const resp = await getCwlStats({ seasonId: currentSeasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
             if (!resp.success) throw new Error();
             const byTag = new Map(resp.data.stats.map((s) => [s.tag.toUpperCase(), s]));
-            for (const r of rows) {
+            rows = rows.map((r) => {
                 const s = byTag.get(normalizeTag(r.cocAccountTag));
-                r.cwlAttacks = s?.attacks ?? 0;
-                r.cwlStars = s?.stars ?? 0;
-                r.cwlDetails = s?.details ?? [];
-            }
-            gridApi?.refreshCells({ force: true, columns: ["cwlAttacks", "cwlStars"] });
+                return { ...r, cwlAttacks: s?.attacks ?? 0, cwlStars: s?.stars ?? 0, cwlDetails: s?.details ?? [] };
+            });
             toast.success("CWL stats fetched");
         } catch (error) {
             toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
@@ -256,22 +226,106 @@
         }
     }
 
-    async function assign(id: number, clanTag: string) {
+    async function assign(row: Row, clanTag: string) {
+        const previous = row.assignedTo;
+        patchRows(
+            (r) => r.id === row.id,
+            () => ({ assignedTo: clanTag || null }),
+        );
         try {
             const resp = await assignCwlApplication(
-                id,
+                row.id,
                 { clanTag: clanTag || null },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
-            if (resp.success) {
-                toast.success(clanTag ? `Bonus clan set to ${clanLabel(clanTag)}` : "Bonus clan cleared");
-                return resp.data.application.assignedTo ?? "";
-            }
-            toast.error("Failed to update bonus clan");
+            if (!resp.success) throw new Error();
+            patchRows(
+                (r) => r.id === row.id,
+                () => ({ assignedTo: resp.data.application.assignedTo ?? null }),
+            );
+            toast.success(clanTag ? `Bonus clan set to ${clanLabel(clanTag)}` : "Bonus clan cleared");
         } catch (error) {
+            patchRows(
+                (r) => r.id === row.id,
+                () => ({ assignedTo: previous }),
+            );
             toast.error("Failed to update bonus clan", { description: error instanceof Error ? error.message : undefined });
         }
-        return null;
+    }
+
+    async function saveNotes(row: Row, value: string) {
+        const notes = value.trim() ? value : null;
+        const previous = row.notes;
+        patchRows(
+            (r) => r.id === row.id,
+            () => ({ notes }),
+        );
+        try {
+            const resp = await updateCwlApplicationNotes(
+                row.id,
+                { notes },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            patchRows(
+                (r) => r.id === row.id,
+                () => ({ notes: resp.data.application.notes }),
+            );
+            toast.success("Notes updated");
+        } catch (error) {
+            patchRows(
+                (r) => r.id === row.id,
+                () => ({ notes: previous }),
+            );
+            toast.error("Failed to update notes", { description: error instanceof Error ? error.message : undefined });
+        }
+    }
+
+    // War weight and stats live on the CoC account, so every row for that account changes.
+    async function saveWarWeight(row: Row, warWeight: number) {
+        if (!Number.isInteger(warWeight) || warWeight < 0) {
+            toast.error("War weight must be a non-negative whole number");
+            return;
+        }
+        const previous = row.warWeight;
+        const sameAccount = (r: Row) => r.cocAccountId === row.cocAccountId;
+        patchRows(sameAccount, () => ({ warWeight }));
+        try {
+            const resp = await updateCocAccountWarWeight(
+                row.cocAccountId,
+                { warWeight },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            patchRows(sameAccount, () => ({ warWeight: resp.data.account.warWeight }));
+            toast.success(`War weight updated for ${row.cocAccountName}`);
+        } catch (error) {
+            patchRows(sameAccount, () => ({ warWeight: previous }));
+            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
+        }
+    }
+
+    async function saveStat(row: Row, field: StatField, label: string, n: number) {
+        if (!Number.isInteger(n) || n < 0) {
+            toast.error(`${label} must be a non-negative whole number`);
+            return;
+        }
+        const previous = row[field];
+        const sameAccount = (r: Row) => r.cocAccountId === row.cocAccountId;
+        patchRows(sameAccount, () => ({ [field]: n }));
+        try {
+            const resp = await updateCocAccountStats(
+                row.cocAccountId,
+                { [field]: n },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            patchRows(sameAccount, () => ({ [field]: (resp.data.account as Record<string, unknown>)[field] as number }));
+            toast.success(`${label} updated for ${row.cocAccountName}`);
+        } catch (error) {
+            patchRows(sameAccount, () => ({ [field]: previous }));
+            toast.error(`Failed to update ${label.toLowerCase()}`, { description: error instanceof Error ? error.message : undefined });
+        }
     }
 
     // Wraps a CSV cell so commas, quotes and newlines survive a round-trip.
@@ -332,21 +386,17 @@
         }
     }
 
-    const formatNumber = (p: { value: unknown }) => (p.value != null ? Number(p.value).toLocaleString() : "");
+    const formatNumber = (value: unknown) => (value != null ? Number(value).toLocaleString() : "");
 
     // Awards or removes a season's bonus for a user. Bonus is per Discord user, so
     // the change is mirrored onto every row that user owns.
     async function toggleBonus(data: Row, seasonId: number, selected: boolean) {
         const discordUserId = data.discordUserId;
-        const apply = (sel: boolean) => {
-            for (const r of rows) {
-                if (r.discordUserId !== discordUserId) continue;
-                const has = r.bonusSeasonIds.includes(seasonId);
-                if (sel && !has) r.bonusSeasonIds = [...r.bonusSeasonIds, seasonId];
-                else if (!sel && has) r.bonusSeasonIds = r.bonusSeasonIds.filter((x) => x !== seasonId);
-            }
-            gridApi?.refreshCells({ force: true, columns: ["thisSeasonBonus", "pastBonuses"] });
-        };
+        const apply = (sel: boolean) =>
+            patchRows(
+                (r) => r.discordUserId === discordUserId,
+                (r) => ({ bonusSeasonIds: sel ? [...new Set([...r.bonusSeasonIds, seasonId])] : r.bonusSeasonIds.filter((x) => x !== seasonId) }),
+            );
         apply(selected);
         try {
             const resp = await setUserSeasonBonus(
@@ -361,20 +411,134 @@
         }
     }
 
+    // Season badge columns are sized to fit every badge, so none get clipped.
+    const seasonsWidth = (list: Season[]) => Math.max(120, 24 + list.reduce((w, s) => w + 46 + s.name.length * 7.5, 0));
+
+    function statColumn(field: StatField, header: string, size: number): TableColumn<Row> {
+        return {
+            accessorKey: field,
+            header,
+            size,
+            cell: ({ getValue }) => formatNumber(getValue()),
+            meta: { filter: "number", edit: { type: "number", commit: (row: Row, n: number) => saveStat(row, field, header, n) } },
+        };
+    }
+
+    let columns = $derived<TableColumn<Row>[]>([
+        {
+            accessorKey: "discordUsername",
+            header: "Discord",
+            size: 220,
+            cell: ({ row }) => renderComponent(CwlDiscordCell, { app: row.original }),
+        },
+        {
+            accessorKey: "discordNickname",
+            header: "Nickname",
+            size: 150,
+            sortUndefined: "last",
+            cell: ({ getValue }) => renderComponent(CwlNicknameCell, { value: getValue(), loading: nicknamesLoading }),
+        },
+        {
+            accessorKey: "cocAccountName",
+            header: "COC Account",
+            size: 260,
+            cell: ({ row }) => renderComponent(CwlAccountCell, { account: row.original, onOpen: () => openAccountSidebar(row.original) }),
+        },
+        {
+            accessorKey: "cocAccountClan",
+            header: "Clan",
+            size: 170,
+            cell: ({ getValue }) => renderComponent(ClanCell, { tag: getValue(), name: clanNameByTag[normalizeTag(getValue())] ?? null }),
+            meta: {
+                filter: "set",
+                filterLabel: (tag) => {
+                    if (!tag) return "No clan";
+                    const name = clanNameByTag[normalizeTag(tag)];
+                    // Some accounts store the clan name instead of its tag.
+                    return name ? `${name} (${tag})` : tag;
+                },
+            },
+        },
+        { accessorKey: "preferenceNum", header: "Pref.", size: 90, meta: { filter: "number" } },
+        {
+            accessorKey: "warWeight",
+            header: "War Weight",
+            size: 130,
+            cell: ({ getValue }) => formatNumber(getValue()),
+            meta: { filter: "number", edit: { type: "number", commit: saveWarWeight } },
+        },
+        {
+            id: "assignedTo",
+            accessorFn: (r) => r.assignedTo ?? "",
+            header: "Assigned Clan",
+            size: 190,
+            cell: ({ getValue }) =>
+                renderComponent(ClanCell, { tag: getValue(), name: getValue() ? (cwlClanNameByTag[normalizeTag(getValue())] ?? null) : null }),
+            meta: { filter: "set", filterLabel: clanLabel, edit: { type: "select", options: () => cwlClanOptions, commit: assign } },
+        },
+        statColumn("totalDonated", "Total Donated", 140),
+        statColumn("totalReceived", "Total Received", 140),
+        statColumn("clanGames", "Clan Games", 130),
+        statColumn("capitalGoldLooted", "Capital Looted", 140),
+        statColumn("capitalGoldContributed", "Capital Contributed", 170),
+        statColumn("activityScore", "Activity Score", 140),
+        {
+            accessorKey: "cwlAttacks",
+            header: "CWL Attacks",
+            size: 130,
+            sortUndefined: "last",
+            cell: ({ getValue }) => (getValue() == null ? "" : `${getValue()}/7`),
+            meta: { filter: "number" },
+        },
+        {
+            accessorKey: "cwlStars",
+            header: "CWL Stars",
+            size: 120,
+            sortUndefined: "last",
+            cell: ({ row }) =>
+                renderComponent(CwlStarsCell, {
+                    stars: row.original.cwlStars ?? null,
+                    attacks: row.original.cwlAttacks,
+                    details: row.original.cwlDetails,
+                }),
+        },
+        {
+            id: "thisSeasonBonus",
+            header: "This Season",
+            size: seasonsWidth(currentSeasonList),
+            enableSorting: false,
+            cell: ({ row }) =>
+                renderComponent(BonusSeasonsCell, {
+                    seasons: currentSeasonList,
+                    awarded: row.original.bonusSeasonIds,
+                    onToggle: (seasonId: number, selected: boolean) => toggleBonus(row.original, seasonId, selected),
+                }),
+        },
+        {
+            id: "pastBonuses",
+            header: "Past Bonuses",
+            size: seasonsWidth(pastSeasons),
+            enableSorting: false,
+            cell: ({ row }) =>
+                renderComponent(BonusSeasonsCell, {
+                    seasons: pastSeasons,
+                    awarded: row.original.bonusSeasonIds,
+                    onToggle: (seasonId: number, selected: boolean) => toggleBonus(row.original, seasonId, selected),
+                }),
+        },
+        {
+            accessorKey: "notes",
+            header: "Notes",
+            size: 220,
+            enableSorting: false,
+            cell: ({ getValue }) => getValue() ?? "",
+            meta: { edit: { type: "text", commit: saveNotes } },
+        },
+    ]);
+
     load();
     loadClans();
     loadCwlClans();
-
-    // Re-render the clan cells once the tag -> name maps resolve.
-    $effect(() => {
-        clanNameByTag;
-        cwlClanNameByTag;
-        gridApi?.refreshCells({ force: true, columns: ["cocAccountClan", "assignedTo"] });
-    });
-    $effect(() => {
-        nicknamesLoading; // track
-        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
-    });
 </script>
 
 <Seo title="CWL Bonus" description="Assign CWL bonuses and review linked account stats." />
@@ -389,7 +553,17 @@
                 {:else}
                     {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
                     {/if}
-                    {#if searchText.trim()}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
+                    {#if searchText.trim() || activeFilters}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
+                    {#if activeFilters}
+                        ·
+                        <button
+                            type="button"
+                            class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
+                            onclick={() => dataTable?.clearFilters()}
+                        >
+                            Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
+                        </button>
+                    {/if}
                 {/if}
             </p>
         </div>
@@ -405,10 +579,7 @@
                 />
             {/if}
             <div class="flex flex-1 items-center gap-2">
-                <Input placeholder="Search anything..." bind:value={searchText} oninput={applySearch} class="min-w-0 flex-1 lg:w-80 lg:flex-none" />
-                <Button variant="success" class="shrink-0" onclick={applySearch} tooltip="Search" tooltipPlacement="bottom">
-                    <TablerSearch class="size-5" />
-                </Button>
+                <Input placeholder="Search anything..." bind:value={searchText} class="min-w-0 flex-1 lg:w-80 lg:flex-none" />
                 <Button
                     variant="base"
                     class="shrink-0"
@@ -447,308 +618,18 @@
         </div>
     {/if}
 
-    <div class="flex-1">
-        <Grid
-            rowData={rows}
-            gridOptions={{
-                context: gridContext,
-                rowHeight: 56,
-                getRowId: (p) => String(p.data.id),
-                // Alternating band + top-border divider per assigned-clan group (see recomputeBands).
-                getRowClass: (p) => {
-                    const id = p.node.id;
-                    if (!id) return undefined;
-                    const classes: string[] = [];
-                    if (bandByRowId.get(id) === 1) classes.push("bonus-band");
-                    if (dividerRowIds.has(id)) classes.push("clan-divider");
-                    return classes.length ? classes : undefined;
-                },
-                // Always cluster rows by assigned CWL clan (groups A→Z, unassigned last);
-                // the active sort orders rows within each clan.
-                postSortRows: (params) => {
-                    const nodes = params.nodes;
-                    const groups = new Map<string, typeof nodes>();
-                    for (const n of nodes) {
-                        const key = n.data?.assignedTo ?? "";
-                        const g = groups.get(key);
-                        if (g) g.push(n);
-                        else groups.set(key, [n]);
-                    }
-                    const keys = [...groups.keys()].sort((a, b) => (a === "" ? 1 : b === "" ? -1 : clanLabel(a).localeCompare(clanLabel(b))));
-                    nodes.length = 0;
-                    for (const k of keys) nodes.push(...groups.get(k)!);
-                },
-                onModelUpdated: (event) => {
-                    displayedCount = event.api.getDisplayedRowCount();
-                    // Recompute bands from the new displayed order; redraw only if they changed.
-                    if (recomputeBands(event.api)) event.api.redrawRows();
-                },
-                onGridReady: (params) => {
-                    gridApi = params.api;
-                },
-                onCellValueChanged: async (event) => {
-                    if (event.oldValue === event.newValue) return;
-                    const field = event.colDef.field;
-
-                    if (field === "notes") {
-                        const notes = event.newValue ? String(event.newValue) : null;
-                        try {
-                            const resp = await updateCwlApplicationNotes(
-                                event.data.id,
-                                { notes },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (!resp.success) throw new Error();
-                            event.data.notes = resp.data.application.notes;
-                            toast.success("Notes updated");
-                        } catch (error) {
-                            event.data.notes = event.oldValue;
-                            toast.error("Failed to update notes", { description: error instanceof Error ? error.message : undefined });
-                        }
-                        event.api.refreshCells({ rowNodes: [event.node], columns: ["notes"], force: true });
-                        return;
-                    }
-
-                    if (field === "warWeight") {
-                        const warWeight = Number(event.newValue);
-                        if (!Number.isInteger(warWeight) || warWeight < 0) {
-                            toast.error("War weight must be a non-negative whole number");
-                            event.data.warWeight = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], columns: ["warWeight"], force: true });
-                            return;
-                        }
-                        try {
-                            const resp = await updateCocAccountWarWeight(
-                                event.data.cocAccountId,
-                                { warWeight },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data.warWeight = resp.data.account.warWeight;
-                                toast.success(`War weight updated for ${event.data.cocAccountName}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
-                            event.data.warWeight = event.oldValue;
-                        }
-                        event.api.refreshCells({ rowNodes: [event.node], columns: ["warWeight"], force: true });
-                        return;
-                    }
-
-                    if (field === "assignedTo") {
-                        const result = await assign(event.data.id, event.newValue || "");
-                        event.data.assignedTo = result ?? event.oldValue;
-                        // Re-sort so the row jumps into its new clan group; this fires
-                        // onModelUpdated, which recomputes the alternating bands.
-                        event.api.applyTransaction({ update: [event.data] });
-                        return;
-                    }
-
-                    if (field && (STAT_FIELDS as readonly string[]).includes(field)) {
-                        const n = Number(event.newValue);
-                        if (!Number.isInteger(n) || n < 0) {
-                            toast.error(`${event.colDef.headerName} must be a non-negative whole number`);
-                            event.data[field] = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], columns: [field], force: true });
-                            return;
-                        }
-                        try {
-                            const resp = await updateCocAccountStats(
-                                event.data.cocAccountId,
-                                { [field]: n },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data[field] = (resp.data.account as Record<string, unknown>)[field];
-                                toast.success(`${event.colDef.headerName} updated for ${event.data.cocAccountName}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            toast.error(`Failed to update ${event.colDef.headerName?.toLowerCase()}`, {
-                                description: error instanceof Error ? error.message : undefined,
-                            });
-                            event.data[field] = event.oldValue;
-                        }
-                        event.api.refreshCells({ rowNodes: [event.node], columns: [field], force: true });
-                        return;
-                    }
-                },
-            }}
-            columnDefs={[
-                {
-                    headerName: "Discord",
-                    field: "discordUsername",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlDiscordCell),
-                    getQuickFilterText: (p) => `${p.data.discordUsername} ${p.data.discordUserId}`,
-                },
-                {
-                    headerName: "Nickname",
-                    field: "discordNickname",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlNicknameCell),
-                    cellRendererParams: () => ({ loading: nicknamesLoading }),
-                },
-                {
-                    headerName: "COC Account",
-                    field: "cocAccountName",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(BonusAccountCell),
-                    getQuickFilterText: (p) => `${p.data.cocAccountName} ${p.data.cocAccountTag}`,
-                },
-                {
-                    headerName: "Clan",
-                    field: "cocAccountClan",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(ClanCell),
-                    cellRendererParams: (p: ICellRendererParams) => ({ clanName: clanNameByTag[normalizeTag(p.value)] ?? null }),
-                    getQuickFilterText: (p) => `${clanNameByTag[normalizeTag(p.value)] ?? ""} ${p.value ?? ""}`.trim(),
-                },
-                { headerName: "Pref.", field: "preferenceNum", sortable: true, filter: "agNumberColumnFilter" },
-                {
-                    headerName: "War Weight",
-                    field: "warWeight",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Assigned Clan",
-                    field: "assignedTo",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditorPopup: true,
-                    cellEditor: "uiSelectEditor",
-                    cellEditorParams: () => ({ options: cwlClanOptions }),
-                    cellRenderer: svelteRenderer(ClanCell),
-                    cellRendererParams: (p: ICellRendererParams) => ({
-                        clanName: p.value ? (cwlClanNameByTag[normalizeTag(p.value)] ?? null) : null,
-                    }),
-                    valueGetter: (p) => p.data?.assignedTo ?? "",
-                    getQuickFilterText: (p) => clanLabel(p.value),
-                },
-                {
-                    headerName: "Total Donated",
-                    field: "totalDonated",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    sort: "desc",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Total Received",
-                    field: "totalReceived",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Clan Games",
-                    field: "clanGames",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Capital Looted",
-                    field: "capitalGoldLooted",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Capital Contributed",
-                    field: "capitalGoldContributed",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Activity Score",
-                    field: "activityScore",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "CWL Attacks",
-                    colId: "cwlAttacks",
-                    field: "cwlAttacks",
-                    sortable: true,
-                    filter: "agNumberColumnFilter",
-                    valueFormatter: (p) => (p.value == null ? "" : `${p.value}/7`),
-                },
-                {
-                    headerName: "CWL Stars",
-                    colId: "cwlStars",
-                    field: "cwlStars",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlStarsCell),
-                },
-                {
-                    headerName: "This Season",
-                    colId: "thisSeasonBonus",
-                    sortable: false,
-                    filter: false,
-                    cellRenderer: svelteRenderer(BonusSeasonsCell),
-                    cellRendererParams: () => ({ seasons: currentSeasonList, toggle: toggleBonus }),
-                },
-                {
-                    headerName: "Past Bonuses",
-                    colId: "pastBonuses",
-                    sortable: false,
-                    filter: false,
-                    cellRenderer: svelteRenderer(BonusSeasonsCell),
-                    cellRendererParams: () => ({ seasons: pastSeasons, toggle: toggleBonus }),
-                },
-                {
-                    headerName: "Notes",
-                    colId: "notes",
-                    field: "notes",
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "text" },
-                    valueFormatter: (p) => p.value ?? "",
-                },
-            ]}
+    <div class="min-h-0 flex-1">
+        <DataTable
+            bind:this={dataTable}
+            data={rows}
+            {columns}
+            getRowId={(r) => String(r.id)}
+            {loading}
+            bind:sorting
+            search={searchText}
+            searchText={searchTextFor}
+            groupBy={groupByClan}
+            groupCompare={compareClans}
         />
     </div>
 </div>
@@ -758,16 +639,3 @@
         <CocAccountSidebar account={selectedAccount as any} />
     {/if}
 </Sidebar>
-
-<style>
-    /* Alternating clan-group band. Skips hover/selected rows so those native
-       states still show through. Themed with the Stone palette. */
-    :global(.ag-theme-quartz .ag-row.bonus-band:not(.ag-row-hover):not(.ag-row-selected)) {
-        background-color: color-mix(in srgb, var(--color-stone-700) 16%, transparent);
-    }
-
-    /* Divider between clan groups: top border on the first row of each group. */
-    :global(.ag-theme-quartz .ag-row.clan-divider) {
-        border-top: 2px solid var(--color-stone-600);
-    }
-</style>

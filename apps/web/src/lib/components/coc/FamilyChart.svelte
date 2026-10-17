@@ -1,7 +1,6 @@
 <script lang="ts">
-    import Chart from "$lib/components/ui/Chart.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import type { AgCartesianChartOptions } from "ag-charts-community";
+    import { BarChart, Bars, LinearGradient } from "layerchart";
 
     export type FamilyClan = {
         name: string;
@@ -44,93 +43,16 @@
 
     const shorten = (name: string) => (name.length > 12 ? name.slice(0, 11) + "…" : name);
 
-    function barFill([light, mid, dark]: [string, string, string]) {
-        return {
-            type: "gradient" as const,
-            rotation: 180,
-            colorStops: [
-                { color: light, stop: 0 },
-                { color: mid, stop: 0.5 },
-                { color: dark, stop: 1 },
-            ],
-        };
-    }
-
-    function tooltip(unit: string) {
-        return {
-            renderer: ({ datum, xKey, yKey }: { datum: Record<string, unknown>; xKey: string; yKey: string }) => ({
-                title: String(datum[xKey]),
-                content: `${datum[yKey]} ${unit}`,
-            }),
-        };
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function barLabel(suffix = ""): any {
-        return {
-            enabled: true,
-            placement: "outside-end",
-            color: "#2a1810",
-            fontFamily: "COC, sans-serif",
-            fontWeight: 700,
-            formatter: ({ value }: { value: number }) => `${value}${suffix}`,
-        };
-    }
-
-    function axisTitle(text: string) {
-        return { enabled: true, text, color: "#2a1810", fontFamily: "COC, sans-serif" };
-    }
-
-    const axisLabel = { color: "#5a3d2b", fontFamily: "COC, sans-serif" };
-
-    const chartOptions = $derived.by<AgCartesianChartOptions>(() => {
-        if (mode === "townhalls") {
-            const data = Object.entries(thDistribution)
-                .map(([th, count]) => ({ th: `TH${th}`, thLevel: Number(th), count }))
-                .sort((a, b) => a.thLevel - b.thLevel);
-            return {
-                data,
-                series: [
-                    {
-                        type: "bar",
-                        xKey: "th",
-                        yKey: "count",
-                        yName: "Players",
-                        fill: barFill(activeMode.gradient),
-                        cornerRadius: 4,
-                        tooltip: tooltip("players"),
-                        label: barLabel(),
-                    },
-                ],
-                axes: {
-                    x: { type: "category", title: axisTitle("Town Hall level"), label: axisLabel },
-                    y: { type: "number", nice: true, title: axisTitle("Players"), label: axisLabel },
-                },
-            };
-        }
-
-        const data = clans.map((c) => ({ clan: shorten(c.name), members: c.members })).sort((a, b) => b.members - a.members);
-        return {
-            padding: { top: 32 },
-            data,
-            series: [
-                {
-                    type: "bar",
-                    xKey: "clan",
-                    yKey: "members",
-                    yName: "Members",
-                    fill: barFill(activeMode.gradient),
-                    cornerRadius: 4,
-                    tooltip: tooltip("of 50 seats"),
-                    label: barLabel("/50"),
-                },
-            ],
-            axes: {
-                x: { type: "category", title: axisTitle("Clan"), label: axisLabel },
-                y: { type: "number", min: 0, max: 50, title: axisTitle("Members"), label: axisLabel },
-            },
-        };
-    });
+    const chartData = $derived(
+        mode === "townhalls"
+            ? Object.entries(thDistribution)
+                  .map(([th, count]) => ({ label: `TH${th}`, level: Number(th), value: count }))
+                  .sort((a, b) => a.level - b.level)
+            : clans.map((c) => ({ label: shorten(c.name), level: 0, value: c.members })).sort((a, b) => b.value - a.value),
+    );
+    const isRoster = $derived(mode === "roster");
+    // LayerChart haloes text in the (dark) surface color, which smears on the parchment card.
+    const axisText = "fill-[#3b2416] stroke-transparent font-coc text-xs";
 </script>
 
 <CocCard variant="dark" contentClass="p-4 md:p-6">
@@ -163,7 +85,36 @@
                 </div>
             </div>
         {:else}
-            <Chart options={chartOptions} class="size-full" />
+            <!-- Clan names need the room, so the roster reads horizontally. -->
+            <BarChart
+                data={chartData}
+                orientation={isRoster ? "horizontal" : "vertical"}
+                x={isRoster ? "value" : "label"}
+                y={isRoster ? "label" : "value"}
+                xDomain={isRoster ? [0, 50] : undefined}
+                padding={isRoster ? { top: 8, left: 96, right: 48, bottom: 24 } : { top: 28, left: 36, bottom: 24 }}
+                series={[{ key: "value", label: isRoster ? "Members" : "Players" }]}
+                labels={{
+                    placement: "outside",
+                    format: (v: number) => (isRoster ? `${v}/50` : `${v}`),
+                    class: "fill-[#2a1810] stroke-transparent font-coc text-sm font-bold",
+                }}
+                props={{
+                    xAxis: { tickLabelProps: { class: axisText } },
+                    yAxis: { tickLabelProps: { class: axisText } },
+                    tooltip: { item: { format: (v: number) => (isRoster ? `${v} of 50 seats` : `${v} players`) } },
+                }}
+                style="--color-surface-content: #5a3d2b"
+            >
+                {#snippet marks()}
+                    <!-- Light end of the gradient sits at the bar's tip in both orientations. -->
+                    <LinearGradient stops={isRoster ? [...activeMode.gradient].reverse() : activeMode.gradient} vertical={!isRoster}>
+                        {#snippet children({ gradient })}
+                            <Bars fill={gradient} radius={4} rounded="edge" />
+                        {/snippet}
+                    </LinearGradient>
+                {/snippet}
+            </BarChart>
         {/if}
     </div>
 </CocCard>

@@ -9,11 +9,12 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Grid from "$lib/components/ui/Grid.svelte";
-    import { svelteRenderer } from "$lib/components/ui/grid/SvelteCellRenderer";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import DataTable from "$lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "$lib/components/ui/table/features";
+    import { InfiniteRows } from "$lib/components/ui/table/infinite.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
@@ -27,8 +28,10 @@
         updateCocAccountExternal,
         updateCocAccountStats,
         updateCocAccountWarWeight,
+        type GetAdminCocAccounts200,
     } from "@repo/clashofclans-client";
-    import type { GridApi, IDatasource, IGetRowsParams } from "ag-grid-community";
+    import { renderComponent, renderSnippet, type RowSelectionState, type SortingState } from "@tanstack/svelte-table";
+    import { untrack } from "svelte";
     import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCheck from "~icons/tabler/check";
@@ -54,14 +57,20 @@
         failedClans: { tag: string; name: string | null }[];
     };
 
+    type Account = GetAdminCocAccounts200["data"]["accounts"][number] & { discordNickname?: string };
+
     let { data }: { data: { canDelete: boolean } } = $props();
 
-    let gridApi: GridApi | null = $state(null);
     let guildNicknames: Record<string, string> = {};
     let nicknamesLoading = $state(false);
     let searchText = $state("");
-    let total = $state(0);
-    let selectedIds = $state<number[]>([]);
+    let sorting = $state<SortingState>([{ id: "warWeight", desc: true }]);
+    let rowSelection = $state<RowSelectionState>({});
+    let selectedIds = $derived(
+        Object.keys(rowSelection)
+            .filter((id) => rowSelection[id])
+            .map(Number),
+    );
     let bulkProcessing = $state(false);
     let downloading = $state(false);
     let syncDialogOpen = $state(false);
@@ -130,8 +139,8 @@
             )) as { success: true; data: { account: { cocAccountTag: string } } } | { success: false; error: string | Record<string, unknown> };
             if (resp.success) {
                 toast.success(`Linked ${resp.data.account.cocAccountTag} to ${addSelectedUser.name}`);
-                // Refresh the loaded blocks in place so the new account appears.
-                gridApi?.refreshInfiniteCache();
+                // Refresh the loaded rows in place so the new account appears.
+                list.refresh();
             } else {
                 toast.error(typeof resp.error === "string" ? resp.error : "Failed to add account");
                 addOpen = true;
@@ -146,57 +155,43 @@
 
     // Account data is fetched lazily in the sidebar (one CoC API call on demand)
     // rather than enriching every row on load.
-    const gridContext = {
-        openAccountSidebar: (account: Record<string, unknown>) => {
-            selectedAccount = account;
-            accountSidebar?.open(String(account.id));
-        },
-    };
-
-    function createDatasource(): IDatasource {
-        return {
-            async getRows(params: IGetRowsParams) {
-                try {
-                    const offset = params.startRow || 0;
-                    const limit = (params.endRow || 0) - offset;
-                    const sort = params.sortModel?.[0];
-
-                    const resp = await getAdminCocAccounts(
-                        { limit, offset, search: searchText || undefined, sortBy: sort?.colId, sortDir: sort?.sort },
-                        { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-                    );
-
-                    if (!resp.success) {
-                        params.failCallback();
-                        return;
-                    }
-
-                    total = resp.data.total;
-                    params.successCallback(
-                        resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
-                        resp.data.total,
-                    );
-                } catch (error) {
-                    toast.error("Failed to load COC accounts", { description: error instanceof Error ? error.message : "An unknown error occurred" });
-                    params.failCallback();
-                }
-            },
-        };
+    function openAccountSidebar(account: Account) {
+        selectedAccount = account;
+        accountSidebar?.open(String(account.id));
     }
+
+    const list = new InfiniteRows<Account>(async (offset, limit) => {
+        const sort = sorting[0];
+        try {
+            const resp = await getAdminCocAccounts(
+                { limit, offset, search: searchText || undefined, sortBy: sort?.id, sortDir: sort ? (sort.desc ? "desc" : "asc") : undefined },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
+            );
+            if (!resp.success) throw new Error();
+            return {
+                rows: resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
+                total: resp.data.total,
+            };
+        } catch (error) {
+            toast.error("Failed to load COC accounts", { description: error instanceof Error ? error.message : "An unknown error occurred" });
+            return null;
+        }
+    });
 
     function handleSearchChange() {
-        gridApi?.setGridOption("datasource", createDatasource());
+        list.reset();
     }
 
-    // Nicknames are fetched separately from the row datasource so the grid isn't
+    // Nicknames are fetched separately from the row pages so the table isn't
     // blocked on the Discord guild-member walk. Rows already fetched are backfilled.
     async function loadNicknames() {
         nicknamesLoading = true;
         try {
             guildNicknames = await loadGuildNicknames();
-            gridApi?.forEachNode((node) => {
-                if (node.data?.discordUserId) node.data.discordNickname = guildNicknames[node.data.discordUserId];
-            });
+            list.update(
+                (a) => !!a.discordUserId,
+                (a) => ({ discordNickname: guildNicknames[a.discordUserId] }),
+            );
         } finally {
             nicknamesLoading = false;
         }
@@ -219,7 +214,7 @@
             syncResult = resp.data;
             syncResultOpen = true;
             sheetUrl = "";
-            gridApi?.setGridOption("datasource", createDatasource());
+            list.reset();
         } catch (error) {
             toast.error("Sync failed", {
                 id: toastId,
@@ -251,7 +246,7 @@
             warWeightResult = resp.data;
             pastedFwa = "";
             warWeightResultOpen = true;
-            gridApi?.setGridOption("datasource", createDatasource());
+            list.reset();
         } catch (error) {
             toast.error("War weight sync failed", {
                 id: toastId,
@@ -298,7 +293,7 @@
             if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Failed to apply weights");
             toast.success(`Updated ${resp.data.updated} war weight${resp.data.updated === 1 ? "" : "s"} from pasted data`, { id: toastId });
             pastedFwa = "";
-            gridApi?.setGridOption("datasource", createDatasource());
+            list.reset();
         } catch (error) {
             toast.error("Failed to apply pasted weights", {
                 id: toastId,
@@ -323,8 +318,7 @@
     }
 
     function clearSelection() {
-        gridApi?.deselectAll();
-        selectedIds = [];
+        rowSelection = {};
     }
 
     // The bulk delete endpoint caps each request at 200 ids, so split larger
@@ -352,13 +346,13 @@
             }
             toast.success(`${count} account${count === 1 ? "" : "s"} deleted`);
             clearSelection();
-            // Refresh the loaded blocks in place; replacing the datasource would
-            // purge the whole cache and reset scroll, making the table "reshuffle".
-            gridApi?.refreshInfiniteCache();
+            // Refresh the loaded rows in place; a reset would jump back to the top
+            // and make the table "reshuffle".
+            list.refresh();
         } catch (error) {
             toast.error("Failed to delete accounts", { description: error instanceof Error ? error.message : undefined });
             // A later batch may have failed after earlier ones succeeded; resync.
-            gridApi?.refreshInfiniteCache();
+            list.refresh();
         } finally {
             bulkProcessing = false;
         }
@@ -423,16 +417,160 @@
         }
     }
 
-    const formatNumber = (p: { value: unknown }) => (p.value != null ? Number(p.value).toLocaleString() : "");
+    const formatNumber = (value: unknown) => (value != null ? Number(value).toLocaleString() : "");
 
-    // Sheet-synced columns that are manually editable in the grid (see updateCocAccountStats).
-    const STAT_FIELDS = ["currentClan", "totalDonated", "totalReceived", "clanGames", "capitalGoldLooted", "capitalGoldContributed", "activityScore"];
+    // Sheet-synced columns that are manually editable in the table (see updateCocAccountStats).
+    // A later Google Sheet sync will overwrite these manual edits.
+    type StatField =
+        "currentClan" | "totalDonated" | "totalReceived" | "clanGames" | "capitalGoldLooted" | "capitalGoldContributed" | "activityScore";
 
+    async function saveWarWeight(account: Account, warWeight: number) {
+        if (!Number.isInteger(warWeight) || warWeight < 0) {
+            toast.error("War weight must be a non-negative whole number");
+            return;
+        }
+        const previous = account.warWeight;
+        const same = (a: Account) => a.id === account.id;
+        list.update(same, () => ({ warWeight }));
+        try {
+            const resp = await updateCocAccountWarWeight(
+                account.id,
+                { warWeight },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            list.update(same, () => ({ warWeight: resp.data.account.warWeight }));
+            toast.success(`War weight updated for ${account.cocAccountTag}`);
+        } catch (error) {
+            list.update(same, () => ({ warWeight: previous }));
+            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
+        }
+    }
+
+    async function saveExternal(account: Account, isExternal: boolean) {
+        const previous = account.isExternal;
+        const same = (a: Account) => a.id === account.id;
+        list.update(same, () => ({ isExternal }));
+        try {
+            const resp = await updateCocAccountExternal(
+                account.id,
+                { isExternal },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            list.update(same, () => ({ isExternal: resp.data.account.isExternal }));
+            toast.success(`${account.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
+        } catch (error) {
+            list.update(same, () => ({ isExternal: previous }));
+            toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
+        }
+    }
+
+    async function saveStat(account: Account, field: StatField, label: string, input: string | number) {
+        let value: string | number | null;
+        if (field === "currentClan") {
+            const text = String(input ?? "").trim();
+            value = text === "" ? null : text;
+        } else {
+            const n = Number(input);
+            if (!Number.isInteger(n) || n < 0) {
+                toast.error(`${label} must be a non-negative whole number`);
+                return;
+            }
+            value = n;
+        }
+        const previous = account[field];
+        const same = (a: Account) => a.id === account.id;
+        list.update(same, () => ({ [field]: value }));
+        try {
+            const resp = await updateCocAccountStats(
+                account.id,
+                { [field]: value },
+                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+            );
+            if (!resp.success) throw new Error();
+            list.update(same, () => ({ [field]: (resp.data.account as Record<string, unknown>)[field] }));
+            toast.success(`${label} updated for ${account.cocAccountTag}`);
+        } catch (error) {
+            list.update(same, () => ({ [field]: previous }));
+            toast.error(`Failed to update ${label.toLowerCase()}`, { description: error instanceof Error ? error.message : undefined });
+        }
+    }
+
+    function statColumn(field: Exclude<StatField, "currentClan">, header: string, size: number): TableColumn<Account> {
+        return {
+            accessorKey: field,
+            header,
+            size,
+            cell: ({ getValue }) => formatNumber(getValue()),
+            meta: { edit: { type: "number", commit: (a: Account, n: number) => saveStat(a, field, header, n) } },
+        };
+    }
+
+    const columns: TableColumn<Account>[] = [
+        {
+            accessorKey: "ownerName",
+            header: "User",
+            size: 220,
+            cell: ({ row }) => renderComponent(CocOwnerCell, { account: row.original }),
+        },
+        {
+            accessorKey: "discordNickname",
+            header: "Nickname",
+            size: 150,
+            enableSorting: false,
+            cell: ({ getValue }) => renderComponent(CwlNicknameCell, { value: getValue(), loading: nicknamesLoading }),
+        },
+        {
+            accessorKey: "cocAccountTag",
+            header: "Account",
+            size: 220,
+            cell: ({ row }) => renderComponent(CocAccountCell, { account: row.original, onOpen: () => openAccountSidebar(row.original) }),
+        },
+        {
+            accessorKey: "currentClan",
+            header: "Clan",
+            size: 160,
+            cell: ({ getValue }) => getValue() ?? "",
+            meta: { edit: { type: "text", commit: (a: Account, v: string) => saveStat(a, "currentClan", "Clan", v) } },
+        },
+        {
+            accessorKey: "warWeight",
+            header: "War Weight",
+            size: 130,
+            cell: ({ getValue }) => formatNumber(getValue()),
+            meta: { edit: { type: "number", commit: saveWarWeight } },
+        },
+        {
+            accessorKey: "isExternal",
+            header: "External",
+            size: 110,
+            cell: ({ row }) => renderSnippet(externalCell, row.original),
+        },
+        statColumn("totalDonated", "Total Donated", 140),
+        statColumn("totalReceived", "Total Received", 140),
+        statColumn("clanGames", "Clan Games", 130),
+        statColumn("capitalGoldLooted", "Capital Looted", 140),
+        statColumn("capitalGoldContributed", "Capital Contributed", 170),
+        statColumn("activityScore", "Activity Score", 140),
+    ];
+
+    // Sorting runs on the server, so a new sort reloads from the first page.
     $effect(() => {
-        nicknamesLoading; // track
-        gridApi?.refreshCells({ force: true, columns: ["discordNickname"] });
+        sorting; // track
+        untrack(() => list.reset());
     });
+    loadNicknames();
 </script>
+
+{#snippet externalCell(account: Account)}
+    <Input
+        type="checkbox"
+        checked={account.isExternal}
+        onchange={(e) => saveExternal(account, e.currentTarget.checked)}
+        aria-label="External account"
+    />
+{/snippet}
 
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
@@ -440,7 +578,7 @@
     <div class="flex flex-col gap-2 px-4 pt-4 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl font-bold">COC Accounts</h1>
-            <p class="text-sm text-stone-400">{total} account{total === 1 ? "" : "s"}</p>
+            <p class="text-sm text-stone-400">{list.total} account{list.total === 1 ? "" : "s"}</p>
         </div>
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
             <div class="flex items-center gap-2">
@@ -501,245 +639,17 @@
         </div>
     </div>
 
-    <div class="flex-1">
-        <Grid
-            gridOptions={{
-                context: gridContext,
-                rowHeight: 56,
-                rowModelType: "infinite",
-                cacheBlockSize: 50,
-                blockLoadDebounceMillis: 300,
-                rowSelection: { mode: "multiRow", checkboxes: true, enableClickSelection: false },
-                onGridReady: (params) => {
-                    gridApi = params.api;
-                    // Load rows immediately; nicknames fill in afterwards so the grid
-                    // isn't blocked on the Discord guild-member walk.
-                    gridApi.setGridOption("datasource", createDatasource());
-                    loadNicknames();
-                },
-                onSelectionChanged: (event) => {
-                    selectedIds = event.api.getSelectedRows().map((r) => r.id);
-                },
-                onCellValueChanged: async (event) => {
-                    if (event.oldValue === event.newValue) return;
-
-                    if (event.colDef.field === "warWeight") {
-                        const warWeight = Number(event.newValue);
-                        if (!Number.isInteger(warWeight) || warWeight < 0) {
-                            toast.error("War weight must be a non-negative whole number");
-                            event.data.warWeight = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                            return;
-                        }
-
-                        try {
-                            const resp = await updateCocAccountWarWeight(
-                                event.data.id,
-                                { warWeight },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data.warWeight = resp.data.account.warWeight;
-                                event.api.refreshCells({ rowNodes: [event.node], force: true });
-                                toast.success(`War weight updated for ${event.data.cocAccountTag}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
-                            event.data.warWeight = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                        }
-                        return;
-                    }
-
-                    if (event.colDef.field === "isExternal") {
-                        const isExternal = Boolean(event.newValue);
-                        try {
-                            const resp = await updateCocAccountExternal(
-                                event.data.id,
-                                { isExternal },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data.isExternal = resp.data.account.isExternal;
-                                event.api.refreshCells({ rowNodes: [event.node], force: true });
-                                toast.success(`${event.data.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
-                            event.data.isExternal = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                        }
-                        return;
-                    }
-
-                    // Sheet-synced stat columns are edited one cell at a time and patched individually.
-                    // A later Google Sheet sync will overwrite these manual edits.
-                    const field = event.colDef.field;
-                    if (field && STAT_FIELDS.includes(field)) {
-                        let value: string | number | null;
-                        if (field === "currentClan") {
-                            const text = String(event.newValue ?? "").trim();
-                            value = text === "" ? null : text;
-                        } else {
-                            const n = Number(event.newValue);
-                            if (!Number.isInteger(n) || n < 0) {
-                                toast.error(`${event.colDef.headerName} must be a non-negative whole number`);
-                                event.data[field] = event.oldValue;
-                                event.api.refreshCells({ rowNodes: [event.node], force: true });
-                                return;
-                            }
-                            value = n;
-                        }
-
-                        try {
-                            const resp = await updateCocAccountStats(
-                                event.data.id,
-                                { [field]: value },
-                                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                            );
-                            if (resp.success) {
-                                event.data[field] = (resp.data.account as Record<string, unknown>)[field];
-                                event.api.refreshCells({ rowNodes: [event.node], force: true });
-                                toast.success(`${event.colDef.headerName} updated for ${event.data.cocAccountTag}`);
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            toast.error(`Failed to update ${event.colDef.headerName?.toLowerCase()}`, {
-                                description: error instanceof Error ? error.message : undefined,
-                            });
-                            event.data[field] = event.oldValue;
-                            event.api.refreshCells({ rowNodes: [event.node], force: true });
-                        }
-                        return;
-                    }
-                },
-            }}
-            columnDefs={[
-                {
-                    headerName: "User",
-                    field: "ownerName",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CocOwnerCell),
-                },
-                {
-                    headerName: "Nickname",
-                    field: "discordNickname",
-                    sortable: false,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CwlNicknameCell),
-                    cellRendererParams: () => ({ loading: nicknamesLoading }),
-                },
-                {
-                    headerName: "Account",
-                    field: "cocAccountTag",
-                    sortable: true,
-                    filter: false,
-                    cellRenderer: svelteRenderer(CocAccountCell),
-                },
-                {
-                    headerName: "Clan",
-                    field: "currentClan",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    valueFormatter: (p) => p.value ?? "",
-                },
-                {
-                    headerName: "War Weight",
-                    field: "warWeight",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    sort: "desc",
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: (p) => (p.value != null ? Number(p.value).toLocaleString() : ""),
-                },
-                {
-                    headerName: "External",
-                    field: "isExternal",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellRenderer: "agCheckboxCellRenderer",
-                    cellEditor: "agCheckboxCellEditor",
-                    valueGetter: (p) => Boolean(p.data?.isExternal),
-                },
-                {
-                    headerName: "Total Donated",
-                    field: "totalDonated",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Total Received",
-                    field: "totalReceived",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Clan Games",
-                    field: "clanGames",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Capital Looted",
-                    field: "capitalGoldLooted",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Capital Contributed",
-                    field: "capitalGoldContributed",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-                {
-                    headerName: "Activity Score",
-                    field: "activityScore",
-                    sortable: true,
-                    filter: false,
-                    editable: true,
-                    cellEditor: "uiInputEditor",
-                    cellEditorParams: { type: "number" },
-                    valueParser: (p) => Number(p.newValue),
-                    valueFormatter: formatNumber,
-                },
-            ]}
+    <div class="min-h-0 flex-1">
+        <DataTable
+            data={list.rows}
+            {columns}
+            getRowId={(a) => String(a.id)}
+            loading={list.loading}
+            manualSorting
+            bind:sorting
+            selectable
+            bind:rowSelection
+            onEndReached={() => list.loadMore()}
         />
     </div>
 

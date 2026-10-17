@@ -19,6 +19,16 @@
     --animate-ring-empty: ring-empty 800ms var(--ease-glide) both;
 }
 
+/* LayerChart theme: charts and their portaled tooltips read these. */
+.lc-root-container,
+.lc-tooltip-root {
+    --color-primary: var(--color-blue-500);
+    --color-surface-100: var(--color-stone-900);
+    --color-surface-200: var(--color-stone-800);
+    --color-surface-300: var(--color-stone-800);
+    --color-surface-content: var(--color-stone-300);
+}
+
 @font-face {
     font-family: "COC";
     font-style: normal;
