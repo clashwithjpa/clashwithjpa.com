@@ -533,15 +533,6 @@ export {
     updateCocAccountWarWeightPathParamsSchema,
 } from "./updateCocAccountWarWeightSchema.ts";
 export {
-    updateCwlApplicationNotes200Schema,
-    updateCwlApplicationNotes401Schema,
-    updateCwlApplicationNotes404Schema,
-    updateCwlApplicationNotes500Schema,
-    updateCwlApplicationNotesMutationRequestSchema,
-    updateCwlApplicationNotesMutationResponseSchema,
-    updateCwlApplicationNotesPathParamsSchema,
-} from "./updateCwlApplicationNotesSchema.ts";
-export {
     updateCwlPingSettings200Schema,
     updateCwlPingSettings400Schema,
     updateCwlPingSettings401Schema,

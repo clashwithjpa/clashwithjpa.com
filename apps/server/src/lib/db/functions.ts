@@ -425,7 +425,6 @@ export async function getBonusData(seasonId?: number) {
             cocAccountClan: cwlApplicationTable.cocAccountClan,
             preferenceNum: cwlApplicationTable.preferenceNum,
             assignedTo: cwlApplicationTable.assignedTo,
-            notes: cwlApplicationTable.notes,
             isExternal: sql<boolean>`coalesce(${cocAccountTable.isExternal}, false)`,
             warWeight: sql<number>`coalesce(${cocAccountTable.warWeight}, 0)`,
             currentClan: cocAccountTable.currentClan,
@@ -540,16 +539,22 @@ export async function getCwlStats(seasonId?: number) {
         seasonId = settings?.currentCwlSeasonId ?? undefined;
     }
 
-    const byTag = new Map<string, { tag: string; name: string; attacks: number; stars: number; details: CwlAttackDetail[] }>();
-    const ensure = (tag: string, name: string) => {
+    // `rounds` holds the ended rounds a member was in the lineup for, so the page can
+    // tell missed hits apart from being benched.
+    const byTag = new Map<
+        string,
+        { tag: string; name: string; clanTag: string; attacks: number; stars: number; rounds: number[]; details: CwlAttackDetail[] }
+    >();
+    const ensure = (tag: string, name: string, clanTag: string) => {
         const key = tag.toUpperCase();
         let e = byTag.get(key);
         if (!e) {
-            e = { tag: key, name, attacks: 0, stars: 0, details: [] };
+            e = { tag: key, name, clanTag, attacks: 0, stars: 0, rounds: [], details: [] };
             byTag.set(key, e);
         }
         return e;
     };
+    const clanRecords = new Map<string, { tag: string; endedRounds: number[]; wins: number; losses: number; ties: number }>();
 
     // Only fetch clans that have at least one applicant assigned to them this season.
     const clanRows =
@@ -564,12 +569,14 @@ export async function getCwlStats(seasonId?: number) {
     await Promise.all(
         clans.map(async (tag) => {
             const clanTag = tag.toUpperCase();
+            const record = { tag: clanTag, endedRounds: [] as number[], wins: 0, losses: 0, ties: 0 };
             let group;
             try {
                 group = await cocClient.getCWLGroup(tag);
             } catch {
                 return; // clan not in CWL this season
             }
+            clanRecords.set(clanTag, record);
             await Promise.all(
                 group.rounds.map(async (round, roundIdx) => {
                     for (const warTag of round.warTags) {
@@ -586,8 +593,18 @@ export async function getCwlStats(seasonId?: number) {
                         const side = isClan ? war.clan : war.opponent;
                         const enemy = isClan ? war.opponent : war.clan;
                         const enemyByTag = new Map(enemy.members.map((m) => [m.tag.toUpperCase(), m]));
+                        const ended = war.state === "warEnded";
+                        if (ended) {
+                            record.endedRounds.push(roundIdx + 1);
+                            // CWL wars are decided on stars, then destruction.
+                            const diff = side.stars - enemy.stars || side.destructionPercentage - enemy.destructionPercentage;
+                            if (diff > 0) record.wins += 1;
+                            else if (diff < 0) record.losses += 1;
+                            else record.ties += 1;
+                        }
                         for (const m of side.members) {
-                            const entry = ensure(m.tag, m.name);
+                            const entry = ensure(m.tag, m.name, clanTag);
+                            if (ended) entry.rounds.push(roundIdx + 1);
                             for (const atk of m.attacks ?? []) {
                                 const def = enemyByTag.get(atk.defenderTag.toUpperCase());
                                 entry.attacks += 1;
@@ -610,17 +627,13 @@ export async function getCwlStats(seasonId?: number) {
         }),
     );
 
-    const stats = [...byTag.values()].map((e) => ({ ...e, details: e.details.sort((a, b) => a.round - b.round) }));
-    return { stats };
-}
-
-export async function updateCwlApplicationNotes(id: number, notes: string | null) {
-    const result = await db
-        .update(cwlApplicationTable)
-        .set({ notes })
-        .where(eq(cwlApplicationTable.id, id))
-        .returning({ id: cwlApplicationTable.id, notes: cwlApplicationTable.notes });
-    return result[0] ?? null;
+    const stats = [...byTag.values()].map((e) => ({
+        ...e,
+        rounds: e.rounds.sort((a, b) => a - b),
+        details: e.details.sort((a, b) => a.round - b.round),
+    }));
+    const records = [...clanRecords.values()].map((c) => ({ ...c, endedRounds: c.endedRounds.sort((a, b) => a - b) }));
+    return { stats, clans: records };
 }
 
 export async function assignCwlApplication(id: number, clanTag: string | null) {

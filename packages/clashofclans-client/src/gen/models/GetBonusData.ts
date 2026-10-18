@@ -48,6 +48,9 @@ export type GetBonusData200 = {
              * @type string
              */
             discordUsername: string;
+            /**
+             * @type string,null
+             */
             image: string | null;
             /**
              * @type string
@@ -57,13 +60,18 @@ export type GetBonusData200 = {
              * @type string
              */
             cocAccountTag: string;
+            /**
+             * @type string,null
+             */
             cocAccountClan: string | null;
             /**
              * @type number
              */
             preferenceNum: number;
+            /**
+             * @type string,null
+             */
             assignedTo: string | null;
-            notes: string | null;
             /**
              * @type boolean
              */
@@ -72,6 +80,9 @@ export type GetBonusData200 = {
              * @type number
              */
             warWeight: number;
+            /**
+             * @type string,null
+             */
             currentClan: string | null;
             /**
              * @type number
@@ -101,14 +112,26 @@ export type GetBonusData200 = {
              * @type number
              */
             activityScore: number;
+            /**
+             * @type string,null
+             */
             ownerName: string | null;
+            /**
+             * @type string,null
+             */
             ownerImage: string | null;
+            /**
+             * @type string,null
+             */
             ownerRole: string | null;
         }[];
         /**
          * @type number
          */
         total: number;
+        /**
+         * @type number,null
+         */
         seasonId: number | null;
     };
 };

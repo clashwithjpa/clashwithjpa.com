@@ -81,7 +81,6 @@ export { updateAdminSettings } from "./updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./updateCocAccountWarWeight.ts";
-export { updateCwlApplicationNotes } from "./updateCwlApplicationNotes.ts";
 export { updateCwlPingSettings } from "./updateCwlPingSettings.ts";
 export { updateJoinApplicationStatus } from "./updateJoinApplicationStatus.ts";
 export { verifyAdminClanDiscord } from "./verifyAdminClanDiscord.ts";

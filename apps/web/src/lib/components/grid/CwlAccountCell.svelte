@@ -3,14 +3,17 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import TablerCircleCheck from "~icons/tabler/circle-check";
     import TablerEye from "~icons/tabler/eye";
     import TablerWorld from "~icons/tabler/world";
 
     let {
         account,
+        eligible = false,
         onOpen,
     }: {
         account: { townHall?: number | null; cocAccountName: string; cocAccountTag: string; isExternal?: boolean };
+        eligible?: boolean;
         onOpen: () => void;
     } = $props();
 </script>
@@ -27,8 +30,15 @@
     </div>
     <!-- Kept beside the eye button so badges line up down the column instead of trailing each name. -->
     <div class="flex shrink-0 items-center gap-2">
-        {#if account.isExternal}
-            <Badge variant="red" content="External" icon={TablerWorld} />
+        {#if account.isExternal || eligible}
+            <div class="flex flex-col items-end gap-1">
+                {#if account.isExternal}
+                    <Badge variant="red" content="External" icon={TablerWorld} />
+                {/if}
+                {#if eligible}
+                    <Badge variant="green" content="Eligible" icon={TablerCircleCheck} />
+                {/if}
+            </div>
         {/if}
         <Button size="icon" variant="ghost" tooltip="View account details" tooltipPlacement="top" onclick={onOpen}>
             <TablerEye />

@@ -13,7 +13,7 @@ function getGetCwlStatsUrl() {
 }
 
 /**
- * @description Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.
+ * @description Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7), stars with a per-attack breakdown and the ended rounds they were in the lineup for, plus each clan's war record.
  * {@link /admin/cwl-stats}
  */
 export async function getCwlStats(params?: GetCwlStatsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {

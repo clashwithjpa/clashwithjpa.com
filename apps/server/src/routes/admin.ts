@@ -52,7 +52,6 @@ import {
     updateCocAccountExternal,
     updateCocAccountStats,
     updateCocAccountWarWeight,
-    updateCwlApplicationNotes,
     updateCwlClan,
     updateCwlPingSettings,
     updateSettings,
@@ -652,44 +651,6 @@ app.put(
     },
 );
 
-const updateCwlNotesBodySchema = z4.object({ notes: z4.string().max(500).nullable() });
-const updateCwlNotesData = z4.object({ application: z4.object({ id: z4.number(), notes: z4.string().nullable() }) });
-app.put(
-    "/cwl-applications/:id/notes",
-    hasAccessAuthMiddleware(isManager),
-    describeRoute({
-        operationId: "updateCwlApplicationNotes",
-        role: "Manager",
-        description: "Updates the free-text notes/remarks on a CWL application.",
-        tags: ["admin"],
-        responses: {
-            200: {
-                description: "Updated application.",
-                content: { "application/json": { schema: resolver(SuccessResponseSchema(updateCwlNotesData)) } },
-            },
-            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-        },
-    }),
-    zValidator("param", assignCwlApplicationPathSchema),
-    zValidator("json", updateCwlNotesBodySchema),
-    async (c) => {
-        try {
-            const { id } = c.req.valid("param");
-            const { notes } = c.req.valid("json");
-            const trimmed = notes?.trim() ? notes.trim() : null;
-            const application = await updateCwlApplicationNotes(id, trimmed);
-            if (!application) return c.json({ success: false, error: "Application not found" }, 404);
-            logAction(c, { action: "cwl_application.update_notes", targetType: "cwl_application", targetId: id, metadata: {} });
-            return c.json({ success: true, data: { application } });
-        } catch (error) {
-            Sentry.captureException(error);
-            return c.json({ success: false, error: "Failed to update notes" }, 500);
-        }
-    },
-);
-
 const bulkAssignCwlBodySchema = z4.object({
     ids: z4.array(z4.number().int().min(1)).min(1).max(10000),
     clanTag: z4.string().nullable(),
@@ -791,7 +752,6 @@ const bonusRowSchema = z4.object({
     cocAccountClan: z4.string().nullable(),
     preferenceNum: z4.number(),
     assignedTo: z4.string().nullable(),
-    notes: z4.string().nullable(),
     isExternal: z4.boolean(),
     warWeight: z4.number(),
     currentClan: z4.string().nullable(),
@@ -1085,9 +1045,20 @@ const getCwlStatsResponse = z4.object({
         z4.object({
             tag: z4.string(),
             name: z4.string(),
+            clanTag: z4.string(),
             attacks: z4.number(),
             stars: z4.number(),
+            rounds: z4.array(z4.number()),
             details: z4.array(cwlAttackDetailSchema),
+        }),
+    ),
+    clans: z4.array(
+        z4.object({
+            tag: z4.string(),
+            endedRounds: z4.array(z4.number()),
+            wins: z4.number(),
+            losses: z4.number(),
+            ties: z4.number(),
         }),
     ),
 });
@@ -1098,7 +1069,7 @@ app.get(
         operationId: "getCwlStats",
         role: "Manager",
         description:
-            "Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7) and stars with a per-attack breakdown.",
+            "Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7), stars with a per-attack breakdown and the ended rounds they were in the lineup for, plus each clan's war record.",
         tags: ["admin"],
         responses: {
             200: { description: "CWL stats.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlStatsResponse)) } } },

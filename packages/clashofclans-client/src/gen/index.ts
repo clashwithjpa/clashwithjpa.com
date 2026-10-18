@@ -81,7 +81,6 @@ export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSe
 export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
 export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
-export type { UpdateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export type { UpdateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
 export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
 export type { VerifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
@@ -739,16 +738,6 @@ export type {
     UpdateCocAccountWarWeightPathParams,
 } from "./models/UpdateCocAccountWarWeight.ts";
 export type {
-    UpdateCwlApplicationNotes200,
-    UpdateCwlApplicationNotes401,
-    UpdateCwlApplicationNotes404,
-    UpdateCwlApplicationNotes500,
-    UpdateCwlApplicationNotesMutation,
-    UpdateCwlApplicationNotesMutationRequest,
-    UpdateCwlApplicationNotesMutationResponse,
-    UpdateCwlApplicationNotesPathParams,
-} from "./models/UpdateCwlApplicationNotes.ts";
-export type {
     UpdateCwlPingSettings200,
     UpdateCwlPingSettings400,
     UpdateCwlPingSettings401,
@@ -862,7 +851,6 @@ export { updateAdminSettings } from "./clients/updateAdminSettings.ts";
 export { updateCocAccountExternal } from "./clients/updateCocAccountExternal.ts";
 export { updateCocAccountStats } from "./clients/updateCocAccountStats.ts";
 export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.ts";
-export { updateCwlApplicationNotes } from "./clients/updateCwlApplicationNotes.ts";
 export { updateCwlPingSettings } from "./clients/updateCwlPingSettings.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { verifyAdminClanDiscord } from "./clients/verifyAdminClanDiscord.ts";
@@ -1078,8 +1066,6 @@ export { createUpdateCocAccountStats } from "./hooks/createUpdateCocAccountStats
 export { updateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
 export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
 export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
-export { createUpdateCwlApplicationNotes } from "./hooks/createUpdateCwlApplicationNotes.ts";
-export { updateCwlApplicationNotesMutationKey } from "./hooks/createUpdateCwlApplicationNotes.ts";
 export { createUpdateCwlPingSettings } from "./hooks/createUpdateCwlPingSettings.ts";
 export { updateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
 export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
@@ -1673,15 +1659,6 @@ export {
     updateCocAccountWarWeightMutationResponseSchema,
     updateCocAccountWarWeightPathParamsSchema,
 } from "./zod/updateCocAccountWarWeightSchema.ts";
-export {
-    updateCwlApplicationNotes200Schema,
-    updateCwlApplicationNotes401Schema,
-    updateCwlApplicationNotes404Schema,
-    updateCwlApplicationNotes500Schema,
-    updateCwlApplicationNotesMutationRequestSchema,
-    updateCwlApplicationNotesMutationResponseSchema,
-    updateCwlApplicationNotesPathParamsSchema,
-} from "./zod/updateCwlApplicationNotesSchema.ts";
 export {
     updateCwlPingSettings200Schema,
     updateCwlPingSettings400Schema,

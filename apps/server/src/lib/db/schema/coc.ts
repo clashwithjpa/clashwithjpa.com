@@ -143,7 +143,6 @@ export const cwlApplicationTable = pgTable(
             .notNull()
             .references(() => cwlSeasonTable.id, { onDelete: "cascade" }),
         preferenceNum: integer("preference_num").notNull(),
-        notes: text("notes"),
         appliedAt: timestamp("applied_at").notNull().defaultNow(),
         assignedTo: text("assigned_to").references(() => cwlClanInfoTable.cocClanTag, {
             onDelete: "cascade",

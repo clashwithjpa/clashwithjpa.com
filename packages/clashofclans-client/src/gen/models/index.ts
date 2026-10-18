@@ -646,16 +646,6 @@ export type {
     UpdateCocAccountWarWeightPathParams,
 } from "./UpdateCocAccountWarWeight.ts";
 export type {
-    UpdateCwlApplicationNotes200,
-    UpdateCwlApplicationNotes401,
-    UpdateCwlApplicationNotes404,
-    UpdateCwlApplicationNotes500,
-    UpdateCwlApplicationNotesMutation,
-    UpdateCwlApplicationNotesMutationRequest,
-    UpdateCwlApplicationNotesMutationResponse,
-    UpdateCwlApplicationNotesPathParams,
-} from "./UpdateCwlApplicationNotes.ts";
-export type {
     UpdateCwlPingSettings200,
     UpdateCwlPingSettings400,
     UpdateCwlPingSettings401,

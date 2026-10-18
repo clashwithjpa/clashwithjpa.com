@@ -13,10 +13,18 @@
         defenderPosition: number;
     };
 
-    let { stars = null, attacks = 0, details = [] }: { stars?: number | null; attacks?: number; details?: Detail[] } = $props();
+    let {
+        stars = null,
+        attacks = 0,
+        details = [],
+        loading = false,
+        stealRounds = [],
+    }: { stars?: number | null; attacks?: number; details?: Detail[]; loading?: boolean; stealRounds?: number[] } = $props();
 </script>
 
-{#if stars === null}
+{#if stars === null && loading}
+    <span class="block h-3.5 w-10 animate-pulse rounded bg-stone-700/60"></span>
+{:else if stars === null}
     <span class="px-2 py-1 text-stone-600">—</span>
 {:else if details.length === 0}
     <!-- Same box as the popup trigger below so every row lines up. -->
@@ -44,6 +52,10 @@
                             R{d.round} · #{d.position}
                             <TablerArrowRight class="size-3 shrink-0 text-stone-400" />
                             #{d.defenderPosition}
+                            {#if stealRounds.includes(d.round)}
+                                <span class="ml-1 rounded border border-orange-700/50 bg-orange-900 px-1 text-[10px] text-orange-200">star steal</span
+                                >
+                            {/if}
                         </span>
                         <span class="truncate text-stone-400">{d.defenderName} · TH{d.defenderTh} · {d.destruction}%</span>
                     </div>

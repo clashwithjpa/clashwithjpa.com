@@ -37,6 +37,10 @@ export type GetCwlStats200 = {
              */
             name: string;
             /**
+             * @type string
+             */
+            clanTag: string;
+            /**
              * @type number
              */
             attacks: number;
@@ -44,6 +48,10 @@ export type GetCwlStats200 = {
              * @type number
              */
             stars: number;
+            /**
+             * @type array
+             */
+            rounds: number[];
             /**
              * @type array
              */
@@ -77,6 +85,31 @@ export type GetCwlStats200 = {
                  */
                 defenderPosition: number;
             }[];
+        }[];
+        /**
+         * @type array
+         */
+        clans: {
+            /**
+             * @type string
+             */
+            tag: string;
+            /**
+             * @type array
+             */
+            endedRounds: number[];
+            /**
+             * @type number
+             */
+            wins: number;
+            /**
+             * @type number
+             */
+            losses: number;
+            /**
+             * @type number
+             */
+            ties: number;
         }[];
     };
 };

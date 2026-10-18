@@ -5,9 +5,12 @@
     import BonusSeasonsCell from "$lib/components/grid/BonusSeasonsCell.svelte";
     import ClanCell from "$lib/components/grid/ClanCell.svelte";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
+    import CwlAttacksCell from "$lib/components/grid/CwlAttacksCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
+    import CwlFlagsCell from "$lib/components/grid/CwlFlagsCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
     import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
+    import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
@@ -17,7 +20,6 @@
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { loadGuildNicknames } from "$lib/discordNicknames";
-    import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
     import { formatRelativeTime } from "$lib/utils";
     import {
@@ -30,24 +32,34 @@
         getJPACwlClans,
         setUserSeasonBonus,
         updateCocAccountStats,
-        updateCocAccountWarWeight,
-        updateCwlApplicationNotes,
         type GetBonusData200,
         type GetCwlSeasons200,
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
     import { renderComponent, type SortingState } from "@tanstack/svelte-table";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import TablerCircleCheck from "~icons/tabler/circle-check";
+    import TablerCircleX from "~icons/tabler/circle-x";
     import TablerDownload from "~icons/tabler/download";
-    import TablerSwords from "~icons/tabler/swords";
+    import TablerShield from "~icons/tabler/shield";
 
     type BonusRow = GetBonusData200["data"]["rows"][number] & { discordNickname?: string };
     type Season = GetCwlSeasons200["data"]["seasons"][number];
     type CwlStat = GetCwlStats200["data"]["stats"][number];
+    type CwlClanRecord = GetCwlStats200["data"]["clans"][number];
     // A bonus is per Discord user per season; each row carries the set of season
     // ids its owner has been awarded (shared across that user's accounts). CWL
-    // attacks/stars are live-fetched on demand.
-    type Row = BonusRow & { bonusSeasonIds: number[]; cwlAttacks?: number; cwlStars?: number; cwlDetails?: CwlStat["details"] };
+    // attacks/stars are live-fetched when the page loads.
+    type Row = BonusRow & {
+        bonusSeasonIds: number[];
+        cwlAttacks?: number;
+        cwlStars?: number;
+        cwlDetails?: CwlStat["details"];
+        cwlStealRounds?: number[];
+        cwlMissed?: number;
+        cwlBenched?: number;
+        cwlZeroStars?: number;
+    };
 
     let rows = $state<Row[]>([]);
     let seasons = $state<Season[]>([]);
@@ -70,6 +82,127 @@
     let activeFilters = $derived(dataTable?.getActiveFilterCount() ?? 0);
     let sorting = $state<SortingState>([{ id: "totalDonated", desc: true }]);
 
+    // Mirrors the old bonus sheet: full attacks on the member's main (PN1) account.
+    const isEligible = (r: Row) => (r.cwlAttacks ?? 0) >= 7 && r.preferenceNum === 1;
+
+    // Flags mirror the old bonus sheet. B2B: a bonus in 3+ of the 6 seasons before this one.
+    const B2B_WINDOW = 6;
+    const B2B_MIN = 3;
+    let b2bSeasonIds = $derived.by(() => {
+        const i = seasons.findIndex((s) => s.id === currentSeasonId);
+        return new Set(seasons.slice(i + 1, i + 1 + B2B_WINDOW).map((s) => s.id));
+    });
+    function b2bCount(r: Row) {
+        const n = r.bonusSeasonIds.filter((id) => b2bSeasonIds.has(id)).length;
+        return n >= B2B_MIN ? n : 0;
+    }
+
+    // Star steal: a hit on a base 3+ map places lower once the attacker already has 8★ this CWL.
+    function starStealRounds(details: CwlStat["details"]) {
+        let stars = 0;
+        const rounds: number[] = [];
+        for (const d of [...details].sort((a, b) => a.round - b.round)) {
+            if (stars >= 8 && d.defenderPosition - d.position >= 3) rounds.push(d.round);
+            stars += d.stars;
+        }
+        return rounds;
+    }
+
+    // Top donor: among a clan's eligible players, the top donors up to its bonus
+    // count (6 + war wins). Like the old sheet, it's a hint and not a pick.
+    const BONUS_BASE = 6;
+    let cwlRecords = $state<Map<string, CwlClanRecord> | null>(null);
+    const bonusCount = (clanTag: string) => BONUS_BASE + (cwlRecords?.get(normalizeTag(clanTag))?.wins ?? 0);
+    let topDonorIds = $derived.by(() => {
+        const ids = new Set<number>();
+        if (!cwlRecords) return ids;
+        const byClan = new Map<string, Row[]>();
+        for (const r of rows) {
+            if (!r.assignedTo || !isEligible(r)) continue;
+            byClan.set(r.assignedTo, [...(byClan.get(r.assignedTo) ?? []), r]);
+        }
+        for (const [tag, list] of byClan) {
+            list.sort((a, b) => b.totalDonated - a.totalDonated)
+                .slice(0, bonusCount(tag))
+                .forEach((r) => ids.add(r.id));
+        }
+        return ids;
+    });
+
+    // Clan and eligibility filters narrow together; each side's counts follow the other's filter.
+    let clanFilter = $state("");
+    let eligibleFilter = $state<boolean | null>(null);
+    const matchesClan = (r: Row) => !clanFilter || r.assignedTo === clanFilter;
+    const matchesEligible = (r: Row) => eligibleFilter === null || isEligible(r) === eligibleFilter;
+    let filteredRows = $derived(rows.filter((r) => matchesClan(r) && matchesEligible(r)));
+    let clanBadges = $derived.by(() => {
+        const counts = new Map<string, number>();
+        for (const r of rows) {
+            if (!r.assignedTo) continue;
+            counts.set(r.assignedTo, (counts.get(r.assignedTo) ?? 0) + (matchesEligible(r) ? 1 : 0));
+        }
+        return [...counts.entries()]
+            .map(([tag, count]) => ({ tag, name: cwlClanNameByTag[normalizeTag(tag)] ?? tag, count }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    });
+    let eligibleCounts = $derived.by(() => {
+        const inClan = rows.filter(matchesClan);
+        const eligible = inClan.filter(isEligible).length;
+        return { eligible, notEligible: inClan.length - eligible };
+    });
+
+    let scrollEl = $state<HTMLDivElement | null>(null);
+
+    // Suppress the click that fires at the end of a drag-scroll so badges don't toggle.
+    $effect(() => {
+        const el = scrollEl;
+        if (!el) return;
+        function suppressClick(e: MouseEvent) {
+            if (hasDragged) {
+                e.stopPropagation();
+                e.preventDefault();
+                hasDragged = false;
+            }
+        }
+        el.addEventListener("click", suppressClick, { capture: true });
+        return () => el.removeEventListener("click", suppressClick, { capture: true });
+    });
+
+    let isDragging = $state(false);
+    let hasDragged = false;
+    let dragStartX = 0;
+    let dragScrollLeft = 0;
+    let dragCursorStyle: HTMLStyleElement | null = null;
+
+    function onDragStart(e: MouseEvent) {
+        if (!scrollEl) return;
+        isDragging = true;
+        hasDragged = false;
+        dragStartX = e.pageX - scrollEl.offsetLeft;
+        dragScrollLeft = scrollEl.scrollLeft;
+        dragCursorStyle = document.createElement("style");
+        dragCursorStyle.textContent = "* { cursor: grabbing !important; }";
+        document.head.appendChild(dragCursorStyle);
+        document.addEventListener("mousemove", onDragMove);
+        document.addEventListener("mouseup", onDragEnd);
+    }
+
+    function onDragMove(e: MouseEvent) {
+        if (!isDragging || !scrollEl) return;
+        e.preventDefault();
+        const dx = e.pageX - scrollEl.offsetLeft - dragStartX;
+        if (Math.abs(dx) > 4) hasDragged = true;
+        scrollEl.scrollLeft = dragScrollLeft - dx;
+    }
+
+    function onDragEnd() {
+        isDragging = false;
+        dragCursorStyle?.remove();
+        dragCursorStyle = null;
+        document.removeEventListener("mousemove", onDragMove);
+        document.removeEventListener("mouseup", onDragEnd);
+    }
+
     // Tag -> name lookups for the clan cells. The "Clan" column holds the JPA clan
     // the account applied with; the "Assigned clan" column holds a CWL clan.
     let clanNameByTag = $state<Record<string, string>>({});
@@ -88,7 +221,7 @@
 
     // Stat columns edited inline; mirror the COC accounts admin page (a later
     // Google Sheet sync will overwrite these manual edits).
-    type StatField = "totalDonated" | "totalReceived" | "clanGames" | "capitalGoldLooted" | "capitalGoldContributed" | "activityScore";
+    type StatField = "totalDonated" | "totalReceived";
 
     function clanLabel(clanTag: string | null | undefined): string {
         if (!clanTag) return "Unassigned";
@@ -110,17 +243,17 @@
             clanNameByTag[normalizeTag(r.cocAccountClan)],
             r.cocAccountClan,
             r.preferenceNum,
-            r.warWeight,
             clanLabel(r.assignedTo),
             r.totalDonated,
             r.totalReceived,
-            r.clanGames,
-            r.capitalGoldLooted,
-            r.capitalGoldContributed,
-            r.activityScore,
             r.cwlAttacks,
             r.cwlStars,
-            r.notes,
+            b2bCount(r) ? "b2b" : null,
+            r.cwlStealRounds?.length ? "star steal" : null,
+            r.cwlMissed ? "missed" : null,
+            r.cwlBenched ? "benched" : null,
+            r.cwlZeroStars ? "0★ zero star" : null,
+            topDonorIds.has(r.id) ? "top donor" : null,
         ]
             .filter((v) => v != null)
             .join(" ");
@@ -188,6 +321,7 @@
             currentSeasonId = bd.data.seasonId;
             selectedSeasonValue = currentSeasonId != null ? String(currentSeasonId) : "";
             restoreCwlStats();
+            if (cwlFetchedAt == null || Date.now() - cwlFetchedAt > CWL_STALE_MS) fetchCwlStats();
         } catch (error) {
             toast.error("Failed to load bonus data", { description: error instanceof Error ? error.message : undefined });
         } finally {
@@ -212,8 +346,10 @@
 
     // Fetched CWL stats are slow to get, so they're kept per season for the rest of
     // the tab's session and come back after navigating away or reloading.
-    const CWL_CACHE_KEY = "jpa:bonus-cwl-stats";
-    type CwlCache = Record<string, { fetchedAt: number; stats: CwlStat[] }>;
+    const CWL_CACHE_KEY = "jpa:bonus-cwl-stats:v2";
+    // Live fetches are slow and hit the CoC API, so a recent fetch is reused instead of refetched on every visit.
+    const CWL_STALE_MS = 10 * 60 * 1000;
+    type CwlCache = Record<string, { fetchedAt: number; stats: CwlStat[]; clans: CwlClanRecord[] }>;
 
     function readCwlCache(): CwlCache {
         try {
@@ -223,46 +359,67 @@
         }
     }
 
-    function applyCwlStats(stats: CwlStat[]) {
+    function applyCwlStats(stats: CwlStat[], clans: CwlClanRecord[]) {
         const byTag = new Map(stats.map((s) => [s.tag.toUpperCase(), s]));
+        const records = new Map(clans.map((c) => [normalizeTag(c.tag), c]));
+        cwlRecords = records;
         rows = rows.map((r) => {
             const s = byTag.get(normalizeTag(r.cocAccountTag));
-            return { ...r, cwlAttacks: s?.attacks ?? 0, cwlStars: s?.stars ?? 0, cwlDetails: s?.details ?? [] };
+            const details = s?.details ?? [];
+            const lineup = s?.rounds ?? [];
+            const attacked = new Set(details.map((d) => d.round));
+            // Members who never made a lineup count against the clan they were assigned to.
+            const record = records.get(normalizeTag(s?.clanTag ?? r.assignedTo));
+            return {
+                ...r,
+                cwlAttacks: s?.attacks ?? 0,
+                cwlStars: s?.stars ?? 0,
+                cwlDetails: details,
+                cwlStealRounds: starStealRounds(details),
+                cwlMissed: lineup.filter((round) => !attacked.has(round)).length,
+                cwlBenched: record ? Math.max(0, record.endedRounds.length - lineup.length) : 0,
+                cwlZeroStars: details.filter((d) => d.stars === 0).length,
+            };
         });
     }
 
     function restoreCwlStats() {
         const cached = readCwlCache()[String(currentSeasonId)];
         cwlFetchedAt = cached?.fetchedAt ?? null;
-        if (cached) applyCwlStats(cached.stats);
+        if (cached) applyCwlStats(cached.stats, cached.clans);
+        else cwlRecords = null;
     }
 
-    const cwlJobKey = () => `bonus-cwl:${currentSeasonId}`;
-    let fetchingCwl = $derived(jobs.running(cwlJobKey()));
-    jobs.onResult(cwlJobKey, restoreCwlStats);
+    let fetchingCwl = $state(false);
+    let cwlLoadId = 0;
 
     // Live-fetches CWL attacks/stars for the roster's season (assigned clans only).
-    // The result lands in the session cache, and the rows pick it up from there.
-    function fetchCwlStats() {
+    // The cache is written even if the page was left or the season changed, so a
+    // later visit picks it up; the rows only take it if they're still that season's.
+    async function fetchCwlStats() {
+        const id = ++cwlLoadId;
         const seasonId = currentSeasonId;
-        jobs.start(cwlJobKey(), "Fetching CWL stats", async () => {
+        fetchingCwl = true;
+        try {
+            const resp = await getCwlStats({ seasonId: seasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (!resp.success) throw new Error();
+            const fetchedAt = Date.now();
             try {
-                const resp = await getCwlStats({ seasonId: seasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (!resp.success) throw new Error();
-                try {
-                    sessionStorage.setItem(
-                        CWL_CACHE_KEY,
-                        JSON.stringify({ ...readCwlCache(), [String(seasonId)]: { fetchedAt: Date.now(), stats: resp.data.stats } }),
-                    );
-                } catch {
-                    // Storage full or blocked, so keep them on the rows instead.
-                    applyCwlStats(resp.data.stats);
-                }
-                toast.success("CWL stats fetched");
-            } catch (error) {
-                toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
+                sessionStorage.setItem(
+                    CWL_CACHE_KEY,
+                    JSON.stringify({ ...readCwlCache(), [String(seasonId)]: { fetchedAt, stats: resp.data.stats, clans: resp.data.clans } }),
+                );
+            } catch {
+                // Storage full or blocked; the rows below still get the stats.
             }
-        });
+            if (id !== cwlLoadId) return;
+            cwlFetchedAt = fetchedAt;
+            applyCwlStats(resp.data.stats, resp.data.clans);
+        } catch (error) {
+            if (id === cwlLoadId) toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
+        } finally {
+            if (id === cwlLoadId) fetchingCwl = false;
+        }
     }
 
     async function assign(row: Row, clanTag: string) {
@@ -289,58 +446,6 @@
                 () => ({ assignedTo: previous }),
             );
             toast.error("Failed to update bonus clan", { description: error instanceof Error ? error.message : undefined });
-        }
-    }
-
-    async function saveNotes(row: Row, value: string) {
-        const notes = value.trim() ? value : null;
-        const previous = row.notes;
-        patchRows(
-            (r) => r.id === row.id,
-            () => ({ notes }),
-        );
-        try {
-            const resp = await updateCwlApplicationNotes(
-                row.id,
-                { notes },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            patchRows(
-                (r) => r.id === row.id,
-                () => ({ notes: resp.data.application.notes }),
-            );
-            toast.success("Notes updated");
-        } catch (error) {
-            patchRows(
-                (r) => r.id === row.id,
-                () => ({ notes: previous }),
-            );
-            toast.error("Failed to update notes", { description: error instanceof Error ? error.message : undefined });
-        }
-    }
-
-    // War weight and stats live on the CoC account, so every row for that account changes.
-    async function saveWarWeight(row: Row, warWeight: number) {
-        if (!Number.isInteger(warWeight) || warWeight < 0) {
-            toast.error("War weight must be a non-negative whole number");
-            return;
-        }
-        const previous = row.warWeight;
-        const sameAccount = (r: Row) => r.cocAccountId === row.cocAccountId;
-        patchRows(sameAccount, () => ({ warWeight }));
-        try {
-            const resp = await updateCocAccountWarWeight(
-                row.cocAccountId,
-                { warWeight },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            patchRows(sameAccount, () => ({ warWeight: resp.data.account.warWeight }));
-            toast.success(`War weight updated for ${row.cocAccountName}`);
-        } catch (error) {
-            patchRows(sameAccount, () => ({ warWeight: previous }));
-            toast.error("Failed to update war weight", { description: error instanceof Error ? error.message : undefined });
         }
     }
 
@@ -381,16 +486,10 @@
         { header: "Tag", field: "cocAccountTag" },
         { header: "Clan", field: "cocAccountClan" },
         { header: "Preference", field: "preferenceNum" },
-        { header: "War Weight", field: "warWeight" },
         { header: "Assigned Clan", field: "assignedTo" },
         { header: "Town Hall", field: "townHall" },
         { header: "Total Donated", field: "totalDonated" },
         { header: "Total Received", field: "totalReceived" },
-        { header: "Clan Games", field: "clanGames" },
-        { header: "Capital Gold Looted", field: "capitalGoldLooted" },
-        { header: "Capital Gold Contributed", field: "capitalGoldContributed" },
-        { header: "Activity Score", field: "activityScore" },
-        { header: "Notes", field: "notes" },
     ];
 
     function downloadCsv() {
@@ -451,6 +550,7 @@
     }
 
     // Season badge columns are sized to fit every badge, so none get clipped.
+    const PAST_SEASON_LIMIT = 6;
     const seasonsWidth = (list: Season[]) => Math.max(120, 24 + list.reduce((w, s) => w + 46 + s.name.length * 7.5, 0));
 
     function statColumn(field: StatField, header: string, size: number): TableColumn<Row> {
@@ -481,7 +581,12 @@
             accessorKey: "cocAccountName",
             header: "COC Account",
             size: 260,
-            cell: ({ row }) => renderComponent(CwlAccountCell, { account: row.original, onOpen: () => openAccountSidebar(row.original) }),
+            cell: ({ row }) =>
+                renderComponent(CwlAccountCell, {
+                    account: row.original,
+                    eligible: isEligible(row.original),
+                    onOpen: () => openAccountSidebar(row.original),
+                }),
         },
         {
             accessorKey: "cocAccountClan",
@@ -500,13 +605,6 @@
         },
         { accessorKey: "preferenceNum", header: "Pref.", size: 90, meta: { filter: "number" } },
         {
-            accessorKey: "warWeight",
-            header: "War Weight",
-            size: 130,
-            cell: ({ getValue }) => formatNumber(getValue()),
-            meta: { filter: "number", edit: { type: "number", commit: saveWarWeight } },
-        },
-        {
             id: "assignedTo",
             accessorFn: (r) => r.assignedTo ?? "",
             header: "Assigned Clan",
@@ -517,16 +615,12 @@
         },
         statColumn("totalDonated", "Total Donated", 140),
         statColumn("totalReceived", "Total Received", 140),
-        statColumn("clanGames", "Clan Games", 130),
-        statColumn("capitalGoldLooted", "Capital Looted", 140),
-        statColumn("capitalGoldContributed", "Capital Contributed", 170),
-        statColumn("activityScore", "Activity Score", 140),
         {
             accessorKey: "cwlAttacks",
             header: "CWL Attacks",
             size: 130,
             sortUndefined: "last",
-            cell: ({ getValue }) => (getValue() == null ? "" : `${getValue()}/7`),
+            cell: ({ row }) => renderComponent(CwlAttacksCell, { attacks: row.original.cwlAttacks, loading: fetchingCwl }),
             meta: { filter: "number" },
         },
         {
@@ -537,8 +631,26 @@
             cell: ({ row }) =>
                 renderComponent(CwlStarsCell, {
                     stars: row.original.cwlStars ?? null,
+                    loading: fetchingCwl,
                     attacks: row.original.cwlAttacks,
                     details: row.original.cwlDetails,
+                    stealRounds: row.original.cwlStealRounds,
+                }),
+        },
+        {
+            id: "flags",
+            header: "Flags",
+            size: 280,
+            enableSorting: false,
+            cell: ({ row }) =>
+                renderComponent(CwlFlagsCell, {
+                    topDonorOf: topDonorIds.has(row.original.id) && row.original.assignedTo ? bonusCount(row.original.assignedTo) : 0,
+                    b2b: b2bCount(row.original),
+                    missed: row.original.cwlMissed ?? 0,
+                    zeroStars: row.original.cwlZeroStars ?? 0,
+                    starSteals: row.original.cwlStealRounds?.length ?? 0,
+                    benched: row.original.cwlBenched ?? 0,
+                    loading: fetchingCwl && row.original.cwlStealRounds == null,
                 }),
         },
         {
@@ -556,22 +668,15 @@
         {
             id: "pastBonuses",
             header: "Past Bonuses",
-            size: seasonsWidth(pastSeasons),
+            size: seasonsWidth(pastSeasons.slice(0, PAST_SEASON_LIMIT)) + (pastSeasons.length > PAST_SEASON_LIMIT ? 90 : 0),
             enableSorting: false,
             cell: ({ row }) =>
                 renderComponent(BonusSeasonsCell, {
                     seasons: pastSeasons,
+                    limit: PAST_SEASON_LIMIT,
                     awarded: row.original.bonusSeasonIds,
                     onToggle: (seasonId: number, selected: boolean) => toggleBonus(row.original, seasonId, selected),
                 }),
-        },
-        {
-            accessorKey: "notes",
-            header: "Notes",
-            size: 220,
-            enableSorting: false,
-            cell: ({ getValue }) => getValue() ?? "",
-            meta: { edit: { type: "text", commit: saveNotes } },
         },
     ]);
 
@@ -583,81 +688,122 @@
 <Seo title="CWL Bonus" description="Assign CWL bonuses and review linked account stats." />
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
-    <PageHeader title="CWL Bonus" class="px-4 pt-4">
-        {#snippet subtitle()}
-            {#if loading}
-                Loading…
-            {:else}
-                {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
-                {/if}
-                {#if searchText.trim() || activeFilters}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
-                {#if activeFilters}
+    <div class="flex flex-col gap-4 px-4 pt-4">
+        <PageHeader title="CWL Bonus">
+            {#snippet subtitle()}
+                {#if loading}
+                    Loading…
+                {:else}
+                    {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
+                    {/if}
+                    {#if searchText.trim() || activeFilters || clanFilter || eligibleFilter !== null}{displayedCount} of {total}{:else}{total}{/if} entr{total ===
+                    1
+                        ? "y"
+                        : "ies"}
+                    {#if activeFilters}
+                        ·
+                        <button
+                            type="button"
+                            class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
+                            onclick={() => dataTable?.clearFilters()}
+                        >
+                            Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
+                        </button>
+                    {/if}
                     ·
-                    <button
-                        type="button"
-                        class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
-                        onclick={() => dataTable?.clearFilters()}
-                    >
-                        Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
-                    </button>
+                    {#if fetchingCwl}
+                        fetching attacks…
+                    {:else if cwlFetchedAt}
+                        attacks from {formatRelativeTime(new Date(cwlFetchedAt))}
+                    {/if}
                 {/if}
-            {/if}
-        {/snippet}
-        {#snippet actions()}
-            {#if seasonOptions.length > 0}
-                <Select
-                    options={seasonOptions}
-                    bind:value={selectedSeasonValue}
-                    onValueChange={(v) => load(Number(v))}
-                    placeholder="Season"
-                    disabled={loading}
-                    class="w-full @md:w-44 @md:shrink-0"
-                />
-            {/if}
-            <Input placeholder="Search anything..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
-            <Button
-                variant="base"
-                class="shrink-0"
-                disabled={fetchingCwl || loading || rows.length === 0}
-                onclick={fetchCwlStats}
-                tooltip={cwlFetchedAt
-                    ? `CWL stats fetched ${formatRelativeTime(new Date(cwlFetchedAt))}, click to refresh`
-                    : "Fetch live CWL attacks & stars"}
-                tooltipPlacement="bottom"
-            >
-                {#if fetchingCwl}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerSwords class="size-5" />
+            {/snippet}
+            {#snippet actions()}
+                {#if seasonOptions.length > 0}
+                    <Select
+                        options={seasonOptions}
+                        bind:value={selectedSeasonValue}
+                        onValueChange={(v) => load(Number(v))}
+                        placeholder="Season"
+                        disabled={loading}
+                        class="w-full @md:w-44 @md:shrink-0"
+                    />
                 {/if}
-            </Button>
-            <Button
-                variant="base"
-                class="shrink-0"
-                disabled={downloading || rows.length === 0}
-                onclick={downloadCsv}
-                tooltip="Download as CSV"
-                tooltipPlacement="bottom"
-            >
-                {#if downloading}
-                    <SvgSpinnersRingResize class="size-5" />
-                {:else}
-                    <TablerDownload class="size-5" />
-                {/if}
-            </Button>
-        {/snippet}
-    </PageHeader>
+                <Input placeholder="Search anything..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
+                <Button
+                    variant="base"
+                    class="shrink-0"
+                    disabled={downloading || rows.length === 0}
+                    onclick={downloadCsv}
+                    tooltip="Download as CSV"
+                    tooltipPlacement="bottom"
+                >
+                    {#if downloading}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerDownload class="size-5" />
+                    {/if}
+                </Button>
+            {/snippet}
+        </PageHeader>
 
-    {#if !loading && seasons.length === 0}
-        <div class="px-4 text-xs text-stone-400">
-            No CWL seasons yet — create one in <span class="font-medium text-stone-300">Settings</span> to start awarding bonuses.
-        </div>
-    {/if}
+        {#if !loading && seasons.length === 0}
+            <div class="text-xs text-stone-400">
+                No CWL seasons yet — create one in <span class="font-medium text-stone-300">Settings</span> to start awarding bonuses.
+            </div>
+        {/if}
+
+        {#if !loading && rows.length > 0}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+                bind:this={scrollEl}
+                onmousedown={onDragStart}
+                class="edge-fade flex cursor-grab items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden {isDragging ? 'select-none' : ''}"
+                style="scrollbar-width: none;"
+            >
+                {#each clanBadges as c (c.tag)}
+                    {@const isActive = clanFilter === c.tag}
+                    <Badge
+                        icon={TablerShield}
+                        content="{c.name} • {c.count}"
+                        variant="blue"
+                        size="button"
+                        iconSize="size-4"
+                        onclick={() => (clanFilter = isActive ? "" : c.tag)}
+                        class="font-medium {isActive ? '' : clanFilter ? 'opacity-50 hover:opacity-100' : ''}"
+                    />
+                {/each}
+
+                {#if clanBadges.length > 0}
+                    <div class="h-6 shrink-0 self-center border-l-2 border-stone-700/50"></div>
+                {/if}
+
+                <Badge
+                    icon={fetchingCwl ? SvgSpinnersRingResize : TablerCircleCheck}
+                    content="Eligible • {eligibleCounts.eligible}"
+                    variant="green"
+                    size="button"
+                    iconSize="size-4"
+                    onclick={() => (eligibleFilter = eligibleFilter === true ? null : true)}
+                    class="font-medium {eligibleFilter === true ? '' : eligibleFilter !== null ? 'opacity-50 hover:opacity-100' : ''}"
+                />
+                <Badge
+                    icon={fetchingCwl ? SvgSpinnersRingResize : TablerCircleX}
+                    content="Not Eligible • {eligibleCounts.notEligible}"
+                    variant="red"
+                    size="button"
+                    iconSize="size-4"
+                    onclick={() => (eligibleFilter = eligibleFilter === false ? null : false)}
+                    class="font-medium {eligibleFilter === false ? '' : eligibleFilter !== null ? 'opacity-50 hover:opacity-100' : ''}"
+                />
+            </div>
+        {/if}
+    </div>
 
     <div class="min-h-0 flex-1">
         <DataTable
             bind:this={dataTable}
-            data={rows}
+            data={filteredRows}
             {columns}
             getRowId={(r) => String(r.id)}
             {loading}

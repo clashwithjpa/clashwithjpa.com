@@ -21,8 +21,10 @@ export const getCwlStats200Schema = z.object({
             z.object({
                 tag: z.string(),
                 name: z.string(),
+                clanTag: z.string(),
                 attacks: z.number(),
                 stars: z.number(),
+                rounds: z.array(z.number()),
                 details: z.array(
                     z.object({
                         round: z.number(),
@@ -34,6 +36,15 @@ export const getCwlStats200Schema = z.object({
                         defenderPosition: z.number(),
                     }),
                 ),
+            }),
+        ),
+        clans: z.array(
+            z.object({
+                tag: z.string(),
+                endedRounds: z.array(z.number()),
+                wins: z.number(),
+                losses: z.number(),
+                ties: z.number(),
             }),
         ),
     }),
