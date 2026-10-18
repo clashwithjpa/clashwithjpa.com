@@ -19,12 +19,18 @@
     let open = $state(false);
     let search = $state("");
     let selected = $derived((column.getFilterValue() as string[] | undefined) ?? []);
-    // Only computed while the popup is open.
-    let options = $derived(open ? getOptions() : []);
+    // Only computed while open, and kept after closing so the list doesn't
+    // empty out and resize the popup during its exit animation.
+    let options = $state<SetOption[]>([]);
     let visible = $derived(search.trim() ? options.filter((o) => o.label.toLowerCase().includes(search.trim().toLowerCase())) : options);
 
     $effect(() => {
-        if (!open) search = "";
+        if (!open) return;
+        options = getOptions();
+    });
+
+    $effect(() => {
+        if (open) search = "";
     });
 
     function toggle(value: string) {
