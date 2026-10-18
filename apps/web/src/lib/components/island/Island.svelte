@@ -1,6 +1,7 @@
 <script lang="ts">
     import { afterNavigate } from "$app/navigation";
     import { page } from "$app/state";
+    import ProgressBorder from "$lib/components/ui/ProgressBorder.svelte";
     import { sidebarStore } from "$lib/components/ui/sidebar";
     import { cn } from "$lib/utils";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
@@ -40,6 +41,23 @@
 
     let current = $derived(island.current);
     let view = $derived(island.expanded ? "cover" : (current?.id ?? "idle"));
+
+    // The border only shows once the shell has stopped resizing. Traced over a
+    // shape that's still morphing, the same fraction slides along the edge and
+    // reads as the progress running away.
+    const RESIZE_MS = 400;
+    // The view the shell has finished resizing to. Switching views hides the
+    // border in the same frame, before the new size is even measured.
+    let settled = $state<string | null>(null);
+    $effect(() => {
+        const settling = view;
+        void size.w;
+        void size.h;
+        settled = null;
+        const timer = setTimeout(() => (settled = settling), RESIZE_MS);
+        return () => clearTimeout(timer);
+    });
+    let progress = $derived(!island.expanded && settled === view && current?.progress ? current.progress() : null);
     // Admin and dashboard pages have a bottom nav bar on small screens.
     let lifted = $derived(isMobile && /^\/(admin|dashboard)(\/|$)/.test(page.url.pathname));
     let left = $derived(storage.islandSide === "left");
@@ -188,10 +206,11 @@
         tabindex="0"
         class={cn(
             "relative overflow-clip rounded-[28px] bg-stone-900 font-rubik shadow-2xl ring-2 ring-stone-700/50 outline-none focus-visible:ring-4 focus-visible:ring-stone-700/50",
-            "transition-[width,height] duration-400 ease-glide motion-reduce:transition-none",
+            "transition-[width,height] duration-(--resize) ease-glide motion-reduce:transition-none",
             !island.expanded && "cursor-pointer touch-none",
             dragging && "cursor-grabbing transition-none",
         )}
+        style:--resize="{RESIZE_MS}ms"
         style:width="{size.w}px"
         style:height="{size.h}px"
         onclick={onClick}
@@ -258,4 +277,10 @@
             {/key}
         </div>
     </div>
+
+    {#if progress != null}
+        <div class="pointer-events-none absolute inset-0" in:fade={{ duration: 200 }}>
+            <ProgressBorder width={size.w} height={size.h} radius={28} value={progress} />
+        </div>
+    {/if}
 </div>

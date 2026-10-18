@@ -7,6 +7,7 @@ export type Activity<K extends ActivityKind = ActivityKind> = {
     props: ActivityProps<K>;
     priority: number;
     createdAt: number;
+    progress?: () => number;
 };
 
 type ShowOptions = {
@@ -14,6 +15,9 @@ type ShowOptions = {
     // Milliseconds before the activity removes itself. Omit to keep it until dismissed.
     duration?: number;
     priority?: number;
+    // A reactive 0 to 1. While the island is collapsed on this activity it shows
+    // as a border that fills clockwise from the top.
+    progress?: () => number;
 };
 
 let nextId = 0;
@@ -44,7 +48,7 @@ class Island {
         const replaced = def.single ? this.#items.filter((a) => a.kind === kind).map((a) => a.id) : [];
         for (const old of replaced) this.#clearTimer(old);
 
-        const activity = { id, kind, props, priority, createdAt: performance.now() } as Activity;
+        const activity = { id, kind, props, priority, createdAt: performance.now(), progress: options.progress } as Activity;
         this.#items = [...this.#items.filter((a) => a.id !== id && !replaced.includes(a.id)), activity];
 
         this.#clearTimer(id);

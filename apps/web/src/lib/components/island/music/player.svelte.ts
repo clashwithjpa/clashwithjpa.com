@@ -72,7 +72,12 @@ class Player {
         const audio = Object.assign(new Audio(), { loop: true, preload: "metadata" });
         const sync = () => {
             this.playing = !audio.paused;
-            if (this.playing) island.show("music", { title: this.current.title, subtitle: this.current.artist }, { id: "music" });
+            if (this.playing)
+                island.show(
+                    "music",
+                    { title: this.current.title, subtitle: this.current.artist },
+                    { id: "music", progress: () => (this.duration ? this.time / this.duration : 0) },
+                );
             else island.dismiss("music");
             this.#position();
         };
