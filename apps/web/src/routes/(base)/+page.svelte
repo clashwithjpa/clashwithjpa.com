@@ -57,7 +57,7 @@
     // Six-digit totals don't fit a half-width cell on phones, so they go compact (1.2M).
     const fmt = (n: number) => new Intl.NumberFormat("en-US", n >= 100_000 ? { notation: "compact", maximumFractionDigits: 1 } : {}).format(n);
     const live = $derived([
-        { icon: "labels/clanwarleague", label: "Clans", value: data.clanTags.length ? fmt(data.clanTags.length) : "–" },
+        { icon: "labels/clan-war-league", label: "Clans", value: data.clanTags.length ? fmt(data.clanTags.length) : "–" },
         { icon: "labels/international", label: "Members", value: loading || failed ? "–" : fmt(totals.members) },
         { icon: "star", label: "Wars won", value: loading || failed ? "–" : fmt(totals.warWins) },
         { icon: "trophy", label: "Trophies", value: loading || failed ? "–" : fmt(totals.trophies) },

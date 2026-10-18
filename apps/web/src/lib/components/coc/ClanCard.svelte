@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                    <Icon name="labels/clangames" class="size-12" />
+                    <Icon name="labels/clan-games" class="size-12" />
                     <div class="flex flex-col">
                         <span class="font-coc text-xs font-bold text-stone-700">Clan Game Points</span>
                         <span class="font-coc text-sm font-black text-stone-900">{requirements.requiredClangames}</span>
@@ -193,14 +193,14 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                    <Icon name="labels/trophypushing" class="size-12" />
+                                    <Icon name="labels/trophy-pushing" class="size-12" />
                                     <div class="flex flex-col">
                                         <span class="font-coc text-xs font-bold text-stone-700">Trophies</span>
                                         <span class="font-coc text-base font-black text-stone-900">{formatNumber(clanData?.clanPoints ?? 0)}</span>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
-                                    <Icon name="labels/clancapital" class="size-12" />
+                                    <Icon name="labels/clan-capital" class="size-12" />
                                     <div class="flex flex-col">
                                         <span class="font-coc text-xs font-bold text-stone-700">War Wins</span>
                                         <span class="font-coc text-base font-black text-stone-900">{clanData?.warWins}</span>
@@ -217,7 +217,7 @@
                             {#if clanData?.warLeague}
                                 <div class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
                                     <div class="flex items-center gap-1">
-                                        <Icon name="labels/clanwarleague" class="size-8" />
+                                        <Icon name="labels/clan-war-league" class="size-8" />
                                         <span class="font-coc text-sm font-bold text-stone-700">War League</span>
                                     </div>
                                     <span class="font-coc text-sm font-black text-stone-900">{clanData.warLeague.name}</span>
@@ -234,7 +234,7 @@
                                             class="flex items-center justify-between gap-2 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900"
                                         >
                                             <div class="flex items-center gap-1">
-                                                <Icon name="labels/trophypushing" class="size-8" />
+                                                <Icon name="labels/trophy-pushing" class="size-8" />
                                                 <span class="font-coc text-sm font-bold text-stone-700">Leader</span>
                                             </div>
                                             <span class="font-coc text-sm font-black text-stone-900">{leader.name}</span>

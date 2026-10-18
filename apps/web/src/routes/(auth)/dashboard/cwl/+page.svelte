@@ -232,5 +232,5 @@
             </form>
         </div>
     {/await}
-    <div class="hidden h-full rounded-xl bg-cover bg-center bg-no-repeat md:flex" style="background-image: url('/cwl_bg.webp')"></div>
+    <div class="hidden h-full rounded-xl bg-cover bg-center bg-no-repeat md:flex" style="background-image: url('/cwl-bg.webp')"></div>
 </div>

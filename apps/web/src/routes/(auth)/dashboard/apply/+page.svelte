@@ -115,7 +115,7 @@
 <Seo title="Apply" description="Fill the application to join JPA Clans" />
 
 <div class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
-    <div class="hidden h-full rounded-xl bg-cover bg-center bg-no-repeat md:flex" style="background-image: url('/apply_bg.webp')"></div>
+    <div class="hidden h-full rounded-xl bg-cover bg-center bg-no-repeat md:flex" style="background-image: url('/apply-bg.webp')"></div>
     <div class="flex size-full flex-col justify-center gap-8 lg:p-8">
         <div class="flex flex-col gap-1">
             <h1 class="text-4xl font-bold">Clan Application</h1>

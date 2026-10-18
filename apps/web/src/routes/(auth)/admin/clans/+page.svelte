@@ -54,7 +54,7 @@
         return [
             { icon: "labels/attacks", label: "Attacks", value: clan.attacksRequirement },
             { icon: "labels/donations", label: "Donations", value: clan.donationsRequirement },
-            { icon: "labels/clangames", label: "Clan games", value: clan.clangamesRequirement },
+            { icon: "labels/clan-games", label: "Clan games", value: clan.clangamesRequirement },
         ];
     }
 

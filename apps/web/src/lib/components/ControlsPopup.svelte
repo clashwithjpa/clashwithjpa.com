@@ -45,7 +45,7 @@
     let audio: HTMLAudioElement;
 
     onMount(() => {
-        audio = new Audio("/music/coc_lofi.ogg");
+        audio = new Audio("/music/coc-lofi.ogg");
         audio.loop = true;
         document.addEventListener("fullscreenchange", () => {
             isFullscreen = !!document.fullscreenElement;

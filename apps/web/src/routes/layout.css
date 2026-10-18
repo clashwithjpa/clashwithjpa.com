@@ -38,7 +38,7 @@
     font-family: "COC";
     font-style: normal;
     font-display: swap;
-    src: url("/fonts/clash_regular.otf") format("opentype");
+    src: url("/fonts/clash-regular.otf") format("opentype");
     font-weight: 100 600;
 }
 
@@ -46,7 +46,7 @@
     font-family: "COC";
     font-style: normal;
     font-display: swap;
-    src: url("/fonts/clash_bold.otf") format("opentype");
+    src: url("/fonts/clash-bold.otf") format("opentype");
     font-weight: 700 900;
 }
 
