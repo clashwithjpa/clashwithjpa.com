@@ -121,6 +121,16 @@ export async function getClans() {
     );
 }
 
+// Accepts a clan tag or a family clan name and returns the tag. Names that
+// match no family clan, or more than one, resolve to null.
+export async function resolveFamilyClanTag(clan: string | null | undefined): Promise<string | null> {
+    const value = clan?.trim();
+    if (!value) return null;
+    if (value.startsWith("#")) return value;
+    const rows = await db.select({ tag: clanInfoTable.cocClanTag }).from(clanInfoTable).where(eq(clanInfoTable.cocClanName, value)).limit(2);
+    return rows.length === 1 ? rows[0]!.tag : null;
+}
+
 export async function getClansWithRequirements() {
     const result = await db
         .select({

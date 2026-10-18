@@ -40,6 +40,7 @@ import {
     getUsersWithDiscordAccounts,
     MissingDiscordAccountError,
     renameCwlSeason,
+    resolveFamilyClanTag,
     setPrivacy,
     setUserApiAccess,
     setUserDiscordUsername,
@@ -568,8 +569,9 @@ app.post(
                 discordUsername,
                 cocAccountName: playerData.name,
                 cocAccountTag: tag,
-                // External accounts don't pick a clan; mains take their live clan.
-                cocAccountClan: matched.isExternal ? null : (playerData.clan?.name ?? matched.currentClan ?? null),
+                // External accounts don't pick a clan. Mains take their live clan, stored
+                // as a tag like member applications. currentClan is a name from imports.
+                cocAccountClan: matched.isExternal ? null : (playerData.clan?.tag ?? (await resolveFamilyClanTag(matched.currentClan))),
                 preferenceNum,
                 seasonId,
             });
