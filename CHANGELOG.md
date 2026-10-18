@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.2.0] - 2026-10-18
+
+### Features
+
+- **web:** Add shuffle, autoplay and repeat to the music player ([9b12daf](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/9b12daf214f2d41e3b2e3655864f9b8b8c9b681e))
+- **web:** Show music progress on the island border ([a35b3f0](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/a35b3f091bc8470322b2a8c83d1e816ce088d43d))
+- **web:** Keep slow admin actions alive across navigation ([5312d50](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/5312d5099bef30280d35f2050ed68fc4a1a164bd))
+
+### Bug Fixes
+
+- **web:** Give chart tooltips a background in production ([31bbb9b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/31bbb9ba513cdf58b8c815ee4792d8dfd144adfd))
 ## [2.1.0] - 2026-10-18
 
 ### Features
