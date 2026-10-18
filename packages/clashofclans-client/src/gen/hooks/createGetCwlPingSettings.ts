@@ -29,7 +29,7 @@ export function getCwlPingSettingsQueryOptions(config: Partial<RequestConfig> & 
 }
 
 /**
- * @description Fetches the CWL ping job's settings (enabled, webhook URL, interval, last run).
+ * @description Fetches the CWL ping job's settings (enabled, channel, interval, last run).
  * {@link /admin/settings/cwl-ping}
  */
 export function createGetCwlPingSettings<

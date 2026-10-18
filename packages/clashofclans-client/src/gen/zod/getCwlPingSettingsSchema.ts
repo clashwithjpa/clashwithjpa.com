@@ -14,10 +14,10 @@ export const getCwlPingSettings200Schema = z.object({
         settings: z.union([
             z.object({
                 enabled: z.boolean(),
-                webhookUrl: z.union([z.string(), z.null()]),
+                channelId: z.nullable(z.string()),
                 intervalMinutes: z.number(),
                 lastRunAt: z.union([z.string().datetime(), z.null()]),
-                lastRunSummary: z.union([z.string(), z.null()]),
+                lastRunSummary: z.nullable(z.string()),
             }),
             z.null(),
         ]),

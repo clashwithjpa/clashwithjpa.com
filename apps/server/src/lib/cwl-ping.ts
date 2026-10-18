@@ -1,4 +1,5 @@
 import { cocClient } from "@/lib/coc";
+import { config } from "@/lib/config";
 import { db } from "@/lib/db";
 import { getCwlPingSettings, getSettings, recordCwlPingRun } from "@/lib/db/functions";
 import { cwlApplicationTable, cwlClanInfoTable, cwlSeasonTable } from "@/lib/db/schema";
@@ -9,13 +10,16 @@ import {
     ButtonStyle,
     ContainerBuilder,
     MessageFlags,
+    REST,
+    Routes,
     SeparatorBuilder,
     subtext,
     TextDisplayBuilder,
-    WebhookClient,
-    type WebhookMessageCreateOptions,
+    type RESTPostAPIChannelMessageJSONBody,
 } from "discord.js";
 import { eq, sql } from "drizzle-orm";
+
+export type CwlPingClan = { tag: string; name: string; pending: number };
 
 export type CwlPingRunSummary = {
     ranAt: Date;
@@ -23,11 +27,16 @@ export type CwlPingRunSummary = {
     clansChecked: number;
     clansPinged: number;
     usersPinged: number;
+    clans: CwlPingClan[];
     skippedReason?: string;
 };
 
 const MENTION_CHUNK_MAX_LENGTH = 1900;
 const DISABLED_POLL_MS = 60_000;
+
+const rest = new REST().setToken(config.JPA_DISCORD_BOT_TOKEN);
+
+type Message = RESTPostAPIChannelMessageJSONBody;
 
 function normalizeTag(tag: string): string {
     return `#${tag.trim().toUpperCase().replace(/^#+/, "")}`;
@@ -61,7 +70,7 @@ function chunkUserIds(userIds: string[]): string[][] {
     return chunks;
 }
 
-function buildPingMessages(clanName: string, clanTag: string, userIds: string[]): WebhookMessageCreateOptions[] {
+function buildPingMessages(clanName: string, clanTag: string, userIds: string[]): Message[] {
     const encodedTag = encodeURIComponent(normalizeTag(clanTag));
     const clanLink = `https://link.clashofclans.com/en?action=OpenClanProfile&tag=${encodedTag}`;
     const chunks = chunkUserIds(userIds);
@@ -70,10 +79,9 @@ function buildPingMessages(clanName: string, clanTag: string, userIds: string[])
         new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Open Clan").setEmoji({ name: "🎮" }).setURL(clanLink),
     );
 
-    const first: WebhookMessageCreateOptions = {
+    const first: Message = {
         flags: MessageFlags.IsComponentsV2,
-        withComponents: true,
-        allowedMentions: { parse: [], users: chunks[0] ?? [] },
+        allowed_mentions: { parse: [], users: chunks[0] ?? [] },
         components: [
             new ContainerBuilder()
                 .addTextDisplayComponents(
@@ -87,27 +95,28 @@ function buildPingMessages(clanName: string, clanTag: string, userIds: string[])
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(subtext((chunks[0] ?? []).map((id) => `<@${id}>`).join(" ")) + "\n"),
                     new TextDisplayBuilder().setContent(subtext("⏰ War starts soon, don't keep your clanmates waiting!")),
-                ),
-            openClanRow,
+                )
+                .toJSON(),
+            openClanRow.toJSON(),
         ],
     };
 
-    const followUps: WebhookMessageCreateOptions[] = chunks.slice(1).map((chunk) => ({
-        username: "Chief Pinger",
+    const followUps: Message[] = chunks.slice(1).map((chunk) => ({
         flags: MessageFlags.IsComponentsV2,
-        withComponents: true,
-        allowedMentions: { parse: [], users: chunk },
-        components: [new TextDisplayBuilder().setContent(subtext(chunk.map((id) => `<@${id}>`).join(" ")))],
+        allowed_mentions: { parse: [], users: chunk },
+        components: [new TextDisplayBuilder().setContent(subtext(chunk.map((id) => `<@${id}>`).join(" "))).toJSON()],
     }));
 
     return [first, ...followUps];
 }
 
-async function sendClanPing(webhookUrl: string, clanName: string, clanTag: string, userIds: string[]): Promise<boolean> {
-    const client = new WebhookClient({ url: webhookUrl });
-    const messages = buildPingMessages(clanName, clanTag, userIds);
+async function send(channelId: string, body: Message) {
+    await rest.post(Routes.channelMessages(channelId), { body });
+}
+
+async function sendClanPing(channelId: string, clanName: string, clanTag: string, userIds: string[]): Promise<boolean> {
     try {
-        for (const message of messages) await client.send(message);
+        for (const message of buildPingMessages(clanName, clanTag, userIds)) await send(channelId, message);
         return true;
     } catch (error) {
         Sentry.captureException(error, { extra: { clanTag } });
@@ -115,34 +124,32 @@ async function sendClanPing(webhookUrl: string, clanName: string, clanTag: strin
     }
 }
 
-export async function sendTestPing(webhookUrl: string): Promise<void> {
-    const client = new WebhookClient({ url: webhookUrl });
-    await client.send({
-        username: "Chief Pinger",
+export async function sendTestPing(channelId: string): Promise<void> {
+    await send(channelId, {
         flags: MessageFlags.IsComponentsV2,
-        withComponents: true,
-        components: [new TextDisplayBuilder().setContent("✅ **CWL Ping test**: this webhook is wired up correctly.")],
+        components: [new TextDisplayBuilder().setContent("✅ **CWL Ping test**: the bot can post in this channel.").toJSON()],
     });
 }
 
-export async function runCwlPingCheck(): Promise<CwlPingRunSummary> {
+// A dry run finds who would be pinged without sending anything or recording a run.
+export async function runCwlPingCheck({ dryRun = false } = {}): Promise<CwlPingRunSummary> {
     const ranAt = new Date();
-    const base: CwlPingRunSummary = { ranAt, seasonId: null, clansChecked: 0, clansPinged: 0, usersPinged: 0 };
+    const base: CwlPingRunSummary = { ranAt, seasonId: null, clansChecked: 0, clansPinged: 0, usersPinged: 0, clans: [] };
+    const record = async (summary: string) => {
+        if (!dryRun) await recordCwlPingRun({ ranAt, summary });
+    };
+    const skip = async (skippedReason: string, seasonId: number | null = null) => {
+        await record(skippedReason);
+        return { ...base, seasonId, skippedReason };
+    };
 
     try {
         const pingSettings = await getCwlPingSettings();
-        if (!pingSettings?.webhookUrl) {
-            const summary = { ...base, skippedReason: "No webhook URL configured" };
-            await recordCwlPingRun({ ranAt, summary: summary.skippedReason });
-            return summary;
-        }
+        const channelId = pingSettings?.channelId;
+        if (!channelId && !dryRun) return await skip("No channel selected");
 
         const seasonId = await resolveSeasonId();
-        if (seasonId == null) {
-            const summary = { ...base, skippedReason: "No CWL season is configured" };
-            await recordCwlPingRun({ ranAt, summary: summary.skippedReason });
-            return summary;
-        }
+        if (seasonId == null) return await skip("No CWL season is configured");
 
         const assigned = await db
             .select({
@@ -155,11 +162,7 @@ export async function runCwlPingCheck(): Promise<CwlPingRunSummary> {
             .innerJoin(cwlClanInfoTable, eq(cwlClanInfoTable.cocClanTag, cwlApplicationTable.assignedTo))
             .where(eq(cwlApplicationTable.seasonId, seasonId));
 
-        if (assigned.length === 0) {
-            const summary = { ...base, seasonId, skippedReason: "No assigned CWL applications this season" };
-            await recordCwlPingRun({ ranAt, summary: summary.skippedReason });
-            return summary;
-        }
+        if (assigned.length === 0) return await skip("No assigned CWL applications this season", seasonId);
 
         const byClan = new Map<string, { clanName: string; applicants: { discordUserId: string; cocAccountTag: string }[] }>();
         for (const row of assigned) {
@@ -170,6 +173,7 @@ export async function runCwlPingCheck(): Promise<CwlPingRunSummary> {
 
         let clansPinged = 0;
         let usersPinged = 0;
+        const clans: CwlPingClan[] = [];
 
         for (const [clanTag, { clanName, applicants }] of byClan) {
             try {
@@ -181,8 +185,9 @@ export async function runCwlPingCheck(): Promise<CwlPingRunSummary> {
                     if (!memberTags.has(normalizeTag(applicant.cocAccountTag))) pendingUserIds.add(applicant.discordUserId);
                 }
                 if (pendingUserIds.size === 0) continue;
+                clans.push({ tag: clanTag, name: clanName, pending: pendingUserIds.size });
 
-                const ok = await sendClanPing(pingSettings.webhookUrl, clanName, clanTag, [...pendingUserIds]);
+                const ok = dryRun || (await sendClanPing(channelId!, clanName, clanTag, [...pendingUserIds]));
                 if (ok) {
                     clansPinged++;
                     usersPinged += pendingUserIds.size;
@@ -192,18 +197,16 @@ export async function runCwlPingCheck(): Promise<CwlPingRunSummary> {
             }
         }
 
-        const summary: CwlPingRunSummary = { ranAt, seasonId, clansChecked: byClan.size, clansPinged, usersPinged };
-        const summaryText =
+        await record(
             usersPinged > 0
                 ? `Pinged ${usersPinged} user(s) across ${clansPinged} clan(s)`
-                : `All caught up — checked ${byClan.size} clan(s), no pings needed`;
-        await recordCwlPingRun({ ranAt, summary: summaryText });
-        return summary;
+                : `All caught up, checked ${byClan.size} clan(s) and no pings needed`,
+        );
+        return { ranAt, seasonId, clansChecked: byClan.size, clansPinged, usersPinged, clans };
     } catch (error) {
         Sentry.captureException(error);
-        const summary = { ...base, skippedReason: "Run failed — see server logs" };
-        await recordCwlPingRun({ ranAt, summary: summary.skippedReason }).catch(() => {});
-        return summary;
+        await record("Run failed, see server logs").catch(() => {});
+        return { ...base, skippedReason: "Run failed, see server logs" };
     }
 }
 
@@ -214,15 +217,25 @@ async function tick(): Promise<void> {
     let delayMs = DISABLED_POLL_MS;
     try {
         const settings = await getCwlPingSettings();
-        if (settings?.enabled && !running) {
-            running = true;
-            try {
-                await runCwlPingCheck();
-            } finally {
-                running = false;
+        if (settings?.enabled) {
+            const intervalMs = Math.max(1, settings.intervalMinutes) * 60_000;
+            // Waits out the rest of the interval when the last run (scheduled, manual, or from
+            // before a restart) was recent, so redeploys and crash loops don't re-ping everyone.
+            const sinceLastMs = settings.lastRunAt ? Date.now() - settings.lastRunAt.getTime() : Infinity;
+            if (sinceLastMs >= 0 && sinceLastMs < intervalMs) {
+                delayMs = intervalMs - sinceLastMs;
+            } else {
+                if (!running) {
+                    running = true;
+                    try {
+                        await runCwlPingCheck();
+                    } finally {
+                        running = false;
+                    }
+                }
+                delayMs = intervalMs;
             }
         }
-        delayMs = settings?.enabled ? Math.max(1, settings.intervalMinutes) * 60_000 : DISABLED_POLL_MS;
     } catch (error) {
         Sentry.captureException(error);
     } finally {

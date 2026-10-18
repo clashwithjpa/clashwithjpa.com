@@ -24,7 +24,7 @@ export const settingsTable = pgTable(
         updatedAt: timestamp("updated_at").defaultNow(),
         // CWL ping: pings applicants who haven't joined their assigned clan yet. Superadmin-only (see routes/admin.ts).
         cwlPingEnabled: boolean("cwl_ping_enabled").notNull().default(false),
-        cwlPingWebhookUrl: text("cwl_ping_webhook_url"),
+        cwlPingChannelId: text("cwl_ping_channel_id"),
         cwlPingIntervalMinutes: integer("cwl_ping_interval_minutes").notNull().default(5),
         cwlPingLastRunAt: timestamp("cwl_ping_last_run_at"),
         cwlPingLastRunSummary: text("cwl_ping_last_run_summary"),

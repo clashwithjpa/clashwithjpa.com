@@ -324,6 +324,12 @@ export {
     getCwlApplicationsQueryResponseSchema,
 } from "./getCwlApplicationsSchema.ts";
 export {
+    getCwlPingChannels200Schema,
+    getCwlPingChannels401Schema,
+    getCwlPingChannels503Schema,
+    getCwlPingChannelsQueryResponseSchema,
+} from "./getCwlPingChannelsSchema.ts";
+export {
     getCwlPingSettings200Schema,
     getCwlPingSettings401Schema,
     getCwlPingSettings500Schema,
@@ -398,6 +404,7 @@ export {
     postCOCPlayerVerifyMutationResponseSchema,
     postCOCPlayerVerifyPathParamsSchema,
 } from "./postCOCPlayerVerifySchema.ts";
+export { previewCwlPing200Schema, previewCwlPing401Schema, previewCwlPingQueryResponseSchema } from "./previewCwlPingSchema.ts";
 export {
     refreshDiscordUsernames200Schema,
     refreshDiscordUsernames401Schema,
@@ -472,13 +479,13 @@ export {
     syncCocAccountsMutationResponseSchema,
 } from "./syncCocAccountsSchema.ts";
 export {
-    testCwlPingWebhook200Schema,
-    testCwlPingWebhook400Schema,
-    testCwlPingWebhook401Schema,
-    testCwlPingWebhook502Schema,
-    testCwlPingWebhookMutationRequestSchema,
-    testCwlPingWebhookMutationResponseSchema,
-} from "./testCwlPingWebhookSchema.ts";
+    testCwlPing200Schema,
+    testCwlPing400Schema,
+    testCwlPing401Schema,
+    testCwlPing502Schema,
+    testCwlPingMutationRequestSchema,
+    testCwlPingMutationResponseSchema,
+} from "./testCwlPingSchema.ts";
 export {
     updateAdminClan200Schema,
     updateAdminClan401Schema,
@@ -539,6 +546,7 @@ export {
     updateCwlPingSettings400Schema,
     updateCwlPingSettings401Schema,
     updateCwlPingSettings500Schema,
+    updateCwlPingSettings503Schema,
     updateCwlPingSettingsMutationRequestSchema,
     updateCwlPingSettingsMutationResponseSchema,
 } from "./updateCwlPingSettingsSchema.ts";

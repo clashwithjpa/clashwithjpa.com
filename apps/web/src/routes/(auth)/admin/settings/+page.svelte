@@ -18,17 +18,20 @@
         createCwlSeason,
         deleteCwlSeason,
         getAdminSettings,
+        getCwlPingChannels,
         getCwlPingSettings,
         getCwlSeasons,
+        previewCwlPing,
         refreshDiscordUsernames,
         renameCwlSeason,
         runCwlPingNow,
-        testCwlPingWebhook,
+        testCwlPing,
         updateAdminSettings,
         updateCwlPingSettings,
         type GetAdminSettings200,
         type GetCwlPingSettings200,
         type GetCwlSeasons200,
+        type PreviewCwlPing200,
     } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -37,13 +40,17 @@
     import TablerBellRinging from "~icons/tabler/bell-ringing";
     import TablerCalendarEvent from "~icons/tabler/calendar-event";
     import TablerClock from "~icons/tabler/clock";
+    import TablerExternalLink from "~icons/tabler/external-link";
+    import TablerEye from "~icons/tabler/eye";
     import TablerFileDescription from "~icons/tabler/file-description";
+    import TablerHash from "~icons/tabler/hash";
     import TablerInfoCircle from "~icons/tabler/info-circle";
     import TablerPencil from "~icons/tabler/pencil";
     import TablerPlayerPlay from "~icons/tabler/player-play";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerSend from "~icons/tabler/send";
+    import TablerSpeakerphone from "~icons/tabler/speakerphone";
     import TablerSwords from "~icons/tabler/swords";
     import TablerTool from "~icons/tabler/tool";
     import TablerTrash from "~icons/tabler/trash";
@@ -53,6 +60,7 @@
 
     type Settings = GetAdminSettings200["data"]["settings"];
     type CwlPingSettings = GetCwlPingSettings200["data"]["settings"];
+    type CwlPingPreview = PreviewCwlPing200["data"];
     type Season = GetCwlSeasons200["data"]["seasons"][number];
 
     let settings = $state<Settings>(null);
@@ -60,8 +68,10 @@
     let loading = $state(true);
     let saving = $state(false);
     let refreshingUsernames = $state(false);
-    let testingWebhook = $state(false);
+    let testingPing = $state(false);
     let runningPingNow = $state(false);
+    let previewingPing = $state(false);
+    let pingPreview = $state<CwlPingPreview | null>(null);
 
     let applicationsEnabled = $state(false);
     let cwlEnabled = $state(false);
@@ -70,8 +80,12 @@
     let currentSeasonValue = $state("");
 
     let cwlPingEnabled = $state(false);
-    let cwlPingWebhookUrl = $state("");
+    let cwlPingChannelId = $state("");
     let cwlPingIntervalMinutes = $state("30");
+
+    let pingGuildId = $state("");
+    let pingChannelsError = $state<string | null>(null);
+    let pingChannelOptions = $state<Option[]>([]);
 
     let seasons = $state<Season[]>([]);
     let seasonOptions = $derived<Option[]>([{ label: "None", value: "" }, ...seasons.map((s) => ({ label: s.name, value: String(s.id) }))]);
@@ -102,7 +116,7 @@
 
     function syncFromCwlPingSettings() {
         cwlPingEnabled = cwlPingSettings?.enabled ?? false;
-        cwlPingWebhookUrl = cwlPingSettings?.webhookUrl ?? "";
+        cwlPingChannelId = cwlPingSettings?.channelId ?? "";
         cwlPingIntervalMinutes = String(cwlPingSettings?.intervalMinutes ?? 5);
     }
 
@@ -128,6 +142,27 @@
         }
     }
 
+    async function loadCwlPingChannels() {
+        if (!data.isSuperadmin) return;
+        try {
+            const resp = await getCwlPingChannels({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                pingGuildId = resp.data.guildId;
+                pingChannelOptions = resp.data.channels.map((ch) => ({
+                    label: ch.name,
+                    value: ch.id,
+                    icon: ch.announcement ? TablerSpeakerphone : TablerHash,
+                    hint: ch.category ?? undefined,
+                }));
+                pingChannelsError = null;
+            } else {
+                pingChannelsError = apiErrorMessage(resp, "Couldn't load channels");
+            }
+        } catch (e) {
+            pingChannelsError = errorMessage(e) ?? "Couldn't load channels";
+        }
+    }
+
     async function load() {
         loading = true;
         try {
@@ -135,6 +170,7 @@
                 getAdminSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
                 loadSeasons(),
                 loadCwlPingSettings(),
+                loadCwlPingChannels(),
             ]);
             if (resp.success) {
                 settings = resp.data.settings;
@@ -256,7 +292,7 @@
                     ? updateCwlPingSettings(
                           {
                               enabled: cwlPingEnabled,
-                              webhookUrl: cwlPingWebhookUrl.trim() ? cwlPingWebhookUrl.trim() : null,
+                              channelId: cwlPingChannelId || null,
                               intervalMinutes: Number(cwlPingIntervalMinutes) || 5,
                           },
                           opts,
@@ -302,19 +338,32 @@
         }
     }
 
-    async function testWebhook() {
-        testingWebhook = true;
+    async function testPing() {
+        testingPing = true;
         try {
-            const resp = await testCwlPingWebhook(
-                { webhookUrl: cwlPingWebhookUrl.trim() || undefined },
+            const resp = await testCwlPing(
+                { channelId: cwlPingChannelId || undefined },
                 { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
             );
-            if (resp.success) toast.success("Test ping sent — check the channel.");
+            if (resp.success) toast.success("Test ping sent, check the channel.");
             else toast.error(apiErrorMessage(resp, "Failed to send test ping"));
         } catch (e) {
             toast.error("Failed to send test ping", { description: errorMessage(e) });
         } finally {
-            testingWebhook = false;
+            testingPing = false;
+        }
+    }
+
+    async function previewPing() {
+        previewingPing = true;
+        try {
+            const resp = await previewCwlPing({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) pingPreview = resp.data;
+            else toast.error("Failed to preview CWL ping");
+        } catch (e) {
+            toast.error("Failed to preview CWL ping", { description: errorMessage(e) });
+        } finally {
+            previewingPing = false;
         }
     }
 
@@ -325,6 +374,7 @@
             if (resp.success) {
                 const { usersPinged, clansPinged, skippedReason } = resp.data;
                 toast.success(skippedReason ?? `Pinged ${usersPinged} user(s) across ${clansPinged} clan(s).`);
+                pingPreview = null;
                 await loadCwlPingSettings();
             } else {
                 toast.error("Failed to run CWL ping");
@@ -341,7 +391,7 @@
     let isCwlPingDirty = $derived(
         !!cwlPingSettings &&
             (cwlPingEnabled !== cwlPingSettings.enabled ||
-                (cwlPingWebhookUrl.trim() || null) !== (cwlPingSettings.webhookUrl || null) ||
+                (cwlPingChannelId || null) !== (cwlPingSettings.channelId || null) ||
                 (Number(cwlPingIntervalMinutes) || 5) !== cwlPingSettings.intervalMinutes),
     );
 
@@ -521,7 +571,34 @@
                                 <Toggle bind:checked={cwlPingEnabled} disabled={saving} />
                             </div>
 
-                            <Input bind:value={cwlPingWebhookUrl} placeholder="https://discord.com/api/webhooks/..." disabled={saving} />
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex items-center gap-2">
+                                    <Select
+                                        options={pingChannelOptions}
+                                        bind:value={cwlPingChannelId}
+                                        placeholder={pingChannelsError ? "Couldn't load channels" : "Pick a channel"}
+                                        disabled={saving || !pingChannelOptions.length}
+                                    />
+                                    {#if cwlPingChannelId && pingGuildId}
+                                        <Tooltip title="Open in Discord" placement="top">
+                                            <a
+                                                href={`https://discord.com/channels/${pingGuildId}/${cwlPingChannelId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="grid size-10 shrink-0 place-items-center rounded-lg border-2 border-stone-700/50 text-stone-400 transition-colors hover:bg-stone-800 hover:text-stone-50"
+                                                aria-label="Open in Discord"
+                                            >
+                                                <TablerExternalLink class="size-4" />
+                                            </a>
+                                        </Tooltip>
+                                    {/if}
+                                </div>
+                                {#if pingChannelsError}
+                                    <p class="text-xs text-red-400">{pingChannelsError}</p>
+                                {:else}
+                                    <p class="text-xs text-stone-400">The bot posts here, so it needs to view and send messages in this channel.</p>
+                                {/if}
+                            </div>
 
                             <div class="flex items-center gap-3">
                                 <div class="w-28">
@@ -555,18 +632,22 @@
                                     <p class="text-xs text-stone-400">Hasn't run yet.</p>
                                 {/if}
 
-                                <div class="grid grid-cols-2 gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        class="w-full"
-                                        onclick={testWebhook}
-                                        disabled={testingWebhook || !cwlPingWebhookUrl.trim()}
-                                    >
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                    <Button variant="ghost" class="w-full" onclick={testPing} disabled={testingPing || !cwlPingChannelId}>
                                         <span class="flex items-center justify-center gap-1">
-                                            {#if testingWebhook}
+                                            {#if testingPing}
                                                 <SvgSpinnersRingResize class="size-4" /> Sending...
                                             {:else}
                                                 <TablerSend class="size-4" /> Send test ping
+                                            {/if}
+                                        </span>
+                                    </Button>
+                                    <Button variant="ghost" class="w-full" onclick={previewPing} disabled={previewingPing}>
+                                        <span class="flex items-center justify-center gap-1">
+                                            {#if previewingPing}
+                                                <SvgSpinnersRingResize class="size-4" /> Checking...
+                                            {:else}
+                                                <TablerEye class="size-4" /> Preview
                                             {/if}
                                         </span>
                                     </Button>
@@ -580,6 +661,33 @@
                                         </span>
                                     </Button>
                                 </div>
+
+                                {#if pingPreview}
+                                    <div class="flex flex-col gap-2 rounded-lg bg-stone-800/50 p-3 text-sm">
+                                        {#if pingPreview.skippedReason}
+                                            <p class="text-stone-400">{pingPreview.skippedReason}</p>
+                                        {:else if pingPreview.clans.length === 0}
+                                            <p class="text-stone-400">
+                                                Everyone has joined. Checked {pingPreview.clansChecked} clan(s), nobody would be pinged.
+                                            </p>
+                                        {:else}
+                                            <p class="text-stone-400">
+                                                A run now would ping {pingPreview.usersPinged} chief(s) across {pingPreview.clans.length} of {pingPreview.clansChecked}
+                                                clan(s):
+                                            </p>
+                                            <ul class="flex flex-col gap-1">
+                                                {#each pingPreview.clans as clan (clan.tag)}
+                                                    <li class="flex items-center justify-between gap-3">
+                                                        <span class="truncate text-stone-200">
+                                                            {clan.name} <span class="text-xs text-stone-500">{clan.tag}</span>
+                                                        </span>
+                                                        <span class="shrink-0 text-stone-400 tabular-nums">{clan.pending} missing</span>
+                                                    </li>
+                                                {/each}
+                                            </ul>
+                                        {/if}
+                                    </div>
+                                {/if}
                             </div>
                         </div>
                     </section>

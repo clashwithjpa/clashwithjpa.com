@@ -15,6 +15,9 @@ export type RunCwlPingNow200 = {
      * @type object
      */
     data: {
+        /**
+         * @type number,null
+         */
         seasonId: number | null;
         /**
          * @type number
@@ -28,6 +31,23 @@ export type RunCwlPingNow200 = {
          * @type number
          */
         usersPinged: number;
+        /**
+         * @type array
+         */
+        clans: {
+            /**
+             * @type string
+             */
+            tag: string;
+            /**
+             * @type string
+             */
+            name: string;
+            /**
+             * @type number
+             */
+            pending: number;
+        }[];
         /**
          * @type string | undefined
          */

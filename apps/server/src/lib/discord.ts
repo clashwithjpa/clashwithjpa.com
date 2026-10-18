@@ -73,19 +73,51 @@ async function getGuildRoles(guildId: string): Promise<Map<string, string>> {
     return new Map(entries);
 }
 
-// channel id -> channel name (cached).
-async function getGuildChannels(guildId: string): Promise<Map<string, string>> {
-    const key = `discord:guild:${guildId}:channels`;
+type RawChannel = { id: string; name: string; type: number; parent_id?: string | null; position: number };
+
+async function fetchGuildChannels(guildId: string): Promise<RawChannel[]> {
+    const key = `discord:guild:${guildId}:channel-list`;
     const cached = await redis.get(key).catch(() => null);
-    if (cached) return new Map<string, string>(JSON.parse(cached));
+    if (cached) return JSON.parse(cached) as RawChannel[];
 
     const res = await discordRequest(`/guilds/${guildId}/channels`);
     if (!res.ok) throw new DiscordUnavailableError(`Failed to fetch guild channels (HTTP ${res.status})`);
 
-    const channels = (await res.json()) as { id: string; name: string }[];
-    const entries = channels.map((ch) => [ch.id, ch.name] as [string, string]);
-    await redis.set(key, JSON.stringify(entries), "EX", LIST_TTL).catch(() => {});
-    return new Map(entries);
+    const channels = ((await res.json()) as RawChannel[]).map(({ id, name, type, parent_id, position }) => ({ id, name, type, parent_id, position }));
+    await redis.set(key, JSON.stringify(channels), "EX", LIST_TTL).catch(() => {});
+    return channels;
+}
+
+// channel id -> channel name (cached).
+async function getGuildChannels(guildId: string): Promise<Map<string, string>> {
+    return new Map((await fetchGuildChannels(guildId)).map((ch) => [ch.id, ch.name]));
+}
+
+const CATEGORY = 4;
+const MESSAGEABLE = new Set([0, 5]); // text, announcement
+
+export type GuildTextChannel = { id: string; name: string; category: string | null; announcement: boolean };
+
+// Text channels in Discord's sidebar order: uncategorised first, then by category.
+export async function getGuildTextChannels(): Promise<{ guildId: string; channels: GuildTextChannel[] }> {
+    const settings = await getCachedSettings();
+    const guildId = settings?.guildId;
+    if (!guildId) throw new DiscordUnavailableError("Discord guild is not configured. Set the Guild ID in admin settings first.");
+
+    const channels = await fetchGuildChannels(guildId);
+    const categories = new Map(channels.filter((ch) => ch.type === CATEGORY).map((ch) => [ch.id, ch]));
+    const rank = (ch: RawChannel) => (ch.parent_id ? (categories.get(ch.parent_id)?.position ?? 0) + 1 : 0);
+
+    const text = channels
+        .filter((ch) => MESSAGEABLE.has(ch.type))
+        .sort((a, b) => rank(a) - rank(b) || a.position - b.position)
+        .map((ch) => ({
+            id: ch.id,
+            name: ch.name,
+            category: ch.parent_id ? (categories.get(ch.parent_id)?.name ?? null) : null,
+            announcement: ch.type === 5,
+        }));
+    return { guildId, channels: text };
 }
 
 // Display name if the user is in the guild, else null.

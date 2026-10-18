@@ -11,6 +11,7 @@ import type {
     UpdateCwlPingSettings400,
     UpdateCwlPingSettings401,
     UpdateCwlPingSettings500,
+    UpdateCwlPingSettings503,
     UpdateCwlPingSettingsMutationRequest,
     UpdateCwlPingSettingsMutationResponse,
 } from "../models/UpdateCwlPingSettings.ts";
@@ -27,7 +28,7 @@ export function createUpdateCwlPingSettings<TContext>(
     options: {
         mutation?: CreateMutationOptions<
             UpdateCwlPingSettingsMutationResponse,
-            ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500>,
+            ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503>,
             { data: UpdateCwlPingSettingsMutationRequest },
             TContext
         > & { client?: QueryClient };
@@ -40,7 +41,7 @@ export function createUpdateCwlPingSettings<TContext>(
 
     return createMutation<
         UpdateCwlPingSettingsMutationResponse,
-        ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500>,
+        ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503>,
         { data: UpdateCwlPingSettingsMutationRequest },
         TContext
     >(

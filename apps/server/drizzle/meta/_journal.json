@@ -218,6 +218,13 @@
             "when": 1786806091396,
             "tag": "0030_square_mordo",
             "breakpoints": true
+        },
+        {
+            "idx": 31,
+            "version": "7",
+            "when": 1792331820728,
+            "tag": "0031_cwl_ping_channel",
+            "breakpoints": true
         }
     ]
 }

@@ -20,12 +20,18 @@ export type GetCwlPingSettings200 = {
              * @type boolean
              */
             enabled: boolean;
-            webhookUrl: string | null;
+            /**
+             * @type string,null
+             */
+            channelId: string | null;
             /**
              * @type number
              */
             intervalMinutes: number;
             lastRunAt: string | null;
+            /**
+             * @type string,null
+             */
             lastRunSummary: string | null;
         } | null;
     };

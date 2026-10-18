@@ -8,15 +8,15 @@ import * as z from "zod";
 /**
  * @description Test message sent.
  */
-export const testCwlPingWebhook200Schema = z.object({
+export const testCwlPing200Schema = z.object({
     success: z.literal(true),
     data: z.object({}),
 });
 
 /**
- * @description No webhook URL to test.
+ * @description No channel to test.
  */
-export const testCwlPingWebhook400Schema = z.object({
+export const testCwlPing400Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
@@ -24,21 +24,21 @@ export const testCwlPingWebhook400Schema = z.object({
 /**
  * @description Unauthorized.
  */
-export const testCwlPingWebhook401Schema = z.object({
+export const testCwlPing401Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
 /**
- * @description Webhook rejected the message.
+ * @description Discord rejected the message.
  */
-export const testCwlPingWebhook502Schema = z.object({
+export const testCwlPing502Schema = z.object({
     success: z.literal(false),
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
-export const testCwlPingWebhookMutationRequestSchema = z.object({
-    webhookUrl: z.optional(z.string().url()),
+export const testCwlPingMutationRequestSchema = z.object({
+    channelId: z.optional(z.string().regex(/^\d{17,20}$/)),
 });
 
-export const testCwlPingWebhookMutationResponseSchema = z.lazy(() => testCwlPingWebhook200Schema);
+export const testCwlPingMutationResponseSchema = z.lazy(() => testCwlPing200Schema);

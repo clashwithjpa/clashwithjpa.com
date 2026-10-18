@@ -13,10 +13,10 @@ export const updateCwlPingSettings200Schema = z.object({
     data: z.object({
         settings: z.object({
             enabled: z.boolean(),
-            webhookUrl: z.union([z.string(), z.null()]),
+            channelId: z.nullable(z.string()),
             intervalMinutes: z.number(),
             lastRunAt: z.union([z.string().datetime(), z.null()]),
-            lastRunSummary: z.union([z.string(), z.null()]),
+            lastRunSummary: z.nullable(z.string()),
         }),
     }),
 });
@@ -45,9 +45,17 @@ export const updateCwlPingSettings500Schema = z.object({
     error: z.union([z.string(), z.object({}).catchall(z.any())]),
 });
 
+/**
+ * @description Discord unavailable.
+ */
+export const updateCwlPingSettings503Schema = z.object({
+    success: z.literal(false),
+    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+});
+
 export const updateCwlPingSettingsMutationRequestSchema = z.object({
     enabled: z.optional(z.boolean()),
-    webhookUrl: z.optional(z.union([z.string().url(), z.null()])),
+    channelId: z.optional(z.union([z.string().regex(/^\d{17,20}$/), z.null()])),
     intervalMinutes: z.optional(z.number().int().min(1).max(240)),
 });
 

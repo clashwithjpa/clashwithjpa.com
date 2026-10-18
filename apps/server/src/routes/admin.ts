@@ -62,6 +62,7 @@ import {
     DiscordRateLimitError,
     DiscordUnavailableError,
     getGuildNicknames,
+    getGuildTextChannels,
     getGuildUsernames,
     verifyClanDiscordIds,
 } from "@/lib/discord";
@@ -1263,12 +1264,11 @@ app.put(
     },
 );
 
-// CWL ping - superadmin-only. Kept off the isAdmin-gated /settings endpoints above so the
-// webhook URL is never returned to a plain sudo-level admin.
+// CWL ping - superadmin-only. Kept off the isAdmin-gated /settings endpoints above.
 
 const cwlPingSettingsSchema = z4.object({
     enabled: z4.boolean(),
-    webhookUrl: z4.string().nullable(),
+    channelId: z4.string().nullable(),
     intervalMinutes: z4.number(),
     lastRunAt: z4.date().nullable(),
     lastRunSummary: z4.string().nullable(),
@@ -1280,7 +1280,7 @@ app.get(
     describeRoute({
         operationId: "getCwlPingSettings",
         role: "Superadmin",
-        description: "Fetches the CWL ping job's settings (enabled, webhook URL, interval, last run).",
+        description: "Fetches the CWL ping job's settings (enabled, channel, interval, last run).",
         tags: ["admin"],
         responses: {
             200: { description: "Settings.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlPingSettingsData)) } } },
@@ -1300,13 +1300,41 @@ app.get(
     },
 );
 
-const discordWebhookUrlSchema = z4
-    .string()
-    .url()
-    .refine((url) => /^https:\/\/(discord|discordapp)\.com\/api\/webhooks\//.test(url), "Must be a discord.com webhook URL");
+const getCwlPingChannelsData = z4.object({
+    guildId: z4.string(),
+    channels: z4.array(z4.object({ id: z4.string(), name: z4.string(), category: z4.string().nullable(), announcement: z4.boolean() })),
+});
+app.get(
+    "/settings/cwl-ping/channels",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "getCwlPingChannels",
+        role: "Superadmin",
+        description: "Lists the guild's text channels the bot can be pointed at.",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Channels.", content: { "application/json": { schema: resolver(SuccessResponseSchema(getCwlPingChannelsData)) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        try {
+            return c.json({ success: true, data: await getGuildTextChannels() });
+        } catch (error) {
+            if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                return c.json({ success: false, error: error.message }, 503);
+            }
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch channels" }, 503);
+        }
+    },
+);
+
+const snowflakeSchema = z4.string().regex(/^\d{17,20}$/, "Must be a Discord channel ID");
 const updateCwlPingSettingsBodySchema = z4.object({
     enabled: z4.boolean().optional(),
-    webhookUrl: discordWebhookUrlSchema.nullable().optional(),
+    channelId: snowflakeSchema.nullable().optional(),
     intervalMinutes: z4.number().int().min(1).max(240).optional(),
 });
 const updateCwlPingSettingsData = z4.object({ settings: cwlPingSettingsSchema });
@@ -1326,12 +1354,19 @@ app.put(
             400: { description: "Bad request.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            503: { description: "Discord unavailable.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
     zValidator("json", updateCwlPingSettingsBodySchema),
     async (c) => {
         try {
             const body = c.req.valid("json");
+            if (body.channelId) {
+                const { channels } = await getGuildTextChannels();
+                if (!channels.some((ch) => ch.id === body.channelId)) {
+                    return c.json({ success: false, error: "That channel isn't a text channel in this server." }, 400);
+                }
+            }
             const settings = await updateCwlPingSettings(body);
             logAction(c, {
                 action: "cwl_ping.settings_update",
@@ -1341,39 +1376,42 @@ app.put(
             });
             return c.json({ success: true, data: { settings } });
         } catch (error) {
+            if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {
+                return c.json({ success: false, error: error.message }, 503);
+            }
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to update CWL ping settings" }, 500);
         }
     },
 );
 
-const testCwlPingWebhookBodySchema = z4.object({ webhookUrl: discordWebhookUrlSchema.optional() });
+const testCwlPingBodySchema = z4.object({ channelId: snowflakeSchema.optional() });
 app.post(
     "/settings/cwl-ping/test",
     hasAccessAuthMiddleware(isSuperadmin),
     describeRoute({
-        operationId: "testCwlPingWebhook",
+        operationId: "testCwlPing",
         role: "Superadmin",
-        description: "Sends a minimal test message to the given (or currently saved) CWL ping webhook URL.",
+        description: "Has the bot post a test message in the given (or currently saved) CWL ping channel.",
         tags: ["admin"],
         responses: {
             200: { description: "Test message sent.", content: { "application/json": { schema: resolver(SuccessResponseSchema(z4.object({}))) } } },
-            400: { description: "No webhook URL to test.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            400: { description: "No channel to test.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
             401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
-            502: { description: "Webhook rejected the message.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            502: { description: "Discord rejected the message.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
         },
     }),
-    zValidator("json", testCwlPingWebhookBodySchema),
+    zValidator("json", testCwlPingBodySchema),
     async (c) => {
         try {
-            const { webhookUrl } = c.req.valid("json");
-            const target = webhookUrl ?? (await getCwlPingSettings())?.webhookUrl;
-            if (!target) return c.json({ success: false, error: "No webhook URL configured." }, 400);
+            const { channelId } = c.req.valid("json");
+            const target = channelId ?? (await getCwlPingSettings())?.channelId;
+            if (!target) return c.json({ success: false, error: "No channel selected." }, 400);
 
             await sendTestPing(target);
             return c.json({ success: true, data: {} });
         } catch (error) {
-            return c.json({ success: false, error: error instanceof Error ? error.message : "Failed to reach the webhook" }, 502);
+            return c.json({ success: false, error: error instanceof Error ? error.message : "Failed to reach Discord" }, 502);
         }
     },
 );
@@ -1383,8 +1421,28 @@ const runCwlPingData = z4.object({
     clansChecked: z4.number(),
     clansPinged: z4.number(),
     usersPinged: z4.number(),
+    clans: z4.array(z4.object({ tag: z4.string(), name: z4.string(), pending: z4.number() })),
     skippedReason: z4.string().optional(),
 });
+app.get(
+    "/settings/cwl-ping/preview",
+    hasAccessAuthMiddleware(isSuperadmin),
+    describeRoute({
+        operationId: "previewCwlPing",
+        role: "Superadmin",
+        description: "Dry run: lists the clans whose assigned applicants haven't joined yet, without pinging anyone.",
+        tags: ["admin"],
+        responses: {
+            200: { description: "Run summary.", content: { "application/json": { schema: resolver(SuccessResponseSchema(runCwlPingData)) } } },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    async (c) => {
+        c.header("Cache-Control", "no-cache, no-store, must-revalidate");
+        return c.json({ success: true, data: await runCwlPingCheck({ dryRun: true }) });
+    },
+);
+
 app.post(
     "/settings/cwl-ping/run",
     hasAccessAuthMiddleware(isSuperadmin),

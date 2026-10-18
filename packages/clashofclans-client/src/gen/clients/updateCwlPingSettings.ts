@@ -9,6 +9,7 @@ import type {
     UpdateCwlPingSettings400,
     UpdateCwlPingSettings401,
     UpdateCwlPingSettings500,
+    UpdateCwlPingSettings503,
     UpdateCwlPingSettingsMutationRequest,
     UpdateCwlPingSettingsMutationResponse,
 } from "../models/UpdateCwlPingSettings.ts";
@@ -32,7 +33,7 @@ export async function updateCwlPingSettings(
 
     const res = await request<
         UpdateCwlPingSettingsMutationResponse,
-        ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500>,
+        ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503>,
         UpdateCwlPingSettingsMutationRequest
     >({ method: "PUT", url: getUpdateCwlPingSettingsUrl().url.toString(), data: requestData, ...requestConfig });
     return res.data;

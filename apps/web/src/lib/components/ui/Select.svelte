@@ -6,7 +6,7 @@
     import { getPopupHost } from "./popupHost";
     import RawPopup from "./RawPopup.svelte";
 
-    export type Option = { label: string; value: string; icon?: Component | string };
+    export type Option = { label: string; value: string; icon?: Component | string; hint?: string };
 
     let {
         value = $bindable(),
@@ -39,7 +39,10 @@
     let searchRef = $state<HTMLInputElement | null>(null);
     let listRef = $state<HTMLDivElement | null>(null);
     let highlightedIndex = $state(-1);
-    let filteredOptions = $derived(search.trim() ? options.filter((o) => o.label.toLowerCase().includes(search.trim().toLowerCase())) : options);
+    let filteredOptions = $derived.by(() => {
+        const q = search.trim().toLowerCase();
+        return q ? options.filter((o) => o.label.toLowerCase().includes(q) || o.hint?.toLowerCase().includes(q)) : options;
+    });
 
     // Reset highlight when filtered options change
     $effect(() => {
@@ -177,6 +180,9 @@
                     {/if}
                     <span class="truncate">{option.label}</span>
                 </div>
+                {#if option.hint}
+                    <span class="ml-auto shrink-0 pl-4 text-xs text-stone-500">{option.hint}</span>
+                {/if}
             </button>
         {/each}
         {#if filteredOptions.length === 0}

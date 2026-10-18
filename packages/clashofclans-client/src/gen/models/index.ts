@@ -407,6 +407,13 @@ export type {
     GetCwlApplicationsQueryResponse,
 } from "./GetCwlApplications.ts";
 export type {
+    GetCwlPingChannels200,
+    GetCwlPingChannels401,
+    GetCwlPingChannels503,
+    GetCwlPingChannelsQuery,
+    GetCwlPingChannelsQueryResponse,
+} from "./GetCwlPingChannels.ts";
+export type {
     GetCwlPingSettings200,
     GetCwlPingSettings401,
     GetCwlPingSettings500,
@@ -495,6 +502,7 @@ export type {
     PostCOCPlayerVerifyPathParams,
     VerifyTokenStatusEnumKey,
 } from "./PostCOCPlayerVerify.ts";
+export type { PreviewCwlPing200, PreviewCwlPing401, PreviewCwlPingQuery, PreviewCwlPingQueryResponse } from "./PreviewCwlPing.ts";
 export type {
     RefreshDiscordUsernames200,
     RefreshDiscordUsernames401,
@@ -578,14 +586,14 @@ export type {
     SyncCocAccountsMutationResponse,
 } from "./SyncCocAccounts.ts";
 export type {
-    TestCwlPingWebhook200,
-    TestCwlPingWebhook400,
-    TestCwlPingWebhook401,
-    TestCwlPingWebhook502,
-    TestCwlPingWebhookMutation,
-    TestCwlPingWebhookMutationRequest,
-    TestCwlPingWebhookMutationResponse,
-} from "./TestCwlPingWebhook.ts";
+    TestCwlPing200,
+    TestCwlPing400,
+    TestCwlPing401,
+    TestCwlPing502,
+    TestCwlPingMutation,
+    TestCwlPingMutationRequest,
+    TestCwlPingMutationResponse,
+} from "./TestCwlPing.ts";
 export type {
     UpdateAdminClan200,
     UpdateAdminClan401,
@@ -652,6 +660,7 @@ export type {
     UpdateCwlPingSettings400,
     UpdateCwlPingSettings401,
     UpdateCwlPingSettings500,
+    UpdateCwlPingSettings503,
     UpdateCwlPingSettingsMutation,
     UpdateCwlPingSettingsMutationRequest,
     UpdateCwlPingSettingsMutationResponse,

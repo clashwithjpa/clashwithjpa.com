@@ -687,7 +687,7 @@ export async function getCwlPingSettings() {
         .select({
             id: settingsTable.id,
             enabled: settingsTable.cwlPingEnabled,
-            webhookUrl: settingsTable.cwlPingWebhookUrl,
+            channelId: settingsTable.cwlPingChannelId,
             intervalMinutes: settingsTable.cwlPingIntervalMinutes,
             lastRunAt: settingsTable.cwlPingLastRunAt,
             lastRunSummary: settingsTable.cwlPingLastRunSummary,
@@ -697,10 +697,10 @@ export async function getCwlPingSettings() {
     return result[0] ?? null;
 }
 
-export async function updateCwlPingSettings(values: { enabled?: boolean; webhookUrl?: string | null; intervalMinutes?: number }) {
+export async function updateCwlPingSettings(values: { enabled?: boolean; channelId?: string | null; intervalMinutes?: number }) {
     const columns = {
         ...(values.enabled !== undefined ? { cwlPingEnabled: values.enabled } : {}),
-        ...(values.webhookUrl !== undefined ? { cwlPingWebhookUrl: values.webhookUrl } : {}),
+        ...(values.channelId !== undefined ? { cwlPingChannelId: values.channelId } : {}),
         ...(values.intervalMinutes !== undefined ? { cwlPingIntervalMinutes: values.intervalMinutes } : {}),
     };
     const result = await db
@@ -713,7 +713,7 @@ export async function updateCwlPingSettings(values: { enabled?: boolean; webhook
         .returning({
             id: settingsTable.id,
             enabled: settingsTable.cwlPingEnabled,
-            webhookUrl: settingsTable.cwlPingWebhookUrl,
+            channelId: settingsTable.cwlPingChannelId,
             intervalMinutes: settingsTable.cwlPingIntervalMinutes,
             lastRunAt: settingsTable.cwlPingLastRunAt,
             lastRunSummary: settingsTable.cwlPingLastRunSummary,

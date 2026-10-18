@@ -11,10 +11,17 @@ import * as z from "zod";
 export const runCwlPingNow200Schema = z.object({
     success: z.literal(true),
     data: z.object({
-        seasonId: z.union([z.number(), z.null()]),
+        seasonId: z.nullable(z.number()),
         clansChecked: z.number(),
         clansPinged: z.number(),
         usersPinged: z.number(),
+        clans: z.array(
+            z.object({
+                tag: z.string(),
+                name: z.string(),
+                pending: z.number(),
+            }),
+        ),
         skippedReason: z.optional(z.string()),
     }),
 });

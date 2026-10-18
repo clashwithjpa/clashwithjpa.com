@@ -6,7 +6,7 @@
 /**
  * @description Test message sent.
  */
-export type TestCwlPingWebhook200 = {
+export type TestCwlPing200 = {
     /**
      * @type boolean
      */
@@ -18,9 +18,9 @@ export type TestCwlPingWebhook200 = {
 };
 
 /**
- * @description No webhook URL to test.
+ * @description No channel to test.
  */
-export type TestCwlPingWebhook400 = {
+export type TestCwlPing400 = {
     /**
      * @type boolean
      */
@@ -35,7 +35,7 @@ export type TestCwlPingWebhook400 = {
 /**
  * @description Unauthorized.
  */
-export type TestCwlPingWebhook401 = {
+export type TestCwlPing401 = {
     /**
      * @type boolean
      */
@@ -48,9 +48,9 @@ export type TestCwlPingWebhook401 = {
 };
 
 /**
- * @description Webhook rejected the message.
+ * @description Discord rejected the message.
  */
-export type TestCwlPingWebhook502 = {
+export type TestCwlPing502 = {
     /**
      * @type boolean
      */
@@ -62,17 +62,18 @@ export type TestCwlPingWebhook502 = {
           };
 };
 
-export type TestCwlPingWebhookMutationRequest = {
+export type TestCwlPingMutationRequest = {
     /**
-     * @type string | undefined, uri
+     * @pattern ^\d{17,20}$
+     * @type string | undefined
      */
-    webhookUrl?: string;
+    channelId?: string;
 };
 
-export type TestCwlPingWebhookMutationResponse = TestCwlPingWebhook200;
+export type TestCwlPingMutationResponse = TestCwlPing200;
 
-export type TestCwlPingWebhookMutation = {
-    Response: TestCwlPingWebhook200;
-    Request: TestCwlPingWebhookMutationRequest;
-    Errors: TestCwlPingWebhook400 | TestCwlPingWebhook401 | TestCwlPingWebhook502;
+export type TestCwlPingMutation = {
+    Response: TestCwlPing200;
+    Request: TestCwlPingMutationRequest;
+    Errors: TestCwlPing400 | TestCwlPing401 | TestCwlPing502;
 };

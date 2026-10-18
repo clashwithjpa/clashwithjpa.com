@@ -13,7 +13,7 @@ function getGetCwlPingSettingsUrl() {
 }
 
 /**
- * @description Fetches the CWL ping job's settings (enabled, webhook URL, interval, last run).
+ * @description Fetches the CWL ping job's settings (enabled, channel, interval, last run).
  * {@link /admin/settings/cwl-ping}
  */
 export async function getCwlPingSettings(config: Partial<RequestConfig> & { client?: Client } = {}) {

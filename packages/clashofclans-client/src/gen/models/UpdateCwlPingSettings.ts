@@ -23,12 +23,18 @@ export type UpdateCwlPingSettings200 = {
              * @type boolean
              */
             enabled: boolean;
-            webhookUrl: string | null;
+            /**
+             * @type string,null
+             */
+            channelId: string | null;
             /**
              * @type number
              */
             intervalMinutes: number;
             lastRunAt: string | null;
+            /**
+             * @type string,null
+             */
             lastRunSummary: string | null;
         };
     };
@@ -79,12 +85,27 @@ export type UpdateCwlPingSettings500 = {
           };
 };
 
+/**
+ * @description Discord unavailable.
+ */
+export type UpdateCwlPingSettings503 = {
+    /**
+     * @type boolean
+     */
+    success: false;
+    error:
+        | string
+        | {
+              [key: string]: any;
+          };
+};
+
 export type UpdateCwlPingSettingsMutationRequest = {
     /**
      * @type boolean | undefined
      */
     enabled?: boolean;
-    webhookUrl?: string | null;
+    channelId?: string | null;
     /**
      * @minLength 1
      * @maxLength 240
@@ -98,5 +119,5 @@ export type UpdateCwlPingSettingsMutationResponse = UpdateCwlPingSettings200;
 export type UpdateCwlPingSettingsMutation = {
     Response: UpdateCwlPingSettings200;
     Request: UpdateCwlPingSettingsMutationRequest;
-    Errors: UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500;
+    Errors: UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503;
 };
