@@ -2,6 +2,7 @@
     /* eslint-disable @typescript-eslint/no-explicit-any */
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
+    import ClanCell from "$lib/components/grid/ClanCell.svelte";
     import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
     import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
     import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
@@ -32,6 +33,7 @@
         getCOCPlayer,
         getCwlApplications,
         getCwlSeasons,
+        getJPAClans,
         getJPACwlClans,
         getUserCocAccountsByUserId,
         updateCocAccountWarWeight,
@@ -60,6 +62,7 @@
     let applications = $state<Application[]>([]);
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
     let clanNameByTag = $state<Record<string, string>>({});
+    let familyClanNameByTag = $state<Record<string, string>>({});
     let total = $state(0);
     let nicknamesLoading = $state(false);
     let nicknameLoadId = 0;
@@ -160,11 +163,14 @@
               ? applications.filter((a) => joinedInfo(a).status === "wrong-clan")
               : applications.filter((a) => a.assignedTo === clanFilter),
     );
-    let unassignedCount = $derived(displayedApplications.filter((a) => !a.assignedTo).length);
-    // Rows hidden by the clan filter drop out of the selection, so bulk actions
-    // only ever touch what's listed.
+    let displayedRows = $derived(dataTable?.getDisplayedRows() ?? displayedApplications);
+    let unassignedCount = $derived(displayedRows.filter((a) => !a.assignedTo).length);
+    let displayedCount = $derived(displayedRows.length);
+    let activeFilters = $derived(dataTable?.getActiveFilterCount() ?? 0);
+    // Rows hidden by search or a filter drop out of the selection, so bulk
+    // actions only ever touch what's listed.
     let selectedIds = $derived.by(() => {
-        const visible = new Set(displayedApplications.map((a) => a.id));
+        const visible = new Set(displayedRows.map((a) => a.id));
         return Object.keys(rowSelection)
             .filter((id) => rowSelection[id])
             .map(Number)
@@ -184,6 +190,19 @@
             }
         } catch {
             // ignore - selectors will still work without options
+        }
+    }
+
+    async function loadFamilyClans() {
+        try {
+            const resp = await getJPAClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+            if (resp.success) {
+                familyClanNameByTag = Object.fromEntries(
+                    Object.values(resp.data.clans).map((c) => [normalizeTag(c.clanTag), c.clanName ?? c.clanTag]),
+                );
+            }
+        } catch {
+            // Clan cells fall back to showing the raw tag.
         }
     }
 
@@ -341,7 +360,7 @@
     function downloadCsv() {
         downloading = true;
         try {
-            const list = displayedApplications;
+            const list = displayedRows;
             const lines = [
                 CSV_COLUMNS.map((c) => csvCell(c.header)).join(","),
                 ...list.map((a) => CSV_COLUMNS.map((c) => csvCell(c.value(a))).join(",")),
@@ -610,6 +629,7 @@
             a.cocAccountName,
             a.cocAccountTag,
             a.cocAccountClan,
+            a.cocAccountClan ? familyClanNameByTag[normalizeTag(a.cocAccountClan)] : "",
             a.preferenceNum,
             a.cocAccountWeight,
             a.appliedAt ? formatDate(a.appliedAt) : "",
@@ -620,6 +640,15 @@
             .filter((v) => v != null)
             .join(" ");
     }
+
+    const STATUS_LABELS: Record<JoinStatus, string> = {
+        "": "Unassigned",
+        joined: "In clan",
+        "wrong-clan": "Wrong clan",
+        missing: "Not in clan",
+        error: "Check failed",
+        unknown: "Checking",
+    };
 
     const columns: TableColumn<TableRow>[] = [
         {
@@ -641,14 +670,32 @@
             size: 260,
             cell: ({ row }) => renderComponent(CwlAccountCell, { account: row.original, onOpen: () => openAccountSidebar(row.original) }),
         },
-        { accessorKey: "cocAccountClan", header: "Clan", size: 160, cell: ({ getValue }) => getValue() || "—" },
-        { accessorKey: "preferenceNum", header: "Pref.", size: 90 },
+        {
+            accessorKey: "cocAccountClan",
+            header: "Clan",
+            size: 160,
+            // Some accounts store the clan name instead of its tag.
+            cell: ({ getValue }) => {
+                const value = getValue();
+                if (!value?.startsWith("#")) return value || "—";
+                return renderComponent(ClanCell, { tag: value, name: familyClanNameByTag[normalizeTag(value)] ?? null });
+            },
+            meta: {
+                filter: "set",
+                filterLabel: (tag) => {
+                    if (!tag) return "No clan";
+                    const name = familyClanNameByTag[normalizeTag(tag)];
+                    return name ? `${name} (${tag})` : tag;
+                },
+            },
+        },
+        { accessorKey: "preferenceNum", header: "Pref.", size: 90, meta: { filter: "number" } },
         {
             accessorKey: "cocAccountWeight",
             header: "Weight",
             size: 120,
             cell: ({ getValue }) => (getValue() != null ? Number(getValue()).toLocaleString() : ""),
-            meta: { edit: { type: "number", commit: saveWeight } },
+            meta: { filter: "number", edit: { type: "number", commit: saveWeight } },
         },
         {
             accessorKey: "appliedAt",
@@ -656,6 +703,7 @@
             size: 130,
             sortFn: "datetime",
             cell: ({ getValue }) => renderSnippet(appliedCell, getValue()),
+            meta: { filter: "date" },
         },
         {
             id: "assignedTo",
@@ -663,17 +711,19 @@
             header: "Assigned clan",
             size: 260,
             cell: ({ getValue }) => clanLabel(getValue()),
-            meta: { edit: { type: "select", options: () => clanOptions, commit: saveAssignment } },
+            meta: { filter: "set", filterLabel: clanLabel, edit: { type: "select", options: () => clanOptions, commit: saveAssignment } },
         },
         {
             accessorKey: "joinedStatus",
             header: "Status",
             size: 150,
             cell: ({ row }) => renderComponent(CwlStatusCell, { status: row.original.joinedStatus, wrongClan: row.original.wrongClan }),
+            meta: { filter: "set", filterLabel: (status) => STATUS_LABELS[status as JoinStatus] ?? status },
         },
     ];
 
     loadClans();
+    loadFamilyClans();
     loadSeasons();
     $effect(() => {
         filterMode; // track
@@ -699,10 +749,20 @@
     <div class="flex flex-col gap-4 px-4 pt-4">
         <PageHeader title="CWL Applications">
             {#snippet subtitle()}
-                {#if displayedApplications.length !== total}
-                    {displayedApplications.length} of {total} application{total === 1 ? "" : "s"}
+                {#if displayedCount !== total}
+                    {displayedCount} of {total} application{total === 1 ? "" : "s"}
                 {:else}
                     {total} application{total === 1 ? "" : "s"}
+                {/if}
+                {#if activeFilters}
+                    ·
+                    <button
+                        type="button"
+                        class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
+                        onclick={() => dataTable?.clearFilters()}
+                    >
+                        Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
+                    </button>
                 {/if}
             {/snippet}
             {#snippet actions()}
@@ -715,7 +775,7 @@
                 </Button>
                 <Button
                     variant="base"
-                    disabled={downloading || displayedApplications.length === 0}
+                    disabled={downloading || displayedCount === 0}
                     onclick={downloadCsv}
                     class="shrink-0"
                     tooltip="Export applications as CSV"

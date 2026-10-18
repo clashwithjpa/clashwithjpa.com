@@ -28,6 +28,7 @@
     import TablerPencil from "~icons/tabler/pencil";
     import { setPopupHost } from "../popupHost";
     import { sidebarStore } from "../sidebar";
+    import DateFilter from "./DateFilter.svelte";
     import { features, setKey, type Features, type TableColumn } from "./features";
     import NumberFilter from "./NumberFilter.svelte";
     import SetFilter from "./SetFilter.svelte";
@@ -476,6 +477,8 @@
                                         {/if}
                                         {#if column.columnDef.meta?.filter === "number"}
                                             <NumberFilter column={column as Column<any, any, any>} />
+                                        {:else if column.columnDef.meta?.filter === "date"}
+                                            <DateFilter column={column as Column<any, any, any>} />
                                         {:else if column.columnDef.meta?.filter === "set"}
                                             <SetFilter column={column as Column<any, any, any>} getOptions={() => setFilterOptions(column)} />
                                         {/if}
