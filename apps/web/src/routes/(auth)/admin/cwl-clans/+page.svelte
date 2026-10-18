@@ -8,6 +8,7 @@
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import {
@@ -69,7 +70,7 @@
     let clans = $state<CwlClan[]>([]);
     let loading = $state(true);
     let saving = $state(false);
-    let syncing = $state(false);
+    let syncing = $derived(jobs.running("cwl-clans:sync"));
     let removing = $state<string | null>(null);
     let searchText = $state("");
     let leagueFilter = $state<string | null>(null);
@@ -210,23 +211,26 @@
         }
     }
 
-    async function syncLeagues() {
-        syncing = true;
-        try {
-            const resp = (await syncAdminCwlClanLeagues({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof syncAdminCwlClanLeagues>> | SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
-            if (resp.success) {
-                clans = resp.data.clans;
+    jobs.onResult<CwlClan[] | undefined>("cwl-clans:sync", (synced) => {
+        if (synced) clans = synced;
+    });
+
+    function syncLeagues() {
+        jobs.start("cwl-clans:sync", "Syncing leagues", async () => {
+            try {
+                const resp = (await syncAdminCwlClanLeagues({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
+                    Awaited<ReturnType<typeof syncAdminCwlClanLeagues>> | SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
+                if (!resp.success) {
+                    toast.error(errMsg(resp.error, "Failed to sync leagues"));
+                    return;
+                }
                 const { updated, unchanged, failed } = resp.data;
                 toast.success(`Leagues synced: ${updated} updated, ${unchanged} unchanged${failed ? `, ${failed} failed` : ""}`);
-            } else {
-                toast.error(errMsg(resp.error, "Failed to sync leagues"));
+                return resp.data.clans;
+            } catch (e) {
+                toast.error("Failed to sync leagues", { description: errorMessage(e) });
             }
-        } catch (e) {
-            toast.error("Failed to sync leagues", { description: errorMessage(e) });
-        } finally {
-            syncing = false;
-        }
+        });
     }
 
     function resetForm() {

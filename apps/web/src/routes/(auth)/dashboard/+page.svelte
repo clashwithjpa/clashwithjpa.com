@@ -11,6 +11,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
+    import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
     import { formatDate, formatDateTime } from "$lib/utils";
     import {
@@ -42,7 +43,7 @@
     const session = authClient.useSession();
 
     let importDismissed = $state(false);
-    let isImporting = $state(false);
+    let isImporting = $derived(jobs.running("dashboard:import"));
 
     type LinkedAccount = {
         id: number;
@@ -99,32 +100,36 @@
         }
     }
 
-    async function importAccounts() {
-        isImporting = true;
-        try {
-            const resp = await importUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (!resp.success) {
-                toast.error("Failed to import accounts");
-                return;
-            }
+    jobs.onResult<"reload" | "dismiss" | undefined>("dashboard:import", (outcome) => {
+        if (outcome === "reload") location.reload();
+        else if (outcome === "dismiss") importDismissed = true;
+    });
 
-            const { imported, available } = resp.data;
-            if (available === 0) {
-                toast.info("No pre-existing accounts found for your Discord ID. Please apply manually.");
-                importDismissed = true;
-            } else if (imported.length === 0) {
-                toast.info("All your accounts are already linked.");
-                importDismissed = true;
-            } else {
+    function importAccounts() {
+        jobs.start("dashboard:import", "Importing accounts", async () => {
+            try {
+                const resp = await importUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (!resp.success) {
+                    toast.error("Failed to import accounts");
+                    return;
+                }
+
+                const { imported, available } = resp.data;
+                if (available === 0) {
+                    toast.info("No pre-existing accounts found for your Discord ID. Please apply manually.");
+                    return "dismiss";
+                }
+                if (imported.length === 0) {
+                    toast.info("All your accounts are already linked.");
+                    return "dismiss";
+                }
                 toast.success(`Imported ${imported.length} account${imported.length === 1 ? "" : "s"}.`);
-                location.reload();
+                return "reload";
+            } catch (err) {
+                console.error("Import error:", err);
+                toast.error("Failed to import accounts");
             }
-        } catch (err) {
-            console.error("Import error:", err);
-            toast.error("Failed to import accounts");
-        } finally {
-            isImporting = false;
-        }
+        });
     }
 
     type CwlApplication = Awaited<ReturnType<typeof getUserCwlApplications>>["data"]["applications"][number];

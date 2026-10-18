@@ -12,6 +12,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
@@ -67,10 +68,10 @@
     let cwlPingSettings = $state<CwlPingSettings>(null);
     let loading = $state(true);
     let saving = $state(false);
-    let refreshingUsernames = $state(false);
-    let testingPing = $state(false);
-    let runningPingNow = $state(false);
-    let previewingPing = $state(false);
+    let refreshingUsernames = $derived(jobs.running("discord:usernames"));
+    let testingPing = $derived(jobs.running("cwl-ping:test"));
+    let runningPingNow = $derived(jobs.running("cwl-ping:run"));
+    let previewingPing = $derived(jobs.running("cwl-ping:preview"));
     let pingPreview = $state<CwlPingPreview | null>(null);
 
     let applicationsEnabled = $state(false);
@@ -322,68 +323,72 @@
         }
     }
 
-    async function refreshUsernames() {
-        refreshingUsernames = true;
-        try {
-            const resp = await refreshDiscordUsernames({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                toast.success(`Updated ${resp.data.updated} of ${resp.data.matched} guild members`);
-            } else {
-                toast.error("Failed to refresh usernames");
+    function refreshUsernames() {
+        jobs.start("discord:usernames", "Refreshing usernames", async () => {
+            try {
+                const resp = await refreshDiscordUsernames({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (resp.success) toast.success(`Updated ${resp.data.updated} of ${resp.data.matched} guild members`);
+                else toast.error("Failed to refresh usernames");
+            } catch (e) {
+                toast.error("Failed to refresh usernames", { description: errorMessage(e) });
             }
-        } catch (e) {
-            toast.error("Failed to refresh usernames", { description: errorMessage(e) });
-        } finally {
-            refreshingUsernames = false;
-        }
+        });
     }
 
-    async function testPing() {
-        testingPing = true;
-        try {
-            const resp = await testCwlPing(
-                { channelId: cwlPingChannelId || undefined },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) toast.success("Test ping sent, check the channel.");
-            else toast.error(apiErrorMessage(resp, "Failed to send test ping"));
-        } catch (e) {
-            toast.error("Failed to send test ping", { description: errorMessage(e) });
-        } finally {
-            testingPing = false;
-        }
+    function testPing() {
+        const channelId = cwlPingChannelId || undefined;
+        jobs.start("cwl-ping:test", "Sending test ping", async () => {
+            try {
+                const resp = await testCwlPing(
+                    { channelId },
+                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
+                );
+                if (resp.success) toast.success("Test ping sent, check the channel.");
+                else toast.error(apiErrorMessage(resp, "Failed to send test ping"));
+            } catch (e) {
+                toast.error("Failed to send test ping", { description: errorMessage(e) });
+            }
+        });
     }
 
-    async function previewPing() {
-        previewingPing = true;
-        try {
-            const resp = await previewCwlPing({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) pingPreview = resp.data;
-            else toast.error("Failed to preview CWL ping");
-        } catch (e) {
-            toast.error("Failed to preview CWL ping", { description: errorMessage(e) });
-        } finally {
-            previewingPing = false;
-        }
+    jobs.onResult<CwlPingPreview | undefined>("cwl-ping:preview", (preview) => {
+        if (preview) pingPreview = preview;
+    });
+
+    function previewPing() {
+        jobs.start("cwl-ping:preview", "Checking who'd be pinged", async () => {
+            try {
+                const resp = await previewCwlPing({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (resp.success) return resp.data;
+                toast.error("Failed to preview CWL ping");
+            } catch (e) {
+                toast.error("Failed to preview CWL ping", { description: errorMessage(e) });
+            }
+        });
     }
 
-    async function runPingNow() {
-        runningPingNow = true;
-        try {
-            const resp = await runCwlPingNow({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
+    jobs.onResult<boolean>("cwl-ping:run", (ran) => {
+        if (!ran) return;
+        pingPreview = null;
+        void loadCwlPingSettings();
+    });
+
+    function runPingNow() {
+        jobs.start("cwl-ping:run", "Running CWL ping", async () => {
+            try {
+                const resp = await runCwlPingNow({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (!resp.success) {
+                    toast.error("Failed to run CWL ping");
+                    return false;
+                }
                 const { usersPinged, clansPinged, skippedReason } = resp.data;
                 toast.success(skippedReason ?? `Pinged ${usersPinged} user(s) across ${clansPinged} clan(s).`);
-                pingPreview = null;
-                await loadCwlPingSettings();
-            } else {
-                toast.error("Failed to run CWL ping");
+                return true;
+            } catch (e) {
+                toast.error("Failed to run CWL ping", { description: errorMessage(e) });
+                return false;
             }
-        } catch (e) {
-            toast.error("Failed to run CWL ping", { description: errorMessage(e) });
-        } finally {
-            runningPingNow = false;
-        }
+        });
     }
 
     load();

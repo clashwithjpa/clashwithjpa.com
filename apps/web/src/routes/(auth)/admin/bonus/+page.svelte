@@ -17,7 +17,9 @@
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { loadGuildNicknames } from "$lib/discordNicknames";
+    import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
+    import { formatRelativeTime } from "$lib/utils";
     import {
         assignCwlApplication,
         getBonusData,
@@ -61,7 +63,7 @@
     let nicknamesLoading = $state(false);
     let nicknameLoadId = 0;
     let downloading = $state(false);
-    let fetchingCwl = $state(false);
+    let cwlFetchedAt = $state<number | null>(null);
     let searchText = $state("");
     let dataTable = $state<ReturnType<typeof DataTable<Row>> | null>(null);
     let displayedCount = $derived(dataTable?.getDisplayedCount() ?? 0);
@@ -185,6 +187,7 @@
             total = bd.data.total;
             currentSeasonId = bd.data.seasonId;
             selectedSeasonValue = currentSeasonId != null ? String(currentSeasonId) : "";
+            restoreCwlStats();
         } catch (error) {
             toast.error("Failed to load bonus data", { description: error instanceof Error ? error.message : undefined });
         } finally {
@@ -207,24 +210,59 @@
         }
     }
 
-    // Live-fetches CWL attacks/stars for the roster's season (assigned clans only)
-    // and merges them onto the rows; nothing is persisted.
-    async function fetchCwlStats() {
-        fetchingCwl = true;
+    // Fetched CWL stats are slow to get, so they're kept per season for the rest of
+    // the tab's session and come back after navigating away or reloading.
+    const CWL_CACHE_KEY = "jpa:bonus-cwl-stats";
+    type CwlCache = Record<string, { fetchedAt: number; stats: CwlStat[] }>;
+
+    function readCwlCache(): CwlCache {
         try {
-            const resp = await getCwlStats({ seasonId: currentSeasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (!resp.success) throw new Error();
-            const byTag = new Map(resp.data.stats.map((s) => [s.tag.toUpperCase(), s]));
-            rows = rows.map((r) => {
-                const s = byTag.get(normalizeTag(r.cocAccountTag));
-                return { ...r, cwlAttacks: s?.attacks ?? 0, cwlStars: s?.stars ?? 0, cwlDetails: s?.details ?? [] };
-            });
-            toast.success("CWL stats fetched");
-        } catch (error) {
-            toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
-        } finally {
-            fetchingCwl = false;
+            return JSON.parse(sessionStorage.getItem(CWL_CACHE_KEY) ?? "{}") as CwlCache;
+        } catch {
+            return {};
         }
+    }
+
+    function applyCwlStats(stats: CwlStat[]) {
+        const byTag = new Map(stats.map((s) => [s.tag.toUpperCase(), s]));
+        rows = rows.map((r) => {
+            const s = byTag.get(normalizeTag(r.cocAccountTag));
+            return { ...r, cwlAttacks: s?.attacks ?? 0, cwlStars: s?.stars ?? 0, cwlDetails: s?.details ?? [] };
+        });
+    }
+
+    function restoreCwlStats() {
+        const cached = readCwlCache()[String(currentSeasonId)];
+        cwlFetchedAt = cached?.fetchedAt ?? null;
+        if (cached) applyCwlStats(cached.stats);
+    }
+
+    const cwlJobKey = () => `bonus-cwl:${currentSeasonId}`;
+    let fetchingCwl = $derived(jobs.running(cwlJobKey()));
+    jobs.onResult(cwlJobKey, restoreCwlStats);
+
+    // Live-fetches CWL attacks/stars for the roster's season (assigned clans only).
+    // The result lands in the session cache, and the rows pick it up from there.
+    function fetchCwlStats() {
+        const seasonId = currentSeasonId;
+        jobs.start(cwlJobKey(), "Fetching CWL stats", async () => {
+            try {
+                const resp = await getCwlStats({ seasonId: seasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+                if (!resp.success) throw new Error();
+                try {
+                    sessionStorage.setItem(
+                        CWL_CACHE_KEY,
+                        JSON.stringify({ ...readCwlCache(), [String(seasonId)]: { fetchedAt: Date.now(), stats: resp.data.stats } }),
+                    );
+                } catch {
+                    // Storage full or blocked, so keep them on the rows instead.
+                    applyCwlStats(resp.data.stats);
+                }
+                toast.success("CWL stats fetched");
+            } catch (error) {
+                toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
+            }
+        });
     }
 
     async function assign(row: Row, clanTag: string) {
@@ -582,7 +620,9 @@
                 class="shrink-0"
                 disabled={fetchingCwl || loading || rows.length === 0}
                 onclick={fetchCwlStats}
-                tooltip="Fetch live CWL attacks & stars"
+                tooltip={cwlFetchedAt
+                    ? `CWL stats fetched ${formatRelativeTime(new Date(cwlFetchedAt))}, click to refresh`
+                    : "Fetch live CWL attacks & stars"}
                 tooltipPlacement="bottom"
             >
                 {#if fetchingCwl}
