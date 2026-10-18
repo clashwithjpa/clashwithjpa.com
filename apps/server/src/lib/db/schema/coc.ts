@@ -1,6 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
-import { account, apikey, user } from "./ba-auth";
+import { account, apikey } from "./ba-auth";
 
 export const cwlSeasonTable = pgTable("cwl_season_table", {
     id: serial("id").primaryKey(),
@@ -30,24 +30,6 @@ export const settingsTable = pgTable(
         cwlPingLastRunSummary: text("cwl_ping_last_run_summary"),
     },
     (t) => [check("settings_table_single_row", sql`${t.id} = 1`)],
-);
-
-export const guidesTable = pgTable(
-    "guides_table",
-    {
-        id: serial("id").primaryKey(),
-        title: text("title").notNull(),
-        slug: text("slug").notNull().unique(),
-        imageLink: text("image_link"),
-        addedAt: timestamp("added_at").notNull().defaultNow(),
-        updatedAt: timestamp("updated_at").notNull().defaultNow(),
-        author: text("author")
-            .notNull()
-            .references(() => user.id, { onDelete: "cascade" }),
-        description: text("description"),
-        isPublished: boolean("is_published").notNull().default(false),
-    },
-    (t) => [index("guides_author_idx").on(t.author)],
 );
 
 export const baseInfoTable = pgTable("base_info_table", {
@@ -196,13 +178,6 @@ export const cocAccountRelations = relations(cocAccountTable, ({ one, many }) =>
         references: [account.accountId],
     }),
     cwlApplications: many(cwlApplicationTable),
-}));
-
-export const guidesRelations = relations(guidesTable, ({ one }) => ({
-    authorUser: one(user, {
-        fields: [guidesTable.author],
-        references: [user.id],
-    }),
 }));
 
 // No FK on actorId so deletes don't cascade (audit must survive user removal).

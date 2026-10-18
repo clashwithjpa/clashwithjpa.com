@@ -1,0 +1,1 @@
+DROP TABLE "guides_table" CASCADE;

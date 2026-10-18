@@ -232,6 +232,13 @@
             "when": 1792350428658,
             "tag": "0032_drop_cwl_application_notes",
             "breakpoints": true
+        },
+        {
+            "idx": 33,
+            "version": "7",
+            "when": 1792351876601,
+            "tag": "0033_drop_guides_table",
+            "breakpoints": true
         }
     ]
 }
