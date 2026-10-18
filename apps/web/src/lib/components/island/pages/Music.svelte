@@ -2,11 +2,14 @@
     import { cn } from "$lib/utils";
     import { Slider } from "@ark-ui/svelte/slider";
     import { onMount } from "svelte";
+    import TablerArrowsShuffle from "~icons/tabler/arrows-shuffle";
     import TablerExternalLink from "~icons/tabler/external-link";
     import TablerPlayerPauseFilled from "~icons/tabler/player-pause-filled";
     import TablerPlayerPlayFilled from "~icons/tabler/player-play-filled";
     import TablerPlayerSkipBackFilled from "~icons/tabler/player-skip-back-filled";
     import TablerPlayerSkipForwardFilled from "~icons/tabler/player-skip-forward-filled";
+    import TablerPlayerTrackNext from "~icons/tabler/player-track-next";
+    import TablerRepeatOnce from "~icons/tabler/repeat-once";
     import { player } from "../music/player.svelte";
     import { TRACKS } from "../music/tracks";
 
@@ -18,6 +21,11 @@
 
     const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
     const control = "grid size-9 cursor-pointer place-items-center rounded-full text-stone-200 transition-colors hover:bg-stone-800";
+    const MODES = [
+        { key: "shuffle", label: "Shuffle", icon: TablerArrowsShuffle },
+        { key: "autoplay", label: "Autoplay next", icon: TablerPlayerTrackNext },
+        { key: "repeatOne", label: "Repeat one", icon: TablerRepeatOnce },
+    ] as const;
 </script>
 
 <div class="flex flex-col gap-3">
@@ -72,9 +80,26 @@
                     <Slider.HiddenInput />
                 </Slider.Thumb>
             </Slider.Control>
-            <div class="flex justify-between text-[11px] text-stone-500 tabular-nums">
-                <span>{clock(shown)}</span>
-                <span>{player.duration ? clock(player.duration) : "--:--"}</span>
+            <div class="flex items-center justify-between text-[11px] text-stone-500 tabular-nums">
+                <span class="w-8">{clock(shown)}</span>
+                <div class="flex items-center gap-1">
+                    {#each MODES as mode (mode.key)}
+                        <button
+                            type="button"
+                            class={cn(
+                                "grid size-7 cursor-pointer place-items-center rounded-full transition-colors hover:bg-stone-800",
+                                player[mode.key] ? "text-lime-300" : "text-stone-500 hover:text-stone-300",
+                            )}
+                            title={mode.label}
+                            aria-label={mode.label}
+                            aria-pressed={player[mode.key]}
+                            onclick={() => (player[mode.key] = !player[mode.key])}
+                        >
+                            <mode.icon class="size-4" />
+                        </button>
+                    {/each}
+                </div>
+                <span class="w-8 text-right">{player.duration ? clock(player.duration) : "--:--"}</span>
             </div>
         </Slider.Root>
     </div>

@@ -37,6 +37,9 @@ const sidebarSize = persisted<number>("sidebar-size", 88);
 export type IslandSide = "left" | "right";
 const islandSide = persisted<IslandSide>("island-side", "right");
 const islandEggs = persisted<boolean>("island-eggs", true);
+const musicShuffle = persisted<boolean>("music-shuffle", false);
+const musicRepeatOne = persisted<boolean>("music-repeat-one", false);
+const musicAutoplay = persisted<boolean>("music-autoplay", true);
 
 export const storage = {
     get snowfall(): boolean {
@@ -65,5 +68,26 @@ export const storage = {
     },
     set islandEggs(value: boolean) {
         islandEggs.value = value;
+    },
+
+    get musicShuffle(): boolean {
+        return musicShuffle.value;
+    },
+    set musicShuffle(value: boolean) {
+        musicShuffle.value = value;
+    },
+
+    get musicRepeatOne(): boolean {
+        return musicRepeatOne.value;
+    },
+    set musicRepeatOne(value: boolean) {
+        musicRepeatOne.value = value;
+    },
+
+    get musicAutoplay(): boolean {
+        return musicAutoplay.value;
+    },
+    set musicAutoplay(value: boolean) {
+        musicAutoplay.value = value;
     },
 };

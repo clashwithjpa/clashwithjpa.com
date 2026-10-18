@@ -1,4 +1,5 @@
 import { toast } from "$lib/toast";
+import { storage } from "$lib/utils/storage.svelte";
 import { island } from "../island.svelte";
 import { TRACKS, type Track } from "./tracks";
 
@@ -52,7 +53,35 @@ class Player {
 
     skip(step: 1 | -1) {
         const i = playable.findIndex((t) => t.id === this.current.id);
+        if (step === 1 && this.shuffle && playable.length > 1) {
+            const others = playable.filter((t) => t.id !== this.current.id);
+            this.play(others[Math.floor(Math.random() * others.length)]);
+            return;
+        }
         this.play(playable[(i + step + playable.length) % playable.length]);
+    }
+
+    get shuffle() {
+        return storage.musicShuffle;
+    }
+    set shuffle(on: boolean) {
+        storage.musicShuffle = on;
+    }
+
+    // Native looping, so it beats autoplay: a looping track never ends.
+    get repeatOne() {
+        return storage.musicRepeatOne;
+    }
+    set repeatOne(on: boolean) {
+        storage.musicRepeatOne = on;
+        if (this.#audio) this.#audio.loop = on;
+    }
+
+    get autoplay() {
+        return storage.musicAutoplay;
+    }
+    set autoplay(on: boolean) {
+        storage.musicAutoplay = on;
     }
 
     #load(track: Track) {
@@ -69,7 +98,7 @@ class Player {
     }
 
     #create() {
-        const audio = Object.assign(new Audio(), { loop: true, preload: "metadata" });
+        const audio = Object.assign(new Audio(), { loop: this.repeatOne, preload: "metadata" });
         const sync = () => {
             this.playing = !audio.paused;
             if (this.playing)
@@ -78,11 +107,16 @@ class Player {
                     { title: this.current.title, subtitle: this.current.artist },
                     { id: "music", progress: () => (this.duration ? this.time / this.duration : 0) },
                 );
-            else island.dismiss("music");
+            // A track ending pauses just before autoplay starts the next one, so
+            // the pill stays up instead of flickering out between tracks.
+            else if (!(audio.ended && this.autoplay && !this.repeatOne)) island.dismiss("music");
             this.#position();
         };
         audio.addEventListener("play", sync);
         audio.addEventListener("pause", sync);
+        audio.addEventListener("ended", () => {
+            if (this.autoplay) this.skip(1);
+        });
         audio.addEventListener("timeupdate", () => (this.time = audio.currentTime));
         audio.addEventListener("seeked", () => {
             this.time = audio.currentTime;
