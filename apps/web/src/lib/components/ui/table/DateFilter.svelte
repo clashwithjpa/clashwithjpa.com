@@ -26,16 +26,22 @@
     let open = $state(false);
     let current = $derived(column.getFilterValue() as DateFilterValue | undefined);
     let op = $state<string>("last");
-    let a = $state("");
-    let b = $state("");
+    // The date inputs bind arrays of Dates; the filter stores local YYYY-MM-DD days.
+    let a = $state<Date[] | null>(null);
+    let b = $state<Date[] | null>(null);
     let days = $state<string | number>("");
-    const today = localDay(new Date());
+    const today = new Date();
+    const fromDay = (day: string) => {
+        const [y, m, d] = day.split("-").map(Number);
+        return new Date(y!, m! - 1, d!);
+    };
 
-    $effect(() => {
+    // Runs before the popup's inputs mount, since they only read their date once.
+    $effect.pre(() => {
         if (!open) return;
         op = current?.op ?? "last";
-        a = current?.a ?? "";
-        b = current?.b ?? "";
+        a = current?.a ? [fromDay(current.a)] : null;
+        b = current?.b ? [fromDay(current.b)] : null;
         days = current?.days != null ? String(current.days) : "";
     });
 
@@ -43,8 +49,8 @@
         const n = Number(String(days).trim());
         column.setFilterValue({
             op: op as DateFilterOp,
-            a: a || null,
-            b: b || null,
+            a: a?.[0] ? localDay(a[0]) : null,
+            b: b?.[0] ? localDay(b[0]) : null,
             days: Number.isFinite(n) && n > 0 ? n : null,
         } satisfies DateFilterValue);
         open = false;
@@ -58,9 +64,6 @@
     function onKeydown(e: KeyboardEvent) {
         if (e.key === "Enter") apply();
     }
-
-    const dateClass =
-        "w-full min-w-0 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-50 scheme-dark outline-none transition-colors duration-200 focus-visible:border-stone-700 focus-visible:ring-4 focus-visible:ring-stone-700/50";
 </script>
 
 <RawPopup bind:open placement="bottom-end" maxWidth="w-64" contentClass="p-3">
@@ -88,9 +91,9 @@
                 <span class="shrink-0 text-stone-400">days</span>
             </div>
         {:else}
-            <input type="date" class={dateClass} max={today} aria-label={op === "between" ? "From" : "Date"} bind:value={a} onkeydown={onKeydown} />
+            <Input type="date" max={today} bind:value={a} />
             {#if op === "between"}
-                <input type="date" class={dateClass} max={today} aria-label="To" bind:value={b} onkeydown={onKeydown} />
+                <Input type="date" max={today} bind:value={b} />
             {/if}
         {/if}
         <div class="flex justify-end gap-2 pt-1">

@@ -4,6 +4,7 @@
     import { DateInput, useDateInput } from "@ark-ui/svelte/date-input";
     import { DatePicker, parseDate, useDatePicker } from "@ark-ui/svelte/date-picker";
     import { Portal } from "@ark-ui/svelte/portal";
+    import { untrack } from "svelte";
     import type { HTMLInputAttributes, HTMLInputTypeAttribute } from "svelte/elements";
     import TablerCalendar from "~icons/tabler/calendar";
     import TablerCheck from "~icons/tabler/check";
@@ -64,10 +65,17 @@
         }
     }
 
+    // The picker only reads its starting date once, so a bound date shows on open.
+    const initialDate = untrack(() => {
+        const first = Array.isArray(value) ? value[0] : value;
+        return type === "date" && first ? [parseDate(first as string | Date)] : undefined;
+    });
+
     const dateId = $derived(restProps.id || Math.random().toString(36).substring(7));
     const datePicker = $derived(
         useDatePicker({
             id: `${dateId}-picker`,
+            defaultValue: initialDate,
             min: min ? parseDate(min as string | Date) : undefined,
             max: max ? parseDate(max as string | Date) : undefined,
             onValueChange(details) {
