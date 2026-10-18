@@ -46,12 +46,14 @@
     </Tooltip.Trigger>
     {#if title && !disabled}
         <Portal disabled={renderInline}>
-            <Tooltip.Positioner class={cn(renderInline ? "z-9999" : "z-60")}>
+            <!-- Ark copies the content's z-index onto the positioner when it opens, so the z-* class lives on the content. -->
+            <Tooltip.Positioner>
                 <Tooltip.Content
                     style="--arrow-background: var(--color-stone-900); --arrow-size: 12px;"
                     class={cn(
                         "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
                         "rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-200 shadow-2xl",
+                        renderInline ? "z-9999" : "z-70",
                     )}
                 >
                     <Tooltip.Arrow>

@@ -3,6 +3,7 @@
     import type { Component } from "svelte";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import Icon from "./Icon.svelte";
+    import { getPopupHost } from "./popupHost";
     import RawPopup from "./RawPopup.svelte";
 
     export type Option = { label: string; value: string; icon?: Component | string };
@@ -26,6 +27,10 @@
         disabled?: boolean;
         onValueChange?: (value: string) => void;
     } = $props();
+
+    // Inside a table the dropdown must stay below the sticky header. Ark copies the
+    // content's z-index onto its positioner, so only lift it outside a host.
+    const inHost = !!getPopupHost();
 
     let selectedOption = $derived(options.find((o) => o.value === value));
     let selectedLabel = $derived(selectedOption?.label || placeholder);
@@ -95,7 +100,7 @@
 <RawPopup
     bind:open
     class={cn("relative w-full", className)}
-    contentClass="p-2 z-9999"
+    contentClass={cn("p-2", !inHost && "z-9999")}
     maxWidth="w-max min-w-[var(--reference-width)] max-w-[var(--available-width)]"
 >
     {#snippet trigger()}
