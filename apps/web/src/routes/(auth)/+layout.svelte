@@ -56,11 +56,20 @@
 
     const LAYOUT_CONFIG = {
         content: { min: 30, max: 85, default: 30 },
-        infoSidebar: { min: 15, max: 45, default: 30 },
+        infoSidebar: { min: 15, max: 45 },
+    };
+
+    // The details panel grows slower than the screen: about 30% on a laptop, easing to
+    // about 24% at 1920px and 21% at 2560px, so wide monitors don't hand it half the table.
+    const defaultInfoWidth = (width: number) => {
+        const pct = pxToPct(160 + 0.15 * width);
+        return Math.min(Math.max(pct, LAYOUT_CONFIG.infoSidebar.min), LAYOUT_CONFIG.infoSidebar.max);
     };
 
     let userSidebarWidth = $derived(pxToPct(storage.sidebarSize));
-    let userInfoWidth = $state(LAYOUT_CONFIG.infoSidebar.default);
+    // Null until the panel is dragged; a manual size then sticks for the session.
+    let draggedInfoWidth = $state<number | null>(null);
+    let userInfoWidth = $derived(draggedInfoWidth ?? defaultInfoWidth(windowWidth));
 
     let desktopSize = $derived.by(() => {
         if (isMobile) return [0, 0, 0];
@@ -88,7 +97,7 @@
             const px = (s[0] / 100) * windowWidth;
             storage.sidebarSize = Math.round(Math.min(Math.max(px, SIDEBAR_PX.min), SIDEBAR_PX.max));
             if (showInfo && s[2] > 0) {
-                userInfoWidth = s[2];
+                draggedInfoWidth = s[2];
             }
         }
     }

@@ -243,12 +243,27 @@ export type {
     GetAnalyticsCwlParticipationQueryResponse,
 } from "./GetAnalyticsCwlParticipation.ts";
 export type {
+    GetAnalyticsCwlSeasonOverview200,
+    GetAnalyticsCwlSeasonOverview401,
+    GetAnalyticsCwlSeasonOverview500,
+    GetAnalyticsCwlSeasonOverviewQuery,
+    GetAnalyticsCwlSeasonOverviewQueryParams,
+    GetAnalyticsCwlSeasonOverviewQueryResponse,
+} from "./GetAnalyticsCwlSeasonOverview.ts";
+export type {
     GetAnalyticsCwlSeasons200,
     GetAnalyticsCwlSeasons401,
     GetAnalyticsCwlSeasons500,
     GetAnalyticsCwlSeasonsQuery,
     GetAnalyticsCwlSeasonsQueryResponse,
 } from "./GetAnalyticsCwlSeasons.ts";
+export type {
+    GetAnalyticsOverview200,
+    GetAnalyticsOverview401,
+    GetAnalyticsOverview500,
+    GetAnalyticsOverviewQuery,
+    GetAnalyticsOverviewQueryResponse,
+} from "./GetAnalyticsOverview.ts";
 export type {
     GetAnalyticsUserJoins200,
     GetAnalyticsUserJoins401,

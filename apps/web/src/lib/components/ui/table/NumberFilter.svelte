@@ -8,6 +8,7 @@
     import type { Column } from "@tanstack/svelte-table";
     import TablerFilter from "~icons/tabler/filter";
     import TablerFilterFilled from "~icons/tabler/filter-filled";
+    import { clearPopupHost } from "../popupHost";
     import type { NumberFilterOp, NumberFilterValue } from "./features";
 
     let { column }: { column: Column<any, any, any> } = $props();
@@ -23,6 +24,9 @@
         { label: "Blank", value: "blank" },
         { label: "Not blank", value: "notBlank" },
     ];
+
+    // Anchored in the sticky header, which the table body host sits below.
+    clearPopupHost();
 
     let open = $state(false);
     let current = $derived(column.getFilterValue() as NumberFilterValue | undefined);

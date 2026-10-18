@@ -11,6 +11,12 @@ export type GetAnalyticsAdminActivityQueryParams = {
      * @type integer | undefined
      */
     limit?: number;
+    /**
+     * @minLength 1
+     * @maxLength 365
+     * @type integer | undefined
+     */
+    days?: number;
 };
 
 /**
@@ -37,8 +43,17 @@ export type GetAnalyticsAdminActivity200 = {
              * @type string
              */
             name: string;
+            /**
+             * @type string,null
+             */
             image: string | null;
+            /**
+             * @type string,null
+             */
             role: string | null;
+            /**
+             * @type string,null
+             */
             discordId: string | null;
             /**
              * @type number

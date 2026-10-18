@@ -9,6 +9,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import RoleBadge, { roleOptions } from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
@@ -386,18 +387,16 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
-        <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <h1 class="text-2xl font-bold">Users</h1>
-                <p class="text-sm text-stone-400">{list.total} user{list.total === 1 ? "" : "s"}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="w-full lg:w-80" />
-                <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="bottom">
-                    <TablerSearch class="size-5" />
-                </Button>
-            </div>
-        </div>
+        <PageHeader title="Users" subtitle="{list.total} user{list.total === 1 ? '' : 's'}">
+            {#snippet actions()}
+                <div class="flex min-w-60 flex-1 items-center gap-2 @4xl:max-w-96">
+                    <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="min-w-0 flex-1" />
+                    <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="bottom">
+                        <TablerSearch class="size-5" />
+                    </Button>
+                </div>
+            {/snippet}
+        </PageHeader>
 
         {#if roleBars.length > 0}
             <!-- svelte-ignore a11y_no_static_element_interactions -->

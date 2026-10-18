@@ -3,6 +3,7 @@
     import { Popover } from "@ark-ui/svelte/popover";
     import { Portal } from "@ark-ui/svelte/portal";
     import { getContext, type Snippet } from "svelte";
+    import { getPopupHost } from "./popupHost";
 
     let {
         trigger,
@@ -37,12 +38,24 @@
     } = $props();
 
     const renderInline = getContext<boolean>("render-inline") ?? false;
+    const host = getPopupHost();
 </script>
 
 <Popover.Root
     bind:open
     {onOpenChange}
-    positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }}
+    positioning={{
+        placement,
+        offset: { mainAxis: 16, crossAxis: 0 },
+        // Inside a host the popup scrolls natively with its anchor, so skip the
+        // scroll-driven repositioning that would pin it in view.
+        ...(host
+            ? {
+                  boundary: () => host.boundary() ?? document.documentElement,
+                  listeners: { ancestorScroll: false, ancestorResize: true, elementResize: true, layoutShift: true },
+              }
+            : {}),
+    }}
     closeOnInteractOutside={true}
     autoFocus={false}
     immediate={true}
@@ -53,19 +66,23 @@
         {@render trigger()}
     </Popover.Trigger>
 
-    <Portal disabled={renderInline}>
-        <Popover.Positioner class={cn(renderInline ? "z-9999" : "z-60")}>
-            <Popover.Content
-                class={cn(
-                    "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
-                    "flex max-h-[calc(var(--available-height)-1rem)] flex-col overflow-x-hidden overflow-y-auto rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 shadow-2xl",
-                    "scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-                    maxWidth,
-                    contentClass,
-                )}
-            >
-                {@render children()}
-            </Popover.Content>
-        </Popover.Positioner>
-    </Portal>
+    <!-- Cells mount before the table binds its scroll element; remount once it exists. -->
+    {#key host?.container()}
+        <Portal disabled={renderInline} container={host?.container() ?? undefined}>
+            <!-- In a host it stays at the default stacking level, below sticky table headers. -->
+            <Popover.Positioner class={cn(host ? "" : renderInline ? "z-9999" : "z-60")}>
+                <Popover.Content
+                    class={cn(
+                        "transition-all duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+                        "flex max-h-[calc(var(--available-height)-1rem)] flex-col overflow-x-hidden overflow-y-auto rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4 shadow-2xl",
+                        "scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+                        maxWidth,
+                        contentClass,
+                    )}
+                >
+                    {@render children()}
+                </Popover.Content>
+            </Popover.Positioner>
+        </Portal>
+    {/key}
 </Popover.Root>

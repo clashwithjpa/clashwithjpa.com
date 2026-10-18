@@ -5,6 +5,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import { errorMessage } from "$lib/utils";
@@ -302,18 +303,14 @@
 <Seo title="CWL Clans" description="Add or remove CWL clans" />
 
 <div class="flex size-full flex-col gap-4">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="min-w-0">
-            <h1 class="text-2xl font-bold">CWL Clans</h1>
-            <p class="text-sm text-stone-400">Add or remove the clans available for Clan War League assignments.</p>
-        </div>
-        {#if !loading}
-            <div class="flex items-center gap-2">
+    <PageHeader title="CWL Clans" subtitle="Add or remove the clans available for Clan War League assignments.">
+        {#snippet actions()}
+            {#if !loading}
                 {#if clans.length > 0}
                     <Input
                         placeholder="Search by clan name, tag, league, or leader..."
                         bind:value={searchText}
-                        class="min-w-0 flex-1 sm:w-64 sm:flex-none"
+                        class="min-w-36 flex-1 @4xl:max-w-80"
                     />
                 {/if}
                 <Button
@@ -335,9 +332,9 @@
                 <Button onclick={openAdd} class="shrink-0" tooltip="Add a new CWL clan by its tag (e.g. #CLANTAG)" tooltipPlacement="bottom">
                     <span class="flex items-center gap-2"><TablerPlus class="size-5 shrink-0" /></span>
                 </Button>
-            </div>
-        {/if}
-    </div>
+            {/if}
+        {/snippet}
+    </PageHeader>
 
     {#if !loading && tierCounts.length > 0}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -385,39 +382,36 @@
                         <Badge variant={group.tier.variant} content={String(group.clans.length)} />
                         <div class="h-0 flex-1 border-t-2 border-stone-700/50"></div>
                     </div>
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="card-grid gap-3 [--card-min:17rem]">
                         {#each group.clans as clan, i (clan.cocClanTag)}
                             <div
-                                class="stagger-card @container flex h-full flex-col justify-between gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4"
+                                class="stagger-card flex items-center gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3"
                                 style="--i:{group.startIndex + i}"
                             >
-                                <div class="flex min-w-0 gap-3">
-                                    <TablerShield class="mt-0.5 size-6 shrink-0 text-stone-400" />
-                                    <div class="min-w-0 flex-1">
-                                        <h3 class="truncate font-semibold text-stone-50">
-                                            {clan.cocClanName}
-                                        </h3>
-                                        <p class="truncate text-xs text-stone-400">{clan.cocClanTag}</p>
-                                        <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
-                                        <Badge class="mt-2" variant={group.tier.variant} content={clan.cocClanLeague} />
-                                    </div>
+                                <TablerShield class="size-6 shrink-0 text-stone-400" />
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="truncate font-semibold text-stone-50">{clan.cocClanName}</h3>
+                                    <p class="truncate font-mono text-xs text-stone-400">{clan.cocClanTag}</p>
+                                    <p class="truncate text-xs text-stone-400">Leader: {clan.cocClanLeader}</p>
                                 </div>
                                 <ConfirmationDialog
-                                    class="w-full min-w-0"
+                                    class="shrink-0"
                                     title="Remove CWL Clan"
                                     description={`Removing ${clan.cocClanName} (${clan.cocClanTag}) will also delete any CWL applications assigned to it for the season. This cannot be undone.`}
                                     confirmText="Remove"
                                     onConfirm={() => removeClan(clan.cocClanTag)}
                                 >
-                                    <Button variant="danger" size="sm" class="w-full min-w-0" disabled={removing === clan.cocClanTag}>
+                                    <Button
+                                        variant="danger"
+                                        size="icon"
+                                        disabled={removing === clan.cocClanTag}
+                                        tooltip="Remove {clan.cocClanName}"
+                                        tooltipPlacement="top"
+                                    >
                                         {#if removing === clan.cocClanTag}
-                                            <span class="flex items-center justify-center gap-2">
-                                                <SvgSpinnersRingResize class="54 shrink-0" /> Removing
-                                            </span>
+                                            <SvgSpinnersRingResize />
                                         {:else}
-                                            <span class="flex items-center justify-center gap-2">
-                                                <TablerTrash class="54 shrink-0" /> Remove
-                                            </span>
+                                            <TablerTrash />
                                         {/if}
                                     </Button>
                                 </ConfirmationDialog>

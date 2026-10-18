@@ -19,6 +19,13 @@
     --animate-ring-empty: ring-empty 800ms var(--ease-glide) both;
 }
 
+/* As many columns as fit at --card-min wide; one column on narrow screens. */
+@utility card-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min, 20rem)), 1fr));
+}
+
 /* LayerChart theme: charts and their portaled tooltips read these. */
 .lc-root-container,
 .lc-tooltip-root {

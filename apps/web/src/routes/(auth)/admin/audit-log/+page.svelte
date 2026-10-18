@@ -6,6 +6,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
@@ -216,24 +217,20 @@
 <Seo title="Audit Log" description="View server actions audit log" />
 
 <div class="flex size-full flex-col gap-4">
-    <div class="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold">Audit Log</h1>
-            <p class="text-sm text-stone-400">{total} entr{total === 1 ? "y" : "ies"} recorded</p>
-        </div>
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
-            <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Filter action" class="lg:w-56" />
-            <Select bind:value={targetTypeFilter} options={auditTargetOptions} placeholder="Filter target" class="lg:w-48" />
-            <Select bind:value={sourceFilter} options={auditSourceOptions} placeholder="Filter source" class="lg:w-40" />
+    <PageHeader title="Audit Log" subtitle="{total} entr{total === 1 ? 'y' : 'ies'} recorded">
+        {#snippet actions()}
+            <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Filter action" class="w-full @md:w-52 @md:shrink-0" />
+            <Select bind:value={targetTypeFilter} options={auditTargetOptions} placeholder="Filter target" class="w-full @md:w-44 @md:shrink-0" />
+            <Select bind:value={sourceFilter} options={auditSourceOptions} placeholder="Filter source" class="w-full @md:w-40 @md:shrink-0" />
             <Input
                 bind:value={actorIdFilter}
                 placeholder="Filter by actor ID"
-                class="lg:w-56"
+                class="min-w-36 flex-1 @4xl:max-w-56"
                 onkeydown={(e: KeyboardEvent) => e.key === "Enter" && load()}
             />
-            <Button variant="ghost" class="w-full lg:w-auto" onclick={resetFilters}>Reset</Button>
-        </div>
-    </div>
+            <Button variant="ghost" class="shrink-0" onclick={resetFilters}>Reset</Button>
+        {/snippet}
+    </PageHeader>
 
     <div class="flex-1">
         {#if loading}

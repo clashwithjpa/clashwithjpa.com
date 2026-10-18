@@ -1,9 +1,11 @@
 import { isReviewer } from "@/lib/auth/functions";
 import {
+    getAdminOverview,
     getAuditCategories,
     getAuditTrend,
     getCwlAssignmentStats,
     getCwlParticipationStats,
+    getCwlSeasonOverview,
     getCwlSeasons,
     getTopAdminActivity,
     getUserJoinTrend,
@@ -111,6 +113,7 @@ app.get(
 
 const adminActivityQuerySchema = z4.object({
     limit: z4.coerce.number().int().min(1).max(20).default(8),
+    days: z4.coerce.number().int().min(1).max(365).optional(),
 });
 const adminActivityData = z4.object({
     data: z4.array(
@@ -131,7 +134,7 @@ app.get(
     describeRoute({
         operationId: "getAnalyticsAdminActivity",
         role: "Reviewer",
-        description: "Admins ranked by audit log action count, with profile info.",
+        description: "Admins ranked by audit log action count, with profile info. All time unless `days` is given.",
         tags: ["analytics"],
         responses: {
             200: {
@@ -144,8 +147,8 @@ app.get(
     zValidator("query", adminActivityQuerySchema),
     async (c) => {
         try {
-            const { limit } = c.req.valid("query");
-            return c.json({ success: true, data: await getTopAdminActivity(limit) });
+            const { limit, days } = c.req.valid("query");
+            return c.json({ success: true, data: await getTopAdminActivity(limit, days) });
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch admin activity" }, 500);
@@ -218,6 +221,73 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch CWL participation stats" }, 500);
+        }
+    },
+);
+
+const overviewData = z4.object({
+    users: z4.object({ total: z4.number(), newLast30d: z4.number(), banned: z4.number() }),
+    cocAccounts: z4.object({ total: z4.number(), external: z4.number() }),
+    pendingJoinApplications: z4.number(),
+    status: z4.object({ applicationsEnabled: z4.boolean(), cwlEnabled: z4.boolean(), maintenance: z4.boolean() }),
+});
+app.get(
+    "/overview",
+    hasAccessAuthMiddleware(isReviewer),
+    describeRoute({
+        operationId: "getAnalyticsOverview",
+        role: "Reviewer",
+        description: "Headline counts for the admin dashboard: users, CoC accounts, pending join applications and site status.",
+        tags: ["analytics"],
+        responses: {
+            200: { description: "Overview.", content: { "application/json": { schema: resolver(SuccessResponseSchema(overviewData)) } } },
+            ...errorResponses,
+        },
+    }),
+    async (c) => {
+        try {
+            return c.json({ success: true, data: await getAdminOverview() });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch overview" }, 500);
+        }
+    },
+);
+
+const cwlSeasonOverviewData = z4.object({
+    seasonId: z4.number().nullable(),
+    seasonName: z4.string().nullable(),
+    applications: z4.number(),
+    applicants: z4.number(),
+    assigned: z4.number(),
+    bonuses: z4.number(),
+    byClan: z4.array(z4.object({ tag: z4.string(), name: z4.string(), league: z4.string(), count: z4.number() })),
+    byTownHall: z4.array(z4.object({ townHall: z4.number(), count: z4.number() })),
+});
+app.get(
+    "/cwl-season-overview",
+    hasAccessAuthMiddleware(isReviewer),
+    describeRoute({
+        operationId: "getAnalyticsCwlSeasonOverview",
+        role: "Reviewer",
+        description: "A CWL season's application totals, per-clan placement and town hall spread. Defaults to the current season.",
+        tags: ["analytics"],
+        responses: {
+            200: {
+                description: "CWL season overview.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(cwlSeasonOverviewData)) } },
+            },
+            ...errorResponses,
+        },
+    }),
+    zValidator("query", seasonQuerySchema),
+    async (c) => {
+        try {
+            const { seasonId } = c.req.valid("query");
+            return c.json({ success: true, data: await getCwlSeasonOverview(seasonId) });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch CWL season overview" }, 500);
         }
     },
 );

@@ -6,6 +6,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -391,10 +392,7 @@
 <Seo title="Admin Settings" description="Manage site settings" />
 
 <div class="flex size-full flex-col gap-6">
-    <div>
-        <h1 class="text-2xl font-bold">Site Settings</h1>
-        <p class="text-sm text-stone-400">Toggles and configuration that apply across the site.</p>
-    </div>
+    <PageHeader title="Site Settings" subtitle="Toggles and configuration that apply across the site." />
 
     {#if loading}
         <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">

@@ -17,9 +17,10 @@
 </script>
 
 {#if stars === null}
-    <span class="text-stone-600">—</span>
+    <span class="px-2 py-1 text-stone-600">—</span>
 {:else if details.length === 0}
-    <span class="flex items-center gap-1 text-sm font-medium text-stone-300">
+    <!-- Same box as the popup trigger below so every row lines up. -->
+    <span class="flex items-center gap-1 px-2 py-1 text-sm font-medium text-stone-300">
         <TablerStar class="size-3.5 text-amber-400" />
         {stars}
     </span>

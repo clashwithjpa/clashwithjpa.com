@@ -12,6 +12,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -696,61 +697,48 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
-        <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <h1 class="text-2xl font-bold">CWL Applications</h1>
-                <p class="text-sm text-stone-400">
-                    {#if displayedApplications.length !== total}
-                        {displayedApplications.length} of {total} application{total === 1 ? "" : "s"}
-                    {:else}
-                        {total} application{total === 1 ? "" : "s"}
-                    {/if}
-                </p>
-            </div>
-            <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-                {#if seasonOptions.length > 0}
-                    <div class="w-full lg:w-44">
-                        <Select options={seasonOptions} bind:value={selectedSeasonValue} placeholder="Season" />
-                    </div>
+        <PageHeader title="CWL Applications">
+            {#snippet subtitle()}
+                {#if displayedApplications.length !== total}
+                    {displayedApplications.length} of {total} application{total === 1 ? "" : "s"}
+                {:else}
+                    {total} application{total === 1 ? "" : "s"}
                 {/if}
-                <div class="flex items-center gap-2">
-                    <Input placeholder="Search anything..." bind:value={searchText} class="w-full lg:w-80" />
-                    <Button
-                        variant="base"
-                        onclick={openRegister}
-                        class="w-full shrink-0 gap-2 lg:w-fit"
-                        tooltip="Register a member for CWL"
-                        tooltipPlacement="bottom"
-                    >
-                        <TablerUserPlus class="size-5" />
-                    </Button>
-                    <Button
-                        variant="base"
-                        disabled={downloading || displayedApplications.length === 0}
-                        onclick={downloadCsv}
-                        class="w-full shrink-0 gap-2 lg:w-fit"
-                        tooltip="Export applications as CSV"
-                        tooltipPlacement="bottom"
-                    >
-                        {#if downloading}
-                            <SvgSpinnersRingResize class="size-5" />
-                        {:else}
-                            <TablerDownload class="size-5" />
-                        {/if}
-                    </Button>
-                    <Button
-                        variant="base"
-                        disabled={unassignedCount === 0}
-                        onclick={() => selectFirstUnassigned()}
-                        class="w-full shrink-0 gap-2 lg:w-fit"
-                        tooltip="Select the first {AUTO_SELECT_COUNT} unassigned applications in the current order (sort by Weight first)"
-                        tooltipPlacement="bottom"
-                    >
-                        <TablerListCheck class="size-5" />
-                    </Button>
-                </div>
-            </div>
-        </div>
+            {/snippet}
+            {#snippet actions()}
+                {#if seasonOptions.length > 0}
+                    <Select options={seasonOptions} bind:value={selectedSeasonValue} placeholder="Season" class="w-full @md:w-44 @md:shrink-0" />
+                {/if}
+                <Input placeholder="Search anything..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
+                <Button variant="base" onclick={openRegister} class="shrink-0" tooltip="Register a member for CWL" tooltipPlacement="bottom">
+                    <TablerUserPlus class="size-5" />
+                </Button>
+                <Button
+                    variant="base"
+                    disabled={downloading || displayedApplications.length === 0}
+                    onclick={downloadCsv}
+                    class="shrink-0"
+                    tooltip="Export applications as CSV"
+                    tooltipPlacement="bottom"
+                >
+                    {#if downloading}
+                        <SvgSpinnersRingResize class="size-5" />
+                    {:else}
+                        <TablerDownload class="size-5" />
+                    {/if}
+                </Button>
+                <Button
+                    variant="base"
+                    disabled={unassignedCount === 0}
+                    onclick={() => selectFirstUnassigned()}
+                    class="shrink-0"
+                    tooltip="Select the first {AUTO_SELECT_COUNT} unassigned applications in the current order (sort by Weight first)"
+                    tooltipPlacement="bottom"
+                >
+                    <TablerListCheck class="size-5" />
+                </Button>
+            {/snippet}
+        </PageHeader>
 
         {#if clanStats.length > 0}
             <!-- svelte-ignore a11y_no_static_element_interactions -->

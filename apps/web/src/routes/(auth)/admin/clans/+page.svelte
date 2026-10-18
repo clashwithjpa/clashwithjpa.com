@@ -6,6 +6,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import { errorMessage } from "$lib/utils";
@@ -375,22 +376,18 @@
 <Seo title="Clans" description="Manage JPA clans" />
 
 <div class="flex size-full flex-col gap-4">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="min-w-0">
-            <h1 class="text-2xl font-bold">Clans</h1>
-            <p class="text-sm text-stone-400">Manage JPA clans, their Discord links and member requirements.</p>
-        </div>
-        {#if !loading}
-            <div class="flex items-center gap-2">
+    <PageHeader title="Clans" subtitle="Manage JPA clans, their Discord links and member requirements.">
+        {#snippet actions()}
+            {#if !loading}
                 {#if clans.length > 0}
-                    <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-0 flex-1 sm:w-72 sm:flex-none" />
+                    <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
                 {/if}
                 <Button onclick={openAdd} class="shrink-0" tooltip="Add a new clan" tooltipPlacement="bottom">
                     <TablerPlus class="size-5 shrink-0" />
                 </Button>
-            </div>
-        {/if}
-    </div>
+            {/if}
+        {/snippet}
+    </PageHeader>
 
     {#if loading}
         <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
@@ -407,7 +404,7 @@
             <p class="text-sm">No clans match your search.</p>
         </div>
     {:else}
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div class="card-grid [--card-min:19rem]">
             {#each filteredClans as clan, i (clan.id)}
                 <div class="stagger-card flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4" style="--i:{i}">
                     <div class="flex min-w-0 items-center gap-4">

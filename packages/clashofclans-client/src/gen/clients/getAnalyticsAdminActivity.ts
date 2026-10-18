@@ -18,7 +18,7 @@ function getGetAnalyticsAdminActivityUrl() {
 }
 
 /**
- * @description Admins ranked by audit log action count, with profile info.
+ * @description Admins ranked by audit log action count, with profile info. All time unless `days` is given.
  * {@link /analytics/admin-activity}
  */
 export async function getAnalyticsAdminActivity(

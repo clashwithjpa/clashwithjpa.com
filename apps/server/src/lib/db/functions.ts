@@ -1231,8 +1231,10 @@ export async function getAuditCategories() {
 }
 
 // Admins (reviewer role and above) ranked by audit action count, with current
-// profile info and each actor's top action types for the hover card.
-export async function getTopAdminActivity(limit: number) {
+// profile info and each actor's top action types for the hover card. All time
+// unless `days` is given.
+export async function getTopAdminActivity(limit: number, days?: number) {
+    const inWindow = days ? gte(auditLogTable.createdAt, utcWindowStart(days)) : undefined;
     const discordJoin = and(eq(account.userId, auditLogTable.actorId), eq(account.providerId, "discord"));
     const actors = await db
         .select({
@@ -1246,7 +1248,7 @@ export async function getTopAdminActivity(limit: number) {
         .from(auditLogTable)
         .innerJoin(user, eq(auditLogTable.actorId, user.id))
         .leftJoin(account, discordJoin)
-        .where(inArray(user.role, ["reviewer", "manager", "admin", "superadmin"]))
+        .where(and(inArray(user.role, ["reviewer", "manager", "admin", "superadmin"]), inWindow))
         .groupBy(auditLogTable.actorId, user.name, auditLogTable.actorName, user.image, user.role, account.accountId)
         .orderBy(desc(sql`count(*)`))
         .limit(limit);
@@ -1261,7 +1263,7 @@ export async function getTopAdminActivity(limit: number) {
             count: sql<number>`count(*)::int`,
         })
         .from(auditLogTable)
-        .where(inArray(auditLogTable.actorId, actorIds))
+        .where(and(inArray(auditLogTable.actorId, actorIds), inWindow))
         .groupBy(auditLogTable.actorId, auditLogTable.action)
         .orderBy(desc(sql`count(*)`));
 
@@ -1318,6 +1320,90 @@ export async function getCwlParticipationStats(seasonId?: number) {
         totalUsers: totals?.total ?? 0,
         seasonId: season.id,
         seasonName: season.name,
+    };
+}
+
+export async function getAdminOverview() {
+    const since = utcWindowStart(30);
+    const [[users], [accounts], [joins], settings] = await Promise.all([
+        db
+            .select({
+                total: sql<number>`count(*)::int`,
+                newLast30d: sql<number>`(count(*) filter (where ${user.createdAt} >= ${since}))::int`,
+                banned: sql<number>`(count(*) filter (where ${user.banned}))::int`,
+            })
+            .from(user),
+        db
+            .select({
+                total: sql<number>`count(*)::int`,
+                external: sql<number>`(count(*) filter (where ${cocAccountTable.isExternal}))::int`,
+            })
+            .from(cocAccountTable),
+        db
+            .select({ pending: sql<number>`count(*)::int` })
+            .from(clanApplicationTable)
+            .where(eq(clanApplicationTable.status, "pending")),
+        getSettings(),
+    ]);
+    return {
+        users: { total: users?.total ?? 0, newLast30d: users?.newLast30d ?? 0, banned: users?.banned ?? 0 },
+        cocAccounts: { total: accounts?.total ?? 0, external: accounts?.external ?? 0 },
+        pendingJoinApplications: joins?.pending ?? 0,
+        status: {
+            applicationsEnabled: settings?.applicationsEnabled ?? false,
+            cwlEnabled: settings?.cwlEnabled ?? false,
+            maintenance: settings?.siteMaintenanceMode ?? false,
+        },
+    };
+}
+
+// One season's CWL roster at a glance: totals, per-clan placement and the town
+// hall spread of everyone who applied.
+export async function getCwlSeasonOverview(seasonId?: number) {
+    const season = await resolveSeason(seasonId);
+    if (!season) return { seasonId: null, seasonName: null, applications: 0, applicants: 0, assigned: 0, bonuses: 0, byClan: [], byTownHall: [] };
+    const inSeason = eq(cwlApplicationTable.seasonId, season.id);
+    const [[totals], [bonuses], byClan, byTownHall] = await Promise.all([
+        db
+            .select({
+                applications: sql<number>`count(*)::int`,
+                applicants: sql<number>`count(distinct ${cwlApplicationTable.discordUserId})::int`,
+                assigned: sql<number>`(count(*) filter (where ${cwlApplicationTable.assignedTo} is not null))::int`,
+            })
+            .from(cwlApplicationTable)
+            .where(inSeason),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(cwlBonusTable)
+            .where(eq(cwlBonusTable.seasonId, season.id)),
+        db
+            .select({
+                tag: cwlClanInfoTable.cocClanTag,
+                name: cwlClanInfoTable.cocClanName,
+                league: cwlClanInfoTable.cocClanLeague,
+                count: sql<number>`count(${cwlApplicationTable.id})::int`,
+            })
+            .from(cwlClanInfoTable)
+            .leftJoin(cwlApplicationTable, and(eq(cwlApplicationTable.assignedTo, cwlClanInfoTable.cocClanTag), inSeason))
+            .groupBy(cwlClanInfoTable.cocClanTag, cwlClanInfoTable.cocClanName, cwlClanInfoTable.cocClanLeague)
+            .orderBy(desc(sql`count(${cwlApplicationTable.id})`), asc(cwlClanInfoTable.cocClanName)),
+        db
+            .select({ townHall: sql<number>`coalesce(${cocAccountTable.townHall}, 0)`, count: sql<number>`count(*)::int` })
+            .from(cwlApplicationTable)
+            .leftJoin(cocAccountTable, eq(cocAccountTable.cocAccountTag, cwlApplicationTable.cocAccountTag))
+            .where(inSeason)
+            .groupBy(sql`coalesce(${cocAccountTable.townHall}, 0)`)
+            .orderBy(desc(sql`coalesce(${cocAccountTable.townHall}, 0)`)),
+    ]);
+    return {
+        seasonId: season.id,
+        seasonName: season.name,
+        applications: totals?.applications ?? 0,
+        applicants: totals?.applicants ?? 0,
+        assigned: totals?.assigned ?? 0,
+        bonuses: bonuses?.count ?? 0,
+        byClan,
+        byTownHall,
     };
 }
 

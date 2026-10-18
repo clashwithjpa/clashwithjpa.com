@@ -26,6 +26,8 @@
     import TablerArrowUp from "~icons/tabler/arrow-up";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import TablerPencil from "~icons/tabler/pencil";
+    import { setPopupHost } from "../popupHost";
+    import { sidebarStore } from "../sidebar";
     import { features, setKey, type Features, type TableColumn } from "./features";
     import NumberFilter from "./NumberFilter.svelte";
     import SetFilter from "./SetFilter.svelte";
@@ -202,6 +204,17 @@
     }
 
     let scrollEl = $state<HTMLDivElement | null>(null);
+    // Columns stretch to fill spare width. The details panel narrows the page, which would
+    // squeeze every column, so the width is only tracked while the panel is closed: with it
+    // open the table keeps its full width and scrolls sideways, like a table that never had
+    // spare room.
+    let viewWidth = $state(0);
+    let fillWidth = $state(0);
+    $effect(() => {
+        if (!sidebarStore.isOpen && viewWidth) fillWidth = viewWidth;
+    });
+    let popupBoundary = $state<HTMLDivElement | null>(null);
+    setPopupHost({ container: () => scrollEl, boundary: () => popupBoundary });
     const virtualizer = createVirtualizer<HTMLDivElement, HTMLTableRowElement>({
         count: 0,
         getScrollElement: () => scrollEl,
@@ -407,166 +420,180 @@
     <Input type="checkbox" checked={row.getIsSelected()} onclick={row.getToggleSelectedHandler()} aria-label="Select row" />
 {/snippet}
 
-<div
-    bind:this={scrollEl}
-    tabindex="0"
-    role="grid"
-    aria-rowcount={rows.length}
-    onkeydown={onTableKeydown}
-    class={cn("relative size-full overflow-auto border-t-2 border-stone-700/50 outline-none", className)}
->
-    <table class="table-fixed border-separate border-spacing-0 text-sm text-stone-200" style:width="{table.getTotalSize()}px" style:min-width="100%">
-        <colgroup>
-            {#each table.getFlatHeaders() as header (header.id)}
-                <col style:width="{header.getSize()}px" />
-            {/each}
-        </colgroup>
-        <thead>
-            {#each table.getHeaderGroups() as group (group.id)}
-                <tr>
-                    {#each group.headers as header (header.id)}
-                        {@const column = header.column}
-                        {@const sorted = column.getIsSorted()}
-                        <th
-                            class={cn(
-                                "sticky top-0 z-10 border-r border-b-2 border-stone-700/50 bg-stone-900 p-0 text-left font-semibold text-stone-200 last:border-r-0",
-                                column.columnDef.meta?.headerClass,
-                            )}
-                            style:height="{HEADER_HEIGHT}px"
-                        >
-                            {#if !header.isPlaceholder}
-                                <div class="flex h-full items-center gap-1 px-3">
-                                    {#if column.getCanSort()}
-                                        <button
-                                            type="button"
-                                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-1 text-left"
-                                            onclick={column.getToggleSortingHandler()}
-                                        >
-                                            <span class="truncate"><FlexRender {header} /></span>
-                                            {#if sorted === "asc"}
-                                                <TablerArrowUp class="size-3.5 shrink-0 text-stone-400" />
-                                            {:else if sorted === "desc"}
-                                                <TablerArrowDown class="size-3.5 shrink-0 text-stone-400" />
-                                            {/if}
-                                            {#if sorted && sorting.length > 1}
-                                                <span class="text-xs text-stone-500">{column.getSortIndex() + 1}</span>
-                                            {/if}
-                                        </button>
-                                    {:else}
-                                        <div class="flex min-w-0 flex-1 items-center truncate"><FlexRender {header} /></div>
-                                    {/if}
-                                    {#if column.columnDef.meta?.filter === "number"}
-                                        <NumberFilter column={column as Column<any, any, any>} />
-                                    {:else if column.columnDef.meta?.filter === "set"}
-                                        <SetFilter column={column as Column<any, any, any>} getOptions={() => setFilterOptions(column)} />
-                                    {/if}
-                                </div>
-                                {#if column.getCanResize()}
-                                    <!-- svelte-ignore a11y_no_static_element_interactions -->
-                                    <div
-                                        class={cn(
-                                            "absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none transition-colors select-none hover:bg-stone-600",
-                                            column.getIsResizing() && "bg-stone-400",
-                                        )}
-                                        onmousedown={header.getResizeHandler()}
-                                        ontouchstart={header.getResizeHandler()}
-                                        ondblclick={() => column.resetSize()}
-                                    ></div>
-                                {/if}
-                            {/if}
-                        </th>
-                    {/each}
-                </tr>
-            {/each}
-        </thead>
-        <tbody>
-            {#if paddingTop > 0}
-                <tr aria-hidden="true"><td style:height="{paddingTop}px" colspan={allColumns.length}></td></tr>
-            {/if}
-            {#each virtualItems as item (item.key)}
-                {@const row = rows[item.index]}
-                {@const mark = groupMarks?.[item.index]}
-                {#if row}
-                    <tr
-                        class={cn(
-                            "group transition-colors hover:bg-stone-900",
-                            mark?.band && "bg-stone-700/16",
-                            row.getIsSelected() && "bg-stone-800 hover:bg-stone-800",
-                        )}
-                        style:height="{rowHeight}px"
-                    >
-                        {#each row.getAllCells() as cell (cell.id)}
-                            {@const meta = cell.column.columnDef.meta}
-                            {@const editable = canEditCell(cell)}
-                            {@const cellEditing = isEditing(cell) && !!editing}
-                            <td
-                                data-cell="{row.id}:{cell.column.id}"
+<div class={cn("relative size-full", className)}>
+    <div
+        bind:this={scrollEl}
+        bind:clientWidth={viewWidth}
+        tabindex="0"
+        role="grid"
+        aria-rowcount={rows.length}
+        onkeydown={onTableKeydown}
+        class="relative size-full overflow-auto border-t-2 border-stone-700/50 outline-none"
+    >
+        <table
+            class="table-fixed border-separate border-spacing-0 text-sm text-stone-200"
+            style:width="{table.getTotalSize()}px"
+            style:min-width={fillWidth ? `${fillWidth}px` : "100%"}
+        >
+            <colgroup>
+                {#each table.getFlatHeaders() as header (header.id)}
+                    <col style:width="{header.getSize()}px" />
+                {/each}
+            </colgroup>
+            <thead>
+                {#each table.getHeaderGroups() as group (group.id)}
+                    <tr>
+                        {#each group.headers as header (header.id)}
+                            {@const column = header.column}
+                            {@const sorted = column.getIsSorted()}
+                            <th
                                 class={cn(
-                                    "group/cell relative scroll-mt-12 overflow-hidden border-r border-b border-stone-700/50 px-2 text-ellipsis whitespace-nowrap last:border-r-0",
-                                    mark?.divider && "border-t-2 border-t-stone-600",
-                                    editable && "pr-7",
-                                    editable && meta?.edit?.type === "select" && "cursor-pointer",
-                                    cellEditing && "p-0",
-                                    meta?.cellClass,
+                                    "sticky top-0 z-10 border-r border-b-2 border-stone-700/50 bg-stone-900 p-0 text-left font-semibold text-stone-200 last:border-r-0",
+                                    column.columnDef.meta?.headerClass,
                                 )}
-                                onclick={(e) => onCellClick(e, cell)}
-                                ondblclick={() => startEdit(cell)}
+                                style:height="{HEADER_HEIGHT}px"
                             >
-                                {#if cellEditing && editing}
-                                    {#if meta?.edit?.type === "select"}
-                                        <Select
-                                            options={meta.edit.options?.() ?? []}
-                                            bind:value={editing.value}
-                                            bind:open={editorOpen}
-                                            onValueChange={(v) => {
-                                                commitEdit(cell, v);
-                                                restoreFocus();
-                                            }}
-                                            class="h-full"
-                                            triggerClass="h-full rounded-none border-0 bg-stone-900 px-2 shadow-none ring-0"
-                                        />
-                                    {:else}
-                                        <input
-                                            {@attach focusOnMount}
-                                            type="text"
-                                            inputmode={meta?.edit?.type === "number" ? "numeric" : "text"}
-                                            bind:value={editing.value}
-                                            onkeydown={(e) => onEditorKeydown(e, cell)}
-                                            onblur={() => commitEdit(cell)}
-                                            class="size-full border-0 bg-stone-900 px-2 text-sm text-stone-50 shadow-none outline-none focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none"
-                                        />
-                                    {/if}
-                                {:else}
-                                    <FlexRender {cell} />
-                                    {#if editable}
-                                        {@const Hint = meta?.edit?.type === "select" ? TablerChevronDown : TablerPencil}
-                                        <Hint
+                                {#if !header.isPlaceholder}
+                                    <div class="flex h-full items-center gap-1 px-3">
+                                        {#if column.getCanSort()}
+                                            <button
+                                                type="button"
+                                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-1 text-left"
+                                                onclick={column.getToggleSortingHandler()}
+                                            >
+                                                <span class="truncate"><FlexRender {header} /></span>
+                                                {#if sorted === "asc"}
+                                                    <TablerArrowUp class="size-3.5 shrink-0 text-stone-400" />
+                                                {:else if sorted === "desc"}
+                                                    <TablerArrowDown class="size-3.5 shrink-0 text-stone-400" />
+                                                {/if}
+                                                {#if sorted && sorting.length > 1}
+                                                    <span class="text-xs text-stone-500">{column.getSortIndex() + 1}</span>
+                                                {/if}
+                                            </button>
+                                        {:else}
+                                            <div class="flex min-w-0 flex-1 items-center truncate"><FlexRender {header} /></div>
+                                        {/if}
+                                        {#if column.columnDef.meta?.filter === "number"}
+                                            <NumberFilter column={column as Column<any, any, any>} />
+                                        {:else if column.columnDef.meta?.filter === "set"}
+                                            <SetFilter column={column as Column<any, any, any>} getOptions={() => setFilterOptions(column)} />
+                                        {/if}
+                                    </div>
+                                    {#if column.getCanResize()}
+                                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                                        <div
                                             class={cn(
-                                                "pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-stone-500 opacity-0 transition-opacity group-hover/cell:opacity-100",
-                                                isFocused(cell) && "opacity-100",
+                                                "absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none transition-colors select-none hover:bg-stone-600",
+                                                column.getIsResizing() && "bg-stone-400",
                                             )}
-                                        />
+                                            onmousedown={header.getResizeHandler()}
+                                            ontouchstart={header.getResizeHandler()}
+                                            ondblclick={() => column.resetSize()}
+                                        ></div>
                                     {/if}
                                 {/if}
-                                {#if isFocused(cell)}
-                                    <div class="pointer-events-none absolute inset-0 ring-2 ring-stone-500 ring-inset"></div>
-                                {/if}
-                            </td>
+                            </th>
                         {/each}
                     </tr>
+                {/each}
+            </thead>
+            <tbody>
+                {#if paddingTop > 0}
+                    <tr aria-hidden="true"><td style:height="{paddingTop}px" colspan={allColumns.length}></td></tr>
                 {/if}
-            {/each}
-            {#if paddingBottom > 0}
-                <tr aria-hidden="true"><td style:height="{paddingBottom}px" colspan={allColumns.length}></td></tr>
-            {/if}
-        </tbody>
-    </table>
+                {#each virtualItems as item (item.key)}
+                    {@const row = rows[item.index]}
+                    {@const mark = groupMarks?.[item.index]}
+                    {#if row}
+                        <tr
+                            class={cn(
+                                "group transition-colors hover:bg-stone-900",
+                                mark?.band && "bg-stone-700/16",
+                                row.getIsSelected() && "bg-stone-800 hover:bg-stone-800",
+                            )}
+                            style:height="{rowHeight}px"
+                        >
+                            {#each row.getAllCells() as cell (cell.id)}
+                                {@const meta = cell.column.columnDef.meta}
+                                {@const editable = canEditCell(cell)}
+                                {@const cellEditing = isEditing(cell) && !!editing}
+                                <td
+                                    data-cell="{row.id}:{cell.column.id}"
+                                    class={cn(
+                                        "group/cell relative scroll-mt-12 overflow-hidden border-r border-b border-stone-700/50 px-2 text-ellipsis whitespace-nowrap last:border-r-0",
+                                        mark?.divider && "border-t-2 border-t-stone-600",
+                                        editable && "pr-7",
+                                        editable && meta?.edit?.type === "select" && "cursor-pointer",
+                                        cellEditing && "p-0",
+                                        meta?.cellClass,
+                                    )}
+                                    onclick={(e) => onCellClick(e, cell)}
+                                    ondblclick={() => startEdit(cell)}
+                                >
+                                    {#if cellEditing && editing}
+                                        {#if meta?.edit?.type === "select"}
+                                            <Select
+                                                options={meta.edit.options?.() ?? []}
+                                                bind:value={editing.value}
+                                                bind:open={editorOpen}
+                                                onValueChange={(v) => {
+                                                    commitEdit(cell, v);
+                                                    restoreFocus();
+                                                }}
+                                                class="h-full"
+                                                triggerClass="h-full rounded-none border-0 bg-stone-900 px-2 shadow-none ring-0"
+                                            />
+                                        {:else}
+                                            <input
+                                                {@attach focusOnMount}
+                                                type="text"
+                                                inputmode={meta?.edit?.type === "number" ? "numeric" : "text"}
+                                                bind:value={editing.value}
+                                                onkeydown={(e) => onEditorKeydown(e, cell)}
+                                                onblur={() => commitEdit(cell)}
+                                                class="size-full border-0 bg-stone-900 px-2 text-sm text-stone-50 shadow-none outline-none focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none"
+                                            />
+                                        {/if}
+                                    {:else}
+                                        <FlexRender {cell} />
+                                        {#if editable}
+                                            {@const Hint = meta?.edit?.type === "select" ? TablerChevronDown : TablerPencil}
+                                            <Hint
+                                                class={cn(
+                                                    "pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-stone-500 opacity-0 transition-opacity group-hover/cell:opacity-100",
+                                                    isFocused(cell) && "opacity-100",
+                                                )}
+                                            />
+                                        {/if}
+                                    {/if}
+                                    {#if isFocused(cell)}
+                                        <div class="pointer-events-none absolute inset-0 ring-2 ring-stone-500 ring-inset"></div>
+                                    {/if}
+                                </td>
+                            {/each}
+                        </tr>
+                    {/if}
+                {/each}
+                {#if paddingBottom > 0}
+                    <tr aria-hidden="true"><td style:height="{paddingBottom}px" colspan={allColumns.length}></td></tr>
+                {/if}
+            </tbody>
+        </table>
 
-    {#if loading && rows.length === 0}
-        <div class="absolute inset-x-0 flex items-center justify-center gap-2 py-10 text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">
-            <SvgSpinnersRingResize class="size-4" /> Loading…
-        </div>
-    {:else if rows.length === 0}
-        <div class="absolute inset-x-0 py-10 text-center text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">{emptyText}</div>
-    {/if}
+        {#if loading && rows.length === 0}
+            <div class="absolute inset-x-0 flex items-center justify-center gap-2 py-10 text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">
+                <SvgSpinnersRingResize class="size-4" /> Loading…
+            </div>
+        {:else if rows.length === 0}
+            <div class="absolute inset-x-0 py-10 text-center text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">{emptyText}</div>
+        {/if}
+    </div>
+    <!-- The table body below the sticky header; popups from cells stay inside it. -->
+    <div
+        bind:this={popupBoundary}
+        aria-hidden="true"
+        class="pointer-events-none invisible absolute inset-x-0 bottom-0"
+        style:top="{HEADER_HEIGHT + 2}px"
+    ></div>
 </div>

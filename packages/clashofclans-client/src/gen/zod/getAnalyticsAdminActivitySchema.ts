@@ -7,6 +7,7 @@ import * as z from "zod";
 
 export const getAnalyticsAdminActivityQueryParamsSchema = z.object({
     limit: z.coerce.number().int().min(1).max(20).default(8),
+    days: z.optional(z.coerce.number().int().min(1).max(365)),
 });
 
 /**
@@ -19,9 +20,9 @@ export const getAnalyticsAdminActivity200Schema = z.object({
             z.object({
                 actorId: z.string(),
                 name: z.string(),
-                image: z.union([z.string(), z.null()]),
-                role: z.union([z.string(), z.null()]),
-                discordId: z.union([z.string(), z.null()]),
+                image: z.nullable(z.string()),
+                role: z.nullable(z.string()),
+                discordId: z.nullable(z.string()),
                 count: z.number(),
                 topActions: z.array(
                     z.object({

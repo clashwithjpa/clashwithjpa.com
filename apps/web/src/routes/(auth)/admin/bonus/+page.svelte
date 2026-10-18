@@ -10,6 +10,7 @@
     import CwlStarsCell from "$lib/components/grid/CwlStarsCell.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
@@ -544,30 +545,27 @@
 <Seo title="CWL Bonus" description="Assign CWL bonuses and review linked account stats." />
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
-    <div class="flex flex-col gap-2 px-4 pt-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold">CWL Bonus</h1>
-            <p class="text-sm text-stone-400">
-                {#if loading}
-                    Loading…
-                {:else}
-                    {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
-                    {/if}
-                    {#if searchText.trim() || activeFilters}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
-                    {#if activeFilters}
-                        ·
-                        <button
-                            type="button"
-                            class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
-                            onclick={() => dataTable?.clearFilters()}
-                        >
-                            Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
-                        </button>
-                    {/if}
+    <PageHeader title="CWL Bonus" class="px-4 pt-4">
+        {#snippet subtitle()}
+            {#if loading}
+                Loading…
+            {:else}
+                {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
                 {/if}
-            </p>
-        </div>
-        <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
+                {#if searchText.trim() || activeFilters}{displayedCount} of {total}{:else}{total}{/if} entr{total === 1 ? "y" : "ies"}
+                {#if activeFilters}
+                    ·
+                    <button
+                        type="button"
+                        class="cursor-pointer text-stone-300 underline-offset-2 hover:text-stone-50 hover:underline"
+                        onclick={() => dataTable?.clearFilters()}
+                    >
+                        Clear {activeFilters} filter{activeFilters === 1 ? "" : "s"}
+                    </button>
+                {/if}
+            {/if}
+        {/snippet}
+        {#snippet actions()}
             {#if seasonOptions.length > 0}
                 <Select
                     options={seasonOptions}
@@ -575,42 +573,40 @@
                     onValueChange={(v) => load(Number(v))}
                     placeholder="Season"
                     disabled={loading}
-                    class="w-full shrink-0 sm:w-40"
+                    class="w-full @md:w-44 @md:shrink-0"
                 />
             {/if}
-            <div class="flex flex-1 items-center gap-2">
-                <Input placeholder="Search anything..." bind:value={searchText} class="min-w-0 flex-1 lg:w-80 lg:flex-none" />
-                <Button
-                    variant="base"
-                    class="shrink-0"
-                    disabled={fetchingCwl || loading || rows.length === 0}
-                    onclick={fetchCwlStats}
-                    tooltip="Fetch live CWL attacks & stars"
-                    tooltipPlacement="bottom"
-                >
-                    {#if fetchingCwl}
-                        <SvgSpinnersRingResize class="size-5" />
-                    {:else}
-                        <TablerSwords class="size-5" />
-                    {/if}
-                </Button>
-                <Button
-                    variant="base"
-                    class="shrink-0"
-                    disabled={downloading || rows.length === 0}
-                    onclick={downloadCsv}
-                    tooltip="Download as CSV"
-                    tooltipPlacement="bottom"
-                >
-                    {#if downloading}
-                        <SvgSpinnersRingResize class="size-5" />
-                    {:else}
-                        <TablerDownload class="size-5" />
-                    {/if}
-                </Button>
-            </div>
-        </div>
-    </div>
+            <Input placeholder="Search anything..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
+            <Button
+                variant="base"
+                class="shrink-0"
+                disabled={fetchingCwl || loading || rows.length === 0}
+                onclick={fetchCwlStats}
+                tooltip="Fetch live CWL attacks & stars"
+                tooltipPlacement="bottom"
+            >
+                {#if fetchingCwl}
+                    <SvgSpinnersRingResize class="size-5" />
+                {:else}
+                    <TablerSwords class="size-5" />
+                {/if}
+            </Button>
+            <Button
+                variant="base"
+                class="shrink-0"
+                disabled={downloading || rows.length === 0}
+                onclick={downloadCsv}
+                tooltip="Download as CSV"
+                tooltipPlacement="bottom"
+            >
+                {#if downloading}
+                    <SvgSpinnersRingResize class="size-5" />
+                {:else}
+                    <TablerDownload class="size-5" />
+                {/if}
+            </Button>
+        {/snippet}
+    </PageHeader>
 
     {#if !loading && seasons.length === 0}
         <div class="px-4 text-xs text-stone-400">

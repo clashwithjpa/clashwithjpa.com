@@ -7,10 +7,14 @@
     import type { Column } from "@tanstack/svelte-table";
     import TablerFilter from "~icons/tabler/filter";
     import TablerFilterFilled from "~icons/tabler/filter-filled";
+    import { clearPopupHost } from "../popupHost";
 
     type SetOption = { value: string; label: string; count: number };
 
     let { column, getOptions }: { column: Column<any, any, any>; getOptions: () => SetOption[] } = $props();
+
+    // Anchored in the sticky header, which the table body host sits below.
+    clearPopupHost();
 
     let open = $state(false);
     let search = $state("");

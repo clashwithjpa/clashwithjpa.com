@@ -6,6 +6,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
@@ -198,18 +199,13 @@
 {/snippet}
 
 <div class="flex size-full flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold">Join Applications</h1>
-            <p class="text-sm text-stone-400">
-                {total} application{total === 1 ? "" : "s"}
-                {statusFilter ? `with status "${statusFilter}"` : "total"}
-            </p>
-        </div>
-        <div class="flex w-full items-center gap-2 sm:w-auto">
-            <div class="flex-1 sm:w-64">
-                <Select bind:value={statusFilter} options={statusOptions} placeholder="Filter by status" />
-            </div>
+    <PageHeader title="Join Applications">
+        {#snippet subtitle()}
+            {total} application{total === 1 ? "" : "s"}
+            {statusFilter ? `with status "${statusFilter}"` : "total"}
+        {/snippet}
+        {#snippet actions()}
+            <Select bind:value={statusFilter} options={statusOptions} placeholder="Filter by status" class="min-w-40 flex-1 @4xl:max-w-64" />
             {#if data.canDelete}
                 <ConfirmationDialog
                     title="Clear accepted applications?"
@@ -227,8 +223,8 @@
                     </Button>
                 </ConfirmationDialog>
             {/if}
-        </div>
-    </div>
+        {/snippet}
+    </PageHeader>
 
     <div class="flex-1">
         {#if loading}
@@ -241,7 +237,7 @@
                 <span>No applications found</span>
             </div>
         {:else}
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div class="card-grid [--card-min:22rem]">
                 {#each applications as app, i (app.id)}
                     {@const p = getPlayer(app)}
                     {@const stats = [

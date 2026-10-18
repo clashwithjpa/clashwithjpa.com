@@ -10,6 +10,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
@@ -575,24 +576,15 @@
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
-    <div class="flex flex-col gap-2 px-4 pt-4 md:flex-row md:items-center md:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold">COC Accounts</h1>
-            <p class="text-sm text-stone-400">{list.total} account{list.total === 1 ? "" : "s"}</p>
-        </div>
-        <div class="flex flex-col gap-2 md:flex-row md:items-center">
-            <div class="flex items-center gap-2">
-                <Input
-                    placeholder="Search anything..."
-                    bind:value={searchText}
-                    onchange={handleSearchChange}
-                    class="min-w-0 flex-1 lg:w-80 lg:flex-none"
-                />
+    <PageHeader title="COC Accounts" subtitle="{list.total} account{list.total === 1 ? '' : 's'}" class="px-4 pt-4">
+        {#snippet actions()}
+            <div class="flex min-w-60 flex-1 items-center gap-2 @4xl:max-w-96">
+                <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="min-w-0 flex-1" />
                 <Button variant="success" class="shrink-0" onclick={handleSearchChange} tooltip="Search" tooltipPlacement="bottom">
                     <TablerSearch class="size-5" />
                 </Button>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex shrink-0 items-center gap-2">
                 {#if data.canDelete}
                     <Button variant="base" class="shrink-0" onclick={openAdd} tooltip="Add an account" tooltipPlacement="bottom">
                         <TablerUserPlus class="size-5" />
@@ -636,8 +628,8 @@
                     {/if}
                 </Button>
             </div>
-        </div>
-    </div>
+        {/snippet}
+    </PageHeader>
 
     <div class="min-h-0 flex-1">
         <DataTable
