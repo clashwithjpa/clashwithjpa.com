@@ -24,9 +24,12 @@
     grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min, 20rem)), 1fr));
 }
 
-/* LayerChart theme: charts and their portaled tooltips read these. */
+/* LayerChart theme: charts and their portaled tooltips read these. The build
+   rewrites LayerChart's light-dark() into variables that only exist where
+   color-scheme is declared, so without it tooltips lose their background. */
 .lc-root-container,
 .lc-tooltip-root {
+    color-scheme: dark;
     --color-primary: var(--color-blue-500);
     --color-surface-100: var(--color-stone-900);
     --color-surface-200: var(--color-stone-800);
