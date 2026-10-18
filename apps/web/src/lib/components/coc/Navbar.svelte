@@ -101,24 +101,23 @@
         {/each}
     </div>
 
-    <!-- Phones get one menu for both the site links and the account. -->
+    <!-- Phones get one menu for both the site links and the account, opened from the avatar like on desktop. -->
     <div class="md:hidden">
         {#if $session.isPending}
-            <div class="h-11 w-20 rounded-full bg-stone-700/50"></div>
+            <div class="size-12 rounded-full bg-stone-700/50"></div>
         {:else}
             <CocPopup bind:open={menuOpen} title="Menu" contentClass="flex flex-col gap-4 p-4 font-coc">
                 {#snippet trigger()}
-                    <span
-                        class="flex items-center gap-2 rounded-full border border-white/15 bg-stone-950/50 p-1 text-stone-50 backdrop-blur-sm"
-                        class:pr-3={!!user}
-                        class:pl-3={!user}
-                        aria-label="Open menu"
-                    >
-                        {#if user}
-                            <Avatar src={user.image} name={user.name} {role} size="xs" />
-                        {/if}
-                        <TablerMenu2 class={cn("size-6", !user && "my-1.5 mr-1.5")} />
-                    </span>
+                    {#if user}
+                        <Avatar src={user.image} name={user.name} {role} size="md" />
+                    {:else}
+                        <span
+                            class="grid size-11 place-items-center rounded-full border border-white/15 bg-stone-950/50 text-stone-50 backdrop-blur-sm"
+                            aria-label="Open menu"
+                        >
+                            <TablerMenu2 class="size-6" />
+                        </span>
+                    {/if}
                 {/snippet}
                 {@render profile()}
                 {#if !user}
