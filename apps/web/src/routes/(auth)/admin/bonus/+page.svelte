@@ -17,6 +17,7 @@
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { loadGuildNicknames } from "$lib/discordNicknames";
+    import { toast } from "$lib/toast";
     import {
         assignCwlApplication,
         getBonusData,
@@ -34,7 +35,6 @@
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
     import { renderComponent, type SortingState } from "@tanstack/svelte-table";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDownload from "~icons/tabler/download";
     import TablerSwords from "~icons/tabler/swords";

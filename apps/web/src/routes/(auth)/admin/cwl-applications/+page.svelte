@@ -22,6 +22,7 @@
     import type { TableColumn } from "$lib/components/ui/table/features";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
+    import { toast } from "$lib/toast";
     import { errorMessage, formatDate, formatDateTime } from "$lib/utils";
     import {
         assignCwlApplication,
@@ -41,7 +42,6 @@
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";

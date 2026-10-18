@@ -12,6 +12,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import { toast } from "$lib/toast";
     import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         createCwlSeason,
@@ -30,7 +31,6 @@
         type GetCwlSeasons200,
     } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
-    import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
@@ -150,7 +150,7 @@
     }
 
     // API error responses aren't always a string (zod validation failures come back as an
-    // issue object) — toasting a non-string crashes svelte-sonner's title renderer.
+    // issue object), and a toast needs text.
     function apiErrorMessage(resp: unknown, fallback: string): string {
         const err = (resp as { error?: unknown } | undefined)?.error;
         return typeof err === "string" ? err : fallback;

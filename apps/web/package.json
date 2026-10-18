@@ -50,7 +50,6 @@
         "isomorphic-dompurify": "^3.22.0",
         "layerchart": "^2.8.0",
         "runed": "^0.37.1",
-        "svelte-sonner": "^1.1.1",
         "ua-parser-js": "^2.0.10"
     },
     "devDependencies": {

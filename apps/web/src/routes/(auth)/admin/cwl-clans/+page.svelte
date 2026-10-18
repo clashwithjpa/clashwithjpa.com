@@ -8,6 +8,7 @@
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import {
         createAdminCwlClan,
@@ -25,7 +26,6 @@
         type SyncAdminCwlClanLeagues401,
         type SyncAdminCwlClanLeagues500,
     } from "@repo/clashofclans-client";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerPlus from "~icons/tabler/plus";

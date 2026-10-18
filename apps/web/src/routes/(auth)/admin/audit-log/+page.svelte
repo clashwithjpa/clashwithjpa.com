@@ -21,6 +21,7 @@
         describeAction,
         type AuditEntry,
     } from "$lib/config/auditLog";
+    import { toast } from "$lib/toast";
     import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         getAuditLog,
@@ -30,7 +31,6 @@
     } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { PreRendered } from "carta-md";
-    import { toast } from "svelte-sonner";
     import { slide } from "svelte/transition";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";

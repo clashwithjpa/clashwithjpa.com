@@ -19,6 +19,7 @@
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
+    import { toast } from "$lib/toast";
     import {
         createCocAccount,
         deleteCocAccountsBulk,
@@ -33,7 +34,6 @@
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState, type SortingState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCheck from "~icons/tabler/check";
     import TablerCopy from "~icons/tabler/copy";

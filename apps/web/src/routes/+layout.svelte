@@ -1,7 +1,7 @@
 <script lang="ts">
     import { clearIdentifiedUser, identifyUser } from "$lib/analytics";
     import { authClient } from "$lib/auth";
-    import ControlsPopup from "$lib/components/ControlsPopup.svelte";
+    import Island from "$lib/components/island/Island.svelte";
     import Snowfall from "$lib/components/Snowfall.svelte";
     import "@cartamd/plugin-anchor/default.css";
     import "@cartamd/plugin-code/default.css";
@@ -73,6 +73,6 @@
     {@render children()}
 </div>
 
-<ControlsPopup />
+<Island />
 
 <Snowfall />

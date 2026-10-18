@@ -6,10 +6,10 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 

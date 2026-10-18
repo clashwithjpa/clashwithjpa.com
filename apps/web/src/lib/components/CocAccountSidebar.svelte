@@ -7,10 +7,10 @@
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
+    import { toast } from "$lib/toast";
     import { num, str } from "$lib/utils";
     import { getCOCPlayer } from "@repo/clashofclans-client";
     import type { Component } from "svelte";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerActivity from "~icons/tabler/activity";
     import TablerBuildingBank from "~icons/tabler/building-bank";

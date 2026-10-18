@@ -11,9 +11,7 @@
     import { storage } from "$lib/utils/storage.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount } from "svelte";
-    import { Toaster } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
@@ -135,21 +133,6 @@
         return groups;
     });
 </script>
-
-<Toaster
-    richColors
-    theme="dark"
-    closeButton
-    toastOptions={{
-        classes: {
-            toast: "font-rubik!",
-        },
-    }}
->
-    {#snippet loadingIcon()}
-        <SvgSpinnersRingResize />
-    {/snippet}
-</Toaster>
 
 {#snippet button(link: any)}
     <div>

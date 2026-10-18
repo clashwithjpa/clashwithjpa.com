@@ -11,6 +11,7 @@
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
+    import { toast } from "$lib/toast";
     import { formatDate, formatDateTime } from "$lib/utils";
     import {
         getCOCPlayer,
@@ -23,7 +24,6 @@
         type GetCOCPlayer500,
         type SetUserAccountExternal500,
     } from "@repo/clashofclans-client";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBuildingCastle from "~icons/tabler/building-castle";

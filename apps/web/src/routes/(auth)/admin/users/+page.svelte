@@ -19,12 +19,12 @@
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import { roleLevel } from "$lib/config/roles";
     import { loadGuildNicknames } from "$lib/discordNicknames";
+    import { toast } from "$lib/toast";
     import { formatDate } from "$lib/utils";
     import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
     import { renderComponent, type SortingState } from "@tanstack/svelte-table";
     import type { UserWithRole } from "better-auth/plugins";
     import { untrack } from "svelte";
-    import { toast } from "svelte-sonner";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowRight from "~icons/tabler/arrow-right";
     import TablerKey from "~icons/tabler/key";

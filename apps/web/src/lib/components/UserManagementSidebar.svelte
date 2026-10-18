@@ -4,6 +4,7 @@
     import { authClient } from "$lib/auth";
     import type { Role } from "$lib/config/roles";
     import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
+    import { toast } from "$lib/toast";
     import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         deleteCocAccount,
@@ -13,7 +14,6 @@
         updateCocAccountExternal,
     } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
-    import { toast } from "svelte-sonner";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBan from "~icons/tabler/ban";

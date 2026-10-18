@@ -2,11 +2,11 @@
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import ReadmeEditor from "$lib/components/ui/ReadmeEditor.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
     import { setPrivacy } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
-    import { toast } from "svelte-sonner";
     import type { PageData } from "./$types";
 
     let { data }: { data: PageData } = $props();

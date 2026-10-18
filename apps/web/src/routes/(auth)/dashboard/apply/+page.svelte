@@ -3,10 +3,10 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
-    import { toast } from "svelte-sonner";
     import { Turnstile } from "svelte-turnstile";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 

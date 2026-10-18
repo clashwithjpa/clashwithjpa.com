@@ -34,6 +34,9 @@ function persisted<T>(key: string, fallback: T): Persisted<T> {
 
 const snowfall = persisted<boolean>("snowfall", false);
 const sidebarSize = persisted<number>("sidebar-size", 88);
+export type IslandSide = "left" | "right";
+const islandSide = persisted<IslandSide>("island-side", "right");
+const islandEggs = persisted<boolean>("island-eggs", true);
 
 export const storage = {
     get snowfall(): boolean {
@@ -48,5 +51,19 @@ export const storage = {
     },
     set sidebarSize(value: number) {
         sidebarSize.value = value;
+    },
+
+    get islandSide(): IslandSide {
+        return islandSide.value;
+    },
+    set islandSide(value: IslandSide) {
+        islandSide.value = value;
+    },
+
+    get islandEggs(): boolean {
+        return islandEggs.value;
+    },
+    set islandEggs(value: boolean) {
+        islandEggs.value = value;
     },
 };

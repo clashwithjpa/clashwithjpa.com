@@ -10,10 +10,10 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { SELECTABLE_SCOPES, type ApiKeyRow } from "$lib/config/apiKeys";
+    import { toast } from "$lib/toast";
     import { formatRelativeTime } from "$lib/utils";
     import { type JpaPermission } from "@repo/auth-shared";
     import { createApiKey, type CreateApiKey200, type CreateApiKey403 } from "@repo/clashofclans-client";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerActivity from "~icons/tabler/activity";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";

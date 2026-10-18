@@ -39,6 +39,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import Select from "$lib/components/ui/Select.svelte";
+    import { toast } from "$lib/toast";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
     import { acceptCompletion, type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
@@ -53,7 +54,6 @@
     import * as prettierPluginMarkdown from "prettier/plugins/markdown";
     import * as prettier from "prettier/standalone";
     import { onMount } from "svelte";
-    import { toast } from "svelte-sonner";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
     import TablerUpload from "~icons/tabler/upload";
