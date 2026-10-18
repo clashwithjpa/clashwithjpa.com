@@ -192,7 +192,7 @@
                 <div class="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
                     <h2 class="font-coc text-3xl font-black text-stone-900 md:text-5xl">Ready to march?</h2>
                     <p class="max-w-xl font-coc text-sm text-stone-700 md:text-base">
-                        Tell us your town hall and stats, and we'll slot you into the clan that fits. Wars start the day you're accepted.
+                        Link your account and we'll slot you into the clan that fits your town hall. Wars start the day you're accepted.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-3 md:justify-start">
                         <CocBtn variant="orange" href="/dashboard/apply">Apply now</CocBtn>

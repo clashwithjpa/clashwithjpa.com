@@ -9,6 +9,7 @@
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
     import { Turnstile } from "svelte-turnstile";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import TablerArrowRight from "~icons/tabler/arrow-right";
 
     let { data } = $props();
 
@@ -154,8 +155,13 @@
                 {#if fieldErrors.apiToken}
                     <Field.ErrorText class="text-xs text-red-400">{fieldErrors.apiToken}</Field.ErrorText>
                 {:else}
-                    <Field.HelperText class="text-xs text-stone-400">
-                        Follow <a href="/guide/coc-api" target="_blank" class="text-stone-200 hover:text-stone-50">this guide</a> to get the API token.
+                    <Field.HelperText class="flex flex-wrap items-center gap-1 text-xs text-stone-400">
+                        Find it in game under
+                        <span class="text-stone-200">Settings</span>
+                        <TablerArrowRight class="size-3 shrink-0" />
+                        <span class="text-stone-200">More Settings</span>
+                        <TablerArrowRight class="size-3 shrink-0" />
+                        <span class="text-stone-200">API Token</span>
                     </Field.HelperText>
                 {/if}
             </Field.Root>
