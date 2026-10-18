@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { afterNavigate } from "$app/navigation";
     import { page } from "$app/state";
     import { clearIdentifiedUser } from "$lib/analytics";
     import { authClient, hasPermission } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
     import { NAV_LINKS as links } from "$lib/utils/links";
+    import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import TablerMenu2 from "~icons/tabler/menu-2";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
@@ -12,15 +14,69 @@
     import Link from "../ui/Link.svelte";
 
     let scrollY = $state(0);
-    let mobileMenuOpen = $state(false);
+    let menuOpen = $state(false);
+    let accountOpen = $state(false);
+    let canAdmin = $state(false);
 
     const session = authClient.useSession();
+    const user = $derived($session.data?.user ?? null);
+    const role = $derived((user?.role ?? null) as Role | null);
 
     const isHomePage = $derived(page.url.pathname === "/");
     const isScrolled = $derived(scrollY > 20);
+
+    $effect(() => {
+        const id = user?.id;
+        canAdmin = false;
+        if (id) hasPermission(id, "review").then((ok) => (canAdmin = ok));
+    });
+
+    afterNavigate(() => {
+        menuOpen = false;
+        accountOpen = false;
+    });
+
+    const isActive = (href: string) => (href === "/" ? page.url.pathname === "/" : page.url.pathname.startsWith(href));
+    const login = () => authClient.signIn.social({ provider: "discord", callbackURL: window.location.href });
+    function logout() {
+        clearIdentifiedUser();
+        authClient.signOut();
+        menuOpen = accountOpen = false;
+    }
 </script>
 
 <svelte:window bind:scrollY />
+
+<!-- Labels and inset panels match ClanCard so the menus read as part of the same parchment UI. -->
+{#snippet label(text: string)}
+    <h4 class="font-coc text-sm font-bold text-stone-800 uppercase">{text}</h4>
+{/snippet}
+
+{#snippet profile()}
+    {#if user}
+        <div class="flex items-center gap-4 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+            <Avatar src={user.image} name={user.name} {role} size="md" />
+            <div class="flex min-w-0 flex-col">
+                <span class="truncate text-lg leading-tight font-bold text-stone-900">{user.name}</span>
+                {#if role && role in ROLE_CONFIG}
+                    <span class="text-sm text-stone-700">{ROLE_CONFIG[role].label}</span>
+                {/if}
+            </div>
+        </div>
+    {/if}
+{/snippet}
+
+{#snippet account()}
+    {#if user}
+        <div class={cn("grid gap-2", canAdmin && "grid-cols-2")}>
+            <CocBtn variant={isActive("/dashboard") ? "green" : "orange"} size="sm" href="/dashboard" class="w-full">Dashboard</CocBtn>
+            {#if canAdmin}
+                <CocBtn variant="orange" size="sm" href="/admin" class="w-full">Admin</CocBtn>
+            {/if}
+        </div>
+        <CocBtn variant="red" size="sm" class="w-full" onclick={logout}>Log out</CocBtn>
+    {/if}
+{/snippet}
 
 <nav
     class={cn(
@@ -29,7 +85,7 @@
     )}
 >
     <a href="/" class="flex h-12 items-center gap-4">
-        <div class="size-12 animate-wavy-bounce bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');"></div>
+        <div class="size-12 bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');"></div>
         <div class="h-full border-l-2 border-stone-700/50"></div>
         <div class="flex flex-col">
             <span class="text-xl font-bold">JPA</span>
@@ -45,73 +101,71 @@
         {/each}
     </div>
 
-    <div class="flex items-center gap-3">
-        <CocPopup bind:open={mobileMenuOpen} title="Menu" placement="bottom-end" aboveNavbar={true} class="md:hidden">
-            {#snippet trigger()}
-                <TablerMenu2
-                    class="press size-8 cursor-pointer text-stone-50 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] transition-transform duration-200"
-                />
-            {/snippet}
-            <div class="flex flex-col gap-3">
-                {#each links as link (link.href)}
-                    <CocBtn
-                        href={link.href}
-                        variant="orange"
-                        size="sm"
-                        class={cn("w-full", page.url.pathname === link.href && "outline outline-offset-2 outline-white/70")}
-                        onclick={() => (mobileMenuOpen = false)}
-                    >
-                        {link.name}
-                    </CocBtn>
-                {/each}
-            </div>
-        </CocPopup>
-
+    <!-- Phones get one menu for both the site links and the account. -->
+    <div class="md:hidden">
         {#if $session.isPending}
-            <div class="size-12 animate-pulse rounded-full bg-stone-700/50"></div>
-        {:else if $session.data?.user}
-            {@const user = $session.data.user}
-            {@const role = (user.role ?? null) as Role | null}
-            <CocPopup placement="bottom-end" aboveNavbar={true}>
+            <div class="h-11 w-20 rounded-full bg-stone-700/50"></div>
+        {:else}
+            <CocPopup bind:open={menuOpen} title="Menu" contentClass="flex flex-col gap-4 p-4 font-coc">
+                {#snippet trigger()}
+                    <span
+                        class="flex items-center gap-2 rounded-full border border-white/15 bg-stone-950/50 p-1 text-stone-50 backdrop-blur-sm"
+                        class:pr-3={!!user}
+                        class:pl-3={!user}
+                        aria-label="Open menu"
+                    >
+                        {#if user}
+                            <Avatar src={user.image} name={user.name} {role} size="xs" />
+                        {/if}
+                        <TablerMenu2 class={cn("size-6", !user && "my-1.5 mr-1.5")} />
+                    </span>
+                {/snippet}
+                {@render profile()}
+                {#if !user}
+                    <CocBtn variant="blurple" size="sm" class="w-full" onclick={login}><SimpleIconsDiscord /> Log in with Discord</CocBtn>
+                {/if}
+                <div class="flex flex-col gap-2">
+                    {@render label("Explore")}
+                    <div class="grid grid-cols-2 gap-2">
+                        {#each links as link (link.href)}
+                            <CocBtn size="sm" variant={isActive(link.href) ? "green" : "orange"} href={link.href} class="w-full whitespace-nowrap">
+                                {link.name}
+                            </CocBtn>
+                        {/each}
+                    </div>
+                </div>
+                {#if user}
+                    <div class="flex flex-col gap-2">
+                        {@render label("Account")}
+                        {@render account()}
+                    </div>
+                {/if}
+            </CocPopup>
+        {/if}
+    </div>
+
+    <div class="hidden items-center gap-4 md:flex">
+        {#if $session.isPending}
+            <div class="size-12 rounded-full bg-stone-700/50"></div>
+        {:else if user}
+            <CocPopup
+                bind:open={accountOpen}
+                title="Account"
+                placement="bottom-end"
+                aboveNavbar={true}
+                maxWidth="w-72"
+                contentClass="flex flex-col gap-4 p-4 font-coc"
+            >
                 {#snippet trigger()}
                     <Avatar src={user.image} name={user.name} {role} size="md" />
                 {/snippet}
-                <div class="flex min-w-52 flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <Avatar src={user.image} name={user.name} {role} size="lg" />
-                        <div class="flex flex-col gap-0.5">
-                            <span class="font-coc font-bold">{user.name}</span>
-                            {#if role && role in ROLE_CONFIG}
-                                <span class="font-coc text-sm text-stone-700">
-                                    {ROLE_CONFIG[role].label}
-                                </span>
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <CocBtn variant="orange" size="sm" href="/dashboard">Dashboard</CocBtn>
-                        {#await hasPermission(user.id, "review") then canAdmin}
-                            {#if canAdmin}
-                                <CocBtn variant="orange" size="sm" href="/admin">Admin</CocBtn>
-                            {/if}
-                        {/await}
-                        <CocBtn
-                            variant="red"
-                            size="sm"
-                            onclick={() => {
-                                clearIdentifiedUser();
-                                authClient.signOut();
-                            }}
-                        >
-                            Logout
-                        </CocBtn>
-                    </div>
+                {@render profile()}
+                <div class="flex flex-col gap-2">
+                    {@render account()}
                 </div>
             </CocPopup>
         {:else}
-            <CocBtn variant="blurple" onclick={() => authClient.signIn.social({ provider: "discord", callbackURL: window.location.origin })}>
-                Login
-            </CocBtn>
+            <CocBtn variant="blurple" onclick={login}>Login</CocBtn>
         {/if}
     </div>
 </nav>

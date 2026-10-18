@@ -13,8 +13,6 @@
     --ease-glide: cubic-bezier(0.33, 1, 0.68, 1);
     --ease-glide-soft: cubic-bezier(0.25, 1, 0.5, 1);
 
-    --animate-wavy-bounce: wavy-bounce 900ms var(--ease-glide-soft) both;
-    --animate-float-sprite: float-sprite var(--float-duration, 4s) ease-in-out var(--float-delay, 0s) infinite alternate;
     --animate-ring-draw: ring-draw 800ms var(--ease-glide) both;
     --animate-ring-empty: ring-empty 800ms var(--ease-glide) both;
 }
@@ -235,17 +233,6 @@ body {
     }
 }
 
-@keyframes glide-char {
-    from {
-        translate: 0 100%;
-    }
-}
-
-.glide-char {
-    animation: glide-char 800ms var(--ease-glide) both;
-    animation-delay: calc(var(--i, 0) * 50ms);
-}
-
 /* Set --i to the item's index in the list. Delay is capped so long lists don't trickle in. */
 .stagger-fade {
     animation: enter-fade 200ms var(--ease-glide-soft) both;
@@ -290,36 +277,6 @@ body {
     animation-delay: 660ms;
 }
 
-@keyframes wavy-bounce {
-    0% {
-        scale: 0;
-        rotate: 0deg;
-    }
-    44% {
-        scale: 1.15;
-        rotate: -5deg;
-    }
-    67% {
-        scale: 0.95;
-        rotate: 3deg;
-    }
-    83% {
-        scale: 1.05;
-        rotate: -2deg;
-    }
-    100% {
-        scale: 1;
-        rotate: 0deg;
-    }
-}
-
-@keyframes float-sprite {
-    to {
-        translate: 0 calc(-1 * var(--float-distance, 20px));
-        rotate: 3deg;
-    }
-}
-
 /* Impersonation ring: circumference of the r=27 circle is 2πr ≈ 169.65. */
 @keyframes ring-draw {
     from {
@@ -339,8 +296,33 @@ body {
     }
 }
 
+/* Homepage hero: the art settles in, then each line rises in order of --i. */
+@keyframes hero-art {
+    from {
+        opacity: 0;
+        scale: 1.06;
+    }
+}
+
+@keyframes hero-rise {
+    from {
+        opacity: 0;
+        translate: 0 1rem;
+    }
+}
+
+.hero-art {
+    animation: hero-art 1400ms var(--ease-glide-soft) both;
+}
+
+.hero-rise {
+    animation: hero-rise 600ms var(--ease-glide) both;
+    animation-delay: calc(150ms + var(--i, 0) * 90ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .glide-char,
+    .hero-art,
+    .hero-rise,
     .stagger-fade,
     .stagger-up,
     .stagger-card,
