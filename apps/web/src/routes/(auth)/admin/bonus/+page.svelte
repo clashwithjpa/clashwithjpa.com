@@ -36,7 +36,7 @@
         type GetCwlSeasons200,
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
-    import { renderComponent, type SortingState } from "@tanstack/svelte-table";
+    import { renderComponent, renderSnippet, type SortingState } from "@tanstack/svelte-table";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCircleCheck from "~icons/tabler/circle-check";
     import TablerCircleX from "~icons/tabler/circle-x";
@@ -65,8 +65,6 @@
     let seasons = $state<Season[]>([]);
     let currentSeasonId = $state<number | null>(null);
     let currentSeasonName = $derived(seasons.find((s) => s.id === currentSeasonId)?.name ?? null);
-    // Split the season columns: the active season (awarded now) vs. all the rest.
-    let currentSeasonList = $derived(seasons.filter((s) => s.id === currentSeasonId));
     let pastSeasons = $derived(seasons.filter((s) => s.id !== currentSeasonId));
     let selectedSeasonValue = $state("");
     let seasonOptions = $derived<Option[]>(seasons.map((s) => ({ label: s.name, value: String(s.id) })));
@@ -563,7 +561,23 @@
         };
     }
 
+    const hasBonus = (r: Row) => currentSeasonId != null && r.bonusSeasonIds.includes(currentSeasonId);
+
     let columns = $derived<TableColumn<Row>[]>([
+        ...(currentSeasonId != null
+            ? [
+                  {
+                      id: "thisSeasonBonus",
+                      header: "Bonus",
+                      size: 90,
+                      minSize: 90,
+                      enableSorting: false,
+                      enableResizing: false,
+                      cell: ({ row }) => renderSnippet(bonusCheckbox, row.original),
+                      meta: { cellClass: "px-0" },
+                  } satisfies TableColumn<Row>,
+              ]
+            : []),
         {
             accessorKey: "discordUsername",
             header: "Discord",
@@ -654,18 +668,6 @@
                 }),
         },
         {
-            id: "thisSeasonBonus",
-            header: "This Season",
-            size: seasonsWidth(currentSeasonList),
-            enableSorting: false,
-            cell: ({ row }) =>
-                renderComponent(BonusSeasonsCell, {
-                    seasons: currentSeasonList,
-                    awarded: row.original.bonusSeasonIds,
-                    onToggle: (seasonId: number, selected: boolean) => toggleBonus(row.original, seasonId, selected),
-                }),
-        },
-        {
             id: "pastBonuses",
             header: "Past Bonuses",
             size: seasonsWidth(pastSeasons.slice(0, PAST_SEASON_LIMIT)) + (pastSeasons.length > PAST_SEASON_LIMIT ? 90 : 0),
@@ -684,6 +686,16 @@
     loadClans();
     loadCwlClans();
 </script>
+
+{#snippet bonusCheckbox(row: Row)}
+    <Input
+        type="checkbox"
+        class="mx-auto"
+        checked={hasBonus(row)}
+        onclick={() => toggleBonus(row, currentSeasonId!, !hasBonus(row))}
+        aria-label="Award {currentSeasonName ?? 'this season'} bonus to {row.discordUsername}"
+    />
+{/snippet}
 
 <Seo title="CWL Bonus" description="Assign CWL bonuses and review linked account stats." />
 
@@ -812,6 +824,7 @@
             searchText={searchTextFor}
             groupBy={groupByClan}
             groupCompare={compareClans}
+            rowClass={(r) => hasBonus(r) && "*:bg-amber-400/10"}
         />
     </div>
 </div>

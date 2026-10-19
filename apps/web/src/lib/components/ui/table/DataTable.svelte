@@ -53,6 +53,7 @@
         // group) and bands alternate groups.
         groupBy?: (row: T) => string;
         groupCompare?: (a: string, b: string) => number;
+        rowClass?: (row: T) => string | false | null | undefined;
         onEndReached?: () => void;
         class?: string;
     }
@@ -72,6 +73,7 @@
         rowSelection = $bindable({}),
         groupBy,
         groupCompare,
+        rowClass,
         onEndReached,
         class: className = "",
     }: Props = $props();
@@ -514,6 +516,7 @@
                                 "group transition-colors hover:bg-stone-900",
                                 mark?.band && "bg-stone-700/16",
                                 row.getIsSelected() && "bg-stone-800 hover:bg-stone-800",
+                                rowClass?.(row.original),
                             )}
                             style:height="{rowHeight}px"
                         >
