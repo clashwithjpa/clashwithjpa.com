@@ -1,6 +1,7 @@
 import { isAuthenticated } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { getClans, getClansWithRequirements, getCwlClans } from "@/lib/db/functions";
+import { FwaPointsSchema, getFwaPoints } from "@/lib/fwa-points";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
 import { describeRoute } from "@/lib/openapi";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
@@ -319,6 +320,53 @@ app.get(
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch current war data" }, 500);
+        }
+    },
+);
+
+const getFWAClanPointsPathSchema = z4.object({
+    tag: z4.string().min(1, "Clan tag is required").max(20).startsWith("#", "Clan tag must start with #"),
+});
+const getFWAClanPointsData = z4.object({
+    points: FwaPointsSchema.nullable(),
+});
+app.get(
+    "/clan/:tag/fwa-points",
+    describeRoute({
+        operationId: "getFWAClanPoints",
+        role: "Public",
+        security: [],
+        description:
+            "Fetches a clan's FWA point balance, current win-calculator matchup and recent point history from points.fwafarm.com, cached for five minutes. `points` is null when the clan isn't in the FWA database.",
+        tags: ["coc"],
+        responses: {
+            200: {
+                description: "Successful response with the clan's FWA points.",
+                content: {
+                    "application/json": {
+                        schema: resolver(SuccessResponseSchema(getFWAClanPointsData)),
+                    },
+                },
+            },
+            502: {
+                description: "The FWA points database couldn't be reached or read.",
+                content: {
+                    "application/json": {
+                        schema: resolver(ErrorResponseSchema),
+                    },
+                },
+            },
+        },
+    }),
+    zValidator("param", getFWAClanPointsPathSchema),
+    async (c) => {
+        const tag = c.req.param("tag");
+        try {
+            const points = await getFwaPoints(tag);
+            return c.json({ success: true, data: { points } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch FWA points" }, 502);
         }
     },
 );
