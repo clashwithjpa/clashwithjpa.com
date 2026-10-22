@@ -1,5 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+// tailwind-merge reads the custom `text-outline` utility (layout.css) as a text colour and
+// would drop any `text-white` before it. Its own group keeps both.
+const twMerge = extendTailwindMerge<"text-outline">({
+    extend: { classGroups: { "text-outline": ["text-outline"] } },
+});
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));

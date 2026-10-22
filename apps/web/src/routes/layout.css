@@ -15,6 +15,9 @@
 
     --animate-ring-draw: ring-draw 800ms var(--ease-glide) both;
     --animate-ring-empty: ring-empty 800ms var(--ease-glide) both;
+
+    /* Body copy on the public pages' wood and dark surfaces. */
+    --color-parchment: #f6dfba;
 }
 
 /* As many columns as fit at --card-min wide; one column on narrow screens. */
@@ -22,6 +25,85 @@
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min, 20rem)), 1fr));
+}
+
+/* The game's white-on-black outlined lettering. */
+@utility text-outline {
+    text-shadow:
+        0 -1px #000,
+        0 2px #000,
+        0 3px #000,
+        -1px -1px #000,
+        1px -1px #000,
+        1px 0 #000,
+        -1px 0 #000,
+        1px 1px #000,
+        -1px 1px #000,
+        1px 2px #000,
+        -1px 2px #000;
+}
+
+/* The dark framed window that public-page boards, popups and long text sit in. */
+@utility coc-panel {
+    background: linear-gradient(180deg, #26201c, #171310);
+    border: 2px solid #000;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* The game's panel wood: a smooth muted brown with a few soft horizontal streaks. Low-octave
+   noise stretched along x gives the streaks; one field darkens and one lightens, both at a
+   few percent alpha so the board reads as smooth from a distance. The tile stitches. */
+:root {
+    --wood-streaks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Cfilter id='d' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0012 0.06' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0 0 0 -0.07'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0015 0.045' numOctaves='1' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.75 0 0 0 0 0.5 0 0.12 0 0 -0.055'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23d)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
+}
+
+/* The painted wood every public-page board shares. */
+@utility coc-wood {
+    background: var(--wood-streaks), linear-gradient(180deg, #6a4a3a, #5f412f 50%, #573b2b);
+}
+
+/* Rips the bottom edge of an element, like the store's top bar. The texture underneath carries
+   into the tear because it's a mask, not a painted edge. Height the element to include --torn-depth.
+   The solid part overlaps the edge by 2px: where the two layers only touched, fractional scaling
+   anti-aliased both sides and left a faint line. */
+@utility torn-bottom {
+    --torn-depth: 1.25rem;
+    mask:
+        linear-gradient(#000 0 0) top / 100% calc(100% - var(--torn-depth) + 2px) no-repeat,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 28' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V12L1390 22 1336 11 1284 19 1230 9 1180 24 1126 12 1075 21 1022 7 970 17 920 10 866 23 815 11 760 19 712 9 660 22 610 12 556 20 500 6 455 18 400 10 352 24 300 12 250 18 196 8 150 20 96 10 48 22 0 14Z'/%3E%3C/svg%3E")
+            bottom / 100% var(--torn-depth) no-repeat;
+}
+
+/* torn-bottom's mirror, for boards that hang below content (the footer). */
+@utility torn-top {
+    --torn-depth: 1.25rem;
+    mask:
+        linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--torn-depth) + 2px) no-repeat,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 28' preserveAspectRatio='none'%3E%3Cpath transform='matrix(1 0 0 -1 0 28)' d='M0 0H1440V12L1390 22 1336 11 1284 19 1230 9 1180 24 1126 12 1075 21 1022 7 970 17 920 10 866 23 815 11 760 19 712 9 660 22 610 12 556 20 500 6 455 18 400 10 352 24 300 12 250 18 196 8 150 20 96 10 48 22 0 14Z'/%3E%3C/svg%3E")
+            top / 100% var(--torn-depth) no-repeat;
+}
+
+/* Wood board for cards on public pages: lit rim on top, dark lip along the bottom. */
+@utility coc-plank {
+    @apply coc-wood;
+    border: 2px solid #1a0f0a;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 220, 190, 0.16),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.28),
+        0 4px 0 rgba(0, 0, 0, 0.4),
+        0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* A recessed bar or pocket in a coc-plank. The streaks carry through so it reads as the same board, sunk. */
+@utility coc-slot {
+    background: var(--wood-streaks), linear-gradient(180deg, #4e3328, #553a2d);
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.35),
+        0 1px 0 rgba(255, 220, 190, 0.08);
 }
 
 /* LayerChart theme: charts and their portaled tooltips read these. The build
@@ -84,6 +166,15 @@ body {
 .show-scrollbar,
 .show-scrollbar * {
     --sb-color: var(--color-stone-800);
+}
+
+/* Public pages draw their own fading page scrollbar (PageScrollbar), so the native one
+   doesn't reserve a strip down the right edge. Inner scroll areas keep theirs. */
+html.overlay-scrollbar {
+    scrollbar-width: none;
+}
+html.overlay-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
 ::-webkit-scrollbar {
@@ -377,7 +468,7 @@ body {
 }
 
 .typography-coc {
-    @apply prose max-w-none font-coc text-base prose-stone prose-headings:text-stone-900 prose-p:text-stone-800 prose-a:text-emerald-800 prose-a:hover:text-emerald-900 prose-blockquote:rounded-lg prose-blockquote:border-l-emerald-600 prose-blockquote:bg-green-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-emerald-800 prose-blockquote:not-italic prose-strong:text-stone-900 prose-code:text-stone-900 prose-ol:marker:text-stone-700 prose-ul:marker:text-stone-700 prose-li:text-stone-800 prose-hr:hidden [&_blockquote_p]:text-emerald-800 [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
+    @apply prose max-w-none font-coc text-base prose-invert prose-headings:text-white prose-p:text-parchment/90 prose-a:text-[#ffcd6a] prose-a:hover:text-[#ffe6a5] prose-blockquote:rounded-lg prose-blockquote:border-l-[#85c03f] prose-blockquote:bg-[#85c03f]/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[#c5e89a] prose-blockquote:not-italic prose-strong:text-white prose-code:text-white prose-ol:marker:text-parchment/60 prose-ul:marker:text-parchment/60 prose-li:text-parchment/90 prose-hr:hidden [&_blockquote_p]:text-[#c5e89a] [&_blockquote_p:first-of-type]:before:content-none [&_blockquote_p:last-of-type]:after:content-none;
 }
 
 .typography-coc a {
