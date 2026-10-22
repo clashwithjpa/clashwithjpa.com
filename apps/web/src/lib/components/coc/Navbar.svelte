@@ -2,16 +2,15 @@
     import { afterNavigate } from "$app/navigation";
     import { page } from "$app/state";
     import { clearIdentifiedUser } from "$lib/analytics";
-    import { authClient, hasPermission } from "$lib/auth";
+    import { authClient, hasPermission, signInWithDiscord } from "$lib/auth";
     import { ROLE_CONFIG, type Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
     import { NAV_LINKS as links } from "$lib/utils/links";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
-    import TablerMenu2 from "~icons/tabler/menu-2";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
     import CocPopup from "../ui/coc/CocPopup.svelte";
-    import Link from "../ui/Link.svelte";
+    import CocTabs from "../ui/coc/CocTabs.svelte";
 
     let scrollY = $state(0);
     let menuOpen = $state(false);
@@ -37,7 +36,11 @@
     });
 
     const isActive = (href: string) => (href === "/" ? page.url.pathname === "/" : page.url.pathname.startsWith(href));
-    const login = () => authClient.signIn.social({ provider: "discord", callbackURL: window.location.href });
+    const navOptions = links.map((l) => ({ key: l.href, label: l.name, href: l.href }));
+    const activeHref = $derived(links.find((l) => isActive(l.href))?.href);
+    // The homepage hero art runs under the bar, so the wood only comes in once you scroll.
+    const showBar = $derived(!isHomePage || isScrolled);
+    const login = () => signInWithDiscord();
     function logout() {
         clearIdentifiedUser();
         authClient.signOut();
@@ -47,19 +50,18 @@
 
 <svelte:window bind:scrollY />
 
-<!-- Labels and inset panels match ClanCard so the menus read as part of the same parchment UI. -->
 {#snippet label(text: string)}
-    <h4 class="font-coc text-sm font-bold text-stone-800 uppercase">{text}</h4>
+    <h4 class="font-coc text-xs font-bold tracking-[0.18em] text-parchment/70 uppercase">{text}</h4>
 {/snippet}
 
 {#snippet profile()}
     {#if user}
-        <div class="flex items-center gap-4 rounded-lg bg-stone-900/10 p-3 inset-shadow-sm shadow-stone-900">
+        <div class="flex items-center gap-4 rounded-xl p-3 coc-slot">
             <Avatar src={user.image} name={user.name} {role} size="md" />
             <div class="flex min-w-0 flex-col">
-                <span class="truncate text-lg leading-tight font-bold text-stone-900">{user.name}</span>
+                <span class="truncate text-lg leading-tight font-bold text-white text-outline">{user.name}</span>
                 {#if role && role in ROLE_CONFIG}
-                    <span class="text-sm text-stone-700">{ROLE_CONFIG[role].label}</span>
+                    <span class="text-sm text-parchment/75">{ROLE_CONFIG[role].label}</span>
                 {/if}
             </div>
         </div>
@@ -78,44 +80,52 @@
     {/if}
 {/snippet}
 
-<nav
-    class={cn(
-        "fixed top-0 z-40 flex h-20 w-full items-center justify-between p-4 font-coc transition-all duration-200 md:p-6",
-        (!isHomePage || isScrolled) && "bg-stone-950/50 backdrop-blur-sm",
-    )}
->
+<nav class="fixed top-0 z-40 flex h-20 w-full items-center justify-between p-4 font-coc md:p-6">
+    <!-- The shadow lives on the wrapper because the mask on the wood would clip it. -->
+    <div
+        class={cn(
+            "bar-shadow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.25rem)] transition-opacity duration-300",
+            showBar ? "opacity-100" : "opacity-0",
+        )}
+        aria-hidden="true"
+    >
+        <div class="size-full torn-bottom coc-wood"></div>
+    </div>
+
     <a href="/" class="flex h-12 items-center gap-4">
-        <div class="size-12 bg-contain bg-center bg-no-repeat" style="background-image: url('/logo.webp');"></div>
-        <div class="h-full border-l-2 border-stone-700/50"></div>
+        <div
+            class="size-12 bg-contain bg-center bg-no-repeat drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
+            style="background-image: url('/logo.webp');"
+        ></div>
+        <div class="h-full border-l-2 border-black/40"></div>
         <div class="flex flex-col">
-            <span class="text-xl font-bold">JPA</span>
-            <span class="text-xs text-stone-400">FWA Clans</span>
+            <span class="text-xl leading-tight font-black text-white text-outline">JPA</span>
+            <span class="text-xs text-parchment/75">FWA Clans</span>
         </div>
     </a>
 
-    <div class="hidden **:text-sm md:absolute md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-8">
-        {#each links as link, i (link.href)}
-            <Link href={link.href} class="stagger-up" style="--i:{i}">
-                {link.name}
-            </Link>
-        {/each}
+    <div class="hidden md:absolute md:left-1/2 md:block md:-translate-x-1/2">
+        <CocTabs label="Site" options={navOptions} value={activeHref} />
     </div>
 
     <!-- Phones get one menu for both the site links and the account, opened from the avatar like on desktop. -->
     <div class="md:hidden">
         {#if $session.isPending}
-            <div class="size-12 rounded-full bg-stone-700/50"></div>
+            <div class="size-12 animate-pulse rounded-full bg-black/25"></div>
         {:else}
-            <CocPopup bind:open={menuOpen} title="Menu" contentClass="flex flex-col gap-4 p-4 font-coc">
+            <CocPopup bind:open={menuOpen} contentClass="flex flex-col gap-4 p-4 font-coc">
                 {#snippet trigger()}
                     {#if user}
                         <Avatar src={user.image} name={user.name} {role} size="md" />
                     {:else}
+                        <!-- The game's own HUD button face (Supercell fan kit) with outlined bars like its HUD glyphs. -->
                         <span
-                            class="grid size-11 place-items-center rounded-full border border-white/15 bg-stone-950/50 text-stone-50 backdrop-blur-sm"
-                            aria-label="Open menu"
+                            class="flex size-12 flex-col items-center justify-center gap-[5px] bg-[url('/icons/hud-button.webp')] bg-contain bg-no-repeat transition-[filter] duration-200 hover:brightness-110 active:brightness-95"
                         >
-                            <TablerMenu2 class="size-6" />
+                            <span class="sr-only">Open menu</span>
+                            {#each [0, 1, 2] as bar (bar)}
+                                <span class="h-1 w-6 rounded-full bg-white shadow-[0_0_0_1.5px_#000,0_2px_0_1.5px_#000]"></span>
+                            {/each}
                         </span>
                     {/if}
                 {/snippet}
@@ -145,11 +155,10 @@
 
     <div class="hidden items-center gap-4 md:flex">
         {#if $session.isPending}
-            <div class="size-12 rounded-full bg-stone-700/50"></div>
+            <div class="size-12 animate-pulse rounded-full bg-black/25"></div>
         {:else if user}
             <CocPopup
                 bind:open={accountOpen}
-                title="Account"
                 placement="bottom-end"
                 aboveNavbar={true}
                 maxWidth="w-72"
@@ -168,3 +177,9 @@
         {/if}
     </div>
 </nav>
+
+<style>
+    .bar-shadow {
+        filter: drop-shadow(0 2px 0 #1a0f0a) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.45));
+    }
+</style>
