@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { cn } from "$lib/utils";
     import type { Snippet } from "svelte";
 
     let {
@@ -42,11 +43,12 @@
         },
     };
 
+    // One fixed scale, the same at every breakpoint: pick the size for the job, not the screen.
     const sizes = {
-        xs: "text-xs px-4 py-2 md:text-sm md:px-5 md:py-3",
-        sm: "text-sm px-5 py-3 md:text-base md:px-6 md:py-4",
-        base: "text-base px-6 py-4",
-        lg: "text-lg px-7 py-5 md:text-xl md:px-8 md:py-6",
+        xs: "h-8 px-3 text-xs",
+        sm: "h-10 px-4 text-sm",
+        base: "h-12 px-6 text-base",
+        lg: "h-14 px-8 text-lg",
     };
 
     const v = $derived(variants[variant] ?? variants.green);
@@ -58,7 +60,11 @@
     {href}
     {target}
     role={href ? "link" : "button"}
-    class={`press relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-[1.2] font-bold tracking-wide text-white shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none ${sizeClasses} ${className}`}
+    class={cn(
+        "press relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-black font-coc leading-none font-bold tracking-wide whitespace-nowrap text-white shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_4px_0_2px_rgba(0,0,0,0.2)] select-none",
+        sizeClasses,
+        className,
+    )}
     onclick={() => {
         onclick?.();
     }}
@@ -70,24 +76,26 @@
 </svelte:element>
 
 <style>
+    /* In em so the outline keeps the same weight relative to the text at every size. */
     .text-shadow {
         text-shadow:
-            0 -2px #000,
+            0 -0.125em #000,
             0 0 #000,
-            0 2px #000,
-            0 4px #000,
-            -1px -1px #000,
-            1px -1px #000,
-            1px 0 #000,
-            -1px 0 #000,
-            1px 1px #000,
-            -1px 1px #000,
-            1px 2px #000,
-            -1px 2px #000;
+            0 0.125em #000,
+            0 0.25em #000,
+            -0.0625em -0.0625em #000,
+            0.0625em -0.0625em #000,
+            0.0625em 0 #000,
+            -0.0625em 0 #000,
+            0.0625em 0.0625em #000,
+            -0.0625em 0.0625em #000,
+            0.0625em 0.125em #000,
+            -0.0625em 0.125em #000;
     }
 
     .text-shadow :global(svg) {
-        filter: drop-shadow(0 -2px #000) drop-shadow(0 2px #000) drop-shadow(1px 0 #000) drop-shadow(-1px 0 #000) drop-shadow(0 4px #000);
+        filter: drop-shadow(0 -0.125em #000) drop-shadow(0 0.125em #000) drop-shadow(0.0625em 0 #000) drop-shadow(-0.0625em 0 #000)
+            drop-shadow(0 0.25em #000);
         flex-shrink: 0;
     }
 </style>

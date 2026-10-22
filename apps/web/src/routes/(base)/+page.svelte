@@ -163,9 +163,9 @@
                                 alt=""
                                 class="pointer-events-none absolute top-0 left-1/2 z-10 size-48 -translate-x-1/2 object-contain drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)] select-none"
                             />
-                            <CocCard variant="dark" class="h-full" contentClass="flex flex-col gap-2 px-5 pt-24 pb-6 text-center">
-                                <h3 class="font-coc text-xl font-black text-stone-900">{feature.title}</h3>
-                                <p class="font-coc text-sm leading-relaxed text-stone-700">{feature.body}</p>
+                            <CocCard class="h-full" contentClass="flex flex-col gap-2 px-5 pt-24 pb-6 text-center">
+                                <h3 class="font-coc text-xl font-black text-white text-outline">{feature.title}</h3>
+                                <p class="font-coc text-sm leading-relaxed text-parchment/85">{feature.body}</p>
                             </CocCard>
                         </div>
                     {/each}
@@ -184,14 +184,10 @@
                 <FamilyChart clans={chartClans} {thDistribution} {loading} />
             </div>
 
-            <CocCard
-                variant="dark"
-                class="mx-auto w-full max-w-5xl"
-                contentClass="grid items-center gap-6 p-6 md:grid-cols-[1fr_minmax(0,18rem)] md:gap-10 md:p-10"
-            >
+            <CocCard class="mx-auto w-full max-w-5xl" contentClass="grid items-center gap-6 p-6 md:grid-cols-[1fr_minmax(0,18rem)] md:gap-10 md:p-10">
                 <div class="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
-                    <h2 class="font-coc text-3xl font-black text-stone-900 md:text-5xl">Ready to march?</h2>
-                    <p class="max-w-xl font-coc text-sm text-stone-700 md:text-base">
+                    <h2 class="font-coc text-3xl font-black text-white text-outline md:text-5xl">Ready to march?</h2>
+                    <p class="max-w-xl font-coc text-sm text-parchment/85 md:text-base">
                         Link your account and we'll slot you into the clan that fits your town hall. Wars start the day you're accepted.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-3 md:justify-start">

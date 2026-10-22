@@ -54,13 +54,35 @@
         return cleanup;
     });
 
-    const v = {
-        bg: "from-[#dcb897] via-[#9e5f37] to-[#3b1d0d]",
-        overlay: "from-[#bd7a50] to-[#713f21]",
-        gloss: "from-[#f2d0b5] to-[rgba(158,95,55,0.7)]",
-    };
-    const contentBg = "from-[#e4cca3] to-[#c7ad85]";
+    // A width-capped popup always "fits" on its side, so the positioner never flips it even when
+    // the other side has far more room. Side placements pick their side on open instead: keep the
+    // requested side if a full-size popup fits there, else take the roomier one.
+    const FULL_WIDTH = 448;
+    let side = $state<string | null>(null);
+    const resolvedPlacement = $derived((side ?? placement) as typeof placement);
+
+    function pickSide(event: Event) {
+        const [wanted, align] = placement.split("-");
+        if (wanted !== "left" && wanted !== "right") return;
+        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+        const room = { left: rect.left, right: window.innerWidth - rect.right };
+        const other = wanted === "left" ? "right" : "left";
+        const chosen = room[wanted] >= FULL_WIDTH || room[wanted] >= room[other] ? wanted : other;
+        side = align ? `${chosen}-${align}` : chosen;
+    }
+
+    const scrollArea = "min-h-0 flex-1 overflow-x-hidden overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
 </script>
+
+{#snippet heading()}
+    {#if title}
+        <div class="flex shrink-0 items-center justify-center border-b-2 border-black/60 px-4 pt-4 pb-3 shadow-[0_1px_0_rgba(255,255,255,0.06)]">
+            <h2 class="font-coc text-2xl font-black tracking-wider text-white uppercase text-outline">{title}</h2>
+        </div>
+    {:else}
+        <div class="h-2.5 shrink-0"></div>
+    {/if}
+{/snippet}
 
 {#if isMobile}
     <Drawer.Root bind:open {onOpenChange}>
@@ -83,37 +105,15 @@
             <Drawer.Positioner class={cn("pointer-events-none fixed inset-0 z-9999 flex items-end justify-center")}>
                 <Drawer.Content
                     class={cn(
-                        "pointer-events-auto relative w-full max-w-2xl overflow-hidden rounded-t-[20px] border border-black transition-all duration-200 outline-none focus:outline-none",
-                        "data-[state=closed]:animate-out data-[state=open]:animate-in",
+                        "pointer-events-auto relative flex max-h-[calc(100vh-6rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[24px] border-b-0! coc-panel outline-none focus:outline-none",
+                        "transition-all duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in",
                         "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
                     )}
                 >
-                    <div
-                        class="pointer-events-none absolute inset-x-0 top-0 bottom-[-100vh] overflow-hidden rounded-t-[20px] border border-black shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_-8px_32px_rgba(0,0,0,0.6)]"
-                    >
-                        <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
-                        <span class={`absolute inset-0.5 rounded-t-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
-                        <span class={`absolute inset-x-1.5 top-1.5 h-[40vh] rounded-t-[14px] rounded-b-xl bg-linear-to-b ${v.gloss} opacity-70`}
-                        ></span>
-                    </div>
-
-                    <div class="relative z-10 flex max-h-[calc(100vh-6rem)] min-h-0 w-full flex-1 flex-col overflow-hidden">
-                        {#if title}
-                            <div class="flex shrink-0 items-center justify-center p-3 pt-5 pb-3">
-                                <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
-                                    {title}
-                                </h2>
-                            </div>
-                        {:else}
-                            <div class="h-2.5 shrink-0"></div>
-                        {/if}
-
-                        <div
-                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} scrollbar-none shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden`}
-                        >
-                            <div class={cn("w-full p-4 text-stone-900", contentClass)}>
-                                {@render children()}
-                            </div>
+                    {@render heading()}
+                    <div class={scrollArea}>
+                        <div class={cn("w-full p-4 font-coc text-parchment", contentClass)}>
+                            {@render children()}
                         </div>
                     </div>
                 </Drawer.Content>
@@ -121,8 +121,12 @@
         </Portal>
     </Drawer.Root>
 {:else}
-    <Popover.Root bind:open positioning={{ placement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
-        <Popover.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
+    <Popover.Root bind:open positioning={{ placement: resolvedPlacement, offset: { mainAxis: 16, crossAxis: 0 } }} {onOpenChange}>
+        <Popover.Trigger
+            class={cn("cursor-pointer border-none bg-transparent outline-none", className)}
+            onpointerdown={pickSide}
+            onkeydown={pickSide}
+        >
             {@render trigger()}
         </Popover.Trigger>
 
@@ -130,33 +134,15 @@
             <Popover.Positioner class={cn("fixed transform-none", zIndex)}>
                 <Popover.Content
                     class={cn(
-                        "relative flex max-h-[calc(var(--available-height)-10rem)] flex-col overflow-hidden rounded-[20px] border border-black outline-none",
+                        "relative flex max-h-[calc(var(--available-height)-10rem)] max-w-[calc(var(--available-width)-0.5rem)] flex-col overflow-hidden rounded-[24px] coc-panel outline-none",
                         "transition-all duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
-                        "shadow-[0_0_0_1px_#000,0_0_0_2px_#000,0_8px_24px_rgba(0,0,0,0.5)]",
                         zIndex,
                     )}
                 >
-                    <span class={`absolute inset-0 bg-linear-to-b ${v.bg}`}></span>
-                    <span class={`absolute inset-0.5 rounded-[18px] bg-linear-to-b ${v.overlay} opacity-80`}></span>
-                    <span class={`absolute inset-x-1.5 top-1.5 h-1/2 rounded-[14px] bg-linear-to-b ${v.gloss} opacity-70`}></span>
-
-                    <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col">
-                        {#if title}
-                            <div class="flex shrink-0 items-center justify-center p-3 pt-5 pb-3">
-                                <h2 class="text-shadow font-coc text-2xl font-black tracking-wider text-white uppercase">
-                                    {title}
-                                </h2>
-                            </div>
-                        {:else}
-                            <div class="h-2.5 shrink-0"></div>
-                        {/if}
-
-                        <div
-                            class={`mx-2 mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-xl border border-black bg-linear-to-b ${contentBg} scrollbar-none shadow-[0_0_0_1px_#000,inset_0_2px_4px_rgba(255,255,255,0.4)] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden`}
-                        >
-                            <div class={cn("w-full p-4 text-stone-900", maxWidth, contentClass)}>
-                                {@render children()}
-                            </div>
+                    {@render heading()}
+                    <div class={scrollArea}>
+                        <div class={cn("w-full p-4 font-coc text-parchment", maxWidth, contentClass)}>
+                            {@render children()}
                         </div>
                     </div>
                 </Popover.Content>
@@ -164,21 +150,3 @@
         </Portal>
     </Popover.Root>
 {/if}
-
-<style>
-    .text-shadow {
-        text-shadow:
-            0 -2px #000,
-            0 0 #000,
-            0 2px #000,
-            0 4px #000,
-            -1px -1px #000,
-            1px -1px #000,
-            1px 0 #000,
-            -1px 0 #000,
-            1px 1px #000,
-            -1px 1px #000,
-            1px 2px #000,
-            -1px 2px #000;
-    }
-</style>
