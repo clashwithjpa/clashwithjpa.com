@@ -344,6 +344,12 @@ export {
     getCwlStatsQueryResponseSchema,
 } from "./getCwlStatsSchema.ts";
 export {
+    getFWAClanPoints200Schema,
+    getFWAClanPoints502Schema,
+    getFWAClanPointsPathParamsSchema,
+    getFWAClanPointsQueryResponseSchema,
+} from "./getFWAClanPointsSchema.ts";
+export {
     getGuildNicknames200Schema,
     getGuildNicknames401Schema,
     getGuildNicknames500Schema,

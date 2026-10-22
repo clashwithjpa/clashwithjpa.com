@@ -49,6 +49,7 @@ export { getCwlPingChannels } from "./getCwlPingChannels.ts";
 export { getCwlPingSettings } from "./getCwlPingSettings.ts";
 export { getCwlSeasons } from "./getCwlSeasons.ts";
 export { getCwlStats } from "./getCwlStats.ts";
+export { getFWAClanPoints } from "./getFWAClanPoints.ts";
 export { getGuildNicknames } from "./getGuildNicknames.ts";
 export { getJPAClanRequirements } from "./getJPAClanRequirements.ts";
 export { getJPAClans } from "./getJPAClans.ts";

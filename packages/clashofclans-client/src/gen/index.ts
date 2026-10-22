@@ -49,6 +49,7 @@ export type { GetCwlPingChannelsQueryKey } from "./hooks/createGetCwlPingChannel
 export type { GetCwlPingSettingsQueryKey } from "./hooks/createGetCwlPingSettings.ts";
 export type { GetCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
 export type { GetCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
+export type { GetFWAClanPointsQueryKey } from "./hooks/createGetFWAClanPoints.ts";
 export type { GetGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
 export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
 export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
@@ -522,6 +523,15 @@ export type {
     GetCwlStatsQueryResponse,
 } from "./models/GetCwlStats.ts";
 export type {
+    GetFWAClanPoints200,
+    GetFWAClanPoints502,
+    GetFWAClanPointsPathParams,
+    GetFWAClanPointsQuery,
+    GetFWAClanPointsQueryResponse,
+    HistoryResultEnumKey,
+    MatchupWinnerEnumKey,
+} from "./models/GetFWAClanPoints.ts";
+export type {
     GetGuildNicknames200,
     GetGuildNicknames401,
     GetGuildNicknames500,
@@ -819,6 +829,7 @@ export { getCwlPingChannels } from "./clients/getCwlPingChannels.ts";
 export { getCwlPingSettings } from "./clients/getCwlPingSettings.ts";
 export { getCwlSeasons } from "./clients/getCwlSeasons.ts";
 export { getCwlStats } from "./clients/getCwlStats.ts";
+export { getFWAClanPoints } from "./clients/getFWAClanPoints.ts";
 export { getGuildNicknames } from "./clients/getGuildNicknames.ts";
 export { getJPAClanRequirements } from "./clients/getJPAClanRequirements.ts";
 export { getJPAClans } from "./clients/getJPAClans.ts";
@@ -989,6 +1000,9 @@ export { getCwlSeasonsQueryOptions } from "./hooks/createGetCwlSeasons.ts";
 export { createGetCwlStats } from "./hooks/createGetCwlStats.ts";
 export { getCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
 export { getCwlStatsQueryOptions } from "./hooks/createGetCwlStats.ts";
+export { createGetFWAClanPoints } from "./hooks/createGetFWAClanPoints.ts";
+export { getFWAClanPointsQueryKey } from "./hooks/createGetFWAClanPoints.ts";
+export { getFWAClanPointsQueryOptions } from "./hooks/createGetFWAClanPoints.ts";
 export { createGetGuildNicknames } from "./hooks/createGetGuildNicknames.ts";
 export { getGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
 export { getGuildNicknamesQueryOptions } from "./hooks/createGetGuildNicknames.ts";
@@ -1100,6 +1114,8 @@ export { playerWarPreferenceEnum } from "./models/GetCOCPlayer.ts";
 export { spellsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { troopsVillageEnum } from "./models/GetCOCPlayer.ts";
 export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
+export { historyResultEnum } from "./models/GetFWAClanPoints.ts";
+export { matchupWinnerEnum } from "./models/GetFWAClanPoints.ts";
 export { applicationsStatusEnum } from "./models/GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./models/GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
@@ -1470,6 +1486,12 @@ export {
     getCwlStatsQueryParamsSchema,
     getCwlStatsQueryResponseSchema,
 } from "./zod/getCwlStatsSchema.ts";
+export {
+    getFWAClanPoints200Schema,
+    getFWAClanPoints502Schema,
+    getFWAClanPointsPathParamsSchema,
+    getFWAClanPointsQueryResponseSchema,
+} from "./zod/getFWAClanPointsSchema.ts";
 export {
     getGuildNicknames200Schema,
     getGuildNicknames401Schema,

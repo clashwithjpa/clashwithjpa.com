@@ -430,6 +430,15 @@ export type {
     GetCwlStatsQueryResponse,
 } from "./GetCwlStats.ts";
 export type {
+    GetFWAClanPoints200,
+    GetFWAClanPoints502,
+    GetFWAClanPointsPathParams,
+    GetFWAClanPointsQuery,
+    GetFWAClanPointsQueryResponse,
+    HistoryResultEnumKey,
+    MatchupWinnerEnumKey,
+} from "./GetFWAClanPoints.ts";
+export type {
     GetGuildNicknames200,
     GetGuildNicknames401,
     GetGuildNicknames500,
@@ -704,6 +713,8 @@ export { playerWarPreferenceEnum } from "./GetCOCPlayer.ts";
 export { spellsVillageEnum } from "./GetCOCPlayer.ts";
 export { troopsVillageEnum } from "./GetCOCPlayer.ts";
 export { itemsBattleTypeEnum } from "./GetCOCPlayerBattleLog.ts";
+export { historyResultEnum } from "./GetFWAClanPoints.ts";
+export { matchupWinnerEnum } from "./GetFWAClanPoints.ts";
 export { applicationsStatusEnum } from "./GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./GetJoinApplications.ts";
 export { verifyTokenStatusEnum } from "./PostCOCPlayerVerify.ts";
