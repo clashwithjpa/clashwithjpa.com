@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { authClient } from "$lib/auth";
+    import { signInWithDiscord } from "$lib/auth";
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -62,7 +62,7 @@
     <img src="/bg.webp" alt="" class="fixed inset-0 -z-20 size-full object-cover opacity-25 blur-sm" />
     <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_0%,var(--color-stone-950)_75%)]"></div>
 
-    <CocCard variant="dark" class="w-full max-w-3xl" contentClass="grid items-center gap-6 p-6 md:grid-cols-[minmax(0,16rem)_1fr] md:gap-8 md:p-8">
+    <CocCard class="w-full max-w-3xl" contentClass="grid items-center gap-6 p-6 md:grid-cols-[minmax(0,16rem)_1fr] md:gap-8 md:p-8">
         <div class="@container relative mx-auto w-48 md:w-full">
             {#if scene.art === "goblin-sign"}
                 <img src="/art/goblin-sign.webp" alt="A goblin holding up a sign" class="w-full select-none" />
@@ -89,22 +89,18 @@
 
         <div class="flex flex-col items-center gap-4 text-center md:items-start md:text-left">
             <span class="rounded-md bg-[#3b2416] px-2 py-0.5 text-xs font-bold tracking-widest text-[#ffcd6a] uppercase">Error {status}</span>
-            <h1 class="text-3xl leading-tight font-black text-stone-900 md:text-4xl">{scene.title}</h1>
-            <p class="text-base text-stone-700">{quip}</p>
+            <h1 class="text-3xl leading-tight font-black text-white text-outline md:text-4xl">{scene.title}</h1>
+            <p class="text-base text-parchment/85">{quip}</p>
             {#if detail}
-                <p class="rounded-lg bg-stone-900/10 px-3 py-2 font-mono text-xs break-all text-stone-700">{detail}</p>
+                <p class="rounded-lg px-3 py-2 font-mono text-xs break-all text-parchment/70 coc-slot">{detail}</p>
             {/if}
             {#if status >= 500 && page.error?.errorId}
-                <p class="font-mono text-xs text-stone-600">Error ID: {page.error.errorId}</p>
+                <p class="font-mono text-xs text-parchment/50">Error ID: {page.error.errorId}</p>
             {/if}
             <div class="flex flex-wrap items-center justify-center gap-3 pt-2 md:justify-start">
                 <CocBtn variant="green" size="sm" href="/">Back to the village</CocBtn>
                 {#if status === 401}
-                    <CocBtn
-                        variant="blurple"
-                        size="sm"
-                        onclick={() => authClient.signIn.social({ provider: "discord", callbackURL: window.location.href })}
-                    >
+                    <CocBtn variant="blurple" size="sm" onclick={() => signInWithDiscord()}>
                         <SimpleIconsDiscord /> Sign in
                     </CocBtn>
                 {:else if status >= 500}
