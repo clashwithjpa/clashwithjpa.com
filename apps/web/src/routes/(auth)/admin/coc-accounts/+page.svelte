@@ -11,6 +11,7 @@
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
+    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
@@ -739,14 +740,17 @@
                 </div>
                 <p class="text-xs text-stone-400">Linked accounts with no matching row in the sheet.</p>
                 {#if syncResult.notInSheet.length}
-                    <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
+                    <ScrollArea
+                        wrapperClass="mt-1"
+                        class="max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40"
+                    >
                         {#each syncResult.notInSheet as a (a.cocAccountTag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{a.ownerName ?? "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{a.cocAccountTag}</span>
                             </div>
                         {/each}
-                    </div>
+                    </ScrollArea>
                 {:else}
                     <p class="text-xs text-stone-500">All linked accounts were present in the sheet.</p>
                 {/if}
@@ -777,14 +781,17 @@
                 </div>
                 <p class="text-xs text-stone-400">Sheet rows whose tag isn’t a linked account in the database.</p>
                 {#if syncResult.notLinked.length}
-                    <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
+                    <ScrollArea
+                        wrapperClass="mt-1"
+                        class="max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40"
+                    >
                         {#each syncResult.notLinked as r (r.tag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{r.name || "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{r.tag}</span>
                             </div>
                         {/each}
-                    </div>
+                    </ScrollArea>
                 {:else}
                     <p class="text-xs text-stone-500">Every sheet row matched a linked account.</p>
                 {/if}
@@ -877,14 +884,17 @@
                 </div>
                 <p class="text-xs text-stone-400">Linked main accounts with no war weight in any JPA clan's FWA roster.</p>
                 {#if warWeightResult.notInFwa.length}
-                    <div class="mt-1 max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40">
+                    <ScrollArea
+                        wrapperClass="mt-1"
+                        class="max-h-40 divide-y divide-stone-800 overflow-y-auto rounded-md border border-stone-700/50 bg-stone-950/40"
+                    >
                         {#each warWeightResult.notInFwa as a (a.cocAccountTag)}
                             <div class="flex items-center justify-between gap-3 px-3 py-1.5">
                                 <span class="truncate text-stone-200">{a.ownerName ?? "—"}</span>
                                 <span class="shrink-0 font-mono text-xs text-stone-400">{a.cocAccountTag}</span>
                             </div>
                         {/each}
-                    </div>
+                    </ScrollArea>
                 {:else}
                     <p class="text-xs text-stone-500">Every linked main account got a war weight.</p>
                 {/if}

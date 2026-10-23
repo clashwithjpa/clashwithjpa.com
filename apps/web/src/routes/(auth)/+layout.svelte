@@ -5,6 +5,8 @@
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
+    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
+    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import { sidebarStore } from "$lib/components/ui/sidebar";
     import type { Role } from "$lib/config/roles";
     import { createMobileMediaQuery } from "$lib/utils/mobile";
@@ -51,6 +53,7 @@
     ];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
+    let infoScroller = $state<HTMLDivElement | null>(null);
 
     const LAYOUT_CONFIG = {
         content: { min: 30, max: 85, default: 30 },
@@ -223,13 +226,13 @@
 
 {#snippet ContentBody()}
     {#if $session.data}
-        <div class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : 'overflow-y-auto'}">
+        <ScrollArea wrapperClass="size-full" class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : ''}">
             {#key page.url.pathname}
                 <div class="page-enter {!noPaddingPaths.includes(page.url.pathname) ? 'p-4' : 'size-full'}">
                     {@render children()}
                 </div>
             {/key}
-        </div>
+        </ScrollArea>
     {:else}
         <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
             <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
@@ -267,9 +270,10 @@
                         <Button size="icon" variant="ghost" class="absolute top-4 right-4 z-20" onclick={() => sidebarStore.close()}>
                             <TablerX />
                         </Button>
-                        <div class="size-full overflow-y-auto p-4">
+                        <div bind:this={infoScroller} class="size-full overflow-y-auto p-4">
                             {@render sidebarStore.content()}
                         </div>
+                        <OverlayScrollbar viewport={infoScroller} />
                     </div>
                 {/key}
             {/if}

@@ -153,42 +153,27 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-@property --sb-color {
-    syntax: "<color>";
-    inherits: true;
-    initial-value: transparent;
-}
-
-* {
-    --sb-color: transparent;
-}
-
-.show-scrollbar,
-.show-scrollbar * {
-    --sb-color: var(--color-stone-800);
-}
-
-/* Public pages draw their own fading page scrollbar (PageScrollbar), so the native one
-   doesn't reserve a strip down the right edge. Inner scroll areas keep theirs. */
-html.overlay-scrollbar {
+/* Public pages draw their own fading page scrollbar (PageScrollbar) and admin scroll areas
+   use OverlayScrollbar, so neither reserves a strip for the native one. */
+html.overlay-scrollbar,
+[data-overlay-scrollbar] {
     scrollbar-width: none;
 }
-html.overlay-scrollbar::-webkit-scrollbar {
+html.overlay-scrollbar::-webkit-scrollbar,
+[data-overlay-scrollbar]::-webkit-scrollbar {
     display: none;
 }
 
 ::-webkit-scrollbar {
     @apply h-0 w-0 md:h-2 md:w-2;
 }
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--sb-color);
-    border-radius: 0;
-}
-::-webkit-scrollbar-corner {
-    background: transparent;
+    background-color: var(--color-stone-700);
+    border-radius: 9999px;
 }
 
 @property --fade-l {

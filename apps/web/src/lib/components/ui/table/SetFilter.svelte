@@ -3,6 +3,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import RawPopup from "$lib/components/ui/RawPopup.svelte";
+    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import { cn } from "$lib/utils";
     import type { Column } from "@tanstack/svelte-table";
     import TablerFilter from "~icons/tabler/filter";
@@ -68,7 +69,7 @@
         {#if options.length > 8}
             <Input placeholder="Search…" bind:value={search} />
         {/if}
-        <div class="flex max-h-72 flex-col overflow-y-auto">
+        <ScrollArea class="flex max-h-72 flex-col overflow-y-auto">
             {#each visible as option (option.value)}
                 <label class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-stone-700/50">
                     <Input type="checkbox" checked={selected.includes(option.value)} onchange={() => toggle(option.value)} />
@@ -79,7 +80,7 @@
             {:else}
                 <p class="py-2 text-center text-stone-400">No matches</p>
             {/each}
-        </div>
+        </ScrollArea>
         <div class="flex items-center justify-between gap-2 border-t border-stone-800 pt-2">
             <span class="text-xs text-stone-400">{selected.length ? `${selected.length} selected` : "Showing all"}</span>
             <div class="flex gap-2">

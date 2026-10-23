@@ -7,6 +7,7 @@
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
+    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
@@ -742,7 +743,7 @@
                                 No seasons match "{seasonSearch}".
                             </p>
                         {:else}
-                            <div class="edge-fade -mr-1 flex max-h-96 flex-col gap-2 overflow-y-auto pr-1">
+                            <ScrollArea wrapperClass="-mr-1" class="edge-fade flex max-h-96 flex-col gap-2 overflow-y-auto pr-1">
                                 {#each filteredSeasons as season (season.id)}
                                     <div
                                         class="flex items-center justify-between gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-800/50 px-3 py-2"
@@ -783,7 +784,7 @@
                                         </div>
                                     </div>
                                 {/each}
-                            </div>
+                            </ScrollArea>
                         {/if}
                     {/if}
 

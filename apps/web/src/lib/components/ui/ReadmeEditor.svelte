@@ -38,6 +38,8 @@
     import { carta } from "$lib/carta";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
+    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
+    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import { toast } from "$lib/toast";
     import { Splitter } from "@ark-ui/svelte/splitter";
@@ -119,6 +121,8 @@
 
     let editorRef: HTMLDivElement;
     let editor: EditorView;
+    let editorScroller = $state<HTMLElement | null>(null);
+    let previewViewport = $state<HTMLDivElement | null>(null);
     let previewHtml = $state("");
 
     const themeCompartment = new Compartment();
@@ -274,6 +278,7 @@
             });
 
             const scroller = editor.scrollDOM;
+            editorScroller = scroller;
             const onScroll = () => {
                 if (previewScroller) syncScroll(scroller, previewScroller, "editor");
             };
@@ -285,6 +290,7 @@
                 detachScroll?.();
                 editor?.destroy();
                 editorRef = undefined as any;
+                editorScroller = null;
             },
         };
     }
@@ -426,19 +432,23 @@
                     >Preview</Tabs.Trigger
                 >
             </Tabs.List>
-            <Tabs.Content value="editor" class="w-full flex-1 overflow-hidden">
+            <Tabs.Content value="editor" class="relative w-full flex-1 overflow-hidden">
                 <div use:attachEditor class="size-full"></div>
+                <OverlayScrollbar viewport={editorScroller} />
             </Tabs.Content>
-            <Tabs.Content value="preview" class="flex-1 overflow-y-auto bg-stone-950 p-4">
-                <div class="typography rules max-w-none!">
-                    <PreRendered html={previewHtml} />
-                </div>
+            <Tabs.Content value="preview" class="min-h-0 flex-1 bg-stone-950">
+                <ScrollArea wrapperClass="size-full" class="size-full p-4">
+                    <div class="typography rules max-w-none!">
+                        <PreRendered html={previewHtml} />
+                    </div>
+                </ScrollArea>
             </Tabs.Content>
         </Tabs.Root>
     {:else}
         <Splitter.Root panels={[{ id: "editor" }, { id: "preview" }]} defaultSize={[50, 50]} class="flex size-full">
-            <Splitter.Panel id="editor" class="flex size-full overflow-hidden bg-stone-950">
+            <Splitter.Panel id="editor" class="relative flex size-full overflow-hidden bg-stone-950">
                 <div use:attachEditor class="size-full"></div>
+                <OverlayScrollbar viewport={editorScroller} />
             </Splitter.Panel>
 
             <Splitter.ResizeTrigger
@@ -448,12 +458,13 @@
                 <div class=" h-10 w-1 rounded-full bg-stone-800 transition-colors duration-200 group-hover:bg-stone-400"></div>
             </Splitter.ResizeTrigger>
 
-            <Splitter.Panel id="preview" class="flex size-full overflow-hidden bg-stone-950">
-                <div use:attachPreviewScroll class="size-full overflow-y-auto p-4">
+            <Splitter.Panel id="preview" class="relative flex size-full overflow-hidden bg-stone-950">
+                <div use:attachPreviewScroll bind:this={previewViewport} class="size-full overflow-y-auto p-4">
                     <div class="typography rules max-w-none!">
                         <PreRendered html={previewHtml} />
                     </div>
                 </div>
+                <OverlayScrollbar viewport={previewViewport} />
             </Splitter.Panel>
         </Splitter.Root>
     {/if}

@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends RowData">
     /* eslint-disable @typescript-eslint/no-explicit-any */
     import Input from "$lib/components/ui/Input.svelte";
+    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import { cn } from "$lib/utils";
     import {
@@ -595,6 +596,7 @@
             <div class="absolute inset-x-0 py-10 text-center text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">{emptyText}</div>
         {/if}
     </div>
+    <OverlayScrollbar viewport={scrollEl} insetTop={HEADER_HEIGHT} />
     <!-- The table body below the sticky header; popups from cells stay inside it. -->
     <div
         bind:this={popupBoundary}
