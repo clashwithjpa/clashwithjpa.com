@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.1] - 2026-10-23
+
+### Documentation
+
+- Drop the assistant context policy file ([56d69e0](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/56d69e095f826b87e0c40bf7e6d684b73f05a072))
 ## [2.3.0] - 2026-10-23
 
 ### Features
