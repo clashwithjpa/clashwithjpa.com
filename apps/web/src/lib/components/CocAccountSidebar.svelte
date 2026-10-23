@@ -5,6 +5,7 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
+    import Tabs from "$lib/components/ui/Tabs.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import type { Role } from "$lib/config/roles";
     import { toast } from "$lib/toast";
@@ -212,18 +213,7 @@
             </Button>
         </div>
 
-        <div class="flex gap-1 border-b border-stone-700/50">
-            {#each tabs as tab (tab)}
-                <button
-                    onclick={() => (activeTab = tab)}
-                    class="flex-1 cursor-pointer border-b-2 px-2 py-2 text-sm font-medium transition-colors duration-200 {activeTab === tab
-                        ? 'border-stone-50 text-stone-50'
-                        : 'border-transparent text-stone-400 hover:text-stone-200'}"
-                >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-            {/each}
-        </div>
+        <Tabs label="Sections" options={tabs.map((key) => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }))} bind:value={activeTab} />
     </div>
 
     <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">

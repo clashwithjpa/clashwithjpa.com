@@ -42,6 +42,7 @@
     import ConfirmationDialog from "./ui/ConfirmationDialog.svelte";
     import Icon from "./ui/Icon.svelte";
     import RoleBadge from "./ui/RoleBadge.svelte";
+    import Tabs from "./ui/Tabs.svelte";
     import Toggle from "./ui/Toggle.svelte";
     import Tooltip from "./ui/Tooltip.svelte";
 
@@ -281,18 +282,7 @@
             <RoleBadge role={user.role as Role} />
         </div>
 
-        <div class="flex gap-1 border-b border-stone-700/50">
-            {#each tabs as tab (tab)}
-                <button
-                    onclick={() => (activeTab = tab)}
-                    class="flex-1 cursor-pointer border-b-2 px-2 py-2 text-sm font-medium transition-colors duration-200 {activeTab === tab
-                        ? 'border-stone-50 text-stone-50'
-                        : 'border-transparent text-stone-400 hover:text-stone-200'}"
-                >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-            {/each}
-        </div>
+        <Tabs label="Sections" options={tabs.map((key) => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }))} bind:value={activeTab} />
     </div>
 
     <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
