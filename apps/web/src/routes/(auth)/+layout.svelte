@@ -42,6 +42,7 @@
         "/admin/coc-accounts",
         "/admin/cwl-applications",
         "/admin/bonus",
+        "/admin/clans",
     ];
 
     // Pages that fill the full height (e.g. data grids) and manage their own overflow
@@ -50,6 +51,7 @@
         "/admin/coc-accounts",
         "/admin/cwl-applications",
         "/admin/bonus",
+        "/admin/clans",
     ];
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);

@@ -8,13 +8,16 @@
     import Input from "$lib/components/ui/Input.svelte";
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar } from "$lib/components/ui/sidebar";
+    import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
+    import DataTable from "$lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "$lib/components/ui/table/features";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import {
         createAdminClan,
         deleteAdminClan,
         getAdminClans,
+        getCOCClan,
         updateAdminClan,
         verifyAdminClanDiscord,
         type CreateAdminClan401,
@@ -27,6 +30,7 @@
         type DeleteAdminClan404,
         type DeleteAdminClan500,
         type GetAdminClans200,
+        type GetCOCClan200,
         type UpdateAdminClan401,
         type UpdateAdminClan404,
         type UpdateAdminClan422,
@@ -37,32 +41,28 @@
         type VerifyAdminClanDiscord500,
         type VerifyAdminClanDiscord503,
     } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
+    import { renderSnippet } from "@tanstack/svelte-table";
     import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
-    import TablerFlag from "~icons/tabler/flag";
     import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
+    import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
-    import TablerX from "~icons/tabler/x";
 
     type Clan = GetAdminClans200["data"]["clans"][number];
+    type LiveClan = GetCOCClan200["data"]["clan"];
+    // A clan plus its live game data: undefined while loading, null when the CoC API had nothing.
+    type Row = Clan & { live: LiveClan | null | undefined };
 
+    const MAX_MEMBERS = 50;
     const nf = new Intl.NumberFormat("en-US");
-
-    // The three joining requirements, in the order the game itself lists them.
-    function requirementsOf(clan: Clan) {
-        return [
-            { icon: "labels/attacks", label: "Attacks", value: clan.attacksRequirement },
-            { icon: "labels/donations", label: "Donations", value: clan.donationsRequirement },
-            { icon: "labels/clan-games", label: "Clan games", value: clan.clangamesRequirement },
-        ];
-    }
 
     let clans = $state<Clan[]>([]);
     let loading = $state(true);
     let saving = $state(false);
     let removing = $state<number | null>(null);
     let searchText = $state("");
+    let live = $state<Record<string, LiveClan | null>>({});
+    const rows = $derived<Row[]>(clans.map((c) => ({ ...c, live: live[c.cocClanTag] })));
 
     let clanSidebar: Sidebar | null = $state(null);
     // null = adding; otherwise the id being edited.
@@ -149,14 +149,82 @@
         return typeof error === "string" ? error : fallback;
     }
 
-    let filteredClans = $derived(
-        clans.filter(
-            (clan) =>
-                (clan.cocClanName ?? "").toLowerCase().includes(searchText.toLowerCase()) ||
-                clan.cocClanTag.toLowerCase().includes(searchText.toLowerCase()) ||
-                clan.cocClanCode.toLowerCase().includes(searchText.toLowerCase()),
-        ),
-    );
+    async function loadLive(tags: string[]) {
+        await Promise.all(
+            tags.map(async (tag) => {
+                try {
+                    const resp = await getCOCClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL });
+                    live[tag] = resp.success && resp.data?.clan ? resp.data.clan : null;
+                } catch {
+                    live[tag] = null;
+                }
+            }),
+        );
+    }
+
+    const requirementColumn = (
+        key: "attacksRequirement" | "donationsRequirement" | "clangamesRequirement",
+        header: string,
+        icon: string,
+        size: number,
+    ) =>
+        ({
+            accessorKey: key,
+            header,
+            size,
+            cell: ({ row }) => renderSnippet(requirementCell, { icon, value: row.original[key] }),
+            meta: { filter: "number" },
+        }) satisfies TableColumn<Row>;
+
+    const columns: TableColumn<Row>[] = [
+        {
+            id: "clan",
+            accessorFn: (r) => r.cocClanName ?? "",
+            header: "Clan",
+            size: 210,
+            cell: ({ row }) => renderSnippet(clanCell, row.original),
+        },
+        {
+            accessorKey: "cocClanCode",
+            header: "Code",
+            size: 75,
+            cell: ({ row }) => renderSnippet(codeCell, row.original.cocClanCode),
+        },
+        {
+            accessorKey: "cocClanLevel",
+            header: "Level",
+            size: 90,
+            cell: ({ row }) => renderSnippet(levelCell, row.original.cocClanLevel),
+            meta: { filter: "number" },
+        },
+        {
+            id: "members",
+            accessorFn: (r) => r.live?.members ?? null,
+            header: "Members",
+            size: 155,
+            cell: ({ row }) => renderSnippet(membersCell, row.original.live),
+            meta: { filter: "number" },
+        },
+        {
+            id: "warLeague",
+            // Sorts by the league's id, which follows its rank in game.
+            accessorFn: (r) => r.live?.warLeague?.id ?? null,
+            header: "War league",
+            size: 150,
+            cell: ({ row }) => renderSnippet(leagueCell, row.original.live),
+        },
+        requirementColumn("attacksRequirement", "Attacks", "labels/attacks", 115),
+        requirementColumn("donationsRequirement", "Donations", "labels/donations", 125),
+        requirementColumn("clangamesRequirement", "Clan games", "labels/clan-games", 140),
+        {
+            id: "actions",
+            header: "",
+            size: 110,
+            enableSorting: false,
+            enableResizing: false,
+            cell: ({ row }) => renderSnippet(actionsCell, row.original),
+        },
+    ];
 
     async function load() {
         loading = true;
@@ -164,6 +232,7 @@
             const resp = await getAdminClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
             if (resp.success) {
                 clans = resp.data.clans;
+                loadLive(clans.map((c) => c.cocClanTag));
             } else {
                 toast.error("Failed to load clans");
             }
@@ -294,6 +363,7 @@
                 | CreateAdminClan503;
             if (resp.success) {
                 clans = [...clans, resp.data.clan].sort((a, b) => a.cocClanCode.localeCompare(b.cocClanCode));
+                loadLive([resp.data.clan.cocClanTag]);
                 toast.success(`Added ${resp.data.clan.cocClanName ?? resp.data.clan.cocClanTag}`);
                 closeSidebar();
             } else {
@@ -340,6 +410,7 @@
                 | UpdateAdminClan503;
             if (resp.success) {
                 clans = clans.map((c) => (c.id === id ? resp.data.clan : c));
+                if (!(resp.data.clan.cocClanTag in live)) loadLive([resp.data.clan.cocClanTag]);
                 toast.success(`Updated ${resp.data.clan.cocClanName ?? resp.data.clan.cocClanTag}`);
                 closeSidebar();
             } else {
@@ -375,97 +446,129 @@
 
 <Seo title="Clans" description="Manage JPA clans" />
 
-<div class="flex size-full flex-col gap-4">
-    <PageHeader title="Clans" subtitle="Manage JPA clans, their Discord links and member requirements.">
-        {#snippet actions()}
-            {#if !loading}
-                {#if clans.length > 0}
-                    <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
-                {/if}
-                <Button onclick={openAdd} class="shrink-0" tooltip="Add a new clan" tooltipPlacement="bottom">
-                    <TablerPlus class="size-5 shrink-0" />
-                </Button>
+{#snippet clanCell(row: Row)}
+    <div class="flex min-w-0 items-center gap-3">
+        <div class="grid size-9 shrink-0 place-items-center">
+            {#if row.live?.badgeUrls}
+                <img src={row.live.badgeUrls.small} alt="" class="size-9 object-contain" loading="lazy" />
+            {:else if row.live === undefined}
+                <div class="size-7 animate-pulse rounded-md bg-stone-800"></div>
+            {:else}
+                <TablerShield class="size-7 text-stone-600" />
             {/if}
-        {/snippet}
-    </PageHeader>
+        </div>
+        <div class="flex min-w-0 flex-col">
+            <span class="truncate text-sm font-medium text-stone-200">{row.cocClanName ?? "Unnamed clan"}</span>
+            <span class="truncate font-mono text-xs text-stone-400">{row.cocClanTag}</span>
+        </div>
+    </div>
+{/snippet}
 
-    {#if loading}
-        <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
-            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+{#snippet codeCell(code: string)}
+    <span class="rounded-md border border-stone-700/50 bg-stone-900 px-1.5 py-0.5 font-mono text-xs font-semibold text-stone-300">{code}</span>
+{/snippet}
+
+{#snippet levelCell(level: number | null)}
+    {#if level === null}
+        <span class="text-sm text-stone-500">—</span>
+    {:else}
+        <Badge variant="yellow" content={`Lv ${level}`} class="font-bold" />
+    {/if}
+{/snippet}
+
+{#snippet membersCell(info: LiveClan | null | undefined)}
+    {#if info}
+        {@const full = info.members >= MAX_MEMBERS}
+        <div class="flex w-full min-w-0 flex-col gap-1.5">
+            <div class="flex items-baseline justify-between gap-2 text-xs">
+                <span class="text-stone-200 tabular-nums">
+                    <span class="font-semibold">{info.members}</span><span class="text-stone-500"> / {MAX_MEMBERS}</span>
+                </span>
+                <span class={full ? "text-stone-500" : "text-green-400"}>{full ? "Full" : `${MAX_MEMBERS - info.members} open`}</span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-stone-800">
+                <div
+                    class="h-full rounded-full {full ? 'bg-stone-500' : 'bg-green-500'}"
+                    style="width: {(Math.min(info.members, MAX_MEMBERS) / MAX_MEMBERS) * 100}%"
+                ></div>
+            </div>
         </div>
-    {:else if clans.length === 0}
-        <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
-            <TablerFlag class="size-12 lg:size-16" />
-            <p class="text-sm">No clans yet. Add one to get started.</p>
-        </div>
-    {:else if filteredClans.length === 0}
-        <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
-            <TablerX class="size-12 lg:size-16" />
-            <p class="text-sm">No clans match your search.</p>
+    {:else if info === undefined}
+        <div class="flex w-full flex-col gap-1.5">
+            <div class="h-3 w-16 animate-pulse rounded bg-stone-800"></div>
+            <div class="h-1.5 w-full animate-pulse rounded-full bg-stone-800"></div>
         </div>
     {:else}
-        <div class="card-grid [--card-min:19rem]">
-            {#each filteredClans as clan, i (clan.id)}
-                <div class="stagger-card flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4" style="--i:{i}">
-                    <div class="flex min-w-0 items-center gap-4">
-                        <!-- The clan code is how managers refer to each clan day to day, so it anchors the card. -->
-                        <div
-                            class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 border-stone-700/50 bg-stone-950 px-1"
-                            title="Clan code"
-                        >
-                            <span class="truncate text-sm font-bold text-stone-200">{clan.cocClanCode}</span>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <h3 class="truncate font-semibold text-stone-50">{clan.cocClanName ?? "Unnamed clan"}</h3>
-                            <p class="truncate font-mono text-xs text-stone-400">{clan.cocClanTag}</p>
-                        </div>
-                        {#if clan.cocClanLevel === null}
-                            <Badge variant="ghost" content="No level" class="shrink-0" />
-                        {:else}
-                            <Badge variant="yellow" content={`Lv ${clan.cocClanLevel}`} class="shrink-0" />
-                        {/if}
-                    </div>
-
-                    <div class="grid grid-cols-3 divide-x-2 divide-stone-700/50 rounded-lg border-2 border-stone-700/50 bg-stone-950">
-                        {#each requirementsOf(clan) as req (req.label)}
-                            <div class="flex flex-col items-center p-4">
-                                <Icon name={req.icon} class="size-8" />
-                                <span class="text-base font-bold text-stone-50">{nf.format(req.value)}</span>
-                                <span class="text-center text-xs text-stone-400">{req.label}</span>
-                            </div>
-                        {/each}
-                    </div>
-
-                    <div class="mt-auto flex items-center gap-2">
-                        <Button variant="base" size="sm" class="min-w-0 flex-1" onclick={() => openEdit(clan)} disabled={removing === clan.id}>
-                            <span class="flex items-center justify-center gap-2"><TablerPencil class="size-5 shrink-0" /> Edit</span>
-                        </Button>
-                        <ConfirmationDialog
-                            class="shrink-0"
-                            title="Remove Clan"
-                            description={`Remove ${clan.cocClanName ?? clan.cocClanTag} (${clan.cocClanTag})? This cannot be undone.`}
-                            confirmText="Remove"
-                            onConfirm={() => removeClan(clan)}
-                        >
-                            <Button
-                                variant="danger"
-                                class="size-10"
-                                disabled={removing === clan.id}
-                                tooltip="Remove {clan.cocClanName ?? clan.cocClanTag}"
-                                tooltipPlacement="top"
-                            >
-                                {#if removing === clan.id}
-                                    <SvgSpinnersRingResize class="size-5 shrink-0" />
-                                {:else}
-                                    <TablerTrash class="size-5 shrink-0" />
-                                {/if}
-                            </Button>
-                        </ConfirmationDialog>
-                    </div>
-                </div>
-            {/each}
-        </div>
+        <span class="text-sm text-stone-500">—</span>
     {/if}
+{/snippet}
+
+{#snippet leagueCell(info: LiveClan | null | undefined)}
+    {#if info?.warLeague}
+        <div class="flex min-w-0 items-center gap-2">
+            <Icon name="labels/clan-war-league" class="size-5 shrink-0" />
+            <span class="truncate text-sm text-stone-200">{info.warLeague.name.replace(/ League/, "")}</span>
+        </div>
+    {:else if info === undefined}
+        <div class="h-3 w-20 animate-pulse rounded bg-stone-800"></div>
+    {:else}
+        <span class="text-sm text-stone-500">—</span>
+    {/if}
+{/snippet}
+
+{#snippet requirementCell({ icon, value }: { icon: string; value: number })}
+    <div class="flex items-center gap-2">
+        <Icon name={icon} class="size-5 shrink-0" />
+        <span class="text-sm font-medium text-stone-200 tabular-nums">{nf.format(value)}</span>
+    </div>
+{/snippet}
+
+{#snippet actionsCell(row: Row)}
+    <div class="flex items-center justify-center gap-2">
+        <Button size="icon" variant="base" tooltip="Edit clan" tooltipPlacement="bottom" onclick={() => openEdit(row)} disabled={removing === row.id}>
+            <TablerPencil />
+        </Button>
+        <ConfirmationDialog
+            title="Remove Clan"
+            description={`Remove ${row.cocClanName ?? row.cocClanTag} (${row.cocClanTag})? This cannot be undone.`}
+            confirmText="Remove"
+            onConfirm={() => removeClan(row)}
+        >
+            <Button size="icon" variant="danger" tooltip="Remove clan" tooltipPlacement="bottom" disabled={removing === row.id}>
+                {#if removing === row.id}
+                    <SvgSpinnersRingResize />
+                {:else}
+                    <TablerTrash />
+                {/if}
+            </Button>
+        </ConfirmationDialog>
+    </div>
+{/snippet}
+
+<div class="relative flex size-full flex-col gap-4 overflow-hidden">
+    <div class="px-4 pt-4">
+        <PageHeader title="Clans" subtitle={loading ? "Manage JPA clans" : `${clans.length} clan${clans.length === 1 ? "" : "s"}`}>
+            {#snippet actions()}
+                <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
+                <Button onclick={openAdd} class="shrink-0" disabled={loading} tooltip="Add a new clan" tooltipPlacement="bottom">
+                    <TablerPlus class="size-5 shrink-0" />
+                </Button>
+            {/snippet}
+        </PageHeader>
+    </div>
+
+    <div class="min-h-0 flex-1">
+        <DataTable
+            data={rows}
+            {columns}
+            getRowId={(r) => String(r.id)}
+            {loading}
+            search={searchText}
+            searchText={(r) => `${r.cocClanName ?? ""} ${r.cocClanTag} ${r.cocClanCode}`}
+            emptyText={clans.length ? "No clans match your search" : "No clans yet. Add one to get started."}
+            rowClass={(r) => sidebarStore.isOpen && editingId === r.id && "*:bg-stone-800/60"}
+        />
+    </div>
 </div>
 
 <Sidebar bind:this={clanSidebar}>
