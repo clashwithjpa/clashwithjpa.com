@@ -1,5 +1,5 @@
 <script lang="ts">
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import Pill from "./Pill.svelte";
 
     // Without a value it spins. With one (0 to 1) it fills a ring.
@@ -12,7 +12,7 @@
 <Pill title={label} subtitle={detail ?? (value != null ? `${Math.round(value * 100)}%` : undefined)}>
     {#snippet lead()}
         {#if value == null}
-            <SvgSpinnersRingResize class="size-5 text-amber-300" />
+            <Spinner class="size-5 text-amber-300" />
         {:else}
             <svg class="size-8 -rotate-90" viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="16" r={R} class="stroke-stone-700" stroke-width="3" />

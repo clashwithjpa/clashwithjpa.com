@@ -2,6 +2,8 @@
     import { goto } from "$app/navigation";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import { authClient } from "$lib/auth";
+    import CardSkeleton from "$lib/components/ui/CardSkeleton.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import type { Role } from "$lib/config/roles";
     import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
     import { toast } from "$lib/toast";
@@ -15,7 +17,6 @@
     } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerBan from "~icons/tabler/ban";
     import TablerCheck from "~icons/tabler/check";
     import TablerClock from "~icons/tabler/clock";
@@ -202,8 +203,9 @@
     }
 </script>
 
+<!-- Rows keep the tag side at least 7rem wide, so a narrow sidebar wraps these buttons onto their own line. -->
 {#snippet accountActions(account: { id: number; cocAccountTag: string; isExternal: boolean })}
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="ml-auto flex shrink-0 items-center gap-2">
         <Button
             size="icon"
             variant={copied[`account-${account.id}`] ? "success" : "base"}
@@ -237,7 +239,7 @@
                 tooltipPlacement="bottom"
             >
                 {#if togglingExternalId === account.id}
-                    <SvgSpinnersBlocksScale />
+                    <Spinner />
                 {:else if account.isExternal}
                     <TablerShieldCheck />
                 {:else}
@@ -254,7 +256,7 @@
             >
                 <Button size="icon" variant="danger" disabled={deletingAccountId === account.id} tooltip="Delete account" tooltipPlacement="bottom">
                     {#if deletingAccountId === account.id}
-                        <SvgSpinnersBlocksScale />
+                        <Spinner />
                     {:else}
                         <TablerTrash />
                     {/if}
@@ -431,8 +433,10 @@
         {:else if activeTab === "sessions"}
             {#key sessionsRefreshKey}
                 {#await authClient.admin.listUserSessions({ userId: user.id })}
-                    <div class="py-8">
-                        <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
+                    <div class="space-y-2" aria-busy="true">
+                        {#each { length: 2 }, i (i)}
+                            <CardSkeleton variant="session" />
+                        {/each}
                     </div>
                 {:then response}
                     {#if !response.data || response.data.sessions.length === 0}
@@ -460,8 +464,31 @@
         {:else if activeTab === "accounts"}
             {#key accountsRefreshKey}
                 {#await getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
-                    <div class="py-8">
-                        <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
+                    <div class="space-y-2" aria-busy="true">
+                        {#each { length: 3 }, i (i)}
+                            <div class="rounded-lg bg-stone-800 px-3 py-2">
+                                <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
+                                    <div class="flex min-w-28 flex-1 items-center gap-2">
+                                        <div class="size-10 shrink-0 skeleton rounded-lg"></div>
+                                        <div class="flex min-w-0 flex-1 flex-col gap-1">
+                                            <div class="h-3.5 w-full max-w-24 skeleton"></div>
+                                            <div class="h-3 w-2/3 max-w-16 skeleton"></div>
+                                        </div>
+                                    </div>
+                                    <div class="ml-auto flex shrink-0 items-center gap-2">
+                                        {#each { length: 2 + (canToggleExternal ? 1 : 0) + (canDeleteAccount ? 1 : 0) }, j (j)}
+                                            <div class="size-8 skeleton rounded-lg"></div>
+                                        {/each}
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex gap-1"><div class="h-5.5 w-24 skeleton rounded-full"></div></div>
+                                <div class="mt-2 flex items-center gap-1 border-t border-stone-700/50 pt-2">
+                                    <div class="size-4 skeleton rounded"></div>
+                                    <div class="h-3 w-16 skeleton"></div>
+                                    <div class="ml-auto h-3 w-12 skeleton"></div>
+                                </div>
+                            </div>
+                        {/each}
                     </div>
                 {:then response}
                     {#if !response.success || response.data.accounts.length === 0}
@@ -476,16 +503,18 @@
                             {#each response.data.accounts as account (account.id)}
                                 <div class="rounded-lg bg-stone-800 px-3 py-2">
                                     {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div class="flex min-w-0 items-center gap-2">
-                                                <SvgSpinnersBlocksScale class="size-10 shrink-0 text-stone-400" />
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <div class="flex min-w-28 flex-1 items-center gap-2">
+                                                <div class="size-10 shrink-0 skeleton rounded-lg"></div>
                                                 <code class="truncate font-mono text-sm font-medium text-stone-50">{account.cocAccountTag}</code>
                                             </div>
                                             {@render accountActions(account)}
                                         </div>
+                                        <!-- Most accounts get a clan or External badge row once loaded; hold its place. -->
+                                        <div class="mt-2 flex gap-1"><div class="h-5.5 w-24 skeleton rounded-full"></div></div>
                                     {:then acc}
-                                        <div class="flex items-start justify-between gap-2">
-                                            <div class="flex min-w-0 items-center gap-2">
+                                        <div class="flex flex-wrap items-start justify-between gap-2">
+                                            <div class="flex min-w-28 flex-1 items-center gap-2">
                                                 {#if acc.success}
                                                     <Tooltip title="Town Hall {acc.data.player.townHallLevel}" placement="top">
                                                         <TownHall level={acc.data.player.townHallLevel} class="size-10 shrink-0" />

@@ -3,10 +3,10 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import LevelSlider from "$lib/components/ui/LevelSlider.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import { SCOPE_LABELS, scopesUpTo } from "$lib/config/apiKeys";
     import type { JpaPermission } from "@repo/auth-shared";
     import { slide } from "svelte/transition";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
@@ -109,7 +109,7 @@
     <div class="flex gap-2">
         <Button class="w-full gap-2" disabled={creating || !name.trim()} onclick={submit}>
             {#if creating}
-                <SvgSpinnersRingResize class="size-5" />
+                <Spinner class="size-5" />
                 Creating…
             {:else}
                 <TablerPlus class="size-5" />

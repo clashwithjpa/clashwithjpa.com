@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import TablerPlus from "~icons/tabler/plus";
 
     interface ClanForm {
@@ -39,7 +39,7 @@
     <div class="space-y-2 border-t border-stone-700/50 pt-4">
         <Button class="w-full gap-2" variant="base" disabled={saving} onclick={onSubmit}>
             {#if saving}
-                <SvgSpinnersRingResize class="size-5" />
+                <Spinner class="size-5" />
                 Saving...
             {:else}
                 <TablerPlus class="size-5" />

@@ -10,6 +10,7 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
     import {
@@ -32,8 +33,6 @@
     import type { UserWithRole } from "better-auth/plugins";
     import { PreRendered } from "carta-md";
     import { slide } from "svelte/transition";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import TablerChevronLeft from "~icons/tabler/chevron-left";
     import TablerChevronRight from "~icons/tabler/chevron-right";
@@ -217,7 +216,7 @@
 <Seo title="Audit Log" description="View server actions audit log" />
 
 <div class="flex size-full flex-col gap-4">
-    <PageHeader title="Audit Log" subtitle="{total} entr{total === 1 ? 'y' : 'ies'} recorded">
+    <PageHeader title="Audit Log" subtitleLoading={loading} subtitle="{total} entr{total === 1 ? 'y' : 'ies'} recorded">
         {#snippet actions()}
             <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Filter action" class="w-full @md:w-52 @md:shrink-0" />
             <Select bind:value={targetTypeFilter} options={auditTargetOptions} placeholder="Filter target" class="w-full @md:w-44 @md:shrink-0" />
@@ -234,8 +233,25 @@
 
     <div class="flex-1">
         {#if loading}
-            <div class="flex size-full items-center justify-center pt-10 text-stone-400">
-                <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+            <div class="flex flex-col gap-2" aria-busy="true">
+                {#each { length: 8 }, i (i)}
+                    <div class="flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3">
+                        <div class="flex h-10 items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="size-8 skeleton rounded-full"></div>
+                                <div class="h-3.5 w-28 skeleton"></div>
+                            </div>
+                            <div class="h-3 w-14 skeleton"></div>
+                        </div>
+                        <div class="flex h-5 items-center">
+                            <div class="h-3.5 skeleton" style:width="{35 + ((i * 17) % 4) * 10}%"></div>
+                        </div>
+                        <div class="flex h-5 items-center gap-2">
+                            <div class="h-5 w-28 skeleton rounded"></div>
+                            <div class="h-5 w-20 skeleton rounded"></div>
+                        </div>
+                    </div>
+                {/each}
             </div>
         {:else if entries.length === 0}
             <div class="flex size-full flex-col items-center justify-center gap-2 pt-10 text-stone-400">
@@ -283,7 +299,7 @@
                                         >{actorLabel(entry)}</span
                                     >
                                     {#if openingEntryId === entry.id}
-                                        <SvgSpinnersRingResize class="size-4 shrink-0 text-stone-400" />
+                                        <Spinner class="size-4 shrink-0 text-stone-400" />
                                     {/if}
                                 </button>
                                 <div class="flex shrink-0 items-center gap-2">

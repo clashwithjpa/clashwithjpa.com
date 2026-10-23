@@ -9,6 +9,7 @@
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { toast } from "$lib/toast";
@@ -42,7 +43,6 @@
         type VerifyAdminClanDiscord503,
     } from "@repo/clashofclans-client";
     import { renderSnippet } from "@tanstack/svelte-table";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerPencil from "~icons/tabler/pencil";
     import TablerPlus from "~icons/tabler/plus";
     import TablerShield from "~icons/tabler/shield";
@@ -452,7 +452,7 @@
             {#if row.live?.badgeUrls}
                 <img src={row.live.badgeUrls.small} alt="" class="size-9 object-contain" loading="lazy" />
             {:else if row.live === undefined}
-                <div class="size-7 animate-pulse rounded-md bg-stone-800"></div>
+                <div class="size-7 skeleton rounded-md"></div>
             {:else}
                 <TablerShield class="size-7 text-stone-600" />
             {/if}
@@ -495,8 +495,8 @@
         </div>
     {:else if info === undefined}
         <div class="flex w-full flex-col gap-1.5">
-            <div class="h-3 w-16 animate-pulse rounded bg-stone-800"></div>
-            <div class="h-1.5 w-full animate-pulse rounded-full bg-stone-800"></div>
+            <div class="h-3 w-16 skeleton rounded"></div>
+            <div class="h-1.5 w-full skeleton rounded-full"></div>
         </div>
     {:else}
         <span class="text-sm text-stone-500">—</span>
@@ -510,7 +510,7 @@
             <span class="truncate text-sm text-stone-200">{info.warLeague.name.replace(/ League/, "")}</span>
         </div>
     {:else if info === undefined}
-        <div class="h-3 w-20 animate-pulse rounded bg-stone-800"></div>
+        <div class="h-3 w-20 skeleton rounded"></div>
     {:else}
         <span class="text-sm text-stone-500">—</span>
     {/if}
@@ -536,7 +536,7 @@
         >
             <Button size="icon" variant="danger" tooltip="Remove clan" tooltipPlacement="bottom" disabled={removing === row.id}>
                 {#if removing === row.id}
-                    <SvgSpinnersRingResize />
+                    <Spinner />
                 {:else}
                     <TablerTrash />
                 {/if}
@@ -547,7 +547,7 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="px-4 pt-4">
-        <PageHeader title="Clans" subtitle={loading ? "Manage JPA clans" : `${clans.length} clan${clans.length === 1 ? "" : "s"}`}>
+        <PageHeader title="Clans" subtitleLoading={loading} subtitle="{clans.length} clan{clans.length === 1 ? '' : 's'}">
             {#snippet actions()}
                 <Input placeholder="Search by clan name, tag, or code..." bind:value={searchText} class="min-w-36 flex-1 @4xl:max-w-80" />
                 <Button onclick={openAdd} class="shrink-0" disabled={loading} tooltip="Add a new clan" tooltipPlacement="bottom">

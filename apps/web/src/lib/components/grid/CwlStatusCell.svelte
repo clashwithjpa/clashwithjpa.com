@@ -1,6 +1,6 @@
 <script lang="ts">
     import Badge from "$lib/components/ui/Badge.svelte";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
@@ -24,7 +24,7 @@
     {:else if status === "error"}
         <Badge variant="red" content="Check failed" icon={TablerAlertTriangle} />
     {:else if status === "unknown"}
-        <Badge variant="ghost" content="…" icon={SvgSpinnersRingResize} />
+        <Badge variant="ghost" content="…" icon={Spinner} />
     {:else}
         <span class="text-stone-500">—</span>
     {/if}

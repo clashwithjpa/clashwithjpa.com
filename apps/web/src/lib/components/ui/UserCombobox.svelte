@@ -1,9 +1,9 @@
 <script lang="ts">
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import type { Role } from "$lib/config/roles";
     import { cn } from "$lib/utils";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerX from "~icons/tabler/x";
     import Button from "./Button.svelte";
     import RawPopup from "./RawPopup.svelte";
@@ -159,7 +159,7 @@
     <div bind:this={listRef} class="flex flex-col gap-1">
         {#if searching && results.length === 0}
             <div class="flex items-center justify-center gap-2 py-4 text-sm text-stone-400">
-                <SvgSpinnersRingResize class="size-4" /> Searching…
+                <Spinner class="size-4" /> Searching…
             </div>
         {:else if results.length === 0}
             <div class="py-4 text-center text-sm text-stone-400">

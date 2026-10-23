@@ -12,7 +12,6 @@
     import { num, str } from "$lib/utils";
     import { getCOCPlayer } from "@repo/clashofclans-client";
     import type { Component } from "svelte";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerActivity from "~icons/tabler/activity";
     import TablerBuildingBank from "~icons/tabler/building-bank";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
@@ -126,7 +125,7 @@
             <Cmp class="size-3.5 shrink-0" />
             <span class="truncate">{label}</span>
         </div>
-        <div class="h-4 w-16 animate-pulse rounded bg-stone-700"></div>
+        <div class="flex h-5 items-center"><div class="h-3.5 w-16 skeleton"></div></div>
     </div>
 {/snippet}
 
@@ -135,6 +134,58 @@
     <div class="flex items-center gap-1.5 text-xs font-medium tracking-wide text-stone-400 uppercase">
         <Cmp class="size-4 shrink-0" />
         <span>{title}</span>
+    </div>
+{/snippet}
+
+<!-- Placeholders for the Profile tab, built from the same pieces as the loaded sections. -->
+{#snippet titleSkeleton()}
+    <div class="flex h-4 items-center gap-1.5">
+        <div class="size-4 skeleton rounded"></div>
+        <div class="h-3 w-20 skeleton"></div>
+    </div>
+{/snippet}
+
+{#snippet tilesSkeleton(count: number)}
+    <div class="grid grid-cols-2 gap-2">
+        {#each { length: count }, i (i)}
+            <div class="flex flex-col gap-1 rounded-lg bg-stone-800 px-3 py-2">
+                <div class="flex h-4 items-center"><div class="h-3 w-16 skeleton"></div></div>
+                <div class="flex h-5 items-center"><div class="h-3.5 w-12 skeleton"></div></div>
+            </div>
+        {/each}
+    </div>
+{/snippet}
+
+{#snippet rowSkeleton(badge: boolean)}
+    <div class="flex items-center gap-3 rounded-lg bg-stone-800 px-3 py-2">
+        <div class="size-10 shrink-0 skeleton rounded-lg"></div>
+        <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex h-5 items-center"><div class="h-3.5 w-24 skeleton"></div></div>
+            <div class="flex h-4 items-center"><div class="h-3 w-16 skeleton"></div></div>
+        </div>
+        {#if badge}
+            <div class="h-5.5 w-16 shrink-0 skeleton rounded-full"></div>
+        {/if}
+    </div>
+{/snippet}
+
+{#snippet profileSkeleton()}
+    <div class="space-y-4" aria-busy="true">
+        <div class="space-y-2">
+            {@render titleSkeleton()}
+            {@render rowSkeleton(true)}
+            {@render tilesSkeleton(2)}
+        </div>
+        {#each [2, 3, 3, 2] as tiles, i (i)}
+            <div class="space-y-2">
+                {@render titleSkeleton()}
+                {@render tilesSkeleton(tiles)}
+            </div>
+        {/each}
+        <div class="space-y-2">
+            {@render titleSkeleton()}
+            {@render rowSkeleton(false)}
+        </div>
     </div>
 {/snippet}
 
@@ -155,7 +206,7 @@
                     <TownHall level={townHall} class="size-14 shrink-0" />
                 </Tooltip>
             {:else if playerLoading}
-                <div class="size-14 shrink-0 animate-pulse rounded-lg bg-stone-800"></div>
+                <div class="size-14 shrink-0 skeleton rounded-lg"></div>
             {/if}
             <div class="min-w-0 flex-1">
                 <h3 class="truncate text-xl font-medium text-stone-50">
@@ -172,7 +223,7 @@
                     {#if townHall}
                         {townHall}
                     {:else if playerLoading}
-                        <span class="inline-block h-3 w-6 animate-pulse rounded bg-stone-700"></span>
+                        <span class="inline-block h-3 w-6 skeleton"></span>
                     {:else}
                         —
                     {/if}
@@ -189,7 +240,7 @@
             {#if currentClan}
                 <Badge variant="blue" content={currentClan} icon={TablerBuildingCastle} class="rounded-lg" />
             {:else if playerLoading}
-                <div class="h-8 w-24 animate-pulse rounded-lg bg-stone-700"></div>
+                <div class="h-8 w-24 skeleton rounded-lg"></div>
             {/if}
             <Button
                 size="icon"
@@ -279,7 +330,7 @@
             </div>
         {:else if activeTab === "profile"}
             {#await playerRequest}
-                <div class="py-8"><SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" /></div>
+                {@render profileSkeleton()}
             {:then res}
                 {#if res.success}
                     {@const player = res.data.player}
@@ -384,7 +435,21 @@
             {/await}
         {:else if activeTab === "army"}
             {#await playerRequest}
-                <div class="py-8"><SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" /></div>
+                <div class="space-y-2" aria-busy="true">
+                    {@render titleSkeleton()}
+                    {#each { length: 6 }, i (i)}
+                        <div class="space-y-2 rounded-lg bg-stone-800 px-3 py-2">
+                            <div class="flex h-5.5 items-center justify-between gap-3">
+                                <div class="h-3.5 w-28 skeleton"></div>
+                                <div class="h-5.5 w-16 skeleton rounded-full"></div>
+                            </div>
+                            <div class="flex gap-1">
+                                <div class="h-5.5 w-32 skeleton rounded-full"></div>
+                                <div class="h-5.5 w-36 skeleton rounded-full"></div>
+                            </div>
+                        </div>
+                    {/each}
+                </div>
             {:then res}
                 {#if res.success && res.data.player.heroes?.filter((h) => h.village === "home").length}
                     {@const heroes = res.data.player.heroes.filter((h) => h.village === "home")}

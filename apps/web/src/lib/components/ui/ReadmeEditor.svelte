@@ -41,6 +41,7 @@
     import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
     import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import Select from "$lib/components/ui/Select.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import { toast } from "$lib/toast";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
@@ -56,7 +57,6 @@
     import * as prettierPluginMarkdown from "prettier/plugins/markdown";
     import * as prettier from "prettier/standalone";
     import { onMount } from "svelte";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
     import TablerUpload from "~icons/tabler/upload";
     import Toolbar from "../Toolbar.svelte";
@@ -484,7 +484,7 @@
             tooltipPlacement="top"
         >
             {#if isSaving}
-                <SvgSpinnersRingResize class="size-5" />
+                <Spinner class="size-5" />
             {:else}
                 <TablerDeviceFloppy class="size-5" />
             {/if}

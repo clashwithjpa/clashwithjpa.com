@@ -14,6 +14,7 @@
     import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { InfiniteRows } from "$lib/components/ui/table/infinite.svelte";
@@ -35,7 +36,6 @@
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState, type SortingState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCheck from "~icons/tabler/check";
     import TablerCopy from "~icons/tabler/copy";
     import TablerDownload from "~icons/tabler/download";
@@ -577,7 +577,12 @@
 <Seo title="COC Accounts" description="View linked Clash of Clans accounts and manage their war weights." />
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
-    <PageHeader title="COC Accounts" subtitle="{list.total} account{list.total === 1 ? '' : 's'}" class="px-4 pt-4">
+    <PageHeader
+        title="COC Accounts"
+        subtitleLoading={list.loading && list.rows.length === 0}
+        subtitle="{list.total} account{list.total === 1 ? '' : 's'}"
+        class="px-4 pt-4"
+    >
         {#snippet actions()}
             <div class="flex min-w-60 flex-1 items-center gap-2 @4xl:max-w-96">
                 <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="min-w-0 flex-1" />
@@ -609,7 +614,7 @@
                     tooltipPlacement="bottom"
                 >
                     {#if warWeightSyncing}
-                        <SvgSpinnersRingResize class="size-5" />
+                        <Spinner class="size-5" />
                     {:else}
                         <TablerScale class="size-5" />
                     {/if}
@@ -623,7 +628,7 @@
                     tooltipPlacement="bottom"
                 >
                     {#if downloading}
-                        <SvgSpinnersRingResize class="size-5" />
+                        <Spinner class="size-5" />
                     {:else}
                         <TablerDownload class="size-5" />
                     {/if}
@@ -661,7 +666,7 @@
                     >
                         <Button variant="danger" class="shrink-0" disabled={bulkProcessing} tooltip="Delete selected" tooltipPlacement="top">
                             {#if bulkProcessing}
-                                <SvgSpinnersRingResize class="size-5" />
+                                <Spinner class="size-5" />
                             {:else}
                                 <TablerTrash class="size-5" />
                             {/if}
@@ -851,7 +856,7 @@
                     <div class="flex justify-end">
                         <Button variant="base" size="sm" disabled={applyingPaste || !pastedFwa.trim()} onclick={applyPastedFwa}>
                             {#if applyingPaste}
-                                <SvgSpinnersRingResize class="size-4" />
+                                <Spinner class="size-4" />
                             {:else}
                                 Apply pasted roster
                             {/if}

@@ -60,7 +60,7 @@
         {/each}
     </div>
 {:else if loading}
-    <span class="block h-3.5 w-16 animate-pulse rounded bg-stone-700/60"></span>
+    <span class="block h-3.5 w-16 skeleton"></span>
 {:else}
     <span class="text-stone-600">—</span>
 {/if}

@@ -18,6 +18,7 @@
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
@@ -43,7 +44,6 @@
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";
@@ -61,6 +61,7 @@
     let { data }: { data: { canDelete: boolean } } = $props();
 
     let applications = $state<Application[]>([]);
+    let loading = $state(true);
     let clanOptions = $state<Option[]>([{ label: "Unassigned", value: "" }]);
     let clanNameByTag = $state<Record<string, string>>({});
     let familyClanNameByTag = $state<Record<string, string>>({});
@@ -383,6 +384,7 @@
     }
 
     async function load() {
+        loading = true;
         try {
             const resp = await getCwlApplications(
                 {
@@ -402,6 +404,8 @@
             }
         } catch (e) {
             toast.error("Failed to load CWL applications", { description: errorMessage(e) });
+        } finally {
+            loading = false;
         }
         // Nicknames are fetched separately so the table isn't blocked on the Discord
         // guild-member walk; the Nickname column shows a skeleton until they arrive.
@@ -748,7 +752,7 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
-        <PageHeader title="CWL Applications">
+        <PageHeader title="CWL Applications" subtitleLoading={loading && applications.length === 0}>
             {#snippet subtitle()}
                 {#if displayedCount !== total}
                     {displayedCount} of {total} application{total === 1 ? "" : "s"}
@@ -783,7 +787,7 @@
                     tooltipPlacement="bottom"
                 >
                     {#if downloading}
-                        <SvgSpinnersRingResize class="size-5" />
+                        <Spinner class="size-5" />
                     {:else}
                         <TablerDownload class="size-5" />
                     {/if}
@@ -801,7 +805,15 @@
             {/snippet}
         </PageHeader>
 
-        {#if clanStats.length > 0}
+        {#if loading && applications.length === 0}
+            <div class="flex items-center gap-2 overflow-hidden" aria-hidden="true">
+                <div class="flex h-5 shrink-0 items-center"><div class="h-3.5 w-52 skeleton"></div></div>
+                <div class="h-4 shrink-0 border-l border-stone-700/50"></div>
+                {#each { length: 8 }, i (i)}
+                    <div class="h-6.5 w-37 shrink-0 skeleton rounded-lg"></div>
+                {/each}
+            </div>
+        {:else if clanStats.length > 0}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 bind:this={scrollEl}
@@ -812,7 +824,7 @@
                 <span class="flex shrink-0 items-center gap-1.5 text-sm font-medium text-stone-200">
                     {totalJoined} / {totalAssigned} joined their CWL clan
                     {#if rostersLoading}
-                        <SvgSpinnersRingResize class="size-3.5 text-stone-400" />
+                        <Spinner class="size-3.5 text-stone-400" />
                     {/if}
                 </span>
                 {#if erroredClans > 0}
@@ -847,7 +859,7 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         <Badge
-                            icon={stat.state === "loading" ? SvgSpinnersRingResize : TablerShield}
+                            icon={stat.state === "loading" ? Spinner : TablerShield}
                             content="{stat.name} • {statusText}"
                             {variant}
                             iconSize="size-4"
@@ -869,6 +881,7 @@
             bind:this={dataTable}
             data={tableRows}
             {columns}
+            {loading}
             getRowId={(a) => String(a.id)}
             selectable
             bind:rowSelection
@@ -891,7 +904,7 @@
                     tooltipPlacement="bottom"
                 >
                     {#if bulkProcessing}
-                        <SvgSpinnersRingResize class="size-5" />
+                        <Spinner class="size-5" />
                     {:else}
                         <TablerCheck class="size-5" />
                     {/if}
@@ -937,7 +950,7 @@
                 <p class="text-xs text-stone-500">Select a member first.</p>
             {:else if loadingAccounts}
                 <div class="flex items-center gap-2 text-xs text-stone-400">
-                    <SvgSpinnersRingResize class="size-4" /> Loading linked accounts…
+                    <Spinner class="size-4" /> Loading linked accounts…
                 </div>
             {:else if linkedAccounts.length === 0}
                 <p class="text-xs text-amber-400">This member has no linked Clash of Clans accounts.</p>

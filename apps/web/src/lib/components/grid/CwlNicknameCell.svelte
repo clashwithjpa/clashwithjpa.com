@@ -3,7 +3,7 @@
 </script>
 
 {#if loading && !value}
-    <span class="block h-3.5 w-20 animate-pulse rounded bg-stone-700/60"></span>
+    <span class="block h-3.5 w-20 skeleton"></span>
 {:else}
     <span class="block truncate">{value ?? "—"}</span>
 {/if}

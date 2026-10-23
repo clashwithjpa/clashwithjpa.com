@@ -459,11 +459,33 @@ html.overlay-scrollbar::-webkit-scrollbar,
 }
 
 .page-enter {
-    animation: page-enter 800ms cubic-bezier(0.33, 1, 0.68, 1) both;
+    animation: page-enter 300ms var(--ease-glide) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .page-enter {
+        animation: none;
+    }
+}
+
+/* Placeholder block shaped like the content it stands in for. It shows at once, together
+   with the card frame around it, and breathes gently until replaced. A delayed fade-in here
+   left empty frames on screen for fast loads. */
+@utility skeleton {
+    border-radius: var(--radius-md);
+    /* Translucent so it reads on stone-950 pages and inside stone-800 tiles alike. */
+    background-color: color-mix(in oklab, var(--color-stone-400) 14%, transparent);
+    animation: skeleton-breathe 1.8s ease-in-out infinite;
+}
+
+@keyframes skeleton-breathe {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
         animation: none;
     }
 }

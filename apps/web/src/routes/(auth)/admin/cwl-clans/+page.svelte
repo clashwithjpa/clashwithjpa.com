@@ -8,6 +8,7 @@
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
@@ -27,8 +28,6 @@
         type SyncAdminCwlClanLeagues401,
         type SyncAdminCwlClanLeagues500,
     } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
     import TablerShield from "~icons/tabler/shield";
@@ -309,7 +308,11 @@
 <div class="flex size-full flex-col gap-4">
     <PageHeader title="CWL Clans" subtitle="Add or remove the clans available for Clan War League assignments.">
         {#snippet actions()}
-            {#if !loading}
+            {#if loading}
+                <div class="h-10 min-w-36 flex-1 skeleton rounded-lg @4xl:max-w-80"></div>
+                <div class="h-10 w-14 shrink-0 skeleton rounded-lg"></div>
+                <div class="h-10 w-14 shrink-0 skeleton rounded-lg"></div>
+            {:else}
                 {#if clans.length > 0}
                     <Input
                         placeholder="Search by clan name, tag, league, or leader..."
@@ -327,7 +330,7 @@
                 >
                     <span class="flex items-center gap-2">
                         {#if syncing}
-                            <SvgSpinnersRingResize class="size-5 shrink-0" />
+                            <Spinner class="size-5 shrink-0" />
                         {:else}
                             <TablerRefresh class="size-5 shrink-0" />
                         {/if}
@@ -340,7 +343,13 @@
         {/snippet}
     </PageHeader>
 
-    {#if !loading && tierCounts.length > 0}
+    {#if loading}
+        <div class="flex items-center gap-2" aria-hidden="true">
+            {#each [28, 26, 24] as width, i (i)}
+                <div class="h-6.5 shrink-0 skeleton rounded-lg" style:width="{width * 0.25}rem"></div>
+            {/each}
+        </div>
+    {:else if tierCounts.length > 0}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
             bind:this={scrollEl}
@@ -364,8 +373,29 @@
     {/if}
 
     {#if loading}
-        <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
-            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+        <div class="flex flex-col gap-6" aria-busy="true">
+            {#each [4, 3, 4] as count, g (g)}
+                <section class="flex flex-col gap-4">
+                    <div class="flex h-5.5 items-center gap-2">
+                        <div class="h-3.5 w-28 skeleton"></div>
+                        <div class="h-5 w-6 skeleton rounded-full"></div>
+                        <div class="h-0 flex-1 border-t-2 border-stone-700/50"></div>
+                    </div>
+                    <div class="card-grid gap-3 [--card-min:17rem]">
+                        {#each { length: count }, i (i)}
+                            <div class="flex items-center gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3">
+                                <div class="size-6 shrink-0 skeleton rounded-md"></div>
+                                <div class="flex min-w-0 flex-1 flex-col">
+                                    <div class="flex h-6 items-center"><div class="h-4 w-32 skeleton"></div></div>
+                                    <div class="flex h-4 items-center"><div class="h-3 w-20 skeleton"></div></div>
+                                    <div class="flex h-4 items-center"><div class="h-3 w-28 skeleton"></div></div>
+                                </div>
+                                <div class="size-10 shrink-0 skeleton rounded-lg"></div>
+                            </div>
+                        {/each}
+                    </div>
+                </section>
+            {/each}
         </div>
     {:else if clans.length === 0}
         <div class="flex flex-1 flex-col items-center justify-center gap-3 pt-10 text-stone-400">
@@ -413,7 +443,7 @@
                                         tooltipPlacement="top"
                                     >
                                         {#if removing === clan.cocClanTag}
-                                            <SvgSpinnersRingResize />
+                                            <Spinner />
                                         {:else}
                                             <TablerTrash />
                                         {/if}

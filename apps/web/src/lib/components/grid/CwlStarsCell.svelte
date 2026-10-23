@@ -23,7 +23,7 @@
 </script>
 
 {#if stars === null && loading}
-    <span class="block h-3.5 w-10 animate-pulse rounded bg-stone-700/60"></span>
+    <span class="block h-3.5 w-10 skeleton"></span>
 {:else if stars === null}
     <span class="px-2 py-1 text-stone-600">—</span>
 {:else if details.length === 0}

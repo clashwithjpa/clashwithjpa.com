@@ -8,6 +8,7 @@
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import TownHall from "$lib/components/ui/TownHall.svelte";
     import type { Role } from "$lib/config/roles";
@@ -25,8 +26,6 @@
         type GetCOCPlayer500,
         type SetUserAccountExternal500,
     } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
     import TablerDownload from "~icons/tabler/download";
@@ -180,7 +179,7 @@
                 <Button size="sm" disabled={isImporting} onclick={importAccounts}>
                     {#if isImporting}
                         <span class="flex items-center justify-center gap-2">
-                            <SvgSpinnersRingResize class="size-4" /> Importing...
+                            <Spinner class="size-4" /> Importing...
                         </span>
                     {:else}
                         Import accounts
@@ -191,15 +190,37 @@
     {/if}
 {/snippet}
 
+{#snippet playerSkeleton()}
+    <div class="flex w-full flex-col items-start gap-2" aria-hidden="true">
+        <div class="size-16 skeleton rounded-lg"></div>
+        <div class="flex w-full flex-col gap-1.5">
+            <div class="h-5 w-3/4 skeleton"></div>
+            <div class="h-3.5 w-1/2 skeleton"></div>
+        </div>
+        <div class="flex gap-1">
+            <div class="h-5 w-16 skeleton rounded-full"></div>
+            <div class="h-5 w-12 skeleton rounded-full"></div>
+        </div>
+    </div>
+{/snippet}
+
 {#if $session.data?.user.role === "unverified"}
     {@render importBanner()}
 {/if}
 
 {#if canManageAccounts}
     {#if accounts === null}
-        <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-            <SvgSpinnersRingResize />
-            <span>Linked Accounts</span>
+        <div aria-busy="true">
+            <h1 class="text-2xl font-bold">Linked Accounts</h1>
+            <br />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                {#each { length: 3 }, i (i)}
+                    <div class="flex min-h-20 flex-col gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-2">
+                        {@render playerSkeleton()}
+                        <div class="h-8 skeleton rounded-lg"></div>
+                    </div>
+                {/each}
+            </div>
         </div>
     {:else}
         <div>
@@ -243,7 +264,7 @@
                         <Button disabled={isImporting} onclick={importAccounts}>
                             {#if isImporting}
                                 <span class="flex items-center justify-center gap-2">
-                                    <SvgSpinnersRingResize class="size-4" /> Importing...
+                                    <Spinner class="size-4" /> Importing...
                                 </span>
                             {:else}
                                 <span class="flex items-center justify-center gap-2">
@@ -262,7 +283,7 @@
                         >
                             <div class="flex w-full grow items-center justify-center">
                                 {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
-                                    <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+                                    {@render playerSkeleton()}
                                 {:then acc}
                                     {#if !acc.success}
                                         <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
@@ -317,7 +338,7 @@
                                 >
                                     <Button variant="ghost" size="sm" class="w-full gap-1 text-xs" disabled={markingId === account.id}>
                                         {#if markingId === account.id}
-                                            <SvgSpinnersRingResize class="size-3.5" />
+                                            <Spinner class="size-3.5" />
                                         {:else}
                                             <TablerWorld class="size-3.5" />
                                         {/if}
@@ -338,9 +359,30 @@
 {#await hasPermission($session.data?.user.id, "cwl") then canApplyCWL}
     {#if canApplyCWL}
         {#await Promise.all( [getUserCwlApplications( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPAClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPACwlClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )] )}
-            <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-                <SvgSpinnersRingResize />
-                <span>CWL Applications</span>
+            <!-- With CWL closed the section usually stays hidden, so a placeholder would only flash and vanish. -->
+            <div aria-busy="true" class={cwlEnabled ? "" : "hidden"}>
+                <h1 class="pb-4 text-2xl font-bold">CWL Applications</h1>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {#each { length: 3 }, i (i)}
+                        <div class="flex min-h-40 flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex flex-1 flex-col gap-2 pt-1">
+                                    <div class="h-6 w-2/5 skeleton"></div>
+                                    <div class="h-3 w-1/4 skeleton"></div>
+                                </div>
+                                <div class="h-4 w-20 skeleton"></div>
+                            </div>
+                            <hr class="border-stone-700/50" />
+                            {#each { length: 3 }, j (j)}
+                                <div class="flex items-center justify-between">
+                                    <div class="h-3.5 w-24 skeleton"></div>
+                                    <div class="h-3.5 w-16 skeleton"></div>
+                                </div>
+                            {/each}
+                            <div class="h-10 skeleton rounded-lg"></div>
+                        </div>
+                    {/each}
+                </div>
             </div>
         {:then [resp, jpaClansResp, jpaCwlClansResp]}
             {@const currentApplications = resp.data.applications.filter((application) => application.seasonId === resp.data.currentSeasonId)}

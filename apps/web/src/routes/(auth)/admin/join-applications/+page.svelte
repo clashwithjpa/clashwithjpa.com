@@ -10,6 +10,7 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import TownHall from "$lib/components/ui/TownHall.svelte";
     import type { Role } from "$lib/config/roles";
@@ -22,8 +23,6 @@
         updateJoinApplicationStatus,
         type GetJoinApplications200,
     } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBolt from "~icons/tabler/bolt";
     import TablerCheck from "~icons/tabler/check";
     import TablerClock from "~icons/tabler/clock";
@@ -41,6 +40,12 @@
     type Status = Application["status"];
 
     let applications = $state<Application[]>([]);
+    // Each card mounts several ark-ui tooltips, so 100 of them in one go blocked the main
+    // thread for ~600ms and froze the status dropdown mid-fade. Cards render a batch per frame.
+    const REVEAL_BATCH = 4;
+    let revealed = $state(REVEAL_BATCH);
+    let revealRun = 0;
+    let shownApplications = $derived(applications.slice(0, revealed));
     let total = $state(0);
     let loading = $state(true);
     let statusFilter = $state<string>("pending");
@@ -72,6 +77,7 @@
             if (resp.success) {
                 applications = resp.data.applications;
                 total = resp.data.total;
+                revealInBatches();
             } else {
                 toast.error("Failed to load applications");
             }
@@ -80,6 +86,17 @@
         } finally {
             loading = false;
         }
+    }
+
+    function revealInBatches() {
+        const run = ++revealRun;
+        revealed = REVEAL_BATCH;
+        const step = () => {
+            if (run !== revealRun || revealed >= applications.length) return;
+            revealed += REVEAL_BATCH;
+            requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
     }
 
     async function updateStatus(id: number, status: Status) {
@@ -199,7 +216,7 @@
 {/snippet}
 
 <div class="flex size-full flex-col gap-4">
-    <PageHeader title="Join Applications">
+    <PageHeader title="Join Applications" subtitleLoading={loading}>
         {#snippet subtitle()}
             {total} application{total === 1 ? "" : "s"}
             {statusFilter ? `with status "${statusFilter}"` : "total"}
@@ -215,7 +232,7 @@
                 >
                     <Button variant="danger" class="shrink-0 gap-1" disabled={clearingAccepted}>
                         {#if clearingAccepted}
-                            <SvgSpinnersRingResize class="size-5" />
+                            <Spinner class="size-5" />
                         {:else}
                             <TablerTrash class="size-5" />
                         {/if}
@@ -228,8 +245,54 @@
 
     <div class="flex-1">
         {#if loading}
-            <div class="flex size-full items-center justify-center pt-10 text-stone-400">
-                <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+            <div class="card-grid [--card-min:22rem]" aria-busy="true">
+                {#each { length: 6 }, i (i)}
+                    <div class="flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex min-w-0 flex-1 items-start gap-3">
+                                <div class="size-12 shrink-0 skeleton rounded-lg"></div>
+                                <div class="flex min-w-0 flex-1 flex-col">
+                                    <div class="flex h-7 items-center"><div class="h-5 w-36 max-w-full skeleton"></div></div>
+                                    <div class="flex h-4 items-center"><div class="h-3 w-24 skeleton"></div></div>
+                                </div>
+                            </div>
+                            <div class="flex shrink-0 gap-2">
+                                <div class="h-5.5 w-16 skeleton rounded-full"></div>
+                                {#if data.canDelete}
+                                    <div class="size-10 skeleton rounded-lg"></div>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <div class="h-6.5 w-28 skeleton rounded-full"></div>
+                            <div class="h-6.5 w-32 skeleton rounded-full"></div>
+                            <div class="h-6.5 w-14 skeleton rounded-full"></div>
+                        </div>
+                        <div class="flex items-center gap-3 border-t border-stone-700/50 pt-3">
+                            <div class="size-10 shrink-0 skeleton rounded-full"></div>
+                            <div class="flex flex-1 flex-col gap-1">
+                                <div class="flex h-5.5 items-center gap-1.5">
+                                    <div class="h-3.5 w-24 skeleton"></div>
+                                    <div class="h-5 w-16 skeleton rounded-full"></div>
+                                </div>
+                                <div class="flex h-4 items-center"><div class="h-3 w-36 skeleton"></div></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            {#each { length: 4 }, j (j)}
+                                <div class="flex flex-col gap-0.5 rounded-lg bg-stone-800 px-3 py-2 {j === 3 ? 'col-span-3' : ''}">
+                                    <div class="flex h-4 items-center"><div class="h-3 w-14 skeleton"></div></div>
+                                    <div class="flex h-5 items-center"><div class="h-3.5 w-10 skeleton"></div></div>
+                                </div>
+                            {/each}
+                        </div>
+                        <div class="flex h-4 items-center"><div class="h-3 w-32 skeleton"></div></div>
+                        <div class="mt-auto flex flex-col gap-2">
+                            <div class="h-10 skeleton rounded-lg"></div>
+                            <div class="h-10 skeleton rounded-lg"></div>
+                        </div>
+                    </div>
+                {/each}
             </div>
         {:else if applications.length === 0}
             <div class="flex size-full flex-col items-center justify-center gap-2 pt-10 text-stone-400">
@@ -238,7 +301,7 @@
             </div>
         {:else}
             <div class="card-grid [--card-min:22rem]">
-                {#each applications as app, i (app.id)}
+                {#each shownApplications as app, i (app.id)}
                     {@const p = getPlayer(app)}
                     {@const stats = [
                         { icon: TablerTrophy, label: "Trophies", value: p.trophies != null ? p.trophies.toLocaleString() : "—" },
@@ -274,7 +337,7 @@
                                         onclick={() => requestDelete(app)}
                                     >
                                         {#if processingId === app.id}
-                                            <SvgSpinnersRingResize />
+                                            <Spinner />
                                         {:else}
                                             <TablerTrash />
                                         {/if}

@@ -5,6 +5,7 @@
     import ApiKeyCreateSidebar from "$lib/components/ApiKeyCreateSidebar.svelte";
     import ApiKeyStatsSidebar from "$lib/components/ApiKeyStatsSidebar.svelte";
     import Button from "$lib/components/ui/Button.svelte";
+    import CardSkeleton from "$lib/components/ui/CardSkeleton.svelte";
     import Dialog from "$lib/components/ui/Dialog.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
@@ -14,7 +15,6 @@
     import { formatRelativeTime } from "$lib/utils";
     import { type JpaPermission } from "@repo/auth-shared";
     import { createApiKey, type CreateApiKey200, type CreateApiKey403 } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerActivity from "~icons/tabler/activity";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerBook2 from "~icons/tabler/book-2";
@@ -163,7 +163,10 @@
                 API Docs
                 <TablerExternalLink class="size-4" />
             </Button>
-            {#if keys && keys.length > 0}
+            {#if loading}
+                <div class="h-10 w-24 skeleton rounded-lg"></div>
+                <div class="h-10 w-30 skeleton rounded-lg"></div>
+            {:else if keys && keys.length > 0}
                 <Tooltip title="{activeCount} active" placement="bottom">
                     <div
                         class="flex cursor-help items-center gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-4 py-2 text-sm text-stone-400"
@@ -201,9 +204,22 @@
     {/snippet}
 
     {#if loading}
-        <div class="flex items-center justify-start gap-2 text-2xl font-bold text-stone-400">
-            <SvgSpinnersBlocksScale />
-            <span>API Keys</span>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-busy="true">
+            {#each { length: 3 }, i (i)}
+                <div class="flex items-center gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    <div class="size-9 shrink-0 skeleton rounded-lg"></div>
+                    <div class="flex min-w-0 flex-1 flex-col gap-2">
+                        <div class="h-3 w-16 skeleton"></div>
+                        <div class="h-5 w-24 skeleton"></div>
+                        <div class="h-3 w-32 max-w-full skeleton"></div>
+                    </div>
+                </div>
+            {/each}
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {#each { length: 3 }, i (i)}
+                <CardSkeleton variant="apiKey" />
+            {/each}
         </div>
     {:else if !keys || keys.length === 0}
         <div

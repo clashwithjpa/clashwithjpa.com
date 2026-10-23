@@ -387,7 +387,7 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
-        <PageHeader title="Users" subtitle="{list.total} user{list.total === 1 ? '' : 's'}">
+        <PageHeader title="Users" subtitleLoading={list.loading && list.rows.length === 0} subtitle="{list.total} user{list.total === 1 ? '' : 's'}">
             {#snippet actions()}
                 <div class="flex min-w-60 flex-1 items-center gap-2 @4xl:max-w-96">
                     <Input placeholder="Search anything..." bind:value={searchText} onchange={handleSearchChange} class="min-w-0 flex-1" />
@@ -398,7 +398,16 @@
             {/snippet}
         </PageHeader>
 
-        {#if roleBars.length > 0}
+        {#if list.loading && list.rows.length === 0}
+            <div class="flex items-center gap-2 overflow-hidden" aria-hidden="true">
+                {#each [126, 92, 108, 116, 123] as width, i (i)}
+                    <div class="h-6.5 shrink-0 skeleton rounded-lg" style:width="{width}px"></div>
+                {/each}
+                <div class="h-6 shrink-0 self-center border-l-2 border-stone-700/50"></div>
+                <div class="h-6.5 w-30 shrink-0 skeleton rounded-lg"></div>
+                <div class="h-6.5 w-38 shrink-0 skeleton rounded-lg"></div>
+            </div>
+        {:else if roleBars.length > 0}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 bind:this={scrollEl}

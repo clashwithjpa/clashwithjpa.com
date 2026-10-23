@@ -55,6 +55,10 @@
     let auditTrend = $state<DailyPoint[] | null>(null);
     let actors = $state<Actor[] | null>(null);
     let recent = $state<AuditEntry[] | null>(null);
+    const AREA_SKELETON_SHAPE =
+        "polygon(0 72%, 8% 60%, 17% 66%, 26% 48%, 35% 55%, 45% 38%, 55% 46%, 64% 30%, 74% 42%, 84% 26%, 92% 34%, 100% 22%, 100% 100%, 0 100%)";
+    // Until the first round of requests settles, nulls mean "loading", not "nothing there".
+    let loaded = $state(false);
 
     const canSeeAudit = $derived(!!data.permissions?.manage);
     const daily = (points: { date: string; count: number }[]) => points.map((p) => ({ date: new Date(p.date), count: p.count }));
@@ -83,6 +87,7 @@
         if (a.status === "fulfilled" && a.value.success) auditTrend = daily(a.value.data.data);
         if (act.status === "fulfilled" && act.value.success) actors = act.value.data.data;
         if (log.status === "fulfilled" && log.value.success) recent = log.value.data.entries;
+        loaded = true;
     });
 
     async function loadSeason(value: string) {
@@ -212,6 +217,53 @@
     </a>
 {/snippet}
 
+{#snippet chartSkeleton(bars: number)}
+    <div class="flex h-full min-h-48 items-end gap-1.5 pt-4" aria-hidden="true">
+        {#each { length: bars }, i (i)}
+            <div class="flex-1 skeleton rounded-b-none" style:height="{30 + ((i * 37) % 60)}%"></div>
+        {/each}
+    </div>
+{/snippet}
+
+{#snippet areaSkeleton()}
+    <div class="flex h-full min-h-48 pt-4" aria-hidden="true">
+        <div class="flex-1 skeleton rounded-none" style:clip-path={AREA_SKELETON_SHAPE}></div>
+    </div>
+{/snippet}
+
+{#snippet actorsSkeleton()}
+    <ol class="flex flex-col gap-3" aria-hidden="true">
+        {#each { length: 8 }, i (i)}
+            <li class="flex items-center gap-3">
+                <span class="flex w-4 shrink-0 justify-end"><span class="h-3 w-2 skeleton"></span></span>
+                <div class="size-10 shrink-0 skeleton rounded-full"></div>
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <div class="flex h-5 items-center justify-between gap-2">
+                        <div class="h-3.5 skeleton" style:width="{40 + ((i * 23) % 35)}%"></div>
+                        <div class="h-3.5 w-6 skeleton"></div>
+                    </div>
+                    <div class="h-1.5 skeleton rounded-full" style:width="{90 - i * 9}%"></div>
+                    <div class="flex h-4 items-center"><div class="h-3 w-24 skeleton"></div></div>
+                </div>
+            </li>
+        {/each}
+    </ol>
+{/snippet}
+
+{#snippet recentSkeleton()}
+    <ul class="flex flex-col divide-y divide-stone-800" aria-hidden="true">
+        {#each { length: 6 }, i (i)}
+            <li class="flex items-start gap-2.5 py-2 first:pt-0 last:pb-0">
+                <div class="mt-0.5 size-4 shrink-0 skeleton rounded"></div>
+                <div class="flex min-w-0 flex-1 flex-col">
+                    <div class="flex h-5 items-center"><div class="h-3.5 skeleton" style:width="{55 + ((i * 23) % 40)}%"></div></div>
+                    <div class="flex h-4 items-center"><div class="h-3 w-2/5 skeleton"></div></div>
+                </div>
+            </li>
+        {/each}
+    </ul>
+{/snippet}
+
 {#snippet empty(text: string)}
     <p class="grid h-full min-h-24 place-items-center text-sm text-stone-500">{text}</p>
 {/snippet}
@@ -222,7 +274,10 @@
             Welcome back, <span class="text-stone-200">{$session.data?.user?.name?.split(" ")[0] ?? ""}</span>.
         {/snippet}
         {#snippet actions()}
-            {#if overview}
+            {#if !loaded}
+                <div class="h-6.5 w-34 skeleton rounded-lg"></div>
+                <div class="h-6.5 w-24 skeleton rounded-lg"></div>
+            {:else if overview}
                 {#if overview.status.maintenance}
                     <Badge variant="red" size="button" icon={TablerTool} content="Maintenance mode" />
                 {/if}
@@ -247,9 +302,13 @@
             <a href={stat.href} class="flex min-w-0 flex-col gap-3 bg-stone-900 p-4 transition-colors hover:bg-stone-800/60">
                 <span class="truncate text-xs font-medium text-stone-400">{stat.label}</span>
                 <div class="flex items-end justify-between gap-3">
-                    <span class={cn("text-3xl leading-none font-bold text-stone-50 tabular-nums", stat.valueClass)}>
-                        {fmt(stat.value)}{#if stat.of != null}<span class="text-base font-medium text-stone-500"> / {fmt(stat.of)}</span>{/if}
-                    </span>
+                    {#if !loaded}
+                        <span class="flex h-8 items-center"><span class="block h-7 w-16 skeleton"></span></span>
+                    {:else}
+                        <span class={cn("text-3xl leading-none font-bold text-stone-50 tabular-nums", stat.valueClass)}>
+                            {fmt(stat.value)}{#if stat.of != null}<span class="text-base font-medium text-stone-500"> / {fmt(stat.of)}</span>{/if}
+                        </span>
+                    {/if}
                     {#if stat.spark?.length}
                         {@render sparkline(stat.spark)}
                     {/if}
@@ -258,9 +317,17 @@
                     {#if stat.meter}
                         {@render bar(stat.meter.value, Math.max(1, stat.meter.max), stat.meter.color)}
                     {/if}
-                    <span class="truncate text-xs text-stone-500">
-                        {#if stat.noteStrong}<span class={cn("font-medium", stat.noteClass)}>{stat.noteStrong}</span>{/if}{stat.note || " "}
-                    </span>
+                    {#if !loaded}
+                        <!-- Stats that carry a meter declare the key even before their data arrives. -->
+                        {#if "meter" in stat}
+                            <span class="block h-1.5 skeleton rounded-full"></span>
+                        {/if}
+                        <span class="flex h-4 items-center"><span class="block h-3 w-24 skeleton"></span></span>
+                    {:else}
+                        <span class="truncate text-xs text-stone-500">
+                            {#if stat.noteStrong}<span class={cn("font-medium", stat.noteClass)}>{stat.noteStrong}</span>{/if}{stat.note || " "}
+                        </span>
+                    {/if}
                 </div>
             </a>
         {/each}
@@ -270,10 +337,13 @@
         <Panel
             title="CWL season"
             subtitle={season ? `${fmt(season.applications)} accounts · ${fmt(season.applicants)} users` : null}
+            subtitleLoading={!loaded}
             class="xl:col-span-2"
         >
             {#snippet actions()}
-                {#if seasonOptions.length}
+                {#if !loaded}
+                    <div class="h-10 w-40 skeleton rounded-lg"></div>
+                {:else if seasonOptions.length}
                     <Select
                         class="w-40"
                         options={seasonOptions}
@@ -284,7 +354,26 @@
                     />
                 {/if}
             {/snippet}
-            {#if !season}
+            {#if !loaded}
+                <div class="grid flex-1 gap-6 md:grid-cols-2" aria-busy="true">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex h-4 items-center"><div class="h-3 w-28 skeleton"></div></div>
+                        <ul class="flex flex-col gap-2">
+                            {#each { length: 14 }, i (i)}
+                                <li class="grid h-5 grid-cols-[minmax(0,9rem)_1fr_2rem] items-center gap-3">
+                                    <div class="h-3.5 skeleton" style:width="{60 + ((i * 17) % 35)}%"></div>
+                                    <div class="h-1.5 skeleton rounded-full" style:width="{30 + ((i * 29) % 65)}%"></div>
+                                    <div class="ml-auto h-3.5 w-5 skeleton"></div>
+                                </li>
+                            {/each}
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex h-4 items-center"><div class="h-3 w-28 skeleton"></div></div>
+                        <div class="min-h-56 flex-1">{@render chartSkeleton(8)}</div>
+                    </div>
+                </div>
+            {:else if !season}
                 {@render empty(currentSeason === null && overview ? "No CWL season set" : "")}
             {:else if season.applications === 0 && season.byClan.length === 0}
                 {@render empty("No applications this season")}
@@ -338,7 +427,9 @@
                     {@render link("/admin/audit-log", "Audit log")}
                 {/if}
             {/snippet}
-            {#if actors === null}
+            {#if !loaded}
+                {@render actorsSkeleton()}
+            {:else if actors === null}
                 {@render empty("")}
             {:else if actors.length === 0}
                 {@render empty("No admin actions yet")}
@@ -365,10 +456,12 @@
         </Panel>
     </div>
 
-    <div class={cn("grid gap-4", recent ? "xl:grid-cols-3" : "lg:grid-cols-2")}>
-        <Panel title="New users" subtitle={joins ? `${fmt(sum(joins))} in the last ${JOIN_DAYS} days` : null}>
+    <div class={cn("grid gap-4", recent || (!loaded && canSeeAudit) ? "xl:grid-cols-3" : "lg:grid-cols-2")}>
+        <Panel title="New users" subtitle={joins ? `${fmt(sum(joins))} in the last ${JOIN_DAYS} days` : null} subtitleLoading={!loaded}>
             <div class="min-h-48 flex-1">
-                {#if joins}
+                {#if !loaded}
+                    {@render areaSkeleton()}
+                {:else if joins}
                     <AreaChart
                         data={joins}
                         x="date"
@@ -384,9 +477,15 @@
             </div>
         </Panel>
 
-        <Panel title="Admin actions" subtitle={auditTrend ? `${fmt(sum(auditTrend))} in the last ${AUDIT_DAYS} days` : null}>
+        <Panel
+            title="Admin actions"
+            subtitle={auditTrend ? `${fmt(sum(auditTrend))} in the last ${AUDIT_DAYS} days` : null}
+            subtitleLoading={!loaded}
+        >
             <div class="min-h-48 flex-1">
-                {#if auditTrend}
+                {#if !loaded}
+                    {@render chartSkeleton(14)}
+                {:else if auditTrend}
                     <BarChart
                         data={auditTrend}
                         x="date"
@@ -402,7 +501,14 @@
             </div>
         </Panel>
 
-        {#if recent}
+        {#if !loaded && canSeeAudit}
+            <Panel title="Recent activity">
+                {#snippet actions()}
+                    <div class="h-4 w-14 skeleton"></div>
+                {/snippet}
+                {@render recentSkeleton()}
+            </Panel>
+        {:else if recent}
             <Panel title="Recent activity">
                 {#snippet actions()}
                     {@render link("/admin/audit-log", "View all")}

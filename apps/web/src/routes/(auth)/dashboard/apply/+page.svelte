@@ -3,12 +3,12 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
     import { Turnstile } from "svelte-turnstile";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerArrowRight from "~icons/tabler/arrow-right";
 
     let { data } = $props();
@@ -213,7 +213,7 @@
             >
                 {#if isLoading}
                     <span class="flex items-center justify-center gap-2">
-                        <SvgSpinnersRingResize class="size-4" /> Submitting...
+                        <Spinner class="size-4" /> Submitting...
                     </span>
                 {:else}
                     <span> {isExternal ? "Add External Account" : "Submit Application"} </span>

@@ -22,7 +22,6 @@
     import { createVirtualizer } from "@tanstack/svelte-virtual";
     import { untrack } from "svelte";
     import { get } from "svelte/store";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerArrowDown from "~icons/tabler/arrow-down";
     import TablerArrowUp from "~icons/tabler/arrow-up";
     import TablerChevronDown from "~icons/tabler/chevron-down";
@@ -585,14 +584,25 @@
                 {#if paddingBottom > 0}
                     <tr aria-hidden="true"><td style:height="{paddingBottom}px" colspan={allColumns.length}></td></tr>
                 {/if}
+                {#if loading && rows.length === 0}
+                    {#each { length: 10 }, r (r)}
+                        <tr aria-hidden="true" style:height="{rowHeight}px">
+                            {#each allColumns as col, c (c)}
+                                <td class="border-r border-b border-stone-700/50 px-2 last:border-r-0">
+                                    {#if col.id === selectColumn.id}
+                                        <div class="mx-auto size-4 skeleton rounded"></div>
+                                    {:else}
+                                        <div class="h-3.5 skeleton" style:width="{40 + ((r * 7 + c * 13) % 5) * 12}%"></div>
+                                    {/if}
+                                </td>
+                            {/each}
+                        </tr>
+                    {/each}
+                {/if}
             </tbody>
         </table>
 
-        {#if loading && rows.length === 0}
-            <div class="absolute inset-x-0 flex items-center justify-center gap-2 py-10 text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">
-                <SvgSpinnersRingResize class="size-4" /> Loading…
-            </div>
-        {:else if rows.length === 0}
+        {#if !loading && rows.length === 0}
             <div class="absolute inset-x-0 py-10 text-center text-sm text-stone-400" style:top="{HEADER_HEIGHT}px">{emptyText}</div>
         {/if}
     </div>

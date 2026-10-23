@@ -6,13 +6,12 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
 
     let options: (Option & { warWeight: number; clanTag?: string; isExternal: boolean })[] = $state([]);
     let clanOptions: Option[] = $state([]);
@@ -157,8 +156,20 @@
 
 <div class="grid size-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
     {#await Promise.all([setOptions(), setClanOptions()])}
-        <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
-            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+        <div class="flex size-full flex-col justify-center gap-8 lg:p-8" aria-busy="true">
+            <div class="flex flex-col gap-1">
+                <h1 class="text-4xl font-bold">Clan War League</h1>
+                <p class="text-sm text-stone-400">Apply to participate in Clan War League.</p>
+            </div>
+            <div class="flex flex-col gap-6">
+                {#each ["w-28", "w-24", "w-36"] as label, i (i)}
+                    <div class="flex flex-col gap-2">
+                        <div class="h-3.5 skeleton {label}"></div>
+                        <div class="h-10 skeleton rounded-lg"></div>
+                    </div>
+                {/each}
+                <div class="h-10 skeleton rounded-lg"></div>
+            </div>
         </div>
     {:then}
         <div class="stagger-children flex size-full flex-col justify-center gap-8 lg:p-8">
@@ -224,7 +235,7 @@
                 <Button type="submit" disabled={isLoading || !tag || (!selectedIsExternal && !accountClan)}>
                     {#if isLoading}
                         <span class="flex items-center justify-center gap-2">
-                            <SvgSpinnersRingResize class="size-4" /> Submitting...
+                            <Spinner class="size-4" /> Submitting...
                         </span>
                     {:else}
                         <span> Submit CWL Application </span>

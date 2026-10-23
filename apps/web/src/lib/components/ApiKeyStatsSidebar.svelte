@@ -9,7 +9,6 @@
     import { getApiKeyUsageDaily, getApiKeyUsageEndpoints, getApiKeyUsageStatus, getApiKeyUsageSummary } from "@repo/clashofclans-client";
     import { curveMonotoneX } from "d3-shape";
     import { AreaChart, BarChart, PieChart } from "layerchart";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerChartBarPopular from "~icons/tabler/chart-bar-popular";
     import TablerRefresh from "~icons/tabler/refresh";
 
@@ -34,6 +33,8 @@
     };
 
     const WINDOW_DAYS = 30;
+    // Known before the stats arrive, so the skeleton can show charts or the "no requests" line up front.
+    const hadRecentTraffic = $derived(apiKey.lastRequest != null && Date.now() - new Date(apiKey.lastRequest).getTime() < WINDOW_DAYS * 86_400_000);
     const ENDPOINT_LIMIT = 8;
     const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
 
@@ -163,9 +164,48 @@
     </div>
 
     {#if loading}
-        <div class="py-8">
-            <SvgSpinnersBlocksScale class="mx-auto size-12 text-stone-400" />
+        <div class="grid grid-cols-2 gap-4" aria-busy="true">
+            {#each { length: 4 }, i (i)}
+                <div class="flex flex-col gap-1 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    <div class="flex h-4 items-center"><div class="h-3 w-16 skeleton"></div></div>
+                    <div class="flex h-8 items-center"><div class="h-6 w-20 skeleton"></div></div>
+                    <div class="flex h-4 items-center"><div class="h-3 w-24 max-w-full skeleton"></div></div>
+                </div>
+            {/each}
         </div>
+        <div class="flex flex-col gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+            <div class="flex h-5 items-center justify-between">
+                <div class="h-3.5 w-20 skeleton"></div>
+                <div class="h-3.5 w-28 skeleton"></div>
+            </div>
+            {#if apiKey.rateLimitMax != null}
+                <div class="h-2 skeleton rounded-full"></div>
+                <div class="flex h-4 items-center justify-between">
+                    <div class="h-3 w-20 skeleton"></div>
+                    <div class="h-3 w-24 skeleton"></div>
+                </div>
+            {/if}
+            <div class="flex h-5 items-center justify-between">
+                <div class="h-3.5 w-16 skeleton"></div>
+                <div class="h-3.5 w-20 skeleton"></div>
+            </div>
+        </div>
+        {#if hadRecentTraffic}
+            {#each ["h-64", "h-72", "h-64"] as height, i (i)}
+                <div class="flex w-full flex-col gap-2 {height}">
+                    <div class="flex h-5 justify-center"><div class="h-3.5 w-40 skeleton"></div></div>
+                    <div class="min-h-0 flex-1 skeleton rounded-lg"></div>
+                </div>
+            {/each}
+        {:else}
+            <div class="flex items-center gap-2">
+                <div class="size-5 shrink-0 skeleton rounded"></div>
+                <div class="flex flex-1 flex-col">
+                    <div class="flex h-6 items-center"><div class="h-3.5 w-full skeleton"></div></div>
+                    <div class="flex h-6 items-center"><div class="h-3.5 w-2/5 skeleton"></div></div>
+                </div>
+            </div>
+        {/if}
     {:else}
         <div class="grid grid-cols-2 gap-4">
             {#snippet stat(label: string, value: string, hint?: string)}

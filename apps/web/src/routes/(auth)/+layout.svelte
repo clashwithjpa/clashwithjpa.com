@@ -13,7 +13,6 @@
     import { storage } from "$lib/utils/storage.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount } from "svelte";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
     import TablerX from "~icons/tabler/x";
     import type { LayoutProps } from "./$types";
 
@@ -56,6 +55,12 @@
 
     let showInfo = $derived(sidebarStore.isOpen && !!sidebarStore.content);
     let infoScroller = $state<HTMLDivElement | null>(null);
+    // One scroller is shared by every page, so a new page would otherwise open at the old page's offset.
+    let contentScroller = $state<HTMLDivElement | null>(null);
+    $effect(() => {
+        void page.url.pathname;
+        if (contentScroller) contentScroller.scrollTop = 0;
+    });
 
     const LAYOUT_CONFIG = {
         content: { min: 30, max: 85, default: 30 },
@@ -214,7 +219,7 @@
                     role={($session.data?.user.role as Role) || "unverified"}
                 />
             {:else}
-                <SvgSpinnersBlocksScale class="size-8 text-stone-400" />
+                <div class="size-12 shrink-0 skeleton rounded-full"></div>
             {/if}
             {#if isSidebarExpanded}
                 <div class="ml-4 flex flex-col overflow-hidden">
@@ -228,17 +233,17 @@
 
 {#snippet ContentBody()}
     {#if $session.data}
-        <ScrollArea wrapperClass="size-full" class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : ''}">
+        <ScrollArea
+            bind:viewport={contentScroller}
+            wrapperClass="size-full"
+            class="size-full {noScrollPaths.includes(page.url.pathname) ? 'overflow-hidden' : ''}"
+        >
             {#key page.url.pathname}
                 <div class="page-enter {!noPaddingPaths.includes(page.url.pathname) ? 'p-4' : 'size-full'}">
                     {@render children()}
                 </div>
             {/key}
         </ScrollArea>
-    {:else}
-        <div class="flex size-full flex-col items-center justify-center gap-2 text-stone-400 opacity-50">
-            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
-        </div>
     {/if}
 {/snippet}
 

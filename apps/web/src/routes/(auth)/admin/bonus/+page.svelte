@@ -17,6 +17,7 @@
     import Select, { type Option } from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import { Sidebar } from "$lib/components/ui/sidebar";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
     import { loadGuildNicknames } from "$lib/discordNicknames";
@@ -37,7 +38,6 @@
         type GetCwlStats200,
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type SortingState } from "@tanstack/svelte-table";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerCircleCheck from "~icons/tabler/circle-check";
     import TablerCircleX from "~icons/tabler/circle-x";
     import TablerDownload from "~icons/tabler/download";
@@ -701,11 +701,9 @@
 
 <div class="relative flex size-full flex-col gap-4 overflow-hidden">
     <div class="flex flex-col gap-4 px-4 pt-4">
-        <PageHeader title="CWL Bonus">
+        <PageHeader title="CWL Bonus" subtitleLoading={loading}>
             {#snippet subtitle()}
-                {#if loading}
-                    Loading…
-                {:else}
+                {#if !loading}
                     {#if currentSeasonName}<span class="font-medium text-stone-300">{currentSeasonName}</span> ·
                     {/if}
                     {#if searchText.trim() || activeFilters || clanFilter || eligibleFilter !== null}{displayedCount} of {total}{:else}{total}{/if} entr{total ===
@@ -751,7 +749,7 @@
                     tooltipPlacement="bottom"
                 >
                     {#if downloading}
-                        <SvgSpinnersRingResize class="size-5" />
+                        <Spinner class="size-5" />
                     {:else}
                         <TablerDownload class="size-5" />
                     {/if}
@@ -765,7 +763,13 @@
             </div>
         {/if}
 
-        {#if !loading && rows.length > 0}
+        {#if loading}
+            <div class="flex items-center gap-2 overflow-hidden" aria-hidden="true">
+                {#each { length: 9 }, i (i)}
+                    <div class="h-6.5 w-33 shrink-0 skeleton rounded-lg"></div>
+                {/each}
+            </div>
+        {:else if rows.length > 0}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 bind:this={scrollEl}
@@ -791,7 +795,7 @@
                 {/if}
 
                 <Badge
-                    icon={fetchingCwl ? SvgSpinnersRingResize : TablerCircleCheck}
+                    icon={fetchingCwl ? Spinner : TablerCircleCheck}
                     content="Eligible • {eligibleCounts.eligible}"
                     variant="green"
                     size="button"
@@ -800,7 +804,7 @@
                     class="font-medium {eligibleFilter === true ? '' : eligibleFilter !== null ? 'opacity-50 hover:opacity-100' : ''}"
                 />
                 <Badge
-                    icon={fetchingCwl ? SvgSpinnersRingResize : TablerCircleX}
+                    icon={fetchingCwl ? Spinner : TablerCircleX}
                     content="Not Eligible • {eligibleCounts.notEligible}"
                     variant="red"
                     size="button"

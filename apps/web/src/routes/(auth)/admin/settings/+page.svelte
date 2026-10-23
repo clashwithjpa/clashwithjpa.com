@@ -11,6 +11,7 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import Toggle from "$lib/components/ui/Toggle.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
     import { jobs } from "$lib/jobs.svelte";
@@ -37,8 +38,6 @@
     } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
-    import SvgSpinnersBlocksScale from "~icons/svg-spinners/blocks-scale";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerBellRinging from "~icons/tabler/bell-ringing";
     import TablerCalendarEvent from "~icons/tabler/calendar-event";
     import TablerClock from "~icons/tabler/clock";
@@ -450,9 +449,138 @@
 <div class="flex size-full flex-col gap-6">
     <PageHeader title="Site Settings" subtitle="Toggles and configuration that apply across the site." />
 
+    <!-- The skeleton follows the loaded layout block for block: same sections, rows and controls. -->
+    {#snippet labelSkeleton(width: string)}
+        <div class="flex h-4 items-center"><div class="h-3 skeleton {width}"></div></div>
+    {/snippet}
+
+    {#snippet iconRowSkeleton(titleWidth: string, lines = 1)}
+        <div class="flex min-w-0 flex-1 items-start gap-3">
+            <div class="size-10 shrink-0 skeleton rounded-lg"></div>
+            <div class="flex min-w-0 flex-1 flex-col">
+                <div class="flex h-6 items-center"><div class="h-4 skeleton {titleWidth}"></div></div>
+                <div class="flex h-4 items-center"><div class="h-3 w-3/4 max-w-72 skeleton"></div></div>
+                {#if lines > 1}
+                    <div class="flex h-4 items-center"><div class="h-3 w-1/3 skeleton"></div></div>
+                {/if}
+            </div>
+        </div>
+    {/snippet}
+
+    {#snippet toggleRowSkeleton(titleWidth: string, lines = 1)}
+        <div class="flex items-center justify-between gap-4">
+            {@render iconRowSkeleton(titleWidth, lines)}
+            <div class="h-6 w-11 shrink-0 skeleton rounded-full"></div>
+        </div>
+    {/snippet}
+
     {#if loading}
-        <div class="flex flex-1 items-center justify-center pt-10 text-stone-400">
-            <SvgSpinnersBlocksScale class="size-12 lg:size-16" />
+        <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-2" aria-busy="true">
+            <div class="flex flex-col gap-6">
+                <section class="flex flex-col gap-3">
+                    {@render labelSkeleton("w-20")}
+                    <div class="flex flex-col divide-y-2 divide-stone-700/50 rounded-lg border-2 border-stone-700/50 bg-stone-900">
+                        <div class="p-4">{@render toggleRowSkeleton("w-28")}</div>
+                        <div class="p-4">{@render toggleRowSkeleton("w-12")}</div>
+                    </div>
+                </section>
+
+                <section class="flex flex-col gap-3">
+                    {@render labelSkeleton("w-24")}
+                    <div class="flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                        {@render iconRowSkeleton("w-40")}
+                        <div class="h-10 skeleton rounded-lg"></div>
+                    </div>
+                </section>
+
+                <section class="flex flex-col gap-3">
+                    {@render labelSkeleton("w-20")}
+                    <div class="rounded-lg border-2 border-red-700/30 bg-red-900/10 p-4">{@render toggleRowSkeleton("w-44")}</div>
+                    <div class="flex flex-col gap-3 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                        {@render iconRowSkeleton("w-32")}
+                        <div class="h-10 skeleton rounded-lg"></div>
+                    </div>
+                    {#if data.isSuperadmin}
+                        <div class="flex items-center justify-between gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            {@render iconRowSkeleton("w-48")}
+                            <div class="h-10 w-27 shrink-0 skeleton rounded-lg"></div>
+                        </div>
+                    {/if}
+                </section>
+
+                {#if data.isSuperadmin}
+                    <section class="flex flex-col gap-3">
+                        {@render labelSkeleton("w-16")}
+                        <div class="flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                            {@render toggleRowSkeleton("w-24", 2)}
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-10 flex-1 skeleton rounded-lg"></div>
+                                    <div class="size-10 shrink-0 skeleton rounded-lg"></div>
+                                </div>
+                                <div class="flex h-4 items-center"><div class="h-3 w-4/5 skeleton"></div></div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-28 skeleton rounded-lg"></div>
+                                <div class="h-3 w-40 skeleton"></div>
+                            </div>
+                            <div class="flex flex-col gap-3 border-t-2 border-stone-700/50 pt-4">
+                                <div class="flex gap-2">
+                                    <div class="h-5.5 w-30 skeleton rounded-full"></div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                    {#each { length: 3 }, i (i)}
+                                        <div class="h-10 skeleton rounded-lg"></div>
+                                    {/each}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {/if}
+
+                <div class="flex justify-end"><div class="h-10 w-32 skeleton rounded-lg"></div></div>
+            </div>
+
+            <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                    {@render labelSkeleton("w-28")}
+                    <div class="h-5.75 w-15 skeleton rounded"></div>
+                </div>
+                <div class="flex flex-col gap-4 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-4">
+                    <div class="flex flex-col">
+                        <div class="flex h-4 items-center"><div class="h-3 w-full skeleton"></div></div>
+                        <div class="flex h-4 items-center"><div class="h-3 w-2/5 skeleton"></div></div>
+                    </div>
+                    <div class="h-10 skeleton rounded-lg"></div>
+                    <div class="flex max-h-96 flex-col gap-2 overflow-hidden">
+                        {#each { length: 7 }, i (i)}
+                            <div
+                                class="flex shrink-0 items-center justify-between gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-800/50 px-3 py-2"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <div class="h-3.5 w-28 skeleton"></div>
+                                    {#if i === 0}
+                                        <div class="h-5.25 w-15 skeleton rounded"></div>
+                                    {/if}
+                                </div>
+                                <div class="flex gap-1">
+                                    <div class="size-9 skeleton rounded-lg"></div>
+                                    <div class="size-9 skeleton rounded-lg"></div>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                    <div class="flex flex-col gap-2 border-t-2 border-stone-700/50 pt-4">
+                        {@render labelSkeleton("w-32")}
+                        <div class="flex flex-col gap-2 sm:flex-row">
+                            <div class="h-10 skeleton rounded-lg sm:w-40"></div>
+                            <div class="h-10 skeleton rounded-lg sm:w-28"></div>
+                            <div class="h-10 flex-1 skeleton rounded-lg"></div>
+                            <div class="h-10 w-20.5 shrink-0 skeleton rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     {:else}
         <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
@@ -549,7 +677,7 @@
                             </div>
                             <Button onclick={refreshUsernames} disabled={refreshingUsernames} class="shrink-0">
                                 {#if refreshingUsernames}
-                                    <SvgSpinnersRingResize class="size-4" />
+                                    <Spinner class="size-4" />
                                 {:else}
                                     <span class="flex items-center gap-1"><TablerRefresh class="size-4" /> Refresh</span>
                                 {/if}
@@ -642,7 +770,7 @@
                                     <Button variant="ghost" class="w-full" onclick={testPing} disabled={testingPing || !cwlPingChannelId}>
                                         <span class="flex items-center justify-center gap-1">
                                             {#if testingPing}
-                                                <SvgSpinnersRingResize class="size-4" /> Sending...
+                                                <Spinner class="size-4" /> Sending...
                                             {:else}
                                                 <TablerSend class="size-4" /> Send test ping
                                             {/if}
@@ -651,7 +779,7 @@
                                     <Button variant="ghost" class="w-full" onclick={previewPing} disabled={previewingPing}>
                                         <span class="flex items-center justify-center gap-1">
                                             {#if previewingPing}
-                                                <SvgSpinnersRingResize class="size-4" /> Checking...
+                                                <Spinner class="size-4" /> Checking...
                                             {:else}
                                                 <TablerEye class="size-4" /> Preview
                                             {/if}
@@ -660,7 +788,7 @@
                                     <Button variant="ghost" class="w-full" onclick={runPingNow} disabled={runningPingNow}>
                                         <span class="flex items-center justify-center gap-1">
                                             {#if runningPingNow}
-                                                <SvgSpinnersRingResize class="size-4" /> Running...
+                                                <Spinner class="size-4" /> Running...
                                             {:else}
                                                 <TablerPlayerPlay class="size-4" /> Run once
                                             {/if}
@@ -705,7 +833,7 @@
                     {/if}
                     <Button onclick={save} disabled={saving || !isDirty}>
                         {#if saving}
-                            <span class="flex items-center gap-2"><SvgSpinnersRingResize class="size-4" /> Saving...</span>
+                            <span class="flex items-center gap-2"><Spinner class="size-4" /> Saving...</span>
                         {:else}
                             Save Changes
                         {/if}
@@ -775,7 +903,7 @@
                                                     tooltip="Delete season"
                                                 >
                                                     {#if deletingSeasonId === season.id}
-                                                        <SvgSpinnersRingResize class="size-4" />
+                                                        <Spinner class="size-4" />
                                                     {:else}
                                                         <TablerTrash class="size-4" />
                                                     {/if}
@@ -801,7 +929,7 @@
                             <Input bind:value={newName} placeholder={`${newMonth} ${newYear}`} class="flex-1" disabled={creatingSeason} />
                             <Button onclick={createSeason} disabled={creatingSeason} class="shrink-0">
                                 {#if creatingSeason}
-                                    <SvgSpinnersRingResize class="size-4" />
+                                    <Spinner class="size-4" />
                                 {:else}
                                     <span class="flex items-center gap-1"><TablerPlus class="size-4" /> Add</span>
                                 {/if}

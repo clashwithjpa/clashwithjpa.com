@@ -2,9 +2,9 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
     import type { Component } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
-    import SvgSpinnersRingResize from "~icons/svg-spinners/ring-resize";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerCheck from "~icons/tabler/check";
     import TablerDeviceFloppy from "~icons/tabler/device-floppy";
@@ -190,10 +190,10 @@
     <div class="space-y-2 border-t border-stone-700/50 pt-4">
         <Button class="w-full gap-2" variant="base" disabled={saving || verifying || !discordFilled} onclick={onSubmit}>
             {#if verifying}
-                <SvgSpinnersRingResize class="size-5" />
+                <Spinner class="size-5" />
                 Verifying...
             {:else if saving}
-                <SvgSpinnersRingResize class="size-5" />
+                <Spinner class="size-5" />
                 Saving...
             {:else if !verified}
                 <TablerRosetteDiscountCheck class="size-5" />
