@@ -109,7 +109,7 @@
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">
     <!-- Pulled up under the transparent navbar so the art runs to the top edge. -->
     <section class="relative -mt-20 flex min-h-dvh flex-col justify-center overflow-hidden pt-20">
-        <img src="/hero.webp" alt="" class="hero-art absolute inset-0 -z-20 size-full object-cover object-[65%_center]" />
+        <img src="/bg.webp" alt="" class="hero-art absolute inset-0 -z-20 size-full object-cover object-[65%_center]" />
         <div class="absolute inset-0 -z-10 bg-linear-to-r from-stone-950/95 via-stone-950/60 to-stone-950/10"></div>
         <div class="absolute inset-x-0 bottom-0 -z-10 h-48 bg-linear-to-b from-transparent to-stone-950"></div>
 
