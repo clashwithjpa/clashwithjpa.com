@@ -16,11 +16,13 @@
     } = $props();
 
     const BAND = "#3a2314";
-    const EDGE =
-        "M0 0H1440V12L1390 22 1336 11 1284 19 1230 9 1180 24 1126 12 1075 21 1022 7 970 17 920 10 866 23 815 11 760 19 712 9 660 22 610 12 556 20 500 6 455 18 400 10 352 24 300 12 250 18 196 8 150 20 96 10 48 22 0 14Z";
+    // Shifts the planks so they don't line up with the navbar's identical row right above. The shading
+    // shares the offset so its grain and lip sit on the right plank ends.
+    const PLANK_OFFSET = "mask-position: -264px bottom";
+    const SHADE_OFFSET = "background-position: -264px bottom";
 </script>
 
-<!-- Runs up under the translucent navbar. The torn edge is drawn in the band's own colour. -->
+<!-- Runs up under the translucent navbar. The plank edge is drawn in the band's own colour over a lighter rim. -->
 <section class="relative -mt-20 pt-20" style="background-color: {BAND}">
     <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_0%,rgba(255,190,120,0.16),transparent_60%)]"></div>
     <div class="relative mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-10 pb-12 md:px-6 md:pt-16 md:pb-16 lg:px-8">
@@ -53,8 +55,9 @@
         {/if}
     </div>
 
-    <svg class="absolute inset-x-0 top-full h-5 w-full md:h-7" viewBox="0 0 1440 28" preserveAspectRatio="none" aria-hidden="true">
-        <path fill="#5c3820" transform="translate(0 4)" d={EDGE} />
-        <path fill={BAND} d={EDGE} />
-    </svg>
+    <div class="pointer-events-none absolute inset-x-0 top-full h-5 md:h-7" aria-hidden="true">
+        <div class="absolute inset-0 translate-y-1 plank-tip" style="background-color: #5c3820; {PLANK_OFFSET}"></div>
+        <div class="absolute inset-0 plank-tip" style="background-color: {BAND}; {PLANK_OFFSET}"></div>
+        <div class="absolute inset-x-0 bottom-0 h-[320%] plank-shade" style={SHADE_OFFSET}></div>
+    </div>
 </section>

@@ -65,25 +65,67 @@
     background: var(--wood-streaks), linear-gradient(180deg, #6a4a3a, #5f412f 50%, #573b2b);
 }
 
-/* Rips the bottom edge of an element, like the store's top bar. The texture underneath carries
-   into the tear because it's a mask, not a painted edge. Height the element to include --torn-depth.
-   The solid part overlaps the edge by 2px: where the two layers only touched, fractional scaling
-   anti-aliased both sides and left a faint line. */
-@utility torn-bottom {
-    --torn-depth: 1.25rem;
-    mask:
-        linear-gradient(#000 0 0) top / 100% calc(100% - var(--torn-depth) + 2px) no-repeat,
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 28' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V12L1390 22 1336 11 1284 19 1230 9 1180 24 1126 12 1075 21 1022 7 970 17 920 10 866 23 815 11 760 19 712 9 660 22 610 12 556 20 500 6 455 18 400 10 352 24 300 12 250 18 196 8 150 20 96 10 48 22 0 14Z'/%3E%3C/svg%3E")
-            bottom / 100% var(--torn-depth) no-repeat;
+/* Plank edges, like the store's top bar: boards of uneven length with rounded ends. The shape is an SVG
+   mask that repeats sideways as a fixed 720x24 tile, so planks keep their proportions at any width and the
+   wood texture runs right into them. /art/plank-edge.webp paints the grain, seams, darkened ends and lip
+   over it; it's rendered for this exact plank layout, so change both together. */
+:root {
+    --plank-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 24' preserveAspectRatio='none'%3E%3Cpath d='M0 -2H96V12Q96 15 93 15H3Q0 15 0 12ZM96 -2H166V7Q166 10 163 10H99Q96 10 96 7ZM166 -2H294V13Q294 16 291 16H169Q166 16 166 13ZM294 -2H378V9Q378 12 375 12H297Q294 12 294 9ZM378 -2H488V14Q488 17 485 17H381Q378 17 378 14ZM488 -2H552V6Q552 9 549 9H491Q488 9 488 6ZM552 -2H644V11Q644 14 641 14H555Q552 14 552 11ZM644 -2H720V8Q720 11 717 11H647Q644 11 644 8Z'/%3E%3C/svg%3E");
+    --plank-edge-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 24' preserveAspectRatio='none'%3E%3Cg transform='matrix%281 0 0 -1 0 24%29'%3E%3Cpath d='M0 -2H96V12Q96 15 93 15H3Q0 15 0 12ZM96 -2H166V7Q166 10 163 10H99Q96 10 96 7ZM166 -2H294V13Q294 16 291 16H169Q166 16 166 13ZM294 -2H378V9Q378 12 375 12H297Q294 12 294 9ZM378 -2H488V14Q488 17 485 17H381Q378 17 378 14ZM488 -2H552V6Q552 9 549 9H491Q488 9 488 6ZM552 -2H644V11Q644 14 641 14H555Q552 14 552 11ZM644 -2H720V8Q720 11 717 11H647Q644 11 644 8Z'/%3E%3C/g%3E%3C/svg%3E");
+    --plank-shade: url("/art/plank-edge.webp");
 }
 
-/* torn-bottom's mirror, for boards that hang below content (the footer). */
-@utility torn-top {
-    --torn-depth: 1.25rem;
+/* Plank-ends the bottom edge of an element. Height the element to include --plank-depth.
+   The solid part overlaps the edge by 2px: where the two layers only touched, fractional scaling
+   anti-aliased both sides and left a faint line. */
+@utility plank-bottom {
+    --plank-depth: 1.25rem;
+    position: relative;
     mask:
-        linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--torn-depth) + 2px) no-repeat,
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 28' preserveAspectRatio='none'%3E%3Cpath transform='matrix(1 0 0 -1 0 28)' d='M0 0H1440V12L1390 22 1336 11 1284 19 1230 9 1180 24 1126 12 1075 21 1022 7 970 17 920 10 866 23 815 11 760 19 712 9 660 22 610 12 556 20 500 6 455 18 400 10 352 24 300 12 250 18 196 8 150 20 96 10 48 22 0 14Z'/%3E%3C/svg%3E")
-            top / 100% var(--torn-depth) no-repeat;
+        linear-gradient(#000 0 0) top / 100% calc(100% - var(--plank-depth) + 2px) no-repeat,
+        var(--plank-edge) left bottom / 720px var(--plank-depth) repeat-x;
+
+    /* The shading tile is 3.2x the edge depth tall: the plank ends plus the grain that climbs above them. */
+    &::before {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        height: calc(var(--plank-depth) * 3.2);
+        background: var(--plank-shade) left bottom / 720px 100% repeat-x;
+        pointer-events: none;
+    }
+}
+
+/* plank-bottom's mirror, for boards that hang below content (the footer). */
+@utility plank-top {
+    --plank-depth: 1.25rem;
+    position: relative;
+    mask:
+        linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--plank-depth) + 2px) no-repeat,
+        var(--plank-edge-top) left top / 720px var(--plank-depth) repeat-x;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        top: 0;
+        height: calc(var(--plank-depth) * 3.2);
+        background: var(--plank-shade) left bottom / 720px 100% repeat-x;
+        transform: scaleY(-1);
+        pointer-events: none;
+    }
+}
+
+/* The plank grain, seams and lip on their own, for a plain band. Height it to 3.2x the edge depth with its
+   bottom on the plank ends; it lines up with plank-tip at the same horizontal offset. */
+@utility plank-shade {
+    background: var(--plank-shade) left bottom / 720px 100% repeat-x;
+}
+
+/* Just the plank ends, for a strip that hangs off a solid-colour band. Height it to the edge depth. */
+@utility plank-tip {
+    mask: var(--plank-edge) left bottom / 720px 100% repeat-x;
 }
 
 /* Wood board for cards on public pages: lit rim on top, dark lip along the bottom. */

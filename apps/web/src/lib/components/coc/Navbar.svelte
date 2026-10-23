@@ -89,7 +89,7 @@
         )}
         aria-hidden="true"
     >
-        <div class="size-full torn-bottom coc-wood"></div>
+        <div class="plank-bottom size-full coc-wood"></div>
     </div>
 
     <a href="/" class="flex h-12 items-center gap-4">

@@ -55,9 +55,9 @@
 </script>
 
 <footer class="relative mt-24 font-coc">
-    <!-- The board hangs below the page with a torn top edge; the shadow sits on the wrapper because the mask would clip it. -->
+    <!-- The board hangs below the page with a plank top edge; the shadow sits on the wrapper because the mask would clip it. -->
     <div class="board-shadow pointer-events-none absolute inset-x-0 -top-5 bottom-0" aria-hidden="true">
-        <div class="size-full torn-top coc-wood"></div>
+        <div class="plank-top size-full coc-wood"></div>
     </div>
 
     <div class="absolute -top-16 right-4 md:right-12">
