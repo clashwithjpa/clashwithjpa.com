@@ -5,13 +5,13 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
     import PageHeader from "$lib/components/ui/PageHeader.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import type { Role } from "$lib/config/roles";
     import { toast } from "$lib/toast";
     import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
@@ -255,7 +255,7 @@
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex min-w-0 items-start gap-3">
                                 {#if p.townHall}
-                                    <Icon name="th/{p.townHall}" class="size-12 shrink-0" />
+                                    <TownHall level={p.townHall} class="size-12 shrink-0" />
                                 {/if}
                                 <div class="min-w-0 flex-1">
                                     <span class="block truncate text-lg font-bold text-stone-50">{p.name}</span>

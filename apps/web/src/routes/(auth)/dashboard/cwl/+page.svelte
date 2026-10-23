@@ -6,6 +6,7 @@
     import type { Option } from "$lib/components/ui/Select.svelte";
     import Select from "$lib/components/ui/Select.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
+    import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
     import { toast } from "$lib/toast";
     import { errorMessage } from "$lib/utils";
     import { Field } from "@ark-ui/svelte/field";
@@ -65,7 +66,7 @@
                     return {
                         tag: acc.cocAccountTag,
                         name: playerData.data.player.name,
-                        icon: `th/${playerData.data.player.townHallLevel}`,
+                        icon: townHallUrl(playerData.data.player.townHallLevel),
                         warWeight: acc.warWeight,
                         clanTag: playerData.data.player.clan?.tag,
                         isExternal: acc.isExternal,

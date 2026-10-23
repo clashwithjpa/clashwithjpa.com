@@ -24,18 +24,16 @@
     type Mode = "townhalls" | "roster";
     let mode = $state<Mode>("townhalls");
 
-    const modes: { id: Mode; label: string; icon: string; gradient: [string, string, string]; hint: string }[] = [
+    const modes: { id: Mode; label: string; gradient: [string, string, string]; hint: string }[] = [
         {
             id: "townhalls",
             label: "Town Halls",
-            icon: "th/16",
             gradient: ["#ffdc9f", "#ffa92b", "#a94908"],
             hint: "Roster strength across every JPA clan",
         },
         {
             id: "roster",
             label: "Roster Fill",
-            icon: "trophy",
             gradient: ["#d3ebb7", "#85c03f", "#366c1b"],
             hint: "Seats filled out of 50 per clan",
         },

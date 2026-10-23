@@ -164,6 +164,12 @@
                     target="_blank"
                     rel="noopener noreferrer"
                     class="underline underline-offset-2 transition-colors duration-200 hover:text-white">Supercell's Fan Content Policy</a
+                >. Town Hall images by
+                <a
+                    href="https://github.com/ClashKingInc/ClashKingAssets"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="underline underline-offset-2 transition-colors duration-200 hover:text-white">ClashKing</a
                 >.
             </span>
         </div>

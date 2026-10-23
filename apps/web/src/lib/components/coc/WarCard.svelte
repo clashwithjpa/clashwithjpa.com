@@ -14,6 +14,7 @@
     import CocMeter from "$lib/components/ui/coc/CocMeter.svelte";
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import { cn } from "$lib/utils";
     import FwaPointsPanel from "./FwaPointsPanel.svelte";
 
@@ -153,7 +154,7 @@
             <div class="flex flex-wrap gap-1.5">
                 {#each lineup as [th, count] (th)}
                     <span class="flex items-center gap-1.5 rounded-lg py-1 pr-2.5 pl-1.5 coc-slot" title="{count} at town hall {th}">
-                        <Icon name="th/{th}" class="size-6" />
+                        <TownHall level={th} class="size-6" />
                         <span class="font-coc text-sm font-bold text-white text-outline">TH{th}</span>
                         <span class="font-coc text-xs text-parchment/80">×{count}</span>
                     </span>

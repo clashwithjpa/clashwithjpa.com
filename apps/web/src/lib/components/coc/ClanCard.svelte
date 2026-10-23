@@ -3,6 +3,7 @@
     import CocMeter from "$lib/components/ui/coc/CocMeter.svelte";
     import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import { cn } from "$lib/utils";
     import type { GetCOCClan200, GetJPAClanRequirements200 } from "@repo/clashofclans-client";
 
@@ -85,7 +86,7 @@
         <div class="col-span-2 row-start-2 flex flex-wrap content-end gap-1.5 sm:col-span-1">
             {#if clan.requiredTownhallLevel}
                 <span class="flex items-center gap-1.5 rounded-lg py-1 pr-2.5 pl-1.5 coc-slot" title="Minimum town hall">
-                    <Icon name="th/{clan.requiredTownhallLevel}" class="size-6" />
+                    <TownHall level={clan.requiredTownhallLevel} class="size-6" />
                     <span class="font-coc text-sm font-bold text-white text-outline">TH{clan.requiredTownhallLevel}+</span>
                 </span>
             {/if}

@@ -40,11 +40,11 @@
     import Badge from "./ui/Badge.svelte";
     import Button from "./ui/Button.svelte";
     import ConfirmationDialog from "./ui/ConfirmationDialog.svelte";
-    import Icon from "./ui/Icon.svelte";
     import RoleBadge from "./ui/RoleBadge.svelte";
     import Tabs from "./ui/Tabs.svelte";
     import Toggle from "./ui/Toggle.svelte";
     import Tooltip from "./ui/Tooltip.svelte";
+    import TownHall from "./ui/TownHall.svelte";
 
     interface Props {
         user: UserWithRole & { discordId?: string };
@@ -488,7 +488,7 @@
                                             <div class="flex min-w-0 items-center gap-2">
                                                 {#if acc.success}
                                                     <Tooltip title="Town Hall {acc.data.player.townHallLevel}" placement="top">
-                                                        <Icon name="th/{acc.data.player.townHallLevel}" class="size-10 shrink-0" />
+                                                        <TownHall level={acc.data.player.townHallLevel} class="size-10 shrink-0" />
                                                     </Tooltip>
                                                 {:else}
                                                     <div

@@ -20,6 +20,7 @@
     import { Sidebar } from "$lib/components/ui/sidebar";
     import DataTable from "$lib/components/ui/table/DataTable.svelte";
     import type { TableColumn } from "$lib/components/ui/table/features";
+    import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
     import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "$lib/discordNicknames";
     import { toast } from "$lib/toast";
@@ -279,7 +280,7 @@
                                 cocAccountTag: acc.cocAccountTag,
                                 isExternal: acc.isExternal,
                                 name: playerData.data.player.name,
-                                icon: `th/${playerData.data.player.townHallLevel}`,
+                                icon: townHallUrl(playerData.data.player.townHallLevel),
                             };
                         } catch {
                             return { cocAccountTag: acc.cocAccountTag, isExternal: acc.isExternal };

@@ -1,8 +1,8 @@
 <script lang="ts">
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import TablerCircleCheck from "~icons/tabler/circle-check";
     import TablerEye from "~icons/tabler/eye";
     import TablerWorld from "~icons/tabler/world";
@@ -21,7 +21,7 @@
 <div class="flex w-full items-center gap-2">
     {#if account.townHall}
         <Tooltip title={`Town Hall ${account.townHall}`} placement="top">
-            <Icon name="th/{account.townHall}" class="size-10 shrink-0" />
+            <TownHall level={account.townHall} class="size-10 shrink-0" />
         </Tooltip>
     {/if}
     <div class="flex min-w-0 flex-1 flex-col justify-center">

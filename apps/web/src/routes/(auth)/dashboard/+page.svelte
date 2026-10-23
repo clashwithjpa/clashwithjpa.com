@@ -6,10 +6,10 @@
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import type { Role } from "$lib/config/roles";
     import { jobs } from "$lib/jobs.svelte";
     import { toast } from "$lib/toast";
@@ -276,7 +276,7 @@
                                         <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
                                                 <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
-                                                    <Icon name="th/{acc.data.player.townHallLevel}" class="size-16 shrink-0" />
+                                                    <TownHall level={acc.data.player.townHallLevel} class="size-16 shrink-0" />
                                                 </Tooltip>
                                                 <div class="w-full min-w-0">
                                                     <Tooltip title={acc.data.player.name} placement="top" class="w-full text-left">

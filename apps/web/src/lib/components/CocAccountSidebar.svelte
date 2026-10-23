@@ -3,10 +3,10 @@
     import Avatar from "$lib/components/ui/Avatar.svelte";
     import Badge from "$lib/components/ui/Badge.svelte";
     import Button from "$lib/components/ui/Button.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
     import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
     import Tabs from "$lib/components/ui/Tabs.svelte";
     import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import TownHall from "$lib/components/ui/TownHall.svelte";
     import type { Role } from "$lib/config/roles";
     import { toast } from "$lib/toast";
     import { num, str } from "$lib/utils";
@@ -152,7 +152,7 @@
         <div class="mb-4 flex items-center gap-4">
             {#if townHall}
                 <Tooltip title="Town Hall {townHall}" placement="bottom">
-                    <Icon name="th/{townHall}" class="size-14 shrink-0" />
+                    <TownHall level={townHall} class="size-14 shrink-0" />
                 </Tooltip>
             {:else if playerLoading}
                 <div class="size-14 shrink-0 animate-pulse rounded-lg bg-stone-800"></div>
