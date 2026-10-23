@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import ClanCard from "$lib/components/coc/ClanCard.svelte";
     import CocBand from "$lib/components/ui/coc/CocBand.svelte";
@@ -8,7 +9,6 @@
     import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { LINKS } from "$lib/utils/links";
     import { getCOCClan, type GetCOCClan200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import TablerSearch from "~icons/tabler/search";
@@ -60,8 +60,8 @@
 
 <Seo
     title="Clans"
-    description="Explore our family of Farm War Alliance clans. Join our community and participate in strategic clan wars."
-    buttons={[{ label: "Join Discord", url: LINKS.discord!, emoji: "💬" }]}
+    description="Every JPA clan in one place: level, trophies, open spots and the town hall, attack and donation minimums each one asks for. Pick the clan that fits and apply."
+    buttons={[{ label: "Browse the clans", url: `${page.url.origin}/clans`, emoji: "🛡️" }]}
 />
 
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">

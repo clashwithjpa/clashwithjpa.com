@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import CocBand from "$lib/components/ui/coc/CocBand.svelte";
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
@@ -17,7 +18,8 @@
 
 <Seo
     title="Rules"
-    description="Discover the official rules and guidelines for JPA FWA Clans. Learn about member conduct, war rules, and more to ensure a positive gaming experience."
+    description="The rulebook for every JPA clan: member conduct, FWA war rules, war strategy, the strike system, Clan Capital raids and Clan War League. Read it before you apply."
+    buttons={[{ label: "Read the rules", url: `${page.url.origin}/rules`, emoji: "📜" }]}
 />
 
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">

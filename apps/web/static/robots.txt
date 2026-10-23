@@ -1,3 +1,8 @@
-# allow crawling everything by default
+# Public pages are open to everyone. Signed-in areas render client-side only and aren't meant for search.
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth/
+
+Sitemap: https://clashwithjpa.com/sitemap.xml

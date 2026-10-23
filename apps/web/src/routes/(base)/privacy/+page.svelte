@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import CocBand from "$lib/components/ui/coc/CocBand.svelte";
     import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
     import CocCard from "$lib/components/ui/coc/CocCard.svelte";
@@ -15,8 +16,10 @@
 </script>
 
 <Seo
-    title="Privacy"
-    description="How JPA collects, uses and protects the personal data of members who sign in to clashwithjpa.com, and the rights you have over it."
+    title="Privacy Policy"
+    description="How JPA collects, uses and protects the personal data of members who sign in to clashwithjpa.com with Discord, and the rights you have over that data."
+    extraButtons={false}
+    buttons={[{ label: "Read the policy", url: `${page.url.origin}/privacy`, emoji: "🔒" }]}
 />
 
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">

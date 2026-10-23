@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from "$app/state";
     import { PUBLIC_SERVER_URL } from "$env/static/public";
     import WarCard, { parseCoCDate, type WarEntry } from "$lib/components/coc/WarCard.svelte";
     import CocBand from "$lib/components/ui/coc/CocBand.svelte";
@@ -6,7 +7,6 @@
     import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Seo from "$lib/components/ui/Seo.svelte";
-    import { LINKS } from "$lib/utils/links";
     import { getCOCClan, getCOCClanCurrentWar } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import type { PageProps } from "./$types";
@@ -83,9 +83,9 @@
 </script>
 
 <Seo
-    title="Wars"
-    description="Track all active clan wars across the JPA family. Real-time war stats, attack progress, and battle day countdowns."
-    buttons={[{ label: "Join Discord", url: LINKS.discord!, emoji: "💬" }]}
+    title="War Details"
+    description="Follow every JPA war as it happens: scores, destruction, attacks left and battle day countdowns, plus each clan's FWA point balance and win calculator."
+    buttons={[{ label: "See live wars", url: `${page.url.origin}/wars`, emoji: "⚔️" }]}
 />
 
 <div class="-mx-2 p-0! md:-mx-4 lg:-mx-8">
