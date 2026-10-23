@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.4.0] - 2026-10-23
+
+### Features
+
+- **web:** Swap torn edges for wooden planks ([4a06c54](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/4a06c5452598110242f29f324c74b801f4fd558d))
+- **web:** Load town hall images from ClashKing ([b103f99](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/b103f996f7eea83c589dac5b66b9d636a450470b))
+- **web:** Show admin clans as a table ([3874de1](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/3874de1dbfefa01e7fc96ba99536cd4b4007f757))
+- **web:** Slide the tab underline in admin sidebars ([8361ea5](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/8361ea5a9ebf696a3ed69a99d1ef2b4a9015d6ce))
+- **web:** Use an overlay scrollbar on admin pages ([bd6759f](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/bd6759fcc2c92b81b7199687c62dcadd1da4ee3f))
+
+### Bug Fixes
+
+- **web:** Clean up the clans search input ([f5e7f98](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/f5e7f98ba5c5fb9626121e47597be897e03bf8c4))
+- **web:** Stop clipping input focus rings in sidebars ([0927bd4](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/0927bd422af9b1663c69c5865f27011b3202a9cc))
 ## [2.3.1] - 2026-10-23
 
 ### Documentation
