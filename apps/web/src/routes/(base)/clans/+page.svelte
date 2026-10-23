@@ -75,7 +75,7 @@
     <section class="mx-auto max-w-7xl px-4 pt-16 pb-24 md:px-6 md:pt-20 lg:px-8">
         <CocPanel label="Clan search">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center">
-                <CocInput type="search" label="Search clans" placeholder="Search by name or tag" bind:value={query} class="flex-1">
+                <CocInput type="search" label="Search clans" placeholder="Search by name or tag" bind:value={query} class="md:flex-1">
                     {#snippet icon()}
                         <TablerSearch class="size-5" />
                     {/snippet}
