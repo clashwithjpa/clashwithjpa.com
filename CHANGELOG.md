@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.0] - 2026-10-23
+
+### Features
+
+- **web:** Improve SEO and the Discord link card ([192d123](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/192d123cd224408edee5cae0cb5f5edd4708e5a4))
+- **web:** Use the cosmic curse key art for the hero ([d65bb48](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/d65bb487e2f7459ad2f641f6dba024bad22cda68))
+- **web:** Rebuild the navbar, footer and page scrollbar ([4128324](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/4128324804ac8f312c22ac57f325cb4e880a880a))
+- **web:** Move rules and privacy to the CoC theme ([e03db6c](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/e03db6c5e558568ea30e677e2b70198d37c0460c))
+- **web:** Redesign the war details page ([92e9d90](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/92e9d901770563793c1659acb7be989d6124aaab))
+- **web:** Redesign the clans page ([0324fb2](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/0324fb2c6aa923e36b105d797427c3b4ca0363ba))
+- **web:** Sign in with Discord in a popup ([90dd8cb](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/90dd8cb01bdd2944356c7654e09a805d33d4fb73))
+- **web:** Restyle CoC components for the wood theme ([fbe551d](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/fbe551d08aa6fad43fba489594478d77abb16302))
+- **web:** Add the CoC wood theme styles ([a2ec1a5](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/a2ec1a52348fb3a76675c657601b797642133cb2))
+- **server:** Add a cached FWA points route ([faf9d2f](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/faf9d2fa3c2e75d6bdfb25deadafcca9d5f343aa))
+- **bonus:** Move this season's bonus into a checkbox column ([3cfebcc](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/3cfebcc8c694ab455dc80711da18949b9cedece1))
+- **bonus:** Simplify the CWL bonus table ([05020d1](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/05020d11187ddbd1c18e551b31937c6fd59ced96))
+
+### Bug Fixes
+
+- **web:** Ship the hero art as a full-resolution bg.webp ([bcdb356](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/bcdb356647e9f4170b29513a9c335b28b7da024a))
+- **web:** Drop copy for things the site doesn't have ([5856f29](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/5856f2920a2f19383732949e632ea6743eac8b33))
 ## [2.2.0] - 2026-10-18
 
 ### Features
