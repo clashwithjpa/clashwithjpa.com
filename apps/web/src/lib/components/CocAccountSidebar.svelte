@@ -146,7 +146,7 @@
     </div>
 {/snippet}
 
-<div class="flex size-full flex-col overflow-hidden">
+<div class="flex size-full flex-col">
     <!-- Header -->
     <div>
         <div class="mb-4 flex items-center gap-4">
@@ -216,7 +216,7 @@
         <Tabs label="Sections" options={tabs.map((key) => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }))} bind:value={activeTab} />
     </div>
 
-    <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div class="-mx-1 flex-1 scrollbar-none overflow-y-auto px-1 py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {#if activeTab === "overview"}
             <div class="space-y-4">
                 <!-- Owner -->

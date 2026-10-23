@@ -87,7 +87,7 @@
     {/if}
 {/snippet}
 
-<div class="flex size-full flex-col overflow-hidden">
+<div class="flex size-full flex-col">
     <div class="flex items-center gap-4">
         <div class="flex-1 overflow-hidden">
             <h3 class="truncate text-xl font-medium text-stone-50">{isEditing ? "Edit Clan" : "Add Clan"}</h3>
@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <div class="flex-1 scrollbar-none overflow-y-auto py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div class="-mx-1 flex-1 scrollbar-none overflow-y-auto px-1 py-4 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div class="flex flex-col gap-6">
             <!-- Clan details -->
             <section class="flex flex-col gap-3">
