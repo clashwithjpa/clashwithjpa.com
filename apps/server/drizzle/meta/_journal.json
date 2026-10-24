@@ -239,6 +239,13 @@
             "when": 1792351876601,
             "tag": "0033_drop_guides_table",
             "breakpoints": true
+        },
+        {
+            "idx": 34,
+            "version": "7",
+            "when": 1792817452783,
+            "tag": "0034_clan_war_log",
+            "breakpoints": true
         }
     ]
 }

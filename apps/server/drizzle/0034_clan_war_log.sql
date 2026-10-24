@@ -1,0 +1,30 @@
+CREATE TABLE "clan_war_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"clan_tag" text NOT NULL,
+	"state" text NOT NULL,
+	"result" text,
+	"source" text NOT NULL,
+	"team_size" integer NOT NULL,
+	"attacks_per_member" integer DEFAULT 2 NOT NULL,
+	"battle_modifier" text,
+	"preparation_start_time" timestamp,
+	"start_time" timestamp,
+	"end_time" timestamp NOT NULL,
+	"opponent_tag" text,
+	"opponent_name" text,
+	"opponent_badge" text,
+	"clan_stars" integer DEFAULT 0 NOT NULL,
+	"clan_destruction" real DEFAULT 0 NOT NULL,
+	"clan_attacks" integer DEFAULT 0 NOT NULL,
+	"opponent_stars" integer DEFAULT 0 NOT NULL,
+	"opponent_destruction" real DEFAULT 0 NOT NULL,
+	"opponent_attacks" integer DEFAULT 0 NOT NULL,
+	"data" jsonb,
+	"attack_seen_at" jsonb DEFAULT '{}'::jsonb NOT NULL,
+	"tracked_since" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "clan_war_clan_end_unique" UNIQUE("clan_tag","end_time")
+);
+--> statement-breakpoint
+CREATE INDEX "clan_war_clan_end_idx" ON "clan_war_table" USING btree ("clan_tag","end_time" DESC NULLS LAST);

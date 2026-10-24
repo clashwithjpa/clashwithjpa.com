@@ -203,8 +203,8 @@ export class ClashOfClansAPI {
      * Get current war information.
      * GET /v1/clans/{clanTag}/currentwar
      */
-    async getCurrentWar(clanTag: string): Promise<APIClanWar> {
-        return this.request<APIClanWar>("GET", `/v1/clans/${this.encodeTag(clanTag)}/currentwar`);
+    async getCurrentWar(clanTag: string, options?: { cacheTTL?: number }): Promise<APIClanWar> {
+        return this.request<APIClanWar>("GET", `/v1/clans/${this.encodeTag(clanTag)}/currentwar`, options);
     }
 
     /**

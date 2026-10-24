@@ -7,6 +7,7 @@ import { betterAuthMiddleware } from "@/lib/middlewares";
 import { describeRoute } from "@/lib/openapi";
 import { getCachedSettings } from "@/lib/settings-cache";
 import { ErrorResponseSchema, SuccessResponseSchema, type AppEnv } from "@/lib/types";
+import { startWarTracker } from "@/lib/war-log";
 import { serve } from "@hono/node-server";
 import { auth } from "@lib/auth";
 import { Scalar } from "@scalar/hono-api-reference";
@@ -33,6 +34,7 @@ import coc from "./routes/coc";
 import manage from "./routes/manage";
 import upload from "./routes/upload";
 import user from "./routes/user";
+import warLog from "./routes/war-log";
 
 const client = new RedisClient(config.JPA_REDIS_URL);
 
@@ -211,6 +213,7 @@ app.get(
     },
 );
 
+app.route("/coc/war-log", warLog);
 app.route("/coc", coc);
 app.route("/admin", admin);
 app.route("/analytics", analytics);
@@ -359,5 +362,6 @@ for (const signal of ["SIGTERM", "SIGINT"] as const) {
 }
 
 startCwlPingScheduler();
+startWarTracker();
 
 export default app;

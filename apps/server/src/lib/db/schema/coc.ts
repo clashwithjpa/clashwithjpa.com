@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
+import { boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, real, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
 import { account, apikey } from "./ba-auth";
 
 export const cwlSeasonTable = pgTable("cwl_season_table", {
@@ -206,6 +206,44 @@ export const auditLogTable = pgTable(
         index("audit_log_action_idx").on(t.action, t.createdAt.desc()),
         index("audit_log_source_idx").on(t.source, t.createdAt.desc()),
     ],
+);
+
+// One row per regular war of a family clan, keyed by its end time (the CoC API, its
+// war log and ClashKing all agree on it). `data` is the full war; it is null for
+// wars only known from the public war log summary.
+export const clanWarTable = pgTable(
+    "clan_war_table",
+    {
+        id: serial("id").primaryKey(),
+        clanTag: text("clan_tag").notNull(),
+        state: text("state").notNull(),
+        result: text("result"),
+        source: text("source").notNull(),
+        teamSize: integer("team_size").notNull(),
+        attacksPerMember: integer("attacks_per_member").notNull().default(2),
+        battleModifier: text("battle_modifier"),
+        preparationStartTime: timestamp("preparation_start_time"),
+        startTime: timestamp("start_time"),
+        endTime: timestamp("end_time").notNull(),
+        opponentTag: text("opponent_tag"),
+        opponentName: text("opponent_name"),
+        opponentBadge: text("opponent_badge"),
+        clanStars: integer("clan_stars").notNull().default(0),
+        clanDestruction: real("clan_destruction").notNull().default(0),
+        clanAttacks: integer("clan_attacks").notNull().default(0),
+        opponentStars: integer("opponent_stars").notNull().default(0),
+        opponentDestruction: real("opponent_destruction").notNull().default(0),
+        opponentAttacks: integer("opponent_attacks").notNull().default(0),
+        data: jsonb("data"),
+        // Attack order -> ISO time the tracker first saw it. The CoC API has no attack
+        // timestamps, so this is the only clock the feed has.
+        attackSeenAt: jsonb("attack_seen_at").$type<Record<string, string | null>>().notNull().default({}),
+        // First poll that saw this war. Attacks already on the board then have no seen time.
+        trackedSince: timestamp("tracked_since"),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    },
+    (t) => [unique("clan_war_clan_end_unique").on(t.clanTag, t.endTime), index("clan_war_clan_end_idx").on(t.clanTag, t.endTime.desc())],
 );
 
 export const apiKeyUsageTable = pgTable(
