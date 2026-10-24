@@ -22,6 +22,14 @@
     } = $props();
 
     const RESULT_BG: Record<string, string> = { win: "bg-[#58a221]", lose: "bg-[#c22a1a]", tie: "bg-stone-500" };
+    // Row tints: a wash plus a matching inner edge, laid between the wood and the text.
+    const TINT: Record<string, string> = {
+        win: "bg-[#58a221]/20 shadow-[inset_0_0_0_1px_rgb(88_162_33/0.45)]",
+        lose: "bg-[#c22a1a]/20 shadow-[inset_0_0_0_1px_rgb(194_42_26/0.45)]",
+        tie: "bg-stone-400/10 shadow-[inset_0_0_0_1px_rgb(168_162_158/0.3)]",
+        active: "bg-[#e68e2e]/20 shadow-[inset_0_0_0_1px_rgb(230_142_46/0.5)]",
+    };
+    const tint = (w: WarSummary) => TINT[w.result ?? (isActive(w.state) ? "active" : "")];
     const finished = $derived(wars.filter((w) => w.result));
 </script>
 
@@ -52,11 +60,15 @@
                     aria-busy={loadingId === w.id}
                     title={open ? "Showing in the panel above" : "Open this war in the panel above"}
                     class={cn(
-                        "grid w-full cursor-pointer grid-cols-[3.25rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-coc coc-slot transition-[filter] duration-200 hover:brightness-125",
+                        "relative isolate grid w-full cursor-pointer grid-cols-[3.25rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-coc coc-slot transition-[filter] duration-200 hover:brightness-125",
                         open && "ring-2 ring-[#ffcd6a]",
                         loadingId === w.id && "cursor-wait",
                     )}
                 >
+                    {#if tint(w)}
+                        <!-- Below the text (isolate + -z-10), so the colours keep their contrast. -->
+                        <span class={cn("pointer-events-none absolute inset-0 -z-10 rounded-lg", tint(w))} aria-hidden="true"></span>
+                    {/if}
                     <span class="flex flex-col text-[0.7rem] leading-tight">
                         <span class="text-parchment/60">{formatShortDate(w.endTime)}</span>
                         {#if w.result}
