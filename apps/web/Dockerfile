@@ -1,5 +1,5 @@
 ARG NODE_IMAGE=node:24-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
-ARG NGINX_IMAGE=nginx:1.31-alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2
+ARG CADDY_IMAGE=caddy:2.11-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f
 
 FROM ${NODE_IMAGE} AS base
 ENV PNPM_HOME=/pnpm \
@@ -28,9 +28,13 @@ ARG PUBLIC_SERVER_URL \
     PUBLIC_TURNSTILE_SITE_KEY
 RUN NODE_ENV=production pnpm --filter "web..." run build
 
-FROM ${NGINX_IMAGE} AS runtime
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/apps/web/build /usr/share/nginx/html
+FROM ${CADDY_IMAGE} AS runtime
+# Where the Caddyfile fetches /meta link-preview cards. The public API by default; the
+# full stack points it at the API container instead (docker-compose.yaml).
+ARG PUBLIC_SERVER_URL
+ENV API_UPSTREAM=${PUBLIC_SERVER_URL}
+COPY apps/web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /app/apps/web/build /srv
 EXPOSE 80
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
     CMD ["wget", "-q", "--spider", "http://127.0.0.1/healthz"]

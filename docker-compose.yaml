@@ -54,6 +54,9 @@ services:
     extends:
       file: ./apps/web/docker-compose.yaml
       service: jpa-web
+    # Link-preview cards come straight from the API container, not back in through Cloudflare.
+    environment:
+      API_UPSTREAM: http://jpa-server:3000
     depends_on:
       - jpa-server
     profiles:

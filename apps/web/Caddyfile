@@ -1,0 +1,80 @@
+{
+	admin off
+	# TLS ends at the proxy in front of this container.
+	auto_https off
+}
+
+:80 {
+	root * /srv
+	encode zstd gzip
+	log
+	log_skip /healthz
+	header -Server
+
+	header /_app/immutable/* Cache-Control "public, max-age=31536000, immutable"
+	# Pages (clean paths, served from .html files) revalidate. `?` leaves the API's own
+	# header on /meta cards alone.
+	@pages not path_regexp \.[A-Za-z0-9]+$
+	header @pages ?Cache-Control "no-cache"
+
+	# Link-preview crawlers don't run JavaScript, so on a page that wasn't prerendered the SPA
+	# shell would only give them the generic site card. They get the page's /meta twin instead:
+	# an internal rewrite, so the shared URL never changes.
+	@bot {
+		header_regexp User-Agent (?i)(discordbot|twitterbot|slackbot|telegrambot|whatsapp|facebookexternalhit|linkedinbot|embedly|skypeuripreview|redditbot|mastodon)
+		not path /meta/*
+		not file {path} {path}.html {path}/index.html
+	}
+	rewrite @bot /meta{uri}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	# A missing build chunk has to 404, not come back as the HTML shell.
+	handle /_app/immutable/* {
+		file_server {
+			precompressed br gzip
+		}
+	}
+
+	# /meta/<path> is the link-preview page for <path>, served by the API (routes/meta.ts).
+	handle /meta/* {
+		reverse_proxy {$API_UPSTREAM} {
+			header_up Host {upstream_hostport}
+			# A page without its own card falls back to the shell and its generic card.
+			@fail status 404 5xx
+			handle_response @fail {
+				rewrite * /200.html
+				file_server
+			}
+		}
+	}
+
+	# 200.html is the SPA shell for routes that weren't prerendered.
+	handle {
+		try_files {path} {path}.html {path}/ /200.html
+		file_server {
+			precompressed br gzip
+		}
+	}
+
+	handle_errors {
+		# An API that can't be reached at all still leaves the crawler with the shell. Errors see
+		# the original path rather than /meta, so this matches on the gateway status, which only
+		# the proxy produces here.
+		@proxy_down expression `{err.status_code} in [502, 503, 504]`
+		handle @proxy_down {
+			rewrite * /200.html
+			file_server {
+				status 200
+			}
+		}
+		# Headers set for the request carry over to its error. A 404 must not be cached as immutable.
+		handle {
+			header -Server
+			header -Cache-Control
+			respond "{err.status_code} {err.status_text}" {err.status_code}
+		}
+	}
+}
