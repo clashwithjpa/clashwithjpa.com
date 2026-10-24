@@ -17,6 +17,7 @@
     import TownHall from "$lib/components/ui/TownHall.svelte";
     import { cn } from "$lib/utils";
     import FwaPointsPanel from "./FwaPointsPanel.svelte";
+    import { warLogHref } from "./war-log/warLog";
 
     let { entry, now, class: className = "" }: { entry: WarEntry; now: number; class?: string } = $props();
 
@@ -168,7 +169,7 @@
         </div>
     {/if}
 
-    <div class="mt-auto grid grid-cols-2 gap-2">
+    <div class="mt-auto grid grid-cols-3 gap-2">
         <CocBtn
             variant="orange"
             size="sm"
@@ -178,6 +179,7 @@
         >
             Clan
         </CocBtn>
+        <CocBtn variant="green" size="sm" class="w-full" href={warLogHref(entry.tag)}>War Log</CocBtn>
         <CocPopup
             title="War Points"
             placement="right"
