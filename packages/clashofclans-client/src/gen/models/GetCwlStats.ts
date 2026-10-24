@@ -84,6 +84,10 @@ export type GetCwlStats200 = {
                  * @type number
                  */
                 defenderPosition: number;
+                /**
+                 * @type number,null
+                 */
+                firstOpenPosition: number | null;
             }[];
         }[];
         /**

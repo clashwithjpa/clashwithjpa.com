@@ -11,6 +11,7 @@
         defenderName: string;
         defenderTh: number;
         defenderPosition: number;
+        firstOpenPosition: number | null;
     };
 
     let {
@@ -53,7 +54,9 @@
                             <TablerArrowRight class="size-3 shrink-0 text-stone-400" />
                             #{d.defenderPosition}
                             {#if stealRounds.includes(d.round)}
-                                <span class="ml-1 rounded border border-orange-700/50 bg-orange-900 px-1 text-[10px] text-orange-200">star steal</span
+                                <span
+                                    class="ml-1 rounded border border-orange-700/50 bg-orange-900 px-1 text-[10px] text-orange-200"
+                                    title="#{d.firstOpenPosition} was still untouched">star steal</span
                                 >
                             {/if}
                         </span>

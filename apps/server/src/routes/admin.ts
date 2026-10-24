@@ -1038,6 +1038,7 @@ const cwlAttackDetailSchema = z4.object({
     defenderName: z4.string(),
     defenderTh: z4.number(),
     defenderPosition: z4.number(),
+    firstOpenPosition: z4.number().nullable(),
 });
 const getCwlStatsQuerySchema = z4.object({ seasonId: z4.coerce.number().int().optional() });
 const getCwlStatsResponse = z4.object({

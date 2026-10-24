@@ -95,13 +95,20 @@
         return n >= B2B_MIN ? n : 0;
     }
 
-    // Star steal: a hit on a base 3+ map places lower once the attacker already has 8★ this CWL.
+    // Star steal: once the attacker already has 8★ this CWL, a hit on a base more than STEAL_REACH
+    // places below them while some base at #1..position+STEAL_REACH was still untouched. If everything
+    // in reach was already taken, they were cleaning up, not farming.
+    const STEAL_REACH = 2;
+    function isStarSteal(d: CwlStat["details"][number], starsBefore: number) {
+        const reach = d.position + STEAL_REACH;
+        return starsBefore >= 8 && d.defenderPosition > reach && d.firstOpenPosition != null && d.firstOpenPosition <= reach;
+    }
     function starStealRounds(details: CwlStat["details"]) {
-        let stars = 0;
+        let starsBefore = 0;
         const rounds: number[] = [];
         for (const d of [...details].sort((a, b) => a.round - b.round)) {
-            if (stars >= 8 && d.defenderPosition - d.position >= 3) rounds.push(d.round);
-            stars += d.stars;
+            if (isStarSteal(d, starsBefore)) rounds.push(d.round);
+            starsBefore += d.stars;
         }
         return rounds;
     }
@@ -344,7 +351,7 @@
 
     // Fetched CWL stats are slow to get, so they're kept per season for the rest of
     // the tab's session and come back after navigating away or reloading.
-    const CWL_CACHE_KEY = "jpa:bonus-cwl-stats:v2";
+    const CWL_CACHE_KEY = "jpa:bonus-cwl-stats:v3";
     // Live fetches are slow and hit the CoC API, so a recent fetch is reused instead of refetched on every visit.
     const CWL_STALE_MS = 10 * 60 * 1000;
     type CwlCache = Record<string, { fetchedAt: number; stats: CwlStat[]; clans: CwlClanRecord[] }>;

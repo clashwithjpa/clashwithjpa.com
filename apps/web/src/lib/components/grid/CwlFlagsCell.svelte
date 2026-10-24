@@ -42,7 +42,7 @@
             zeroStars > 0 && { content: `0★ ×${zeroStars}`, title: "Attacks that got no stars", icon: TablerStarOff, variant: "red" },
             starSteals > 0 && {
                 content: `Star steal ×${starSteals}`,
-                title: "Hit a base 3+ places lower after already having 8★",
+                title: "With 8★ already, hit a base 3+ places lower while a base in reach was still untouched",
                 icon: TablerStarHalf,
                 variant: "orange",
             },

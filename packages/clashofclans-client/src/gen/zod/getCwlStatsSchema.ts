@@ -34,6 +34,7 @@ export const getCwlStats200Schema = z.object({
                         defenderName: z.string(),
                         defenderTh: z.number(),
                         defenderPosition: z.number(),
+                        firstOpenPosition: z.nullable(z.number()),
                     }),
                 ),
             }),

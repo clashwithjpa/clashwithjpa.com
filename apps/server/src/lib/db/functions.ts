@@ -528,7 +528,16 @@ export type CwlAttackDetail = {
     defenderName: string;
     defenderTh: number;
     defenderPosition: number;
+    // Highest-ranked enemy base our side hadn't attacked yet when this hit landed; null once every base was hit.
+    firstOpenPosition: number | null;
 };
+
+// CWL wars report mapPosition with gaps (a 30v30 can run past #40), so positions are
+// re-ranked to the 1..N order shown on the in-game war map before being compared.
+function mapRanks(members: { tag: string; mapPosition: number }[]) {
+    const sorted = [...members].sort((a, b) => a.mapPosition - b.mapPosition);
+    return new Map(sorted.map((m, i) => [m.tag.toUpperCase(), i + 1]));
+}
 
 // Live-fetches the current CWL for the season's assigned clans and tallies, per
 // player, how many of their (up to 7) attacks they used and the stars earned, plus
@@ -593,6 +602,14 @@ export async function getCwlStats(seasonId?: number) {
                         const side = isClan ? war.clan : war.opponent;
                         const enemy = isClan ? war.opponent : war.clan;
                         const enemyByTag = new Map(enemy.members.map((m) => [m.tag.toUpperCase(), m]));
+                        const sideRank = mapRanks(side.members);
+                        const enemyRank = mapRanks(enemy.members);
+                        const sideAttacks = side.members.flatMap((m) => m.attacks ?? []);
+                        const firstOpenBefore = (order: number) => {
+                            const hit = new Set(sideAttacks.filter((a) => a.order < order).map((a) => enemyRank.get(a.defenderTag.toUpperCase())));
+                            for (let rank = 1; rank <= enemy.members.length; rank++) if (!hit.has(rank)) return rank;
+                            return null;
+                        };
                         const ended = war.state === "warEnded";
                         if (ended) {
                             record.endedRounds.push(roundIdx + 1);
@@ -613,10 +630,11 @@ export async function getCwlStats(seasonId?: number) {
                                     round: roundIdx + 1,
                                     stars: atk.stars,
                                     destruction: atk.destructionPercentage,
-                                    position: m.mapPosition,
+                                    position: sideRank.get(m.tag.toUpperCase()) ?? 0,
                                     defenderName: def?.name ?? atk.defenderTag,
                                     defenderTh: def?.townhallLevel ?? 0,
-                                    defenderPosition: def?.mapPosition ?? 0,
+                                    defenderPosition: enemyRank.get(atk.defenderTag.toUpperCase()) ?? 0,
+                                    firstOpenPosition: firstOpenBefore(atk.order),
                                 });
                             }
                         }
