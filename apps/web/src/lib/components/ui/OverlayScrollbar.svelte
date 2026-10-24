@@ -5,9 +5,11 @@
         viewport: HTMLElement | null | undefined;
         /** Pixels at the top of the viewport the vertical track skips, e.g. a sticky table header. */
         insetTop?: number;
+        /** `coc` matches the public pages' PageScrollbar thumb. */
+        tone?: "stone" | "coc";
     }
 
-    let { viewport, insetTop = 0 }: Props = $props();
+    let { viewport, insetTop = 0, tone = "stone" }: Props = $props();
 
     type Axis = "x" | "y";
     const AXES: Axis[] = ["y", "x"];
@@ -135,9 +137,10 @@
 
     const thumbClass = (axis: Axis) =>
         cn(
-            "pointer-events-auto absolute cursor-grab rounded-full bg-stone-600/60 transition-[opacity,width,height,background-color] duration-300 hover:bg-stone-500/80",
+            "pointer-events-auto absolute cursor-grab rounded-full transition-[opacity,width,height,background-color] duration-300",
+            tone === "coc" ? "border border-black/50 bg-parchment/40 hover:bg-parchment/60" : "bg-stone-600/60 hover:bg-stone-500/80",
             axis === "y" ? "right-0.5 w-1.5 hover:w-2.5" : "bottom-0.5 h-1.5 hover:h-2.5",
-            dragging === axis && cn("cursor-grabbing bg-stone-400/80", axis === "y" ? "w-2.5" : "h-2.5"),
+            dragging === axis && cn("cursor-grabbing", tone === "coc" ? "bg-parchment/70" : "bg-stone-400/80", axis === "y" ? "w-2.5" : "h-2.5"),
             !visible(axis) && "pointer-events-none opacity-0",
         );
 </script>
