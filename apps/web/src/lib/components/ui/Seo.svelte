@@ -57,14 +57,13 @@
         return unique.slice(0, 5).map((b) => linkButton(b.label, b.url, b.emoji));
     });
 
-    // Discord's Components v2 link card: key art banner, a labelled linked title, the description, buttons and the domain. No separators.
+    // Discord's Components v2 link card: key art banner, the linked title, the description and buttons. No separators.
     let card = $derived.by((): Container =>
         container(
             [
                 mediaGallery([{ media: { url: absoluteImage }, description: imageAlt }]),
-                textDisplay(`-# CLASH WITH JPA · FWA CLANS\n## [${title || SITE}](${canonical})\n${description}`),
+                textDisplay(`## [${title || SITE}](${canonical})\n${description}`),
                 ...(cardButtons.length ? [actionRow(cardButtons)] : []),
-                textDisplay(`-# ${page.url.host}`),
             ],
             hexToAccentColor(ACCENT),
         ),
