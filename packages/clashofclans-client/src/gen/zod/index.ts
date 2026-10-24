@@ -398,6 +398,35 @@ export {
 } from "./getUserFeaturesSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./getUserSchema.ts";
 export {
+    getWarLogClans200Schema,
+    getWarLogClans404Schema,
+    getWarLogClans500Schema,
+    getWarLogClansQueryResponseSchema,
+} from "./getWarLogClansSchema.ts";
+export {
+    getWarLogPlayers200Schema,
+    getWarLogPlayers404Schema,
+    getWarLogPlayers500Schema,
+    getWarLogPlayersPathParamsSchema,
+    getWarLogPlayersQueryParamsSchema,
+    getWarLogPlayersQueryResponseSchema,
+} from "./getWarLogPlayersSchema.ts";
+export {
+    getWarLogWar200Schema,
+    getWarLogWar404Schema,
+    getWarLogWar500Schema,
+    getWarLogWarPathParamsSchema,
+    getWarLogWarQueryResponseSchema,
+} from "./getWarLogWarSchema.ts";
+export {
+    getWarLogWars200Schema,
+    getWarLogWars404Schema,
+    getWarLogWars500Schema,
+    getWarLogWarsPathParamsSchema,
+    getWarLogWarsQueryParamsSchema,
+    getWarLogWarsQueryResponseSchema,
+} from "./getWarLogWarsSchema.ts";
+export {
     importUserAccounts200Schema,
     importUserAccounts401Schema,
     importUserAccounts500Schema,

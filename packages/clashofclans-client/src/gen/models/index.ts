@@ -495,6 +495,34 @@ export type {
     GetUserFeaturesQuery,
     GetUserFeaturesQueryResponse,
 } from "./GetUserFeatures.ts";
+export type { GetWarLogClans200, GetWarLogClans404, GetWarLogClans500, GetWarLogClansQuery, GetWarLogClansQueryResponse } from "./GetWarLogClans.ts";
+export type {
+    GetWarLogPlayers200,
+    GetWarLogPlayers404,
+    GetWarLogPlayers500,
+    GetWarLogPlayersPathParams,
+    GetWarLogPlayersQuery,
+    GetWarLogPlayersQueryParams,
+    GetWarLogPlayersQueryResponse,
+} from "./GetWarLogPlayers.ts";
+export type {
+    AttacksSideEnumKey,
+    GetWarLogWar200,
+    GetWarLogWar404,
+    GetWarLogWar500,
+    GetWarLogWarPathParams,
+    GetWarLogWarQuery,
+    GetWarLogWarQueryResponse,
+} from "./GetWarLogWar.ts";
+export type {
+    GetWarLogWars200,
+    GetWarLogWars404,
+    GetWarLogWars500,
+    GetWarLogWarsPathParams,
+    GetWarLogWarsQuery,
+    GetWarLogWarsQueryParams,
+    GetWarLogWarsQueryResponse,
+} from "./GetWarLogWars.ts";
 export type {
     ImportUserAccounts200,
     ImportUserAccounts401,
@@ -717,6 +745,7 @@ export { historyResultEnum } from "./GetFWAClanPoints.ts";
 export { matchupWinnerEnum } from "./GetFWAClanPoints.ts";
 export { applicationsStatusEnum } from "./GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./GetJoinApplications.ts";
+export { attacksSideEnum } from "./GetWarLogWar.ts";
 export { verifyTokenStatusEnum } from "./PostCOCPlayerVerify.ts";
 export { applicationStatusEnum } from "./UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./UpdateJoinApplicationStatus.ts";

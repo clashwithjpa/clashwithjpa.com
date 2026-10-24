@@ -62,6 +62,10 @@ export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
 export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCocAccountsByUserId.ts";
 export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
 export type { GetUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
+export type { GetWarLogClansQueryKey } from "./hooks/createGetWarLogClans.ts";
+export type { GetWarLogPlayersQueryKey } from "./hooks/createGetWarLogPlayers.ts";
+export type { GetWarLogWarQueryKey } from "./hooks/createGetWarLogWar.ts";
+export type { GetWarLogWarsQueryKey } from "./hooks/createGetWarLogWars.ts";
 export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
 export type { PreviewCwlPingQueryKey } from "./hooks/createPreviewCwlPing.ts";
@@ -589,6 +593,40 @@ export type {
     GetUserFeaturesQueryResponse,
 } from "./models/GetUserFeatures.ts";
 export type {
+    GetWarLogClans200,
+    GetWarLogClans404,
+    GetWarLogClans500,
+    GetWarLogClansQuery,
+    GetWarLogClansQueryResponse,
+} from "./models/GetWarLogClans.ts";
+export type {
+    GetWarLogPlayers200,
+    GetWarLogPlayers404,
+    GetWarLogPlayers500,
+    GetWarLogPlayersPathParams,
+    GetWarLogPlayersQuery,
+    GetWarLogPlayersQueryParams,
+    GetWarLogPlayersQueryResponse,
+} from "./models/GetWarLogPlayers.ts";
+export type {
+    AttacksSideEnumKey,
+    GetWarLogWar200,
+    GetWarLogWar404,
+    GetWarLogWar500,
+    GetWarLogWarPathParams,
+    GetWarLogWarQuery,
+    GetWarLogWarQueryResponse,
+} from "./models/GetWarLogWar.ts";
+export type {
+    GetWarLogWars200,
+    GetWarLogWars404,
+    GetWarLogWars500,
+    GetWarLogWarsPathParams,
+    GetWarLogWarsQuery,
+    GetWarLogWarsQueryParams,
+    GetWarLogWarsQueryResponse,
+} from "./models/GetWarLogWars.ts";
+export type {
     ImportUserAccounts200,
     ImportUserAccounts401,
     ImportUserAccounts500,
@@ -842,6 +880,10 @@ export { getUserAccounts } from "./clients/getUserAccounts.ts";
 export { getUserCocAccountsByUserId } from "./clients/getUserCocAccountsByUserId.ts";
 export { getUserCwlApplications } from "./clients/getUserCwlApplications.ts";
 export { getUserFeatures } from "./clients/getUserFeatures.ts";
+export { getWarLogClans } from "./clients/getWarLogClans.ts";
+export { getWarLogPlayers } from "./clients/getWarLogPlayers.ts";
+export { getWarLogWar } from "./clients/getWarLogWar.ts";
+export { getWarLogWars } from "./clients/getWarLogWars.ts";
 export { importUserAccounts } from "./clients/importUserAccounts.ts";
 export { postCOCPlayerVerify } from "./clients/postCOCPlayerVerify.ts";
 export { previewCwlPing } from "./clients/previewCwlPing.ts";
@@ -1039,6 +1081,18 @@ export { getUserCwlApplicationsQueryOptions } from "./hooks/createGetUserCwlAppl
 export { createGetUserFeatures } from "./hooks/createGetUserFeatures.ts";
 export { getUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
 export { getUserFeaturesQueryOptions } from "./hooks/createGetUserFeatures.ts";
+export { createGetWarLogClans } from "./hooks/createGetWarLogClans.ts";
+export { getWarLogClansQueryKey } from "./hooks/createGetWarLogClans.ts";
+export { getWarLogClansQueryOptions } from "./hooks/createGetWarLogClans.ts";
+export { createGetWarLogPlayers } from "./hooks/createGetWarLogPlayers.ts";
+export { getWarLogPlayersQueryKey } from "./hooks/createGetWarLogPlayers.ts";
+export { getWarLogPlayersQueryOptions } from "./hooks/createGetWarLogPlayers.ts";
+export { createGetWarLogWar } from "./hooks/createGetWarLogWar.ts";
+export { getWarLogWarQueryKey } from "./hooks/createGetWarLogWar.ts";
+export { getWarLogWarQueryOptions } from "./hooks/createGetWarLogWar.ts";
+export { createGetWarLogWars } from "./hooks/createGetWarLogWars.ts";
+export { getWarLogWarsQueryKey } from "./hooks/createGetWarLogWars.ts";
+export { getWarLogWarsQueryOptions } from "./hooks/createGetWarLogWars.ts";
 export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
 export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
 export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
@@ -1118,6 +1172,7 @@ export { historyResultEnum } from "./models/GetFWAClanPoints.ts";
 export { matchupWinnerEnum } from "./models/GetFWAClanPoints.ts";
 export { applicationsStatusEnum } from "./models/GetJoinApplications.ts";
 export { getJoinApplicationsQueryParamsStatusEnum } from "./models/GetJoinApplications.ts";
+export { attacksSideEnum } from "./models/GetWarLogWar.ts";
 export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
 export { applicationStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
 export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
@@ -1540,6 +1595,35 @@ export {
     getUserFeaturesQueryResponseSchema,
 } from "./zod/getUserFeaturesSchema.ts";
 export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./zod/getUserSchema.ts";
+export {
+    getWarLogClans200Schema,
+    getWarLogClans404Schema,
+    getWarLogClans500Schema,
+    getWarLogClansQueryResponseSchema,
+} from "./zod/getWarLogClansSchema.ts";
+export {
+    getWarLogPlayers200Schema,
+    getWarLogPlayers404Schema,
+    getWarLogPlayers500Schema,
+    getWarLogPlayersPathParamsSchema,
+    getWarLogPlayersQueryParamsSchema,
+    getWarLogPlayersQueryResponseSchema,
+} from "./zod/getWarLogPlayersSchema.ts";
+export {
+    getWarLogWar200Schema,
+    getWarLogWar404Schema,
+    getWarLogWar500Schema,
+    getWarLogWarPathParamsSchema,
+    getWarLogWarQueryResponseSchema,
+} from "./zod/getWarLogWarSchema.ts";
+export {
+    getWarLogWars200Schema,
+    getWarLogWars404Schema,
+    getWarLogWars500Schema,
+    getWarLogWarsPathParamsSchema,
+    getWarLogWarsQueryParamsSchema,
+    getWarLogWarsQueryResponseSchema,
+} from "./zod/getWarLogWarsSchema.ts";
 export {
     importUserAccounts200Schema,
     importUserAccounts401Schema,
