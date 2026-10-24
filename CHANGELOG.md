@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.5.1] - 2026-10-24
+
+### Bug Fixes
+
+- **server:** Show the latest war card for an unknown ?war= id ([7bef27d](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/7bef27db0c56772ee6e2f8428b5c91186298fcf2))
 ## [2.5.0] - 2026-10-24
 
 ### Features
