@@ -73,6 +73,8 @@
         "cross-env": "^10.1.0",
         "eslint": "catalog:",
         "prettier": "catalog:",
+        "satori": "^0.63.2",
+        "sharp": "^0.35.5",
         "shiki": "^4.4.3",
         "svelte": "^5.56.8",
         "svelte-check": "^4.7.5",
