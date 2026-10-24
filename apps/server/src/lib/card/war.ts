@@ -144,9 +144,11 @@ function headline(war: WarDetail) {
 /** The link card for a clan's war log, or one of its wars when `warId` is set. */
 export async function buildWarCard(tag: string, warId?: number): Promise<MetaCard> {
     tag = normalizeTag(tag);
-    const [war, history] = await Promise.all([warId ? getWarDetail(tag, warId) : getLatestWarDetail(tag), listClanWars(tag, { limit: 20 })]);
+    const [picked, history] = await Promise.all([warId ? getWarDetail(tag, warId) : null, listClanWars(tag, { limit: 20 })]);
+    // An unknown ?war= gets the latest war's card, the same war the page falls back to.
+    const war = picked ?? (await getLatestWarDetail(tag));
     const site = config.JPA_APP_URL.replace(/\/$/, "");
-    const url = `${site}/wars/log/${slug(tag)}${war && warId ? `?war=${war.id}` : ""}`;
+    const url = `${site}/wars/log/${slug(tag)}${picked ? `?war=${picked.id}` : ""}`;
     // A score-only war has no lineup, so our own name and badge come from the latest war.
     const latest = war && !war.clan.name ? await getLatestWarDetail(tag) : war;
     const clanName = war?.clan.name ?? latest?.clan.name ?? null;
@@ -182,7 +184,7 @@ export async function buildWarCard(tag: string, warId?: number): Promise<MetaCar
 
     // FWA marks who should win each matchup; only the live war's call is published.
     let fwa = "";
-    if (live && !warId) {
+    if (live && !picked) {
         const points = await getFwaPoints(tag).catch(() => null);
         const m = points?.matchup;
         if (m?.winner && normalizeTag(m.opponent.tag) === normalizeTag(war.opponent.tag ?? "")) fwa = m.winner === "clan" ? "Win" : "Lose";
