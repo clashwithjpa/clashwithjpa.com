@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.5.2] - 2026-10-24
+
+### Features
+
+- **web:** Tint war log history cards by result ([826ee5f](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/826ee5f564f060d79719e3f4e1274432a331c39f))
+
+### Bug Fixes
+
+- **web:** Show the opponent's destruction meter in blurple ([e006319](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/e0063196a554602c62da72f83214ce268430e7d9))
 ## [2.5.1] - 2026-10-24
 
 ### Bug Fixes
