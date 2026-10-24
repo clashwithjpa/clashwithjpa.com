@@ -130,7 +130,7 @@
             label="{war.opponent.name} destruction"
             value={war.opponent.destruction}
             max={100}
-            tone="red"
+            tone="blurple"
             text={pct(war.opponent.destruction, 2)}
         />
         <CocMeter

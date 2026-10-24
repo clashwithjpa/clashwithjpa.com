@@ -136,7 +136,7 @@
                 label="{war.opponent.name} destruction"
                 value={war.opponent.destructionPercentage}
                 max={100}
-                tone="red"
+                tone="blurple"
                 text="{war.opponent.destructionPercentage.toFixed(1)}%"
             />
         </div>

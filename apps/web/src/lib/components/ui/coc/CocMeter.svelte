@@ -13,7 +13,7 @@
         max: number;
         text: string;
         label: string;
-        tone?: "green" | "orange" | "red";
+        tone?: "green" | "orange" | "red" | "blurple";
         class?: string;
     } = $props();
 
@@ -21,6 +21,8 @@
         green: "from-[#a6dc5a] to-[#4f961d]",
         orange: "from-[#ffcd6a] to-[#d97a1e]",
         red: "from-[#ff8a75] to-[#c22a1a]",
+        // The opponent's side, matching the war log's blurple; red stays for losses.
+        blurple: "from-[#a5acf8] to-[#4754e0]",
     };
 
     const pct = $derived(max > 0 ? Math.min(Math.max(value / max, 0), 1) * 100 : 0);
