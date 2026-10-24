@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.5.0] - 2026-10-24
+
+### Features
+
+- **web:** Trim the Discord link card ([c5fc955](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/c5fc955d87a52c21f19a0b5bc04e9b8559464500))
+- **web:** Build og.jpg from bg.webp at build time ([e32bd5d](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/e32bd5d878a7135f76f00e7b9e462cbe6984eac4))
+- **server:** Serve link preview cards under /meta ([4b8fb80](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/4b8fb80891d5718ee942fb25c657335baec3d58e))
+- **web:** Add a live war log page for each clan ([ea0995b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/ea0995b575d290a0dde6b6e485520ac0278c811a))
+- **web:** Add CocDataTable for public pages ([218abfb](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/218abfb48b5cf2183a467a8cd432e49c9c0becd3))
+- **server:** Track clan wars and serve a war log API ([f72210c](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/f72210c662e66fd69931a3a13dbbdf75c79f76c3))
+- **web:** Replace square loaders with layout-matched skeletons ([22b3b09](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/22b3b09b7f81064005083f75b9100544f5ed0cfa))
+
+### Bug Fixes
+
+- Only flag star steals when a base in reach was still open ([2519bce](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/2519bceba97c6e210d4b19246319c60e3378263c))
+
+### Build
+
+- **web:** Serve the site with Caddy instead of nginx ([1b3a7d0](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/1b3a7d0ff3f591714b4d3b048d78808911f411e6))
 ## [2.4.0] - 2026-10-23
 
 ### Features
