@@ -1,89 +1,62 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:best-practices", "group:allNonMajor", "schedule:weekly"],
-    "labels": ["dependencies"],
+    "extends": ["local>renovate-bot/renovate-config", "group:allNonMajor"],
     "postUpdateOptions": ["pnpmDedupe"],
-    "semanticCommits": "enabled",
-    "osvVulnerabilityAlerts": true,
-
     "packageRules": [
         {
+            "description": "Move caret ranges up with each update instead of pinning, so package.json and the pnpm catalog show what's installed.",
             "matchManagers": ["npm"],
-            "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies", "pnpm.catalog.**"],
             "rangeStrategy": "bump"
         },
         {
-            "matchUpdateTypes": ["lockFileMaintenance", "digest", "pin", "pinDigest"],
-            "automerge": true
-        },
-        {
-            "matchPackageNames": ["@types/**", "@iconify-json/**"],
-            "matchUpdateTypes": ["minor", "patch"],
-            "groupName": "types and icon data",
-            "automerge": true
-        },
-        {
-            "matchPackageNames": ["pnpm", "turbo"],
-            "groupName": "build toolchain"
-        },
-        {
-            "matchDepNames": ["node"],
-            "groupName": "node",
-            "allowedVersions": "/^\\d*[02468](\\D|$)/"
-        },
-        {
-            "matchPackageNames": ["better-auth", "@better-auth/**", "zod"],
-            "matchUpdateTypes": ["major", "minor"],
-            "groupName": "better-auth and zod",
+            "description": "Majors wait on the Dependency Dashboard. Tick one when you're ready for the migration.",
+            "matchUpdateTypes": ["major"],
             "dependencyDashboardApproval": true
         },
         {
-            "matchPackageNames": ["svelte", "@sveltejs/**", "svelte-check", "prettier-plugin-svelte"],
+            "description": "Better Auth can change its database schema in a minor, so its minors wait for a tick too and land on their own.",
+            "matchPackageNames": ["better-auth", "@better-auth/**"],
+            "matchUpdateTypes": ["minor"],
+            "groupName": "better-auth",
+            "dependencyDashboardApproval": true
+        },
+        {
+            "description": "Svelte, SvelteKit and the Svelte tooling only cross a major together.",
+            "matchPackageNames": ["svelte", "@sveltejs/**", "svelte-check", "eslint-plugin-svelte", "prettier-plugin-svelte"],
             "matchUpdateTypes": ["major"],
             "groupName": "svelte"
         },
         {
-            "matchPackageNames": ["codemirror", "@codemirror/**", "@uiw/codemirror-**"],
+            "description": "Kubb's plugins publish from two repos, so the kubb monorepo group misses some. The generated client needs every @kubb package on one major.",
+            "matchPackageNames": ["@kubb/**"],
             "matchUpdateTypes": ["major"],
-            "groupName": "codemirror"
+            "groupName": "kubb"
         },
         {
-            "matchPackageNames": ["carta-md", "@cartamd/**"],
-            "matchUpdateTypes": ["major"],
-            "groupName": "carta"
-        },
-        {
-            "matchPackageNames": ["hono", "@hono/**", "hono-*"],
-            "matchUpdateTypes": ["major"],
-            "groupName": "hono"
-        },
-        {
+            "description": "drizzle-kit has to match the drizzle-orm release it writes migrations for.",
             "matchPackageNames": ["drizzle-orm", "drizzle-kit"],
             "matchUpdateTypes": ["major"],
             "groupName": "drizzle"
         },
         {
-            "matchPackageNames": ["@tanstack/svelte-table", "@tanstack/svelte-virtual"],
-            "matchUpdateTypes": ["major"],
-            "groupName": "tanstack table"
+            "description": "Capacitor owns the native projects. cap sync rewrites these files, and their Gradle and Swift versions move with Capacitor upgrades.",
+            "matchFileNames": ["apps/web/android/**", "apps/web/ios/**"],
+            "enabled": false
         },
         {
-            "matchPackageNames": ["@tanstack/svelte-query"],
-            "matchUpdateTypes": ["major"],
-            "groupName": "tanstack query",
-            "dependencyDashboardApproval": true
-        },
-        {
-            "matchPackageNames": ["typescript"],
-            "matchUpdateTypes": ["major"],
-            "groupName": "typescript",
-            "dependencyDashboardApproval": true
+            "description": "MinIO stopped publishing images, so there is no new digest to find and the lookup fails on every run.",
+            "matchPackageNames": ["minio/minio"],
+            "enabled": false
         }
     ],
-
-    "vulnerabilityAlerts": {
-        "schedule": ["at any time"],
-        "minimumReleaseAge": null,
-        "dependencyDashboardApproval": false
-    }
+    "customManagers": [
+        {
+            "description": "git-cliff runs through pnpm dlx in the release workflow, where no built-in manager sees it.",
+            "customType": "regex",
+            "managerFilePatterns": ["/^\\.github/workflows/release\\.yml$/"],
+            "matchStrings": ["GIT_CLIFF: git-cliff@(?<currentValue>\\S+)"],
+            "depNameTemplate": "git-cliff",
+            "datasourceTemplate": "npm"
+        }
+    ]
 }
