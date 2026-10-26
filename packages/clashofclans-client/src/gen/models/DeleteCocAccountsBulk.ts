@@ -3,66 +3,56 @@
  * Do not edit manually.
  */
 
-/**
- * @description Number of accounts deleted.
- */
-export type DeleteCocAccountsBulk200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountsBulkStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         count: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteCocAccountsBulk401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountsBulkStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteCocAccountsBulkStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteCocAccountsBulk500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountsBulkStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteCocAccountsBulkMutationRequest = {
-    /**
-     * @type array
-     */
+export type DeleteCocAccountsBulkBody = {
     ids: number[];
 };
 
-export type DeleteCocAccountsBulkMutationResponse = DeleteCocAccountsBulk200;
-
-export type DeleteCocAccountsBulkMutation = {
-    Response: DeleteCocAccountsBulk200;
-    Request: DeleteCocAccountsBulkMutationRequest;
-    Errors: DeleteCocAccountsBulk401 | DeleteCocAccountsBulk500;
+export type DeleteCocAccountsBulkOptions = {
+    body: DeleteCocAccountsBulkBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteCocAccountsBulkResponses = {
+    "200": DeleteCocAccountsBulkStatus200;
+    "400": DeleteCocAccountsBulkStatus400;
+    "401": DeleteCocAccountsBulkStatus401;
+    "500": DeleteCocAccountsBulkStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteCocAccountsBulkResponse = DeleteCocAccountsBulkStatus200;

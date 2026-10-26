@@ -3,21 +3,9 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the JPA clans.
- */
-export type GetJPAClanRequirements200 = {
-    /**
-     * @type boolean
-     */
+export type GetJPAClanRequirementsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clans: {
             [key: string]: {
                 requiredAttacks: number | null;
@@ -28,24 +16,28 @@ export type GetJPAClanRequirements200 = {
     };
 };
 
-/**
- * @description Server error response when fetching JPA clans fails.
- */
-export type GetJPAClanRequirements500 = {
-    /**
-     * @type boolean
-     */
+export type GetJPAClanRequirementsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetJPAClanRequirementsQueryResponse = GetJPAClanRequirements200;
-
-export type GetJPAClanRequirementsQuery = {
-    Response: GetJPAClanRequirements200;
-    Errors: GetJPAClanRequirements500;
+export type GetJPAClanRequirementsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetJPAClanRequirementsResponses = {
+    "200": GetJPAClanRequirementsStatus200;
+    "500": GetJPAClanRequirementsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetJPAClanRequirementsResponse = GetJPAClanRequirementsStatus200;

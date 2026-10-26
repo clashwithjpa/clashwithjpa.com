@@ -5,14 +5,11 @@
 
 import * as z from "zod";
 
-/**
- * @description Accounts imported (or nothing to import).
- */
-export const importUserAccounts200Schema = z.object({
+export const importUserAccountsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         imported: z.array(
-            z.object({
+            z.strictObject({
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
             }),
@@ -21,20 +18,16 @@ export const importUserAccounts200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const importUserAccounts401Schema = z.object({
+export const importUserAccountsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const importUserAccounts500Schema = z.object({
+export const importUserAccountsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const importUserAccountsMutationResponseSchema = z.lazy(() => importUserAccounts200Schema);
+export const importUserAccountsResponseSchema = importUserAccountsStatus200Schema;
+
+export const importUserAccountsErrorSchema = z.union([importUserAccountsStatus401Schema, importUserAccountsStatus500Schema]);

@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetBonusLedger401, GetBonusLedger500, GetBonusLedgerQueryResponse } from "../models/GetBonusLedger.ts";
-
-function getGetBonusLedgerUrl() {
-    const res = { method: "GET", url: `/admin/bonus-ledger` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetBonusLedgerOptions, GetBonusLedgerResponses } from "../models/GetBonusLedger.ts";
 
 /**
  * @description Lists every awarded bonus (one row per user per season).
  * {@link /admin/bonus-ledger}
  */
-export async function getBonusLedger(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getBonusLedger<ThrowOnError extends boolean = false>(
+    options: Options<GetBonusLedgerOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetBonusLedgerResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetBonusLedgerQueryResponse, ResponseErrorConfig<GetBonusLedger401 | GetBonusLedger500>, unknown>({
-        method: "GET",
-        url: getGetBonusLedgerUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/bonus-ledger",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetBonusLedgerResponses, ThrowOnError>>,
+    );
 }

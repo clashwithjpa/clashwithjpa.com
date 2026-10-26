@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteAdminCwlClan401,
-    DeleteAdminCwlClan404,
-    DeleteAdminCwlClan500,
-    DeleteAdminCwlClanMutationResponse,
-    DeleteAdminCwlClanPathParams,
-} from "../models/DeleteAdminCwlClan.ts";
-
-function getDeleteAdminCwlClanUrl(tag: DeleteAdminCwlClanPathParams["tag"]) {
-    const res = { method: "DELETE", url: `/admin/cwl-clans/${tag}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteAdminCwlClanOptions, DeleteAdminCwlClanResponses } from "../models/DeleteAdminCwlClan.ts";
 
 /**
  * @description Deletes a CWL clan identified by URL-encoded clan tag.
  * {@link /admin/cwl-clans/:tag}
  */
-export async function deleteAdminCwlClan(tag: DeleteAdminCwlClanPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteAdminCwlClan<ThrowOnError extends boolean = false>(
+    options: Options<DeleteAdminCwlClanOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteAdminCwlClanResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        DeleteAdminCwlClanMutationResponse,
-        ResponseErrorConfig<DeleteAdminCwlClan401 | DeleteAdminCwlClan404 | DeleteAdminCwlClan500>,
-        unknown
-    >({ method: "DELETE", url: getDeleteAdminCwlClanUrl(tag).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/cwl-clans/{tag}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteAdminCwlClanResponses, ThrowOnError>>,
+    );
 }

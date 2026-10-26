@@ -5,18 +5,13 @@
 
 import * as z from "zod";
 
-export const getAnalyticsUserJoinsQueryParamsSchema = z.object({
-    days: z.coerce.number().int().min(1).max(90).default(30),
-});
+export const getAnalyticsUserJoinsQueryDaysSchema = z.int().min(1).max(90).optional().default(30);
 
-/**
- * @description User join trend.
- */
-export const getAnalyticsUserJoins200Schema = z.object({
+export const getAnalyticsUserJoinsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 date: z.string(),
                 count: z.number(),
             }),
@@ -24,20 +19,30 @@ export const getAnalyticsUserJoins200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsUserJoins401Schema = z.object({
+export const getAnalyticsUserJoinsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsUserJoins500Schema = z.object({
+export const getAnalyticsUserJoinsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsUserJoinsQueryResponseSchema = z.lazy(() => getAnalyticsUserJoins200Schema);
+export const getAnalyticsUserJoinsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsUserJoinsResponseSchema = getAnalyticsUserJoinsStatus200Schema;
+
+export const getAnalyticsUserJoinsErrorSchema = z.union([
+    getAnalyticsUserJoinsStatus400Schema,
+    getAnalyticsUserJoinsStatus401Schema,
+    getAnalyticsUserJoinsStatus500Schema,
+]);
+
+export const getAnalyticsUserJoinsQuerySchema = z.object({
+    days: z.int().min(1).max(90).optional().default(30),
+});

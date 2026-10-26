@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { PreviewCwlPing401, PreviewCwlPingQueryResponse } from "../models/PreviewCwlPing.ts";
-
-function getPreviewCwlPingUrl() {
-    const res = { method: "GET", url: `/admin/settings/cwl-ping/preview` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { PreviewCwlPingOptions, PreviewCwlPingResponses } from "../models/PreviewCwlPing.ts";
 
 /**
  * @description Dry run: lists the clans whose assigned applicants haven't joined yet, without pinging anyone.
  * {@link /admin/settings/cwl-ping/preview}
  */
-export async function previewCwlPing(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function previewCwlPing<ThrowOnError extends boolean = false>(
+    options: Options<PreviewCwlPingOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<PreviewCwlPingResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<PreviewCwlPingQueryResponse, ResponseErrorConfig<PreviewCwlPing401>, unknown>({
-        method: "GET",
-        url: getPreviewCwlPingUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/settings/cwl-ping/preview",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<PreviewCwlPingResponses, ThrowOnError>>,
+    );
 }

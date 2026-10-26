@@ -3,67 +3,48 @@
  * Do not edit manually.
  */
 
-/**
- * @description Audit categories.
- */
-export type GetAnalyticsAuditCategories200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditCategoriesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             category: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsAuditCategories401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditCategoriesStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsAuditCategories500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditCategoriesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsAuditCategoriesQueryResponse = GetAnalyticsAuditCategories200;
-
-export type GetAnalyticsAuditCategoriesQuery = {
-    Response: GetAnalyticsAuditCategories200;
-    Errors: GetAnalyticsAuditCategories401 | GetAnalyticsAuditCategories500;
+export type GetAnalyticsAuditCategoriesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAnalyticsAuditCategoriesResponses = {
+    "200": GetAnalyticsAuditCategoriesStatus200;
+    "401": GetAnalyticsAuditCategoriesStatus401;
+    "500": GetAnalyticsAuditCategoriesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsAuditCategoriesResponse = GetAnalyticsAuditCategoriesStatus200;

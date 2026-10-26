@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateCocAccountExternal401,
-    UpdateCocAccountExternal404,
-    UpdateCocAccountExternal500,
-    UpdateCocAccountExternalMutationRequest,
-    UpdateCocAccountExternalMutationResponse,
-    UpdateCocAccountExternalPathParams,
-} from "../models/UpdateCocAccountExternal.ts";
-
-function getUpdateCocAccountExternalUrl(id: UpdateCocAccountExternalPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/coc-accounts/${id}/external` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateCocAccountExternalOptions, UpdateCocAccountExternalResponses } from "../models/UpdateCocAccountExternal.ts";
 
 /**
  * @description Sets whether a linked Clash of Clans account is external. Toggles either way, so staff can revert a member-marked external account back to a main account.
  * {@link /admin/coc-accounts/:id/external}
  */
-export async function updateCocAccountExternal(
-    id: UpdateCocAccountExternalPathParams["id"],
-    data: UpdateCocAccountExternalMutationRequest,
-    config: Partial<RequestConfig<UpdateCocAccountExternalMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateCocAccountExternal<ThrowOnError extends boolean = false>(
+    options: Options<UpdateCocAccountExternalOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateCocAccountExternalResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateCocAccountExternalMutationResponse,
-        ResponseErrorConfig<UpdateCocAccountExternal401 | UpdateCocAccountExternal404 | UpdateCocAccountExternal500>,
-        UpdateCocAccountExternalMutationRequest
-    >({ method: "PUT", url: getUpdateCocAccountExternalUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/coc-accounts/{id}/external",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateCocAccountExternalResponses, ThrowOnError>>,
+    );
 }

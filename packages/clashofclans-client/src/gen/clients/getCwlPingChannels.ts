@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCwlPingChannels401, GetCwlPingChannels503, GetCwlPingChannelsQueryResponse } from "../models/GetCwlPingChannels.ts";
-
-function getGetCwlPingChannelsUrl() {
-    const res = { method: "GET", url: `/admin/settings/cwl-ping/channels` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCwlPingChannelsOptions, GetCwlPingChannelsResponses } from "../models/GetCwlPingChannels.ts";
 
 /**
  * @description Lists the guild's text channels the bot can be pointed at.
  * {@link /admin/settings/cwl-ping/channels}
  */
-export async function getCwlPingChannels(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCwlPingChannels<ThrowOnError extends boolean = false>(
+    options: Options<GetCwlPingChannelsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCwlPingChannelsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCwlPingChannelsQueryResponse, ResponseErrorConfig<GetCwlPingChannels401 | GetCwlPingChannels503>, unknown>({
-        method: "GET",
-        url: getGetCwlPingChannelsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/settings/cwl-ping/channels",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCwlPingChannelsResponses, ThrowOnError>>,
+    );
 }

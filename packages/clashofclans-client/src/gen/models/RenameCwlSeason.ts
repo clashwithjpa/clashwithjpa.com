@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type RenameCwlSeasonPathParams = {
+export type RenameCwlSeasonPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,104 +12,62 @@ export type RenameCwlSeasonPathParams = {
     id: number;
 };
 
-/**
- * @description Updated season.
- */
-export type RenameCwlSeason200 = {
-    /**
-     * @type boolean
-     */
+export type RenameCwlSeasonStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         season: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
             createdAt: string | null;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type RenameCwlSeason401 = {
-    /**
-     * @type boolean
-     */
+export type RenameCwlSeasonStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type RenameCwlSeasonStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type RenameCwlSeason404 = {
-    /**
-     * @type boolean
-     */
+export type RenameCwlSeasonStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Name already in use.
- */
-export type RenameCwlSeason409 = {
-    /**
-     * @type boolean
-     */
+export type RenameCwlSeasonStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type RenameCwlSeason500 = {
-    /**
-     * @type boolean
-     */
+export type RenameCwlSeasonStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type RenameCwlSeasonMutationRequest = {
+export type RenameCwlSeasonBody = {
     /**
      * @minLength 1
      * @type string
@@ -117,11 +75,23 @@ export type RenameCwlSeasonMutationRequest = {
     name: string;
 };
 
-export type RenameCwlSeasonMutationResponse = RenameCwlSeason200;
-
-export type RenameCwlSeasonMutation = {
-    Response: RenameCwlSeason200;
-    Request: RenameCwlSeasonMutationRequest;
-    PathParams: RenameCwlSeasonPathParams;
-    Errors: RenameCwlSeason401 | RenameCwlSeason404 | RenameCwlSeason409 | RenameCwlSeason500;
+export type RenameCwlSeasonOptions = {
+    body: RenameCwlSeasonBody;
+    path: RenameCwlSeasonPath;
+    query?: never;
+    headers?: never;
 };
+
+export type RenameCwlSeasonResponses = {
+    "200": RenameCwlSeasonStatus200;
+    "400": RenameCwlSeasonStatus400;
+    "401": RenameCwlSeasonStatus401;
+    "404": RenameCwlSeasonStatus404;
+    "409": RenameCwlSeasonStatus409;
+    "500": RenameCwlSeasonStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type RenameCwlSeasonResponse = RenameCwlSeasonStatus200;

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateCocAccountStatsPathParams = {
+export type UpdateCocAccountStatsPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,70 +12,22 @@ export type UpdateCocAccountStatsPathParams = {
     id: number;
 };
 
-/**
- * @description Updated COC account.
- */
-export type UpdateCocAccountStats200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountStatsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
@@ -85,111 +37,100 @@ export type UpdateCocAccountStats200 = {
     };
 };
 
-/**
- * @description Invalid request.
- */
-export type UpdateCocAccountStats400 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountStatsStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateCocAccountStats401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountStatsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type UpdateCocAccountStats404 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountStatsStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateCocAccountStats500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountStatsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateCocAccountStatsMutationRequest = {
-    currentClan?: string | null;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    totalDonated?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    totalReceived?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    clanGames?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    capitalGoldLooted?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    capitalGoldContributed?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    activityScore?: number;
+export type UpdateCocAccountStatsBody =
+    | {
+          currentClan?: string | null;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          totalDonated?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          totalReceived?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          clanGames?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          capitalGoldLooted?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          capitalGoldContributed?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          activityScore?: number;
+      }
+    | undefined;
+
+export type UpdateCocAccountStatsOptions = {
+    body: UpdateCocAccountStatsBody;
+    path: UpdateCocAccountStatsPath;
+    query?: never;
+    headers?: never;
 };
 
-export type UpdateCocAccountStatsMutationResponse = UpdateCocAccountStats200;
-
-export type UpdateCocAccountStatsMutation = {
-    Response: UpdateCocAccountStats200;
-    Request: UpdateCocAccountStatsMutationRequest;
-    PathParams: UpdateCocAccountStatsPathParams;
-    Errors: UpdateCocAccountStats400 | UpdateCocAccountStats401 | UpdateCocAccountStats404 | UpdateCocAccountStats500;
+export type UpdateCocAccountStatsResponses = {
+    "200": UpdateCocAccountStatsStatus200;
+    "400": UpdateCocAccountStatsStatus400;
+    "401": UpdateCocAccountStatsStatus401;
+    "404": UpdateCocAccountStatsStatus404;
+    "500": UpdateCocAccountStatsStatus500;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateCocAccountStatsResponse = UpdateCocAccountStatsStatus200;

@@ -3,41 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    CreateCwlApplication400,
-    CreateCwlApplication401,
-    CreateCwlApplication404,
-    CreateCwlApplication409,
-    CreateCwlApplication500,
-    CreateCwlApplicationMutationRequest,
-    CreateCwlApplicationMutationResponse,
-} from "../models/CreateCwlApplication.ts";
-
-function getCreateCwlApplicationUrl() {
-    const res = { method: "POST", url: `/admin/cwl-applications` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { CreateCwlApplicationOptions, CreateCwlApplicationResponses } from "../models/CreateCwlApplication.ts";
 
 /**
  * @description Manually registers a CWL application for a user (latecomers after signups close). The Discord account and Clash of Clans account must already be linked. Defaults to the current season.
  * {@link /admin/cwl-applications}
  */
-export async function createCwlApplication(
-    data: CreateCwlApplicationMutationRequest,
-    config: Partial<RequestConfig<CreateCwlApplicationMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function createCwlApplication<ThrowOnError extends boolean = false>(
+    options: Options<CreateCwlApplicationOptions, ThrowOnError>,
+): Unwrappable<RequestResult<CreateCwlApplicationResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        CreateCwlApplicationMutationResponse,
-        ResponseErrorConfig<
-            CreateCwlApplication400 | CreateCwlApplication401 | CreateCwlApplication404 | CreateCwlApplication409 | CreateCwlApplication500
-        >,
-        CreateCwlApplicationMutationRequest
-    >({ method: "POST", url: getCreateCwlApplicationUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-applications",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<CreateCwlApplicationResponses, ThrowOnError>>,
+    );
 }

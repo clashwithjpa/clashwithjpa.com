@@ -5,34 +5,37 @@
 
 import * as z from "zod";
 
-/**
- * @description Number of applications deleted.
- */
-export const deleteCwlApplicationsBulk200Schema = z.object({
+export const deleteCwlApplicationsBulkStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         count: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteCwlApplicationsBulk401Schema = z.object({
+export const deleteCwlApplicationsBulkStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const deleteCwlApplicationsBulk500Schema = z.object({
+export const deleteCwlApplicationsBulkStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteCwlApplicationsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.number().int().min(1).max(9007199254740991)).min(1).max(10000),
+export const deleteCwlApplicationsBulkStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteCwlApplicationsBulkMutationResponseSchema = z.lazy(() => deleteCwlApplicationsBulk200Schema);
+export const deleteCwlApplicationsBulkResponseSchema = deleteCwlApplicationsBulkStatus200Schema;
+
+export const deleteCwlApplicationsBulkErrorSchema = z.union([
+    deleteCwlApplicationsBulkStatus400Schema,
+    deleteCwlApplicationsBulkStatus401Schema,
+    deleteCwlApplicationsBulkStatus500Schema,
+]);
+
+export const deleteCwlApplicationsBulkBodySchema = z.object({
+    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(10000),
+});

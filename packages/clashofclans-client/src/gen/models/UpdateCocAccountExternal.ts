@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateCocAccountExternalPathParams = {
+export type UpdateCocAccountExternalPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,70 +12,22 @@ export type UpdateCocAccountExternalPathParams = {
     id: number;
 };
 
-/**
- * @description Updated COC account.
- */
-export type UpdateCocAccountExternal200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountExternalStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
@@ -85,63 +37,59 @@ export type UpdateCocAccountExternal200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateCocAccountExternal401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountExternalStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type UpdateCocAccountExternalStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type UpdateCocAccountExternal404 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountExternalStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateCocAccountExternal500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountExternalStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateCocAccountExternalMutationRequest = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountExternalBody = {
     isExternal: boolean;
 };
 
-export type UpdateCocAccountExternalMutationResponse = UpdateCocAccountExternal200;
-
-export type UpdateCocAccountExternalMutation = {
-    Response: UpdateCocAccountExternal200;
-    Request: UpdateCocAccountExternalMutationRequest;
-    PathParams: UpdateCocAccountExternalPathParams;
-    Errors: UpdateCocAccountExternal401 | UpdateCocAccountExternal404 | UpdateCocAccountExternal500;
+export type UpdateCocAccountExternalOptions = {
+    body: UpdateCocAccountExternalBody;
+    path: UpdateCocAccountExternalPath;
+    query?: never;
+    headers?: never;
 };
+
+export type UpdateCocAccountExternalResponses = {
+    "200": UpdateCocAccountExternalStatus200;
+    "400": UpdateCocAccountExternalStatus400;
+    "401": UpdateCocAccountExternalStatus401;
+    "404": UpdateCocAccountExternalStatus404;
+    "500": UpdateCocAccountExternalStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateCocAccountExternalResponse = UpdateCocAccountExternalStatus200;

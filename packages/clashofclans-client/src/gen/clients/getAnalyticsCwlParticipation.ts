@@ -3,34 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsCwlParticipation401,
-    GetAnalyticsCwlParticipation500,
-    GetAnalyticsCwlParticipationQueryParams,
-    GetAnalyticsCwlParticipationQueryResponse,
-} from "../models/GetAnalyticsCwlParticipation.ts";
-
-function getGetAnalyticsCwlParticipationUrl() {
-    const res = { method: "GET", url: `/analytics/cwl-participation` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsCwlParticipationOptions, GetAnalyticsCwlParticipationResponses } from "../models/GetAnalyticsCwlParticipation.ts";
 
 /**
  * @description Participating users vs total users for a CWL season.
  * {@link /analytics/cwl-participation}
  */
-export async function getAnalyticsCwlParticipation(
-    params?: GetAnalyticsCwlParticipationQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsCwlParticipation<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsCwlParticipationOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsCwlParticipationResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsCwlParticipationQueryResponse,
-        ResponseErrorConfig<GetAnalyticsCwlParticipation401 | GetAnalyticsCwlParticipation500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsCwlParticipationUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/cwl-participation",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsCwlParticipationResponses, ThrowOnError>>,
+    );
 }

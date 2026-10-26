@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsCwlAssignmentQueryParams = {
+export type GetAnalyticsCwlAssignmentQuery = {
     /**
      * @maxLength 9007199254740991
      * @type integer | undefined
@@ -11,65 +11,55 @@ export type GetAnalyticsCwlAssignmentQueryParams = {
     seasonId?: number;
 };
 
-/**
- * @description CWL assignment.
- */
-export type GetAnalyticsCwlAssignment200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlAssignmentStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         assigned: number;
-        /**
-         * @type number
-         */
         unassigned: number;
         seasonId: number | null;
         seasonName: string | null;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsCwlAssignment401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlAssignmentStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsCwlAssignmentStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsCwlAssignment500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlAssignmentStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsCwlAssignmentQueryResponse = GetAnalyticsCwlAssignment200;
-
-export type GetAnalyticsCwlAssignmentQuery = {
-    Response: GetAnalyticsCwlAssignment200;
-    QueryParams: GetAnalyticsCwlAssignmentQueryParams;
-    Errors: GetAnalyticsCwlAssignment401 | GetAnalyticsCwlAssignment500;
+export type GetAnalyticsCwlAssignmentOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsCwlAssignmentQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsCwlAssignmentResponses = {
+    "200": GetAnalyticsCwlAssignmentStatus200;
+    "400": GetAnalyticsCwlAssignmentStatus400;
+    "401": GetAnalyticsCwlAssignmentStatus401;
+    "500": GetAnalyticsCwlAssignmentStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsCwlAssignmentResponse = GetAnalyticsCwlAssignmentStatus200;

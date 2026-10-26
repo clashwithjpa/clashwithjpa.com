@@ -3,38 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateCwlPingSettings400,
-    UpdateCwlPingSettings401,
-    UpdateCwlPingSettings500,
-    UpdateCwlPingSettings503,
-    UpdateCwlPingSettingsMutationRequest,
-    UpdateCwlPingSettingsMutationResponse,
-} from "../models/UpdateCwlPingSettings.ts";
-
-function getUpdateCwlPingSettingsUrl() {
-    const res = { method: "PUT", url: `/admin/settings/cwl-ping` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateCwlPingSettingsOptions, UpdateCwlPingSettingsResponses } from "../models/UpdateCwlPingSettings.ts";
 
 /**
  * @description Updates the CWL ping job's settings.
  * {@link /admin/settings/cwl-ping}
  */
-export async function updateCwlPingSettings(
-    data: UpdateCwlPingSettingsMutationRequest,
-    config: Partial<RequestConfig<UpdateCwlPingSettingsMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateCwlPingSettings<ThrowOnError extends boolean = false>(
+    options: Options<UpdateCwlPingSettingsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateCwlPingSettingsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateCwlPingSettingsMutationResponse,
-        ResponseErrorConfig<UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503>,
-        UpdateCwlPingSettingsMutationRequest
-    >({ method: "PUT", url: getUpdateCwlPingSettingsUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/settings/cwl-ping",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateCwlPingSettingsResponses, ThrowOnError>>,
+    );
 }

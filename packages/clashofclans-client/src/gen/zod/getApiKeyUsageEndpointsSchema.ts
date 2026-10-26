@@ -5,20 +5,17 @@
 
 import * as z from "zod";
 
-export const getApiKeyUsageEndpointsQueryParamsSchema = z.object({
-    keyId: z.string().min(1),
-    days: z.optional(z.coerce.number().int().min(1).max(90).default(30)),
-    limit: z.optional(z.coerce.number().int().min(1).max(25).default(10)),
-});
+export const getApiKeyUsageEndpointsQueryKeyIdSchema = z.string().min(1);
 
-/**
- * @description Endpoint breakdown.
- */
-export const getApiKeyUsageEndpoints200Schema = z.object({
+export const getApiKeyUsageEndpointsQueryDaysSchema = z.int().min(1).max(90).optional().default(30);
+
+export const getApiKeyUsageEndpointsQueryLimitSchema = z.int().min(1).max(25).optional().default(10);
+
+export const getApiKeyUsageEndpointsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 method: z.string(),
                 path: z.string(),
                 count: z.number(),
@@ -28,28 +25,38 @@ export const getApiKeyUsageEndpoints200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getApiKeyUsageEndpoints401Schema = z.object({
+export const getApiKeyUsageEndpointsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description API key not found.
- */
-export const getApiKeyUsageEndpoints404Schema = z.object({
+export const getApiKeyUsageEndpointsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getApiKeyUsageEndpoints500Schema = z.object({
+export const getApiKeyUsageEndpointsStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getApiKeyUsageEndpointsQueryResponseSchema = z.lazy(() => getApiKeyUsageEndpoints200Schema);
+export const getApiKeyUsageEndpointsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getApiKeyUsageEndpointsResponseSchema = getApiKeyUsageEndpointsStatus200Schema;
+
+export const getApiKeyUsageEndpointsErrorSchema = z.union([
+    getApiKeyUsageEndpointsStatus400Schema,
+    getApiKeyUsageEndpointsStatus401Schema,
+    getApiKeyUsageEndpointsStatus404Schema,
+    getApiKeyUsageEndpointsStatus500Schema,
+]);
+
+export const getApiKeyUsageEndpointsQuerySchema = z.object({
+    keyId: z.string().min(1),
+    days: z.int().min(1).max(90).optional().default(30),
+    limit: z.int().min(1).max(25).optional().default(10),
+});

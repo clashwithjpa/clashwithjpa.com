@@ -3,81 +3,27 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the JPA clans.
- */
-export type GetJPAClans200 = {
-    /**
-     * @type boolean
-     */
+export type GetJPAClansStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clans: {
             [key: string]: {
-                /**
-                 * @type string
-                 */
                 clanTag: string;
-                /**
-                 * @type string
-                 */
                 clanCode: string;
                 clanName: string | null;
                 clanLevel: number | null;
-                /**
-                 * @type object
-                 */
                 discord: {
-                    /**
-                     * @type string
-                     */
                     clanRoleId: string;
-                    /**
-                     * @type string
-                     */
                     clanChannelId: string;
-                    /**
-                     * @type string
-                     */
                     memberRoleId: string;
-                    /**
-                     * @type string
-                     */
                     elderRoleId: string;
-                    /**
-                     * @type string
-                     */
                     coleaderRoleId: string;
-                    /**
-                     * @type string
-                     */
                     leaderRoleId: string;
-                    /**
-                     * @type string
-                     */
                     leaderId: string;
                 };
-                /**
-                 * @type object
-                 */
                 requirements: {
-                    /**
-                     * @type number
-                     */
                     attacks: number;
-                    /**
-                     * @type number
-                     */
                     donations: number;
-                    /**
-                     * @type number
-                     */
                     clangames: number;
                 };
             };
@@ -85,24 +31,28 @@ export type GetJPAClans200 = {
     };
 };
 
-/**
- * @description Server error response when fetching JPA clans fails.
- */
-export type GetJPAClans500 = {
-    /**
-     * @type boolean
-     */
+export type GetJPAClansStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetJPAClansQueryResponse = GetJPAClans200;
-
-export type GetJPAClansQuery = {
-    Response: GetJPAClans200;
-    Errors: GetJPAClans500;
+export type GetJPAClansOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetJPAClansResponses = {
+    "200": GetJPAClansStatus200;
+    "500": GetJPAClansStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetJPAClansResponse = GetJPAClansStatus200;

@@ -1,7 +1,7 @@
 <script lang="ts" module>
-    import type { GetCOCClanCurrentWar200 } from "@repo/clashofclans-client";
+    import type { GetCOCClanCurrentWarStatus200 } from "@repo/clashofclans-client";
 
-    export type War = GetCOCClanCurrentWar200["data"]["currentWar"];
+    export type War = GetCOCClanCurrentWarStatus200["data"]["currentWar"];
     export type WarEntry = { tag: string; name: string; badge: string; war: War | null };
 
     // Supercell sends compact ISO 8601 (20240321T060136.000Z), which Date can't parse as-is.

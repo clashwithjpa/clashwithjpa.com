@@ -5,28 +5,27 @@
 
 import * as z from "zod";
 
-export const getAdminCocAccountsQueryParamsSchema = z.object({
-    search: z.optional(z.string()),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
-    offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
-    sortBy: z.optional(z.string()),
-    sortDir: z.optional(z.enum(["asc", "desc"])),
-});
+export const getAdminCocAccountsQuerySearchSchema = z.string().optional();
 
-/**
- * @description COC accounts.
- */
-export const getAdminCocAccounts200Schema = z.object({
+export const getAdminCocAccountsQueryLimitSchema = z.int().min(1).max(200).optional().default(50);
+
+export const getAdminCocAccountsQueryOffsetSchema = z.int().min(0).max(9007199254740991).optional().default(0);
+
+export const getAdminCocAccountsQuerySortBySchema = z.string().optional();
+
+export const getAdminCocAccountsQuerySortDirSchema = z.enum(["asc", "desc"]).optional();
+
+export const getAdminCocAccountsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         accounts: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
                 isExternal: z.boolean(),
-                currentClan: z.union([z.string(), z.null()]),
+                currentClan: z.string().nullable(),
                 townHall: z.number(),
                 totalDonated: z.number(),
                 totalReceived: z.number(),
@@ -34,30 +33,44 @@ export const getAdminCocAccounts200Schema = z.object({
                 capitalGoldLooted: z.number(),
                 capitalGoldContributed: z.number(),
                 activityScore: z.number(),
-                ownerUserId: z.union([z.string(), z.null()]),
-                ownerName: z.union([z.string(), z.null()]),
-                ownerImage: z.union([z.string(), z.null()]),
-                ownerRole: z.union([z.string(), z.null()]),
+                ownerUserId: z.string().nullable(),
+                ownerName: z.string().nullable(),
+                ownerImage: z.string().nullable(),
+                ownerRole: z.string().nullable(),
             }),
         ),
         total: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAdminCocAccounts401Schema = z.object({
+export const getAdminCocAccountsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAdminCocAccounts500Schema = z.object({
+export const getAdminCocAccountsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAdminCocAccountsQueryResponseSchema = z.lazy(() => getAdminCocAccounts200Schema);
+export const getAdminCocAccountsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAdminCocAccountsResponseSchema = getAdminCocAccountsStatus200Schema;
+
+export const getAdminCocAccountsErrorSchema = z.union([
+    getAdminCocAccountsStatus400Schema,
+    getAdminCocAccountsStatus401Schema,
+    getAdminCocAccountsStatus500Schema,
+]);
+
+export const getAdminCocAccountsQuerySchema = z.object({
+    search: z.string().optional(),
+    limit: z.int().min(1).max(200).optional().default(50),
+    offset: z.int().min(0).max(9007199254740991).optional().default(0),
+    sortBy: z.string().optional(),
+    sortDir: z.enum(["asc", "desc"]).optional(),
+});

@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetWarLogClans404, GetWarLogClans500, GetWarLogClansQueryResponse } from "../models/GetWarLogClans.ts";
-
-function getGetWarLogClansUrl() {
-    const res = { method: "GET", url: `/coc/war-log/clans` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetWarLogClansOptions, GetWarLogClansResponses } from "../models/GetWarLogClans.ts";
 
 /**
  * @description Lists the family clans with their latest recorded war, for the war log's clan picker.
  * {@link /coc/war-log/clans}
  */
-export async function getWarLogClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getWarLogClans<ThrowOnError extends boolean = false>(
+    options: Options<GetWarLogClansOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetWarLogClansResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetWarLogClansQueryResponse, ResponseErrorConfig<GetWarLogClans404 | GetWarLogClans500>, unknown>({
-        method: "GET",
-        url: getGetWarLogClansUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/war-log/clans", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetWarLogClansResponses, ThrowOnError>
+        >,
+    );
 }

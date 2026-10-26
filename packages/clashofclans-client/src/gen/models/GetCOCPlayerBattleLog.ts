@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetCOCPlayerBattleLogPathParams = {
+export type GetCOCPlayerBattleLogPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,95 +15,36 @@ export type GetCOCPlayerBattleLogPathParams = {
     tag: string;
 };
 
-export const itemsBattleTypeEnum = {
+export const getCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnum = {
     legend: "legend",
     homeVillage: "homeVillage",
     ranked: "ranked",
 } as const;
 
-export type ItemsBattleTypeEnumKey = (typeof itemsBattleTypeEnum)[keyof typeof itemsBattleTypeEnum];
+export type GetCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnumKey =
+    (typeof getCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnum)[keyof typeof getCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnum];
 
-/**
- * @description Successful response with the player\'s battle log.
- */
-export type GetCOCPlayerBattleLog200 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCPlayerBattleLogStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         battleLog: {
-            /**
-             * @type array
-             */
             items: {
-                /**
-                 * @type string
-                 */
-                battleType: ItemsBattleTypeEnumKey;
-                /**
-                 * @type boolean
-                 */
+                battleType: GetCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnumKey;
                 attack: boolean;
-                /**
-                 * @type string
-                 */
                 armyShareCode: string;
-                /**
-                 * @type string
-                 */
                 opponentPlayerTag: string;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destructionPercentage: number;
-                /**
-                 * @type array
-                 */
                 lootedResources: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     amount: number;
                 }[];
-                /**
-                 * @type array
-                 */
                 extraLootedResources: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     amount: number;
                 }[];
-                /**
-                 * @type array
-                 */
                 availableLoot: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     amount: number;
                 }[];
             }[];
@@ -109,25 +52,35 @@ export type GetCOCPlayerBattleLog200 = {
     };
 };
 
-/**
- * @description Server error response when fetching battle log fails.
- */
-export type GetCOCPlayerBattleLog500 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCPlayerBattleLogStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCOCPlayerBattleLogStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCOCPlayerBattleLogQueryResponse = GetCOCPlayerBattleLog200;
-
-export type GetCOCPlayerBattleLogQuery = {
-    Response: GetCOCPlayerBattleLog200;
-    PathParams: GetCOCPlayerBattleLogPathParams;
-    Errors: GetCOCPlayerBattleLog500;
+export type GetCOCPlayerBattleLogOptions = {
+    body?: never;
+    path: GetCOCPlayerBattleLogPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCOCPlayerBattleLogResponses = {
+    "200": GetCOCPlayerBattleLogStatus200;
+    "400": GetCOCPlayerBattleLogStatus400;
+    "500": GetCOCPlayerBattleLogStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCOCPlayerBattleLogResponse = GetCOCPlayerBattleLogStatus200;

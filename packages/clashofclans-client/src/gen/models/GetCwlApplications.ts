@@ -3,20 +3,14 @@
  * Do not edit manually.
  */
 
-export type GetCwlApplicationsQueryParams = {
+export type GetCwlApplicationsQuery = {
     /**
      * @minLength -9007199254740991
      * @maxLength 9007199254740991
      * @type integer | undefined
      */
     seasonId?: number;
-    /**
-     * @type string | undefined
-     */
     assignedTo?: string;
-    /**
-     * @type boolean | undefined
-     */
     unassigned?: boolean;
     /**
      * @minLength 1
@@ -32,116 +26,78 @@ export type GetCwlApplicationsQueryParams = {
     offset?: number;
 };
 
-/**
- * @description Applications.
- */
-export type GetCwlApplications200 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlApplicationsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         applications: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             discordUsername: string;
-            /**
-             * @type string
-             */
             cocAccountName: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             cocAccountWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             image: string | null;
-            /**
-             * @type number
-             */
             seasonId: number;
             seasonName: string | null;
             month: string | null;
             year: number | null;
-            /**
-             * @type number
-             */
             preferenceNum: number;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             appliedAt: string;
             assignedTo: string | null;
-            /**
-             * @type number
-             */
             cocAccountId: number;
             ownerRole: string | null;
         }[];
-        /**
-         * @type number
-         */
         total: number;
         seasonId: number | null;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetCwlApplications401 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlApplicationsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCwlApplicationsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetCwlApplications500 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlApplicationsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCwlApplicationsQueryResponse = GetCwlApplications200;
-
-export type GetCwlApplicationsQuery = {
-    Response: GetCwlApplications200;
-    QueryParams: GetCwlApplicationsQueryParams;
-    Errors: GetCwlApplications401 | GetCwlApplications500;
+export type GetCwlApplicationsOptions = {
+    body?: never;
+    path?: never;
+    query?: GetCwlApplicationsQuery;
+    headers?: never;
 };
+
+export type GetCwlApplicationsResponses = {
+    "200": GetCwlApplicationsStatus200;
+    "400": GetCwlApplicationsStatus400;
+    "401": GetCwlApplicationsStatus401;
+    "500": GetCwlApplicationsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCwlApplicationsResponse = GetCwlApplicationsStatus200;

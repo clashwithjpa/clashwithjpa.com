@@ -5,19 +5,14 @@
 
 import * as z from "zod";
 
-export const getCOCPlayerBattleLogPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCPlayerBattleLogPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the player\'s battle log.
- */
-export const getCOCPlayerBattleLog200Schema = z.object({
+export const getCOCPlayerBattleLogStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        battleLog: z.object({
+    data: z.strictObject({
+        battleLog: z.strictObject({
             items: z.array(
-                z.object({
+                z.strictObject({
                     battleType: z.enum(["legend", "homeVillage", "ranked"]),
                     attack: z.boolean(),
                     armyShareCode: z.string(),
@@ -25,19 +20,19 @@ export const getCOCPlayerBattleLog200Schema = z.object({
                     stars: z.number(),
                     destructionPercentage: z.number(),
                     lootedResources: z.array(
-                        z.object({
+                        z.strictObject({
                             name: z.string(),
                             amount: z.number(),
                         }),
                     ),
                     extraLootedResources: z.array(
-                        z.object({
+                        z.strictObject({
                             name: z.string(),
                             amount: z.number(),
                         }),
                     ),
                     availableLoot: z.array(
-                        z.object({
+                        z.strictObject({
                             name: z.string(),
                             amount: z.number(),
                         }),
@@ -48,12 +43,21 @@ export const getCOCPlayerBattleLog200Schema = z.object({
     }),
 });
 
-/**
- * @description Server error response when fetching battle log fails.
- */
-export const getCOCPlayerBattleLog500Schema = z.object({
+export const getCOCPlayerBattleLogStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCPlayerBattleLogQueryResponseSchema = z.lazy(() => getCOCPlayerBattleLog200Schema);
+export const getCOCPlayerBattleLogStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCPlayerBattleLogResponseSchema = getCOCPlayerBattleLogStatus200Schema;
+
+export const getCOCPlayerBattleLogErrorSchema = z.union([getCOCPlayerBattleLogStatus400Schema, getCOCPlayerBattleLogStatus500Schema]);
+
+export const getCOCPlayerBattleLogPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

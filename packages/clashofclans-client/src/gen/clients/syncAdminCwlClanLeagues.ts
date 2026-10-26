@@ -3,30 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SyncAdminCwlClanLeagues401,
-    SyncAdminCwlClanLeagues500,
-    SyncAdminCwlClanLeaguesMutationResponse,
-} from "../models/SyncAdminCwlClanLeagues.ts";
-
-function getSyncAdminCwlClanLeaguesUrl() {
-    const res = { method: "POST", url: `/admin/cwl-clans/sync-leagues` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SyncAdminCwlClanLeaguesOptions, SyncAdminCwlClanLeaguesResponses } from "../models/SyncAdminCwlClanLeagues.ts";
 
 /**
  * @description Refreshes every CWL clan's league from the Clash of Clans API.
  * {@link /admin/cwl-clans/sync-leagues}
  */
-export async function syncAdminCwlClanLeagues(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function syncAdminCwlClanLeagues<ThrowOnError extends boolean = false>(
+    options: Options<SyncAdminCwlClanLeaguesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<SyncAdminCwlClanLeaguesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        SyncAdminCwlClanLeaguesMutationResponse,
-        ResponseErrorConfig<SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500>,
-        unknown
-    >({ method: "POST", url: getSyncAdminCwlClanLeaguesUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-clans/sync-leagues",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SyncAdminCwlClanLeaguesResponses, ThrowOnError>>,
+    );
 }

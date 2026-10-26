@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClanCurrentWar500, GetCOCClanCurrentWarPathParams, GetCOCClanCurrentWarQueryResponse } from "../models/GetCOCClanCurrentWar.ts";
-
-function getGetCOCClanCurrentWarUrl(tag: GetCOCClanCurrentWarPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/clan/${tag}/currentwar` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCClanCurrentWarOptions, GetCOCClanCurrentWarResponses } from "../models/GetCOCClanCurrentWar.ts";
 
 /**
  * @description Fetches a Clash of Clans clan's current war by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar}
  */
-export async function getCOCClanCurrentWar(tag: GetCOCClanCurrentWarPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCClanCurrentWar<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCClanCurrentWarOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCClanCurrentWarResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCClanCurrentWarQueryResponse, ResponseErrorConfig<GetCOCClanCurrentWar500>, unknown>({
-        method: "GET",
-        url: getGetCOCClanCurrentWarUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/clan/{tag}/currentwar", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetCOCClanCurrentWarResponses, ThrowOnError>
+        >,
+    );
 }

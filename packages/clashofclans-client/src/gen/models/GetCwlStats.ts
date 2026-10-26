@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetCwlStatsQueryParams = {
+export type GetCwlStatsQuery = {
     /**
      * @minLength -9007199254740991
      * @maxLength 9007199254740991
@@ -12,146 +12,76 @@ export type GetCwlStatsQueryParams = {
     seasonId?: number;
 };
 
-/**
- * @description CWL stats.
- */
-export type GetCwlStats200 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlStatsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         stats: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             clanTag: string;
-            /**
-             * @type number
-             */
             attacks: number;
-            /**
-             * @type number
-             */
             stars: number;
-            /**
-             * @type array
-             */
             rounds: number[];
-            /**
-             * @type array
-             */
             details: {
-                /**
-                 * @type number
-                 */
                 round: number;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destruction: number;
-                /**
-                 * @type number
-                 */
                 position: number;
-                /**
-                 * @type string
-                 */
                 defenderName: string;
-                /**
-                 * @type number
-                 */
                 defenderTh: number;
-                /**
-                 * @type number
-                 */
                 defenderPosition: number;
-                /**
-                 * @type number,null
-                 */
                 firstOpenPosition: number | null;
             }[];
         }[];
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type array
-             */
             endedRounds: number[];
-            /**
-             * @type number
-             */
             wins: number;
-            /**
-             * @type number
-             */
             losses: number;
-            /**
-             * @type number
-             */
             ties: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetCwlStats401 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlStatsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCwlStatsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetCwlStats500 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlStatsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCwlStatsQueryResponse = GetCwlStats200;
-
-export type GetCwlStatsQuery = {
-    Response: GetCwlStats200;
-    QueryParams: GetCwlStatsQueryParams;
-    Errors: GetCwlStats401 | GetCwlStats500;
+export type GetCwlStatsOptions = {
+    body?: never;
+    path?: never;
+    query?: GetCwlStatsQuery;
+    headers?: never;
 };
+
+export type GetCwlStatsResponses = {
+    "200": GetCwlStatsStatus200;
+    "400": GetCwlStatsStatus400;
+    "401": GetCwlStatsStatus401;
+    "500": GetCwlStatsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCwlStatsResponse = GetCwlStatsStatus200;

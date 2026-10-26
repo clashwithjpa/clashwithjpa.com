@@ -3,38 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    PostCOCPlayerVerify500,
-    PostCOCPlayerVerifyMutationRequest,
-    PostCOCPlayerVerifyMutationResponse,
-    PostCOCPlayerVerifyPathParams,
-} from "../models/PostCOCPlayerVerify.ts";
-
-function getPostCOCPlayerVerifyUrl(tag: PostCOCPlayerVerifyPathParams["tag"]) {
-    const res = { method: "POST", url: `/coc/player/${tag}/verifytoken` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { PostCOCPlayerVerifyOptions, PostCOCPlayerVerifyResponses } from "../models/PostCOCPlayerVerify.ts";
 
 /**
  * @description Verifies a Clash of Clans player's API token.
  * {@link /coc/player/:tag/verifytoken}
  */
-export async function postCOCPlayerVerify(
-    tag: PostCOCPlayerVerifyPathParams["tag"],
-    data: PostCOCPlayerVerifyMutationRequest,
-    config: Partial<RequestConfig<PostCOCPlayerVerifyMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function postCOCPlayerVerify<ThrowOnError extends boolean = false>(
+    options: Options<PostCOCPlayerVerifyOptions, ThrowOnError>,
+): Unwrappable<RequestResult<PostCOCPlayerVerifyResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<PostCOCPlayerVerifyMutationResponse, ResponseErrorConfig<PostCOCPlayerVerify500>, PostCOCPlayerVerifyMutationRequest>({
-        method: "POST",
-        url: getPostCOCPlayerVerifyUrl(tag).url.toString(),
-        data: requestData,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/coc/player/{tag}/verifytoken",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<PostCOCPlayerVerifyResponses, ThrowOnError>>,
+    );
 }

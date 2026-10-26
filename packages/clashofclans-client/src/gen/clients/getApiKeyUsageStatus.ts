@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetApiKeyUsageStatus401,
-    GetApiKeyUsageStatus404,
-    GetApiKeyUsageStatus500,
-    GetApiKeyUsageStatusQueryParams,
-    GetApiKeyUsageStatusQueryResponse,
-} from "../models/GetApiKeyUsageStatus.ts";
-
-function getGetApiKeyUsageStatusUrl() {
-    const res = { method: "GET", url: `/api-keys/usage/status` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetApiKeyUsageStatusOptions, GetApiKeyUsageStatusResponses } from "../models/GetApiKeyUsageStatus.ts";
 
 /**
  * @description Response status mix (2xx / 3xx / 4xx / 429 / 5xx) for one of your own API keys.
  * {@link /api-keys/usage/status}
  */
-export async function getApiKeyUsageStatus(params: GetApiKeyUsageStatusQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getApiKeyUsageStatus<ThrowOnError extends boolean = false>(
+    options: Options<GetApiKeyUsageStatusOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetApiKeyUsageStatusResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetApiKeyUsageStatusQueryResponse,
-        ResponseErrorConfig<GetApiKeyUsageStatus401 | GetApiKeyUsageStatus404 | GetApiKeyUsageStatus500>,
-        unknown
-    >({ method: "GET", url: getGetApiKeyUsageStatusUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/api-keys/usage/status",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetApiKeyUsageStatusResponses, ThrowOnError>>,
+    );
 }

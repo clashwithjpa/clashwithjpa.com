@@ -3,145 +3,80 @@
  * Do not edit manually.
  */
 
-/**
- * @description Application submitted successfully.
- */
-export type ApplyUserAccount200 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object | undefined
-         */
         application?: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            cocAccountData: any;
-            /**
-             * @type string
-             */
+            cocAccountData: unknown;
             discordUserId: string;
-            /**
-             * @type string
-             */
             status: string;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             createdAt: string;
         };
-        /**
-         * @type object | undefined
-         */
         account?: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
         };
     };
 };
 
-/**
- * @description Bad request (captcha failed or token verification failed).
- */
-export type ApplyUserAccount400 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type ApplyUserAccount401 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Applications closed, or external account add requires a verified member.
- */
-export type ApplyUserAccount403 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus403 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Application already exists for this account.
- */
-export type ApplyUserAccount409 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type ApplyUserAccount500 = {
-    /**
-     * @type boolean
-     */
+export type ApplyUserAccountStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type ApplyUserAccountMutationRequest = {
+export type ApplyUserAccountBody = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -168,10 +103,23 @@ export type ApplyUserAccountMutationRequest = {
     warWeight?: number;
 };
 
-export type ApplyUserAccountMutationResponse = ApplyUserAccount200;
-
-export type ApplyUserAccountMutation = {
-    Response: ApplyUserAccount200;
-    Request: ApplyUserAccountMutationRequest;
-    Errors: ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500;
+export type ApplyUserAccountOptions = {
+    body: ApplyUserAccountBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type ApplyUserAccountResponses = {
+    "200": ApplyUserAccountStatus200;
+    "400": ApplyUserAccountStatus400;
+    "401": ApplyUserAccountStatus401;
+    "403": ApplyUserAccountStatus403;
+    "409": ApplyUserAccountStatus409;
+    "500": ApplyUserAccountStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type ApplyUserAccountResponse = ApplyUserAccountStatus200;

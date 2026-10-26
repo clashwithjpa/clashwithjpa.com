@@ -5,22 +5,18 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the rules content.
- */
-export const getRules200Schema = z.object({
+export const getRulesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        rules: z.union([z.string(), z.null()]),
+    data: z.strictObject({
+        rules: z.string().nullable(),
     }),
 });
 
-/**
- * @description Server error response when fetching rules fails.
- */
-export const getRules500Schema = z.object({
+export const getRulesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getRulesQueryResponseSchema = z.lazy(() => getRules200Schema);
+export const getRulesResponseSchema = getRulesStatus200Schema;
+
+export const getRulesErrorSchema = getRulesStatus500Schema;

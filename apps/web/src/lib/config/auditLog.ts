@@ -1,5 +1,5 @@
 import type { Option } from "#lib/components/ui/Select.svelte";
-import type { GetAuditLog200 } from "@repo/clashofclans-client";
+import type { GetAuditLogStatus200 } from "@repo/clashofclans-client";
 import type { Component } from "svelte";
 import TablerArrowBackUp from "~icons/tabler/arrow-back-up";
 import TablerArrowRight from "~icons/tabler/arrow-right";
@@ -39,7 +39,7 @@ import TablerUsers from "~icons/tabler/users";
 import TablerWorld from "~icons/tabler/world";
 import TablerX from "~icons/tabler/x";
 
-export type AuditEntry = GetAuditLog200["data"]["entries"][number];
+export type AuditEntry = GetAuditLogStatus200["data"]["entries"][number];
 export type AuditAction = AuditEntry["action"];
 export type AuditTargetType = NonNullable<AuditEntry["targetType"]>;
 

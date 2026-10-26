@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteJoinApplication401,
-    DeleteJoinApplication404,
-    DeleteJoinApplication500,
-    DeleteJoinApplicationMutationResponse,
-    DeleteJoinApplicationPathParams,
-} from "../models/DeleteJoinApplication.ts";
-
-function getDeleteJoinApplicationUrl(id: DeleteJoinApplicationPathParams["id"]) {
-    const res = { method: "DELETE", url: `/admin/join-applications/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteJoinApplicationOptions, DeleteJoinApplicationResponses } from "../models/DeleteJoinApplication.ts";
 
 /**
  * @description Permanently deletes a single clan join application. Cannot be undone.
  * {@link /admin/join-applications/:id}
  */
-export async function deleteJoinApplication(id: DeleteJoinApplicationPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteJoinApplication<ThrowOnError extends boolean = false>(
+    options: Options<DeleteJoinApplicationOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteJoinApplicationResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        DeleteJoinApplicationMutationResponse,
-        ResponseErrorConfig<DeleteJoinApplication401 | DeleteJoinApplication404 | DeleteJoinApplication500>,
-        unknown
-    >({ method: "DELETE", url: getDeleteJoinApplicationUrl(id).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/join-applications/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteJoinApplicationResponses, ThrowOnError>>,
+    );
 }

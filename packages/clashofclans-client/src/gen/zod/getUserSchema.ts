@@ -5,53 +5,46 @@
 
 import * as z from "zod";
 
-/**
- * @description User data fetched successfully.
- */
-export const getUser200Schema = z.object({
+export const getUserStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        user: z.object({
+    data: z.strictObject({
+        user: z.strictObject({
             id: z.string(),
             name: z.string(),
             email: z.string(),
             emailVerified: z.boolean(),
-            image: z.optional(z.union([z.string(), z.null()])),
-            createdAt: z.string().datetime(),
-            updatedAt: z.string().datetime(),
-            role: z.optional(z.union([z.string(), z.null()])),
-            banned: z.optional(z.union([z.boolean(), z.null()])),
-            banReason: z.optional(z.union([z.string(), z.null()])),
-            banExpires: z.optional(z.union([z.string().datetime(), z.null()])),
+            image: z.string().nullish(),
+            createdAt: z.iso.datetime(),
+            updatedAt: z.iso.datetime(),
+            role: z.string().nullish(),
+            banned: z.boolean().nullish(),
+            banReason: z.string().nullish(),
+            banExpires: z.union([z.iso.datetime(), z.null()]).optional(),
         }),
-        session: z.object({
+        session: z.strictObject({
             id: z.string(),
-            expiresAt: z.string().datetime(),
+            expiresAt: z.iso.datetime(),
             token: z.string(),
-            createdAt: z.string().datetime(),
-            updatedAt: z.string().datetime(),
-            ipAddress: z.optional(z.union([z.string(), z.null()])),
-            userAgent: z.optional(z.union([z.string(), z.null()])),
+            createdAt: z.iso.datetime(),
+            updatedAt: z.iso.datetime(),
+            ipAddress: z.string().nullish(),
+            userAgent: z.string().nullish(),
             userId: z.string(),
-            impersonatedBy: z.optional(z.union([z.string(), z.null()])),
+            impersonatedBy: z.string().nullish(),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getUser401Schema = z.object({
+export const getUserStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const getUser500Schema = z.object({
+export const getUserStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getUserQueryResponseSchema = z.lazy(() => getUser200Schema);
+export const getUserResponseSchema = getUserStatus200Schema;
+
+export const getUserErrorSchema = z.union([getUserStatus401Schema, getUserStatus500Schema]);

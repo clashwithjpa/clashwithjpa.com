@@ -33,7 +33,6 @@
 
     let { data }: PageProps = $props();
 
-    const opts = { baseURL: PUBLIC_SERVER_URL };
     const PAGE_SIZE = 30;
 
     let clans = $state<WarLogClan[]>([]);
@@ -68,21 +67,20 @@
         if (!war || war.clan.name) return war;
         return { ...war, clan: { ...war.clan, name: clanName, badge: war.clan.badge ?? live?.clan.badge ?? clan?.badge ?? null } };
     });
-    const enc = $derived(encodeURIComponent(data.tag));
 
     async function loadWars(reset: boolean) {
         const before = reset ? undefined : wars.at(-1)?.id;
-        const res = await getWarLogWars(enc, { limit: PAGE_SIZE, before }, opts).catch(() => null);
+        const res = await getWarLogWars({ path: { tag: data.tag }, query: { limit: PAGE_SIZE, before } }).catch(() => null);
         if (!res) {
             if (reset) status = "failed";
             return;
         }
-        if (!res.success) {
+        if (!res.data) {
             if (reset) status = "missing";
             return;
         }
-        wars = reset ? res.data.wars : [...wars, ...res.data.wars];
-        hasMore = res.data.hasMore;
+        wars = reset ? res.data.data.wars : [...wars, ...res.data.data.wars];
+        hasMore = res.data.data.hasMore;
         if (reset) status = "ready";
     }
 
@@ -144,9 +142,9 @@
         const opponent = liveOpponent;
         if (!opponent) return;
         let cancelled = false;
-        getFWAClanPoints(enc, opts)
+        getFWAClanPoints({ path: { tag: data.tag } })
             .then((r) => {
-                const m = r.success ? r.data.points?.matchup : null;
+                const m = r.data ? r.data.data.points?.matchup : null;
                 if (!cancelled && m?.winner && m.opponent.tag.toUpperCase() === opponent.toUpperCase()) {
                     fwaCall = m.winner === "clan" ? "win" : "lose";
                 }
@@ -167,11 +165,11 @@
         if (untrack(() => selected?.id) === id) return;
         let cancelled = false;
         selecting = id;
-        getWarLogWar(encodeURIComponent(tag), id, opts)
+        getWarLogWar({ path: { tag, id } })
             .then((res) => {
                 if (cancelled) return;
-                if (res.success) {
-                    selected = res.data.war;
+                if (res.data) {
+                    selected = res.data.data.war;
                     void reveal();
                 } else {
                     toast.error("That war isn't in this clan's log");
@@ -210,8 +208,8 @@
     }
 
     onMount(() => {
-        getWarLogClans(opts)
-            .then((r) => r.success && (clans = r.data.clans))
+        getWarLogClans({})
+            .then((r) => r.data && (clans = r.data.data.clans))
             .catch(() => {});
         const tick = setInterval(() => (now = Date.now()), 1000);
         return () => clearInterval(tick);

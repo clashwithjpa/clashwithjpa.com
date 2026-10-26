@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsAdminActivityQueryParams = {
+export type GetAnalyticsAdminActivityQuery = {
     /**
      * @minLength 1
      * @maxLength 20
@@ -19,97 +19,63 @@ export type GetAnalyticsAdminActivityQueryParams = {
     days?: number;
 };
 
-/**
- * @description Top admin activity.
- */
-export type GetAnalyticsAdminActivity200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAdminActivityStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             actorId: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string,null
-             */
             image: string | null;
-            /**
-             * @type string,null
-             */
             role: string | null;
-            /**
-             * @type string,null
-             */
             discordId: string | null;
-            /**
-             * @type number
-             */
             count: number;
-            /**
-             * @type array
-             */
             topActions: {
-                /**
-                 * @type string
-                 */
                 action: string;
-                /**
-                 * @type number
-                 */
                 count: number;
             }[];
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsAdminActivity401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAdminActivityStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsAdminActivityStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsAdminActivity500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAdminActivityStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsAdminActivityQueryResponse = GetAnalyticsAdminActivity200;
-
-export type GetAnalyticsAdminActivityQuery = {
-    Response: GetAnalyticsAdminActivity200;
-    QueryParams: GetAnalyticsAdminActivityQueryParams;
-    Errors: GetAnalyticsAdminActivity401 | GetAnalyticsAdminActivity500;
+export type GetAnalyticsAdminActivityOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsAdminActivityQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsAdminActivityResponses = {
+    "200": GetAnalyticsAdminActivityStatus200;
+    "400": GetAnalyticsAdminActivityStatus400;
+    "401": GetAnalyticsAdminActivityStatus401;
+    "500": GetAnalyticsAdminActivityStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsAdminActivityResponse = GetAnalyticsAdminActivityStatus200;

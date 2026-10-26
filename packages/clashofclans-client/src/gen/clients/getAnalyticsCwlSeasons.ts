@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAnalyticsCwlSeasons401, GetAnalyticsCwlSeasons500, GetAnalyticsCwlSeasonsQueryResponse } from "../models/GetAnalyticsCwlSeasons.ts";
-
-function getGetAnalyticsCwlSeasonsUrl() {
-    const res = { method: "GET", url: `/analytics/cwl-seasons` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsCwlSeasonsOptions, GetAnalyticsCwlSeasonsResponses } from "../models/GetAnalyticsCwlSeasons.ts";
 
 /**
  * @description Lists CWL seasons for the analytics season selector.
  * {@link /analytics/cwl-seasons}
  */
-export async function getAnalyticsCwlSeasons(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsCwlSeasons<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsCwlSeasonsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsCwlSeasonsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsCwlSeasonsQueryResponse,
-        ResponseErrorConfig<GetAnalyticsCwlSeasons401 | GetAnalyticsCwlSeasons500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsCwlSeasonsUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/cwl-seasons",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsCwlSeasonsResponses, ThrowOnError>>,
+    );
 }

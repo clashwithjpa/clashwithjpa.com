@@ -5,21 +5,16 @@
 
 import * as z from "zod";
 
-export const deleteAdminClanPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const deleteAdminClanPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Deleted clan.
- */
-export const deleteAdminClan200Schema = z.object({
+export const deleteAdminClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             id: z.number(),
             cocClanCode: z.string(),
-            cocClanName: z.union([z.string(), z.null()]),
-            cocClanLevel: z.union([z.number(), z.null()]),
+            cocClanName: z.string().nullable(),
+            cocClanLevel: z.number().nullable(),
             cocClanTag: z.string(),
             discordClanRoleId: z.string(),
             discordClanChannelId: z.string(),
@@ -35,28 +30,36 @@ export const deleteAdminClan200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteAdminClan401Schema = z.object({
+export const deleteAdminClanStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const deleteAdminClan404Schema = z.object({
+export const deleteAdminClanStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const deleteAdminClan500Schema = z.object({
+export const deleteAdminClanStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteAdminClanMutationResponseSchema = z.lazy(() => deleteAdminClan200Schema);
+export const deleteAdminClanStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const deleteAdminClanResponseSchema = deleteAdminClanStatus200Schema;
+
+export const deleteAdminClanErrorSchema = z.union([
+    deleteAdminClanStatus400Schema,
+    deleteAdminClanStatus401Schema,
+    deleteAdminClanStatus404Schema,
+    deleteAdminClanStatus500Schema,
+]);
+
+export const deleteAdminClanPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

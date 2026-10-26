@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetWarLogPlayersPathParams = {
+export type GetWarLogPlayersPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,7 +15,7 @@ export type GetWarLogPlayersPathParams = {
     tag: string;
 };
 
-export type GetWarLogPlayersQueryParams = {
+export type GetWarLogPlayersQuery = {
     /**
      * @minLength 1
      * @maxLength 60
@@ -23,146 +25,75 @@ export type GetWarLogPlayersQueryParams = {
     wars?: number;
 };
 
-/**
- * @description Player totals and the wars they cover, newest first.
- */
-export type GetWarLogPlayers200 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogPlayersStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         wars: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             endTime: string;
         }[];
-        /**
-         * @type array
-         */
         players: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type number
-             */
             th: number;
-            /**
-             * @type number
-             */
             wars: number;
-            /**
-             * @type number
-             */
             attacksUsed: number;
-            /**
-             * @type number
-             */
             attacksAvailable: number;
-            /**
-             * @type number
-             */
             missed: number;
-            /**
-             * @type number
-             */
             missedStreak: number;
-            /**
-             * @type number
-             */
             stars: number;
-            /**
-             * @type number
-             */
             newStars: number;
-            /**
-             * @type number
-             */
             triples: number;
-            /**
-             * @type number
-             */
             zeroes: number;
-            /**
-             * @type number
-             */
             avgDestruction: number;
-            /**
-             * @type number
-             */
             mirrorFirst: number;
-            /**
-             * @type number
-             */
             firstAttacks: number;
-            /**
-             * @type number
-             */
             defenses: number;
-            /**
-             * @type number
-             */
             triplesConceded: number;
-            /**
-             * @type array
-             */
             recent: number[];
         }[];
     };
 };
 
-/**
- * @description Not a family clan, or no such war.
- */
-export type GetWarLogPlayers404 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogPlayersStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetWarLogPlayersStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetWarLogPlayers500 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogPlayersStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetWarLogPlayersQueryResponse = GetWarLogPlayers200;
-
-export type GetWarLogPlayersQuery = {
-    Response: GetWarLogPlayers200;
-    PathParams: GetWarLogPlayersPathParams;
-    QueryParams: GetWarLogPlayersQueryParams;
-    Errors: GetWarLogPlayers404 | GetWarLogPlayers500;
+export type GetWarLogPlayersOptions = {
+    body?: never;
+    path: GetWarLogPlayersPath;
+    query?: GetWarLogPlayersQuery;
+    headers?: never;
 };
+
+export type GetWarLogPlayersResponses = {
+    "200": GetWarLogPlayersStatus200;
+    "400": GetWarLogPlayersStatus400;
+    "404": GetWarLogPlayersStatus404;
+    "500": GetWarLogPlayersStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetWarLogPlayersResponse = GetWarLogPlayersStatus200;

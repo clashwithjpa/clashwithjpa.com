@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { RunCwlPingNow401, RunCwlPingNowMutationResponse } from "../models/RunCwlPingNow.ts";
-
-function getRunCwlPingNowUrl() {
-    const res = { method: "POST", url: `/admin/settings/cwl-ping/run` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { RunCwlPingNowOptions, RunCwlPingNowResponses } from "../models/RunCwlPingNow.ts";
 
 /**
  * @description Immediately runs one CWL ping pass, independent of the schedule and the enabled toggle.
  * {@link /admin/settings/cwl-ping/run}
  */
-export async function runCwlPingNow(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function runCwlPingNow<ThrowOnError extends boolean = false>(
+    options: Options<RunCwlPingNowOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<RunCwlPingNowResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<RunCwlPingNowMutationResponse, ResponseErrorConfig<RunCwlPingNow401>, unknown>({
-        method: "POST",
-        url: getRunCwlPingNowUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/settings/cwl-ping/run",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<RunCwlPingNowResponses, ThrowOnError>>,
+    );
 }

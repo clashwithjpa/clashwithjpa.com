@@ -5,38 +5,31 @@
 
 import * as z from "zod";
 
-/**
- * @description Seasons.
- */
-export const getAnalyticsCwlSeasons200Schema = z.object({
+export const getAnalyticsCwlSeasonsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         seasons: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 name: z.string(),
                 month: z.string(),
                 year: z.number(),
-                createdAt: z.union([z.string().datetime(), z.null()]),
+                createdAt: z.union([z.iso.datetime(), z.null()]),
             }),
         ),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsCwlSeasons401Schema = z.object({
+export const getAnalyticsCwlSeasonsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsCwlSeasons500Schema = z.object({
+export const getAnalyticsCwlSeasonsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsCwlSeasonsQueryResponseSchema = z.lazy(() => getAnalyticsCwlSeasons200Schema);
+export const getAnalyticsCwlSeasonsResponseSchema = getAnalyticsCwlSeasonsStatus200Schema;
+
+export const getAnalyticsCwlSeasonsErrorSchema = z.union([getAnalyticsCwlSeasonsStatus401Schema, getAnalyticsCwlSeasonsStatus500Schema]);

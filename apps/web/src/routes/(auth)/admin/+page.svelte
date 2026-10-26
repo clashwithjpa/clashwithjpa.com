@@ -9,7 +9,6 @@
     import { actionConfig, actorLabel, describeAction, type AuditEntry } from "#lib/config/auditLog.js";
     import type { Role } from "#lib/config/roles.js";
     import { cn, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         getAnalyticsAdminActivity,
         getAnalyticsAuditTrend,
@@ -18,9 +17,9 @@
         getAnalyticsOverview,
         getAnalyticsUserJoins,
         getAuditLog,
-        type GetAnalyticsAdminActivity200,
-        type GetAnalyticsCwlSeasonOverview200,
-        type GetAnalyticsOverview200,
+        type GetAnalyticsAdminActivityStatus200,
+        type GetAnalyticsCwlSeasonOverviewStatus200,
+        type GetAnalyticsOverviewStatus200,
     } from "@repo/clashofclans-client";
     import { curveMonotoneX } from "d3-shape";
     import { AreaChart, BarChart } from "layerchart";
@@ -31,14 +30,13 @@
     import TablerTool from "~icons/tabler/tool";
     import type { PageProps } from "./$types";
 
-    type Overview = GetAnalyticsOverview200["data"];
-    type CwlSeason = GetAnalyticsCwlSeasonOverview200["data"];
-    type Actor = GetAnalyticsAdminActivity200["data"]["data"][number];
+    type Overview = GetAnalyticsOverviewStatus200["data"];
+    type CwlSeason = GetAnalyticsCwlSeasonOverviewStatus200["data"];
+    type Actor = GetAnalyticsAdminActivityStatus200["data"]["data"][number];
     type DailyPoint = { date: Date; count: number };
 
     let { data }: PageProps = $props();
     const session = authClient.useSession();
-    const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
 
     const JOIN_DAYS = 30;
     const AUDIT_DAYS = 14;
@@ -68,25 +66,25 @@
 
     onMount(async () => {
         const [o, s, list, j, a, act, log] = await Promise.allSettled([
-            getAnalyticsOverview(opts),
-            getAnalyticsCwlSeasonOverview(undefined, opts),
-            getAnalyticsCwlSeasons(opts),
-            getAnalyticsUserJoins({ days: JOIN_DAYS }, opts),
-            getAnalyticsAuditTrend({ days: AUDIT_DAYS }, opts),
-            getAnalyticsAdminActivity({ limit: 8, days: ACTIVITY_DAYS }, opts),
-            canSeeAudit ? getAuditLog({ limit: 6 }, opts) : Promise.reject(),
+            getAnalyticsOverview({}),
+            getAnalyticsCwlSeasonOverview({}),
+            getAnalyticsCwlSeasons({}),
+            getAnalyticsUserJoins({ query: { days: JOIN_DAYS } }),
+            getAnalyticsAuditTrend({ query: { days: AUDIT_DAYS } }),
+            getAnalyticsAdminActivity({ query: { limit: 8, days: ACTIVITY_DAYS } }),
+            canSeeAudit ? getAuditLog({ query: { limit: 6 } }) : Promise.reject(),
         ]);
-        if (o.status === "fulfilled" && o.value.success) overview = o.value.data;
-        if (s.status === "fulfilled" && s.value.success) {
-            currentSeason = season = s.value.data;
-            if (s.value.data.seasonId != null) seasonValue = String(s.value.data.seasonId);
+        if (o.status === "fulfilled" && o.value.data) overview = o.value.data.data;
+        if (s.status === "fulfilled" && s.value.data) {
+            currentSeason = season = s.value.data.data;
+            if (s.value.data.data.seasonId != null) seasonValue = String(s.value.data.data.seasonId);
         }
-        if (list.status === "fulfilled" && list.value.success)
-            seasonOptions = list.value.data.seasons.map((x) => ({ label: x.name, value: String(x.id) }));
-        if (j.status === "fulfilled" && j.value.success) joins = daily(j.value.data.data);
-        if (a.status === "fulfilled" && a.value.success) auditTrend = daily(a.value.data.data);
-        if (act.status === "fulfilled" && act.value.success) actors = act.value.data.data;
-        if (log.status === "fulfilled" && log.value.success) recent = log.value.data.entries;
+        if (list.status === "fulfilled" && list.value.data)
+            seasonOptions = list.value.data.data.seasons.map((x) => ({ label: x.name, value: String(x.id) }));
+        if (j.status === "fulfilled" && j.value.data) joins = daily(j.value.data.data.data);
+        if (a.status === "fulfilled" && a.value.data) auditTrend = daily(a.value.data.data.data);
+        if (act.status === "fulfilled" && act.value.data) actors = act.value.data.data.data;
+        if (log.status === "fulfilled" && log.value.data) recent = log.value.data.data.entries;
         loaded = true;
     });
 
@@ -94,8 +92,8 @@
         if (!value) return;
         seasonLoading = true;
         try {
-            const resp = await getAnalyticsCwlSeasonOverview({ seasonId: Number(value) }, opts);
-            if (resp.success) season = resp.data;
+            const resp = await getAnalyticsCwlSeasonOverview({ query: { seasonId: Number(value) } });
+            if (resp.data) season = resp.data.data;
         } catch {
             // keep the previous season on screen
         } finally {

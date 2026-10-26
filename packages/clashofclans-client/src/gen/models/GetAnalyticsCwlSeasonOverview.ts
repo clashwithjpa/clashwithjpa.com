@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsCwlSeasonOverviewQueryParams = {
+export type GetAnalyticsCwlSeasonOverviewQuery = {
     /**
      * @maxLength 9007199254740991
      * @type integer | undefined
@@ -11,113 +11,67 @@ export type GetAnalyticsCwlSeasonOverviewQueryParams = {
     seasonId?: number;
 };
 
-/**
- * @description CWL season overview.
- */
-export type GetAnalyticsCwlSeasonOverview200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonOverviewStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number,null
-         */
         seasonId: number | null;
-        /**
-         * @type string,null
-         */
         seasonName: string | null;
-        /**
-         * @type number
-         */
         applications: number;
-        /**
-         * @type number
-         */
         applicants: number;
-        /**
-         * @type number
-         */
         assigned: number;
-        /**
-         * @type number
-         */
         bonuses: number;
-        /**
-         * @type array
-         */
         byClan: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             league: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
-        /**
-         * @type array
-         */
         byTownHall: {
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsCwlSeasonOverview401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonOverviewStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsCwlSeasonOverviewStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsCwlSeasonOverview500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonOverviewStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsCwlSeasonOverviewQueryResponse = GetAnalyticsCwlSeasonOverview200;
-
-export type GetAnalyticsCwlSeasonOverviewQuery = {
-    Response: GetAnalyticsCwlSeasonOverview200;
-    QueryParams: GetAnalyticsCwlSeasonOverviewQueryParams;
-    Errors: GetAnalyticsCwlSeasonOverview401 | GetAnalyticsCwlSeasonOverview500;
+export type GetAnalyticsCwlSeasonOverviewOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsCwlSeasonOverviewQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsCwlSeasonOverviewResponses = {
+    "200": GetAnalyticsCwlSeasonOverviewStatus200;
+    "400": GetAnalyticsCwlSeasonOverviewStatus400;
+    "401": GetAnalyticsCwlSeasonOverviewStatus401;
+    "500": GetAnalyticsCwlSeasonOverviewStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsCwlSeasonOverviewResponse = GetAnalyticsCwlSeasonOverviewStatus200;

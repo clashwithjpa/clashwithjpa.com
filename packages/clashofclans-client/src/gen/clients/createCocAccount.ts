@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    CreateCocAccount400,
-    CreateCocAccount401,
-    CreateCocAccount404,
-    CreateCocAccount409,
-    CreateCocAccount500,
-    CreateCocAccountMutationRequest,
-    CreateCocAccountMutationResponse,
-} from "../models/CreateCocAccount.ts";
-
-function getCreateCocAccountUrl() {
-    const res = { method: "POST", url: `/admin/coc-accounts` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { CreateCocAccountOptions, CreateCocAccountResponses } from "../models/CreateCocAccount.ts";
 
 /**
  * @description Manually links a Clash of Clans account to a member by tag, with an optional war weight and external flag. Unlike member-initiated linking, no in-game API token is required, so ownership of the tag is not verified.
  * {@link /admin/coc-accounts}
  */
-export async function createCocAccount(
-    data: CreateCocAccountMutationRequest,
-    config: Partial<RequestConfig<CreateCocAccountMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function createCocAccount<ThrowOnError extends boolean = false>(
+    options: Options<CreateCocAccountOptions, ThrowOnError>,
+): Unwrappable<RequestResult<CreateCocAccountResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        CreateCocAccountMutationResponse,
-        ResponseErrorConfig<CreateCocAccount400 | CreateCocAccount401 | CreateCocAccount404 | CreateCocAccount409 | CreateCocAccount500>,
-        CreateCocAccountMutationRequest
-    >({ method: "POST", url: getCreateCocAccountUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/coc-accounts",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<CreateCocAccountResponses, ThrowOnError>>,
+    );
 }

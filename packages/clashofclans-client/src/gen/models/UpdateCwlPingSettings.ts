@@ -3,121 +3,84 @@
  * Do not edit manually.
  */
 
-/**
- * @description Updated settings.
- */
-export type UpdateCwlPingSettings200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCwlPingSettingsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         settings: {
-            /**
-             * @type boolean
-             */
             enabled: boolean;
-            /**
-             * @type string,null
-             */
             channelId: string | null;
-            /**
-             * @type number
-             */
             intervalMinutes: number;
             lastRunAt: string | null;
-            /**
-             * @type string,null
-             */
             lastRunSummary: string | null;
         };
     };
 };
 
-/**
- * @description Bad request.
- */
-export type UpdateCwlPingSettings400 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCwlPingSettingsStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateCwlPingSettings401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCwlPingSettingsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateCwlPingSettings500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCwlPingSettingsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord unavailable.
- */
-export type UpdateCwlPingSettings503 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCwlPingSettingsStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateCwlPingSettingsMutationRequest = {
-    /**
-     * @type boolean | undefined
-     */
-    enabled?: boolean;
-    channelId?: string | null;
-    /**
-     * @minLength 1
-     * @maxLength 240
-     * @type integer | undefined
-     */
-    intervalMinutes?: number;
+export type UpdateCwlPingSettingsBody =
+    | {
+          enabled?: boolean;
+          channelId?: string | null;
+          /**
+           * @minLength 1
+           * @maxLength 240
+           * @type integer | undefined
+           */
+          intervalMinutes?: number;
+      }
+    | undefined;
+
+export type UpdateCwlPingSettingsOptions = {
+    body: UpdateCwlPingSettingsBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
 
-export type UpdateCwlPingSettingsMutationResponse = UpdateCwlPingSettings200;
-
-export type UpdateCwlPingSettingsMutation = {
-    Response: UpdateCwlPingSettings200;
-    Request: UpdateCwlPingSettingsMutationRequest;
-    Errors: UpdateCwlPingSettings400 | UpdateCwlPingSettings401 | UpdateCwlPingSettings500 | UpdateCwlPingSettings503;
+export type UpdateCwlPingSettingsResponses = {
+    "200": UpdateCwlPingSettingsStatus200;
+    "400": UpdateCwlPingSettingsStatus400;
+    "401": UpdateCwlPingSettingsStatus401;
+    "500": UpdateCwlPingSettingsStatus500;
+    "503": UpdateCwlPingSettingsStatus503;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateCwlPingSettingsResponse = UpdateCwlPingSettingsStatus200;

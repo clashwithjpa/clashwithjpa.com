@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type PostCOCPlayerVerifyPathParams = {
+export type PostCOCPlayerVerifyPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,72 +15,58 @@ export type PostCOCPlayerVerifyPathParams = {
     tag: string;
 };
 
-export const verifyTokenStatusEnum = {
+export const postCOCPlayerVerifyStatus200DataVerifyTokenStatusEnum = {
     ok: "ok",
     invalid: "invalid",
 } as const;
 
-export type VerifyTokenStatusEnumKey = (typeof verifyTokenStatusEnum)[keyof typeof verifyTokenStatusEnum];
+export type PostCOCPlayerVerifyStatus200DataVerifyTokenStatusEnumKey =
+    (typeof postCOCPlayerVerifyStatus200DataVerifyTokenStatusEnum)[keyof typeof postCOCPlayerVerifyStatus200DataVerifyTokenStatusEnum];
 
-/**
- * @description Successful response with the verification token.
- */
-export type PostCOCPlayerVerify200 = {
-    /**
-     * @type boolean
-     */
+export type PostCOCPlayerVerifyStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         verifyToken: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             token: string;
-            /**
-             * @type string
-             */
-            status: VerifyTokenStatusEnumKey;
+            status: PostCOCPlayerVerifyStatus200DataVerifyTokenStatusEnumKey;
         };
     };
 };
 
-/**
- * @description Server error response when verifying the API token fails.
- */
-export type PostCOCPlayerVerify500 = {
-    /**
-     * @type boolean
-     */
+export type PostCOCPlayerVerifyStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type PostCOCPlayerVerifyStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type PostCOCPlayerVerifyMutationRequest = {
-    /**
-     * @type string
-     */
+export type PostCOCPlayerVerifyBody = {
     apiToken: string;
 };
 
-export type PostCOCPlayerVerifyMutationResponse = PostCOCPlayerVerify200;
-
-export type PostCOCPlayerVerifyMutation = {
-    Response: PostCOCPlayerVerify200;
-    Request: PostCOCPlayerVerifyMutationRequest;
-    PathParams: PostCOCPlayerVerifyPathParams;
-    Errors: PostCOCPlayerVerify500;
+export type PostCOCPlayerVerifyOptions = {
+    body: PostCOCPlayerVerifyBody;
+    path: PostCOCPlayerVerifyPath;
+    query?: never;
+    headers?: never;
 };
+
+export type PostCOCPlayerVerifyResponses = {
+    "200": PostCOCPlayerVerifyStatus200;
+    "400": PostCOCPlayerVerifyStatus400;
+    "500": PostCOCPlayerVerifyStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type PostCOCPlayerVerifyResponse = PostCOCPlayerVerifyStatus200;

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type SetUserApiAccessPathParams = {
+export type SetUserApiAccessPath = {
     /**
      * @minLength 1
      * @type string
@@ -11,90 +11,68 @@ export type SetUserApiAccessPathParams = {
     userid: string;
 };
 
-/**
- * @description API access updated.
- */
-export type SetUserApiAccess200 = {
-    /**
-     * @type boolean
-     */
+export type SetUserApiAccessStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type string
-         */
         userId: string;
-        /**
-         * @type boolean
-         */
         apiAccess: boolean;
-        /**
-         * @type number
-         */
         disabledKeys: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SetUserApiAccess401 = {
-    /**
-     * @type boolean
-     */
+export type SetUserApiAccessStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type SetUserApiAccessStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description User not found.
- */
-export type SetUserApiAccess404 = {
-    /**
-     * @type boolean
-     */
+export type SetUserApiAccessStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SetUserApiAccess500 = {
-    /**
-     * @type boolean
-     */
+export type SetUserApiAccessStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SetUserApiAccessMutationRequest = {
-    /**
-     * @type boolean
-     */
+export type SetUserApiAccessBody = {
     enabled: boolean;
 };
 
-export type SetUserApiAccessMutationResponse = SetUserApiAccess200;
-
-export type SetUserApiAccessMutation = {
-    Response: SetUserApiAccess200;
-    Request: SetUserApiAccessMutationRequest;
-    PathParams: SetUserApiAccessPathParams;
-    Errors: SetUserApiAccess401 | SetUserApiAccess404 | SetUserApiAccess500;
+export type SetUserApiAccessOptions = {
+    body: SetUserApiAccessBody;
+    path: SetUserApiAccessPath;
+    query?: never;
+    headers?: never;
 };
+
+export type SetUserApiAccessResponses = {
+    "200": SetUserApiAccessStatus200;
+    "400": SetUserApiAccessStatus400;
+    "401": SetUserApiAccessStatus401;
+    "404": SetUserApiAccessStatus404;
+    "500": SetUserApiAccessStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SetUserApiAccessResponse = SetUserApiAccessStatus200;

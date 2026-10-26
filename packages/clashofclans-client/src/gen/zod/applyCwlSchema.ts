@@ -5,61 +5,48 @@
 
 import * as z from "zod";
 
-/**
- * @description CWL application submitted successfully.
- */
-export const applyCwl200Schema = z.object({
+export const applyCwlStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        application: z.object({
+    data: z.strictObject({
+        application: z.strictObject({
             id: z.number(),
             cocAccountTag: z.string(),
-            cocAccountClan: z.union([z.string(), z.null()]),
+            cocAccountClan: z.string().nullable(),
             cocAccountWeight: z.number(),
             preferenceNum: z.number(),
             month: z.string(),
             year: z.number(),
-            appliedAt: z.string().datetime(),
+            appliedAt: z.iso.datetime(),
         }),
     }),
 });
 
-/**
- * @description Bad request (invalid tag or failed to fetch player data).
- */
-export const applyCwl400Schema = z.object({
+export const applyCwlStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const applyCwl401Schema = z.object({
+export const applyCwlStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Duplicate preference number for this account or user.
- */
-export const applyCwl409Schema = z.object({
+export const applyCwlStatus409Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const applyCwl500Schema = z.object({
+export const applyCwlStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const applyCwlMutationRequestSchema = z.object({
-    preferenceNum: z.number().int().min(1).max(99),
+export const applyCwlResponseSchema = applyCwlStatus200Schema;
+
+export const applyCwlErrorSchema = z.union([applyCwlStatus400Schema, applyCwlStatus401Schema, applyCwlStatus409Schema, applyCwlStatus500Schema]);
+
+export const applyCwlBodySchema = z.object({
+    preferenceNum: z.int().min(1).max(99),
     tag: z.string().min(1).max(20).regex(/^#.*/),
-    accountClan: z.optional(z.union([z.string(), z.null()])),
+    accountClan: z.union([z.string().max(50), z.null()]).optional(),
 });
-
-export const applyCwlMutationResponseSchema = z.lazy(() => applyCwl200Schema);

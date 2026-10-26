@@ -3,91 +3,58 @@
  * Do not edit manually.
  */
 
-/**
- * @description The created key.
- */
-export type CreateApiKey200 = {
-    /**
-     * @type boolean
-     */
+export type CreateApiKeyStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type string
-         */
         id: string;
         name: string | null;
-        /**
-         * @type string
-         */
         key: string;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateApiKey401 = {
-    /**
-     * @type boolean
-     */
+export type CreateApiKeyStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type CreateApiKeyStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API access disabled, key limit reached, or scope above the caller\'s role.
- */
-export type CreateApiKey403 = {
-    /**
-     * @type boolean
-     */
+export type CreateApiKeyStatus403 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API key not found.
- */
-export type CreateApiKey404 = {
-    /**
-     * @type boolean
-     */
+export type CreateApiKeyStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateApiKey500 = {
-    /**
-     * @type boolean
-     */
+export type CreateApiKeyStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export const createApiKeyMutationRequestScopeEnum = {
+export const createApiKeyRequestScopeEnum = {
     apply: "apply",
     cwl: "cwl",
     review: "review",
@@ -96,20 +63,16 @@ export const createApiKeyMutationRequestScopeEnum = {
     root: "root",
 } as const;
 
-export type CreateApiKeyMutationRequestScopeEnumKey =
-    (typeof createApiKeyMutationRequestScopeEnum)[keyof typeof createApiKeyMutationRequestScopeEnum];
+export type CreateApiKeyRequestScopeEnumKey = (typeof createApiKeyRequestScopeEnum)[keyof typeof createApiKeyRequestScopeEnum];
 
-export type CreateApiKeyMutationRequest = {
+export type CreateApiKeyBody = {
     /**
      * @minLength 1
      * @maxLength 64
      * @type string
      */
     name: string;
-    /**
-     * @type string
-     */
-    scope: CreateApiKeyMutationRequestScopeEnumKey;
+    scope: CreateApiKeyRequestScopeEnumKey;
     /**
      * @minLength 86400
      * @maxLength 31536000
@@ -118,10 +81,23 @@ export type CreateApiKeyMutationRequest = {
     expiresIn?: number;
 };
 
-export type CreateApiKeyMutationResponse = CreateApiKey200;
-
-export type CreateApiKeyMutation = {
-    Response: CreateApiKey200;
-    Request: CreateApiKeyMutationRequest;
-    Errors: CreateApiKey401 | CreateApiKey403 | CreateApiKey404 | CreateApiKey500;
+export type CreateApiKeyOptions = {
+    body: CreateApiKeyBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateApiKeyResponses = {
+    "200": CreateApiKeyStatus200;
+    "400": CreateApiKeyStatus400;
+    "401": CreateApiKeyStatus401;
+    "403": CreateApiKeyStatus403;
+    "404": CreateApiKeyStatus404;
+    "500": CreateApiKeyStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateApiKeyResponse = CreateApiKeyStatus200;

@@ -3,38 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    CreateAdminCwlClan400,
-    CreateAdminCwlClan401,
-    CreateAdminCwlClan409,
-    CreateAdminCwlClan500,
-    CreateAdminCwlClanMutationRequest,
-    CreateAdminCwlClanMutationResponse,
-} from "../models/CreateAdminCwlClan.ts";
-
-function getCreateAdminCwlClanUrl() {
-    const res = { method: "POST", url: `/admin/cwl-clans` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { CreateAdminCwlClanOptions, CreateAdminCwlClanResponses } from "../models/CreateAdminCwlClan.ts";
 
 /**
  * @description Registers a CWL clan from its tag, fetching name, league and leader from the Clash of Clans API.
  * {@link /admin/cwl-clans}
  */
-export async function createAdminCwlClan(
-    data: CreateAdminCwlClanMutationRequest,
-    config: Partial<RequestConfig<CreateAdminCwlClanMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function createAdminCwlClan<ThrowOnError extends boolean = false>(
+    options: Options<CreateAdminCwlClanOptions, ThrowOnError>,
+): Unwrappable<RequestResult<CreateAdminCwlClanResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        CreateAdminCwlClanMutationResponse,
-        ResponseErrorConfig<CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500>,
-        CreateAdminCwlClanMutationRequest
-    >({ method: "POST", url: getCreateAdminCwlClanUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-clans",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<CreateAdminCwlClanResponses, ThrowOnError>>,
+    );
 }

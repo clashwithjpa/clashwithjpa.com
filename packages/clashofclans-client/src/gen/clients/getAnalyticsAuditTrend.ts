@@ -3,31 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsAuditTrend401,
-    GetAnalyticsAuditTrend500,
-    GetAnalyticsAuditTrendQueryParams,
-    GetAnalyticsAuditTrendQueryResponse,
-} from "../models/GetAnalyticsAuditTrend.ts";
-
-function getGetAnalyticsAuditTrendUrl() {
-    const res = { method: "GET", url: `/analytics/audit-trend` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsAuditTrendOptions, GetAnalyticsAuditTrendResponses } from "../models/GetAnalyticsAuditTrend.ts";
 
 /**
  * @description Daily count of audit log actions over the requested window.
  * {@link /analytics/audit-trend}
  */
-export async function getAnalyticsAuditTrend(params?: GetAnalyticsAuditTrendQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsAuditTrend<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsAuditTrendOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsAuditTrendResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsAuditTrendQueryResponse,
-        ResponseErrorConfig<GetAnalyticsAuditTrend401 | GetAnalyticsAuditTrend500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsAuditTrendUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/audit-trend",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsAuditTrendResponses, ThrowOnError>>,
+    );
 }

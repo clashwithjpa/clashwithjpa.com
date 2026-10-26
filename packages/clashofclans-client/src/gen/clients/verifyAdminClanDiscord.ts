@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    VerifyAdminClanDiscord401,
-    VerifyAdminClanDiscord500,
-    VerifyAdminClanDiscord503,
-    VerifyAdminClanDiscordMutationRequest,
-    VerifyAdminClanDiscordMutationResponse,
-} from "../models/VerifyAdminClanDiscord.ts";
-
-function getVerifyAdminClanDiscordUrl() {
-    const res = { method: "POST", url: `/admin/clans/verify-discord` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { VerifyAdminClanDiscordOptions, VerifyAdminClanDiscordResponses } from "../models/VerifyAdminClanDiscord.ts";
 
 /**
  * @description Verifies that the provided Discord role/channel/user IDs exist in the configured guild.
  * {@link /admin/clans/verify-discord}
  */
-export async function verifyAdminClanDiscord(
-    data: VerifyAdminClanDiscordMutationRequest,
-    config: Partial<RequestConfig<VerifyAdminClanDiscordMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function verifyAdminClanDiscord<ThrowOnError extends boolean = false>(
+    options: Options<VerifyAdminClanDiscordOptions, ThrowOnError>,
+): Unwrappable<RequestResult<VerifyAdminClanDiscordResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        VerifyAdminClanDiscordMutationResponse,
-        ResponseErrorConfig<VerifyAdminClanDiscord401 | VerifyAdminClanDiscord500 | VerifyAdminClanDiscord503>,
-        VerifyAdminClanDiscordMutationRequest
-    >({ method: "POST", url: getVerifyAdminClanDiscordUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/clans/verify-discord",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<VerifyAdminClanDiscordResponses, ThrowOnError>>,
+    );
 }

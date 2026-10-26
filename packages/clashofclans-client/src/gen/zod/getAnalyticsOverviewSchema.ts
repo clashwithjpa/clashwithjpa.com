@@ -5,23 +5,20 @@
 
 import * as z from "zod";
 
-/**
- * @description Overview.
- */
-export const getAnalyticsOverview200Schema = z.object({
+export const getAnalyticsOverviewStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        users: z.object({
+    data: z.strictObject({
+        users: z.strictObject({
             total: z.number(),
             newLast30d: z.number(),
             banned: z.number(),
         }),
-        cocAccounts: z.object({
+        cocAccounts: z.strictObject({
             total: z.number(),
             external: z.number(),
         }),
         pendingJoinApplications: z.number(),
-        status: z.object({
+        status: z.strictObject({
             applicationsEnabled: z.boolean(),
             cwlEnabled: z.boolean(),
             maintenance: z.boolean(),
@@ -29,20 +26,16 @@ export const getAnalyticsOverview200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsOverview401Schema = z.object({
+export const getAnalyticsOverviewStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsOverview500Schema = z.object({
+export const getAnalyticsOverviewStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsOverviewQueryResponseSchema = z.lazy(() => getAnalyticsOverview200Schema);
+export const getAnalyticsOverviewResponseSchema = getAnalyticsOverviewStatus200Schema;
+
+export const getAnalyticsOverviewErrorSchema = z.union([getAnalyticsOverviewStatus401Schema, getAnalyticsOverviewStatus500Schema]);

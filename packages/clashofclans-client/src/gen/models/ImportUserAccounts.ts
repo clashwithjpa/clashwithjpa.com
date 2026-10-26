@@ -3,71 +3,49 @@
  * Do not edit manually.
  */
 
-/**
- * @description Accounts imported (or nothing to import).
- */
-export type ImportUserAccounts200 = {
-    /**
-     * @type boolean
-     */
+export type ImportUserAccountsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         imported: {
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
         }[];
-        /**
-         * @type number
-         */
         available: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type ImportUserAccounts401 = {
-    /**
-     * @type boolean
-     */
+export type ImportUserAccountsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type ImportUserAccounts500 = {
-    /**
-     * @type boolean
-     */
+export type ImportUserAccountsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type ImportUserAccountsMutationResponse = ImportUserAccounts200;
-
-export type ImportUserAccountsMutation = {
-    Response: ImportUserAccounts200;
-    Errors: ImportUserAccounts401 | ImportUserAccounts500;
+export type ImportUserAccountsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type ImportUserAccountsResponses = {
+    "200": ImportUserAccountsStatus200;
+    "401": ImportUserAccountsStatus401;
+    "500": ImportUserAccountsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type ImportUserAccountsResponse = ImportUserAccountsStatus200;

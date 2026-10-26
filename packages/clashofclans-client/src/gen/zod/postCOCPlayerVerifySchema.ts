@@ -5,17 +5,12 @@
 
 import * as z from "zod";
 
-export const postCOCPlayerVerifyPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const postCOCPlayerVerifyPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the verification token.
- */
-export const postCOCPlayerVerify200Schema = z.object({
+export const postCOCPlayerVerifyStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        verifyToken: z.object({
+    data: z.strictObject({
+        verifyToken: z.strictObject({
             tag: z.string(),
             token: z.string(),
             status: z.enum(["ok", "invalid"]),
@@ -23,16 +18,25 @@ export const postCOCPlayerVerify200Schema = z.object({
     }),
 });
 
-/**
- * @description Server error response when verifying the API token fails.
- */
-export const postCOCPlayerVerify500Schema = z.object({
+export const postCOCPlayerVerifyStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const postCOCPlayerVerifyMutationRequestSchema = z.object({
+export const postCOCPlayerVerifyStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const postCOCPlayerVerifyResponseSchema = postCOCPlayerVerifyStatus200Schema;
+
+export const postCOCPlayerVerifyErrorSchema = z.union([postCOCPlayerVerifyStatus400Schema, postCOCPlayerVerifyStatus500Schema]);
+
+export const postCOCPlayerVerifyBodySchema = z.object({
     apiToken: z.string(),
 });
 
-export const postCOCPlayerVerifyMutationResponseSchema = z.lazy(() => postCOCPlayerVerify200Schema);
+export const postCOCPlayerVerifyPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

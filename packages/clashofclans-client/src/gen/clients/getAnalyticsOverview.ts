@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAnalyticsOverview401, GetAnalyticsOverview500, GetAnalyticsOverviewQueryResponse } from "../models/GetAnalyticsOverview.ts";
-
-function getGetAnalyticsOverviewUrl() {
-    const res = { method: "GET", url: `/analytics/overview` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsOverviewOptions, GetAnalyticsOverviewResponses } from "../models/GetAnalyticsOverview.ts";
 
 /**
  * @description Headline counts for the admin dashboard: users, CoC accounts, pending join applications and site status.
  * {@link /analytics/overview}
  */
-export async function getAnalyticsOverview(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsOverview<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsOverviewOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsOverviewResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAnalyticsOverviewQueryResponse, ResponseErrorConfig<GetAnalyticsOverview401 | GetAnalyticsOverview500>, unknown>({
-        method: "GET",
-        url: getGetAnalyticsOverviewUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/overview",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsOverviewResponses, ThrowOnError>>,
+    );
 }

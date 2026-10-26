@@ -11,22 +11,12 @@
     import { jobs } from "#lib/jobs.svelte.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         createAdminCwlClan,
         deleteAdminCwlClan,
         getAdminCwlClans,
         syncAdminCwlClanLeagues,
-        type CreateAdminCwlClan400,
-        type CreateAdminCwlClan401,
-        type CreateAdminCwlClan409,
-        type CreateAdminCwlClan500,
-        type DeleteAdminCwlClan401,
-        type DeleteAdminCwlClan404,
-        type DeleteAdminCwlClan500,
-        type GetAdminCwlClans200,
-        type SyncAdminCwlClanLeagues401,
-        type SyncAdminCwlClanLeagues500,
+        type GetAdminCwlClansStatus200,
     } from "@repo/clashofclans-client";
     import TablerPlus from "~icons/tabler/plus";
     import TablerRefresh from "~icons/tabler/refresh";
@@ -34,7 +24,7 @@
     import TablerTrash from "~icons/tabler/trash";
     import TablerX from "~icons/tabler/x";
 
-    type CwlClan = GetAdminCwlClans200["data"]["clans"][number];
+    type CwlClan = GetAdminCwlClansStatus200["data"]["clans"][number];
     type LeagueTier = { key: string; label: string; variant: "red" | "purple" | "blue" | "yellow" | "orange" | "ghost"; order: number };
 
     const LEAGUE_TIERS: LeagueTier[] = [
@@ -197,9 +187,9 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getAdminCwlClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                clans = resp.data.clans;
+            const resp = await getAdminCwlClans({});
+            if (resp.data) {
+                clans = resp.data.data.clans;
             } else {
                 toast.error("Failed to load CWL clans");
             }
@@ -217,15 +207,14 @@
     function syncLeagues() {
         jobs.start("cwl-clans:sync", "Syncing leagues", async () => {
             try {
-                const resp = (await syncAdminCwlClanLeagues({ baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                    Awaited<ReturnType<typeof syncAdminCwlClanLeagues>> | SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
-                if (!resp.success) {
-                    toast.error(errMsg(resp.error, "Failed to sync leagues"));
+                const resp = await syncAdminCwlClanLeagues({});
+                if (!resp.data) {
+                    toast.error(errMsg(resp.error?.error, "Failed to sync leagues"));
                     return;
                 }
-                const { updated, unchanged, failed } = resp.data;
+                const { updated, unchanged, failed } = resp.data.data;
                 toast.success(`Leagues synced: ${updated} updated, ${unchanged} unchanged${failed ? `, ${failed} failed` : ""}`);
-                return resp.data.clans;
+                return resp.data.data.clans;
             } catch (e) {
                 toast.error("Failed to sync leagues", { description: errorMessage(e) });
             }
@@ -259,21 +248,13 @@
         try {
             // Name, league and leader are fetched server-side from the CoC API.
             // Widen to the error variants so we can read the server's message (e.g. invalid/duplicate tag).
-            const resp = (await createAdminCwlClan(
-                { cocClanTag: tag },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as
-                | Awaited<ReturnType<typeof createAdminCwlClan>>
-                | CreateAdminCwlClan400
-                | CreateAdminCwlClan401
-                | CreateAdminCwlClan409
-                | CreateAdminCwlClan500;
-            if (resp.success) {
-                clans = [...clans, resp.data.clan].sort((a, b) => a.cocClanTag.localeCompare(b.cocClanTag));
-                toast.success(`Added ${resp.data.clan.cocClanName}`);
+            const resp = await createAdminCwlClan({ body: { cocClanTag: tag } });
+            if (resp.data) {
+                clans = [...clans, resp.data.data.clan].sort((a, b) => a.cocClanTag.localeCompare(b.cocClanTag));
+                toast.success(`Added ${resp.data.data.clan.cocClanName}`);
                 closeSidebar();
             } else {
-                toast.error(errMsg(resp.error, "Failed to add CWL clan"));
+                toast.error(errMsg(resp.error?.error, "Failed to add CWL clan"));
             }
         } catch (e) {
             toast.error("Failed to add CWL clan", { description: errorMessage(e) });
@@ -285,13 +266,12 @@
     async function removeClan(tag: string) {
         removing = tag;
         try {
-            const resp = (await deleteAdminCwlClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof deleteAdminCwlClan>> | DeleteAdminCwlClan401 | DeleteAdminCwlClan404 | DeleteAdminCwlClan500;
-            if (resp.success) {
+            const resp = await deleteAdminCwlClan({ path: { tag } });
+            if (resp.data) {
                 clans = clans.filter((c) => c.cocClanTag !== tag);
                 toast.success("CWL clan removed");
             } else {
-                toast.error(errMsg(resp.error, "Failed to remove CWL clan"));
+                toast.error(errMsg(resp.error?.error, "Failed to remove CWL clan"));
             }
         } catch (e) {
             toast.error("Failed to remove CWL clan", { description: errorMessage(e) });

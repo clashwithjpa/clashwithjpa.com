@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClan500, GetCOCClanPathParams, GetCOCClanQueryResponse } from "../models/GetCOCClan.ts";
-
-function getGetCOCClanUrl(tag: GetCOCClanPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/clan/${tag}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCClanOptions, GetCOCClanResponses } from "../models/GetCOCClan.ts";
 
 /**
  * @description Fetches a Clash of Clans clan's data by its tag. The tag must start with #.
  * {@link /coc/clan/:tag}
  */
-export async function getCOCClan(tag: GetCOCClanPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCClan<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCClanOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCClanResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCClanQueryResponse, ResponseErrorConfig<GetCOCClan500>, unknown>({
-        method: "GET",
-        url: getGetCOCClanUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/clan/{tag}", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetCOCClanResponses, ThrowOnError>
+        >,
+    );
 }

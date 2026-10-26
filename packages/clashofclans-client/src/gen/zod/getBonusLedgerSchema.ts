@@ -5,36 +5,29 @@
 
 import * as z from "zod";
 
-/**
- * @description Bonus ledger.
- */
-export const getBonusLedger200Schema = z.object({
+export const getBonusLedgerStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         bonuses: z.array(
-            z.object({
+            z.strictObject({
                 discordUserId: z.string(),
                 seasonId: z.number(),
-                cocAccountTag: z.union([z.string(), z.null()]),
+                cocAccountTag: z.string().nullable(),
             }),
         ),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getBonusLedger401Schema = z.object({
+export const getBonusLedgerStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getBonusLedger500Schema = z.object({
+export const getBonusLedgerStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getBonusLedgerQueryResponseSchema = z.lazy(() => getBonusLedger200Schema);
+export const getBonusLedgerResponseSchema = getBonusLedgerStatus200Schema;
+
+export const getBonusLedgerErrorSchema = z.union([getBonusLedgerStatus401Schema, getBonusLedgerStatus500Schema]);

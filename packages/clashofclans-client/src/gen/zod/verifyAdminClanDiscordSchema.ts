@@ -5,55 +5,59 @@
 
 import * as z from "zod";
 
-/**
- * @description Per-field verification result.
- */
-export const verifyAdminClanDiscord200Schema = z.object({
+export const verifyAdminClanDiscordStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         ok: z.boolean(),
-        results: z.object({}).catchall(
-            z.object({
+        results: z.record(
+            z.string(),
+            z.strictObject({
                 valid: z.boolean(),
-                name: z.optional(z.string()),
-                reason: z.optional(z.string()),
+                name: z.string().optional(),
+                reason: z.string().optional(),
             }),
         ),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const verifyAdminClanDiscord401Schema = z.object({
+export const verifyAdminClanDiscordStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const verifyAdminClanDiscord500Schema = z.object({
+export const verifyAdminClanDiscordStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Discord verification unavailable.
- */
-export const verifyAdminClanDiscord503Schema = z.object({
+export const verifyAdminClanDiscordStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const verifyAdminClanDiscordMutationRequestSchema = z.object({
-    discordClanRoleId: z.optional(z.string()),
-    discordMemberRoleId: z.optional(z.string()),
-    discordElderRoleId: z.optional(z.string()),
-    discordColeaderRoleId: z.optional(z.string()),
-    discordLeaderRoleId: z.optional(z.string()),
-    discordClanChannelId: z.optional(z.string()),
-    discordLeaderId: z.optional(z.string()),
+export const verifyAdminClanDiscordStatus503Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const verifyAdminClanDiscordMutationResponseSchema = z.lazy(() => verifyAdminClanDiscord200Schema);
+export const verifyAdminClanDiscordResponseSchema = verifyAdminClanDiscordStatus200Schema;
+
+export const verifyAdminClanDiscordErrorSchema = z.union([
+    verifyAdminClanDiscordStatus400Schema,
+    verifyAdminClanDiscordStatus401Schema,
+    verifyAdminClanDiscordStatus500Schema,
+    verifyAdminClanDiscordStatus503Schema,
+]);
+
+export const verifyAdminClanDiscordBodySchema = z
+    .object({
+        discordClanRoleId: z.string().optional(),
+        discordMemberRoleId: z.string().optional(),
+        discordElderRoleId: z.string().optional(),
+        discordColeaderRoleId: z.string().optional(),
+        discordLeaderRoleId: z.string().optional(),
+        discordClanChannelId: z.string().optional(),
+        discordLeaderId: z.string().optional(),
+    })
+    .optional();

@@ -5,55 +5,45 @@
 
 import * as z from "zod";
 
-/**
- * @description Sync result.
- */
-export const syncCocAccounts200Schema = z.object({
+export const syncCocAccountsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         updated: z.number(),
         skipped: z.number(),
         notLinked: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 name: z.string(),
             }),
         ),
         notInSheet: z.array(
-            z.object({
+            z.strictObject({
                 cocAccountTag: z.string(),
-                ownerName: z.union([z.string(), z.null()]),
+                ownerName: z.string().nullable(),
             }),
         ),
     }),
 });
 
-/**
- * @description Invalid sheet URL or sheet not publicly viewable.
- */
-export const syncCocAccounts400Schema = z.object({
+export const syncCocAccountsStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const syncCocAccounts401Schema = z.object({
+export const syncCocAccountsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const syncCocAccounts500Schema = z.object({
+export const syncCocAccountsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const syncCocAccountsMutationRequestSchema = z.object({
-    sheetUrl: z.string().url(),
-});
+export const syncCocAccountsResponseSchema = syncCocAccountsStatus200Schema;
 
-export const syncCocAccountsMutationResponseSchema = z.lazy(() => syncCocAccounts200Schema);
+export const syncCocAccountsErrorSchema = z.union([syncCocAccountsStatus400Schema, syncCocAccountsStatus401Schema, syncCocAccountsStatus500Schema]);
+
+export const syncCocAccountsBodySchema = z.object({
+    sheetUrl: z.url(),
+});

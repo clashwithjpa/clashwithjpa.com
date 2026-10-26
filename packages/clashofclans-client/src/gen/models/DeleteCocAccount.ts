@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeleteCocAccountPathParams = {
+export type DeleteCocAccountPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,70 +12,22 @@ export type DeleteCocAccountPathParams = {
     id: number;
 };
 
-/**
- * @description Deleted COC account.
- */
-export type DeleteCocAccount200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
@@ -85,55 +37,55 @@ export type DeleteCocAccount200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteCocAccount401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteCocAccountStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type DeleteCocAccount404 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteCocAccount500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCocAccountStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteCocAccountMutationResponse = DeleteCocAccount200;
-
-export type DeleteCocAccountMutation = {
-    Response: DeleteCocAccount200;
-    PathParams: DeleteCocAccountPathParams;
-    Errors: DeleteCocAccount401 | DeleteCocAccount404 | DeleteCocAccount500;
+export type DeleteCocAccountOptions = {
+    body?: never;
+    path: DeleteCocAccountPath;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteCocAccountResponses = {
+    "200": DeleteCocAccountStatus200;
+    "400": DeleteCocAccountStatus400;
+    "401": DeleteCocAccountStatus401;
+    "404": DeleteCocAccountStatus404;
+    "500": DeleteCocAccountStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteCocAccountResponse = DeleteCocAccountStatus200;

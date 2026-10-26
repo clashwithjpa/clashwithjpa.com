@@ -3,87 +3,53 @@
  * Do not edit manually.
  */
 
-/**
- * @description Sync summary and the refreshed CWL clan list.
- */
-export type SyncAdminCwlClanLeagues200 = {
-    /**
-     * @type boolean
-     */
+export type SyncAdminCwlClanLeaguesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         updated: number;
-        /**
-         * @type number
-         */
         unchanged: number;
-        /**
-         * @type number
-         */
         failed: number;
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             cocClanName: string;
-            /**
-             * @type string
-             */
             cocClanLeague: string;
-            /**
-             * @type string
-             */
             cocClanLeader: string;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SyncAdminCwlClanLeagues401 = {
-    /**
-     * @type boolean
-     */
+export type SyncAdminCwlClanLeaguesStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SyncAdminCwlClanLeagues500 = {
-    /**
-     * @type boolean
-     */
+export type SyncAdminCwlClanLeaguesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SyncAdminCwlClanLeaguesMutationResponse = SyncAdminCwlClanLeagues200;
-
-export type SyncAdminCwlClanLeaguesMutation = {
-    Response: SyncAdminCwlClanLeagues200;
-    Errors: SyncAdminCwlClanLeagues401 | SyncAdminCwlClanLeagues500;
+export type SyncAdminCwlClanLeaguesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type SyncAdminCwlClanLeaguesResponses = {
+    "200": SyncAdminCwlClanLeaguesStatus200;
+    "401": SyncAdminCwlClanLeaguesStatus401;
+    "500": SyncAdminCwlClanLeaguesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SyncAdminCwlClanLeaguesResponse = SyncAdminCwlClanLeaguesStatus200;

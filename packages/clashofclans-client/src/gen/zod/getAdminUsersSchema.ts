@@ -5,46 +5,59 @@
 
 import * as z from "zod";
 
-export const getAdminUsersQueryParamsSchema = z.object({
-    search: z.optional(z.string()),
-    role: z.optional(z.string()),
-    apiAccess: z.optional(z.string()),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
-    offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
-    sortBy: z.optional(z.string()),
-    sortDirection: z.optional(z.enum(["asc", "desc"])),
-});
+export const getAdminUsersQuerySearchSchema = z.string().optional();
 
-/**
- * @description Users.
- */
-export const getAdminUsers200Schema = z.object({
+export const getAdminUsersQueryRoleSchema = z.string().optional();
+
+export const getAdminUsersQueryApiAccessSchema = z.string().optional();
+
+export const getAdminUsersQueryLimitSchema = z.int().min(1).max(200).optional().default(50);
+
+export const getAdminUsersQueryOffsetSchema = z.int().min(0).max(9007199254740991).optional().default(0);
+
+export const getAdminUsersQuerySortBySchema = z.string().optional();
+
+export const getAdminUsersQuerySortDirectionSchema = z.enum(["asc", "desc"]).optional();
+
+export const getAdminUsersStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        users: z.array(z.any()),
+    data: z.strictObject({
+        users: z.array(z.unknown()),
         total: z.number(),
-        roleCounts: z.object({}).catchall(z.number()),
-        apiAccessCounts: z.object({
+        roleCounts: z.record(z.string(), z.number()),
+        apiAccessCounts: z.strictObject({
             granted: z.number(),
             none: z.number(),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAdminUsers401Schema = z.object({
+export const getAdminUsersStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAdminUsers500Schema = z.object({
+export const getAdminUsersStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAdminUsersQueryResponseSchema = z.lazy(() => getAdminUsers200Schema);
+export const getAdminUsersStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAdminUsersResponseSchema = getAdminUsersStatus200Schema;
+
+export const getAdminUsersErrorSchema = z.union([getAdminUsersStatus400Schema, getAdminUsersStatus401Schema, getAdminUsersStatus500Schema]);
+
+export const getAdminUsersQuerySchema = z.object({
+    search: z.string().optional(),
+    role: z.string().optional(),
+    apiAccess: z.string().optional(),
+    limit: z.int().min(1).max(200).optional().default(50),
+    offset: z.int().min(0).max(9007199254740991).optional().default(0),
+    sortBy: z.string().optional(),
+    sortDirection: z.enum(["asc", "desc"]).optional(),
+});

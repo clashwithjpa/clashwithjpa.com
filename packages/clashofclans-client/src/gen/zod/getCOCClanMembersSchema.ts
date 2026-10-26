@@ -5,76 +5,80 @@
 
 import * as z from "zod";
 
-export const getCOCClanMembersPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCClanMembersPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the clan\'s members.
- */
-export const getCOCClanMembers200Schema = z.object({
+export const getCOCClanMembersStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clanMembers: z.object({
+    data: z.strictObject({
+        clanMembers: z.strictObject({
             items: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     tag: z.string(),
                     role: z.enum(["member", "admin", "coLeader", "leader"]),
                     expLevel: z.number(),
                     townHallLevel: z.number(),
-                    leagueTier: z.optional(
-                        z.object({
+                    leagueTier: z
+                        .strictObject({
                             id: z.number(),
                             name: z.string(),
-                            iconUrls: z.object({
+                            iconUrls: z.strictObject({
                                 small: z.string(),
                                 large: z.string(),
                             }),
-                        }),
-                    ),
-                    builderBaseLeague: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    builderBaseLeague: z
+                        .strictObject({
                             id: z.number(),
                             name: z.string(),
-                        }),
-                    ),
+                        })
+                        .optional(),
                     trophies: z.number(),
-                    builderBaseTrophies: z.optional(z.number()),
+                    builderBaseTrophies: z.number().optional(),
                     clanRank: z.number(),
                     previousClanRank: z.number(),
                     donations: z.number(),
                     donationsReceived: z.number(),
-                    playerHouse: z.optional(
-                        z.object({
+                    playerHouse: z
+                        .strictObject({
                             elements: z.array(
-                                z.object({
+                                z.strictObject({
                                     type: z.string(),
                                     id: z.number(),
                                 }),
                             ),
-                        }),
-                    ),
+                        })
+                        .optional(),
                 }),
             ),
-            paging: z.object({
-                cursors: z.optional(
-                    z.object({
-                        after: z.optional(z.string()),
-                        before: z.optional(z.string()),
-                    }),
-                ),
+            paging: z.strictObject({
+                cursors: z
+                    .strictObject({
+                        after: z.string().optional(),
+                        before: z.string().optional(),
+                    })
+                    .optional(),
             }),
         }),
     }),
 });
 
-/**
- * @description Server error response when fetching clan members fails.
- */
-export const getCOCClanMembers500Schema = z.object({
+export const getCOCClanMembersStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCClanMembersQueryResponseSchema = z.lazy(() => getCOCClanMembers200Schema);
+export const getCOCClanMembersStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCClanMembersResponseSchema = getCOCClanMembersStatus200Schema;
+
+export const getCOCClanMembersErrorSchema = z.union([getCOCClanMembersStatus400Schema, getCOCClanMembersStatus500Schema]);
+
+export const getCOCClanMembersPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

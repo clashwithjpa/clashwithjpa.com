@@ -5,17 +5,12 @@
 
 import * as z from "zod";
 
-export const deleteAdminCwlClanPathParamsSchema = z.object({
-    tag: z.string().min(1),
-});
+export const deleteAdminCwlClanPathTagSchema = z.string().min(1);
 
-/**
- * @description Deleted CWL clan.
- */
-export const deleteAdminCwlClan200Schema = z.object({
+export const deleteAdminCwlClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             cocClanTag: z.string(),
             cocClanName: z.string(),
             cocClanLeague: z.string(),
@@ -24,28 +19,36 @@ export const deleteAdminCwlClan200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteAdminCwlClan401Schema = z.object({
+export const deleteAdminCwlClanStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const deleteAdminCwlClan404Schema = z.object({
+export const deleteAdminCwlClanStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const deleteAdminCwlClan500Schema = z.object({
+export const deleteAdminCwlClanStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteAdminCwlClanMutationResponseSchema = z.lazy(() => deleteAdminCwlClan200Schema);
+export const deleteAdminCwlClanStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const deleteAdminCwlClanResponseSchema = deleteAdminCwlClanStatus200Schema;
+
+export const deleteAdminCwlClanErrorSchema = z.union([
+    deleteAdminCwlClanStatus400Schema,
+    deleteAdminCwlClanStatus401Schema,
+    deleteAdminCwlClanStatus404Schema,
+    deleteAdminCwlClanStatus500Schema,
+]);
+
+export const deleteAdminCwlClanPathSchema = z.object({
+    tag: z.string().min(1),
+});

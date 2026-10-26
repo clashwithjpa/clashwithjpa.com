@@ -3,45 +3,25 @@
  * Do not edit manually.
  */
 
-/**
- * @description User data fetched successfully.
- */
-export type GetUser200 = {
-    /**
-     * @type boolean
-     */
+export type GetUserStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         user: {
-            /**
-             * @type string
-             */
             id: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             email: string;
-            /**
-             * @type boolean
-             */
             emailVerified: boolean;
             image?: string | null;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             createdAt: string;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             updatedAt: string;
             role?: string | null;
@@ -49,74 +29,67 @@ export type GetUser200 = {
             banReason?: string | null;
             banExpires?: string | null;
         };
-        /**
-         * @type object
-         */
         session: {
-            /**
-             * @type string
-             */
             id: string;
             /**
-             * @type string, date-time
-             */
-            expiresAt: string;
-            /**
+             * @description
+             * Format: `date-time`
              * @type string
              */
+            expiresAt: string;
             token: string;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             createdAt: string;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             updatedAt: string;
             ipAddress?: string | null;
             userAgent?: string | null;
-            /**
-             * @type string
-             */
             userId: string;
             impersonatedBy?: string | null;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetUser401 = {
-    /**
-     * @type boolean
-     */
+export type GetUserStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type GetUser500 = {
-    /**
-     * @type boolean
-     */
+export type GetUserStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetUserQueryResponse = GetUser200;
-
-export type GetUserQuery = {
-    Response: GetUser200;
-    Errors: GetUser401 | GetUser500;
+export type GetUserOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetUserResponses = {
+    "200": GetUserStatus200;
+    "401": GetUserStatus401;
+    "500": GetUserStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserResponse = GetUserStatus200;

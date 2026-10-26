@@ -3,36 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    CreateCwlSeason401,
-    CreateCwlSeason500,
-    CreateCwlSeasonMutationRequest,
-    CreateCwlSeasonMutationResponse,
-} from "../models/CreateCwlSeason.ts";
-
-function getCreateCwlSeasonUrl() {
-    const res = { method: "POST", url: `/admin/cwl-seasons` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { CreateCwlSeasonOptions, CreateCwlSeasonResponses } from "../models/CreateCwlSeason.ts";
 
 /**
  * @description Creates a new CWL season.
  * {@link /admin/cwl-seasons}
  */
-export async function createCwlSeason(
-    data: CreateCwlSeasonMutationRequest,
-    config: Partial<RequestConfig<CreateCwlSeasonMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function createCwlSeason<ThrowOnError extends boolean = false>(
+    options: Options<CreateCwlSeasonOptions, ThrowOnError>,
+): Unwrappable<RequestResult<CreateCwlSeasonResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        CreateCwlSeasonMutationResponse,
-        ResponseErrorConfig<CreateCwlSeason401 | CreateCwlSeason500>,
-        CreateCwlSeasonMutationRequest
-    >({ method: "POST", url: getCreateCwlSeasonUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-seasons",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<CreateCwlSeasonResponses, ThrowOnError>>,
+    );
 }

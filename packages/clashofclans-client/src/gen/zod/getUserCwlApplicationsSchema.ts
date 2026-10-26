@@ -5,20 +5,17 @@
 
 import * as z from "zod";
 
-/**
- * @description CWL applications fetched successfully.
- */
-export const getUserCwlApplications200Schema = z.object({
+export const getUserCwlApplicationsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         applications: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 discordUserId: z.string(),
                 discordUsername: z.string(),
                 cocAccountName: z.string(),
                 cocAccountTag: z.string(),
-                cocAccountClan: z.union([z.string(), z.null()]),
+                cocAccountClan: z.string().nullable(),
                 cocAccountWeight: z.number(),
                 isExternal: z.boolean(),
                 seasonId: z.number(),
@@ -26,28 +23,24 @@ export const getUserCwlApplications200Schema = z.object({
                 month: z.string(),
                 year: z.number(),
                 preferenceNum: z.number(),
-                appliedAt: z.string().datetime(),
-                assignedTo: z.union([z.string(), z.null()]),
+                appliedAt: z.iso.datetime(),
+                assignedTo: z.string().nullable(),
             }),
         ),
-        currentSeasonId: z.union([z.number(), z.null()]),
+        currentSeasonId: z.number().nullable(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getUserCwlApplications401Schema = z.object({
+export const getUserCwlApplicationsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const getUserCwlApplications500Schema = z.object({
+export const getUserCwlApplicationsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getUserCwlApplicationsQueryResponseSchema = z.lazy(() => getUserCwlApplications200Schema);
+export const getUserCwlApplicationsResponseSchema = getUserCwlApplicationsStatus200Schema;
+
+export const getUserCwlApplicationsErrorSchema = z.union([getUserCwlApplicationsStatus401Schema, getUserCwlApplicationsStatus500Schema]);

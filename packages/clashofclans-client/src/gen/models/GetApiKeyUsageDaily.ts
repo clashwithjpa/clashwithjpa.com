@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetApiKeyUsageDailyQueryParams = {
+export type GetApiKeyUsageDailyQuery = {
     /**
      * @minLength 1
      * @type string
@@ -18,83 +18,65 @@ export type GetApiKeyUsageDailyQueryParams = {
     days?: number;
 };
 
-/**
- * @description Daily usage.
- */
-export type GetApiKeyUsageDaily200 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageDailyStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             date: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetApiKeyUsageDaily401 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageDailyStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetApiKeyUsageDailyStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API key not found.
- */
-export type GetApiKeyUsageDaily404 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageDailyStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetApiKeyUsageDaily500 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageDailyStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetApiKeyUsageDailyQueryResponse = GetApiKeyUsageDaily200;
-
-export type GetApiKeyUsageDailyQuery = {
-    Response: GetApiKeyUsageDaily200;
-    QueryParams: GetApiKeyUsageDailyQueryParams;
-    Errors: GetApiKeyUsageDaily401 | GetApiKeyUsageDaily404 | GetApiKeyUsageDaily500;
+export type GetApiKeyUsageDailyOptions = {
+    body?: never;
+    path?: never;
+    query: GetApiKeyUsageDailyQuery;
+    headers?: never;
 };
+
+export type GetApiKeyUsageDailyResponses = {
+    "200": GetApiKeyUsageDailyStatus200;
+    "400": GetApiKeyUsageDailyStatus400;
+    "401": GetApiKeyUsageDailyStatus401;
+    "404": GetApiKeyUsageDailyStatus404;
+    "500": GetApiKeyUsageDailyStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetApiKeyUsageDailyResponse = GetApiKeyUsageDailyStatus200;

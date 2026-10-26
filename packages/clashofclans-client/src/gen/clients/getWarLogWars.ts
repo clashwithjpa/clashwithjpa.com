@@ -3,37 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetWarLogWars404,
-    GetWarLogWars500,
-    GetWarLogWarsPathParams,
-    GetWarLogWarsQueryParams,
-    GetWarLogWarsQueryResponse,
-} from "../models/GetWarLogWars.ts";
-
-function getGetWarLogWarsUrl(tag: GetWarLogWarsPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/war-log/${tag}/wars` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetWarLogWarsOptions, GetWarLogWarsResponses } from "../models/GetWarLogWars.ts";
 
 /**
  * @description Lists a family clan's wars, newest first. The first call in a while backfills history from ClashKing (full wars) and the public war log (totals only).
  * {@link /coc/war-log/:tag/wars}
  */
-export async function getWarLogWars(
-    tag: GetWarLogWarsPathParams["tag"],
-    params?: GetWarLogWarsQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getWarLogWars<ThrowOnError extends boolean = false>(
+    options: Options<GetWarLogWarsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetWarLogWarsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetWarLogWarsQueryResponse, ResponseErrorConfig<GetWarLogWars404 | GetWarLogWars500>, unknown>({
-        method: "GET",
-        url: getGetWarLogWarsUrl(tag).url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/war-log/{tag}/wars", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetWarLogWarsResponses, ThrowOnError>
+        >,
+    );
 }

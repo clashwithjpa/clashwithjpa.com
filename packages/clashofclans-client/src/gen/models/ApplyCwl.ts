@@ -3,116 +3,64 @@
  * Do not edit manually.
  */
 
-/**
- * @description CWL application submitted successfully.
- */
-export type ApplyCwl200 = {
-    /**
-     * @type boolean
-     */
+export type ApplyCwlStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         application: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             cocAccountWeight: number;
-            /**
-             * @type number
-             */
             preferenceNum: number;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             appliedAt: string;
         };
     };
 };
 
-/**
- * @description Bad request (invalid tag or failed to fetch player data).
- */
-export type ApplyCwl400 = {
-    /**
-     * @type boolean
-     */
+export type ApplyCwlStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type ApplyCwl401 = {
-    /**
-     * @type boolean
-     */
+export type ApplyCwlStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Duplicate preference number for this account or user.
- */
-export type ApplyCwl409 = {
-    /**
-     * @type boolean
-     */
+export type ApplyCwlStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type ApplyCwl500 = {
-    /**
-     * @type boolean
-     */
+export type ApplyCwlStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type ApplyCwlMutationRequest = {
+export type ApplyCwlBody = {
     /**
      * @minLength 1
      * @maxLength 99
@@ -120,6 +68,8 @@ export type ApplyCwlMutationRequest = {
      */
     preferenceNum: number;
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -129,10 +79,22 @@ export type ApplyCwlMutationRequest = {
     accountClan?: string | null;
 };
 
-export type ApplyCwlMutationResponse = ApplyCwl200;
-
-export type ApplyCwlMutation = {
-    Response: ApplyCwl200;
-    Request: ApplyCwlMutationRequest;
-    Errors: ApplyCwl400 | ApplyCwl401 | ApplyCwl409 | ApplyCwl500;
+export type ApplyCwlOptions = {
+    body: ApplyCwlBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type ApplyCwlResponses = {
+    "200": ApplyCwlStatus200;
+    "400": ApplyCwlStatus400;
+    "401": ApplyCwlStatus401;
+    "409": ApplyCwlStatus409;
+    "500": ApplyCwlStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type ApplyCwlResponse = ApplyCwlStatus200;

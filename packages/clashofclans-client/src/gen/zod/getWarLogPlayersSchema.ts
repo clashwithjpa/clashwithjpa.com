@@ -5,28 +5,21 @@
 
 import * as z from "zod";
 
-export const getWarLogPlayersPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getWarLogPlayersPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-export const getWarLogPlayersQueryParamsSchema = z.object({
-    wars: z.coerce.number().int().min(1).max(60).default(20),
-});
+export const getWarLogPlayersQueryWarsSchema = z.int().min(1).max(60).optional().default(20);
 
-/**
- * @description Player totals and the wars they cover, newest first.
- */
-export const getWarLogPlayers200Schema = z.object({
+export const getWarLogPlayersStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         wars: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 endTime: z.string(),
             }),
         ),
         players: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 name: z.string(),
                 th: z.number(),
@@ -44,26 +37,40 @@ export const getWarLogPlayers200Schema = z.object({
                 firstAttacks: z.number(),
                 defenses: z.number(),
                 triplesConceded: z.number(),
-                recent: z.array(z.number().nullable()),
+                recent: z.array(z.number()),
             }),
         ),
     }),
 });
 
-/**
- * @description Not a family clan, or no such war.
- */
-export const getWarLogPlayers404Schema = z.object({
+export const getWarLogPlayersStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getWarLogPlayers500Schema = z.object({
+export const getWarLogPlayersStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getWarLogPlayersQueryResponseSchema = z.lazy(() => getWarLogPlayers200Schema);
+export const getWarLogPlayersStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getWarLogPlayersResponseSchema = getWarLogPlayersStatus200Schema;
+
+export const getWarLogPlayersErrorSchema = z.union([
+    getWarLogPlayersStatus400Schema,
+    getWarLogPlayersStatus404Schema,
+    getWarLogPlayersStatus500Schema,
+]);
+
+export const getWarLogPlayersPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});
+
+export const getWarLogPlayersQuerySchema = z.object({
+    wars: z.int().min(1).max(60).optional().default(20),
+});

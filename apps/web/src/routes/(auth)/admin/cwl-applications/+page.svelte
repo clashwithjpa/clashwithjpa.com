@@ -25,7 +25,6 @@
     import { loadGuildNicknames } from "#lib/discordNicknames.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage, formatDate, formatDateTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,
@@ -40,7 +39,7 @@
         getJPACwlClans,
         getUserCocAccountsByUserId,
         updateCocAccountWarWeight,
-        type GetCwlApplications200,
+        type GetCwlApplicationsStatus200,
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
@@ -55,7 +54,7 @@
     import TablerUserPlus from "~icons/tabler/user-plus";
     import TablerX from "~icons/tabler/x";
 
-    type Application = GetCwlApplications200["data"]["applications"][number] & { discordNickname?: string };
+    type Application = GetCwlApplicationsStatus200["data"]["applications"][number] & { discordNickname?: string };
     type TableRow = Application & { joinedStatus: JoinStatus; wrongClan: string };
 
     let { data }: { data: { canDelete: boolean } } = $props();
@@ -181,9 +180,9 @@
 
     async function loadClans() {
         try {
-            const resp = await getJPACwlClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                const clans = Object.values(resp.data.clans);
+            const resp = await getJPACwlClans({});
+            if (resp.data) {
+                const clans = Object.values(resp.data.data.clans);
                 clanOptions = [
                     { label: "Unassigned", value: "" },
                     ...clans.map((c) => ({ label: `${c.clanName} - ${c.clanLeague} (${c.clanTag})`, value: c.clanTag })),
@@ -197,10 +196,10 @@
 
     async function loadFamilyClans() {
         try {
-            const resp = await getJPAClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
+            const resp = await getJPAClans({});
+            if (resp.data) {
                 familyClanNameByTag = Object.fromEntries(
-                    Object.values(resp.data.clans).map((c) => [normalizeTag(c.clanTag), c.clanName ?? c.clanTag]),
+                    Object.values(resp.data.data.clans).map((c) => [normalizeTag(c.clanTag), c.clanName ?? c.clanTag]),
                 );
             }
         } catch {
@@ -210,8 +209,8 @@
 
     async function loadSeasons() {
         try {
-            const resp = await getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) seasons = resp.data.seasons;
+            const resp = await getCwlSeasons({});
+            if (resp.data) seasons = resp.data.data.seasons;
         } catch {
             // season selector falls back to empty
         }
@@ -248,8 +247,8 @@
 
     async function searchUsers(query: string): Promise<ComboboxUser[]> {
         try {
-            const resp = await getAdminUsers({ search: query, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) return resp.data.users as ComboboxUser[];
+            const resp = await getAdminUsers({ query: { search: query, limit: 8 } });
+            if (resp.data) return resp.data.data.users as ComboboxUser[];
         } catch {
             // return empty on failure
         }
@@ -267,21 +266,18 @@
         registerCocTag = "";
         linkedAccounts = [];
         loadingAccounts = true;
-        getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })
+        getUserCocAccountsByUserId({ path: { userid: user.id } })
             .then(async (resp) => {
-                if (!resp.success) return;
+                if (!resp.data) return;
                 linkedAccounts = await Promise.all(
-                    resp.data.accounts.map(async (acc) => {
+                    resp.data.data.accounts.map(async (acc) => {
                         try {
-                            const playerData = await getCOCPlayer(encodeURIComponent(acc.cocAccountTag), {
-                                baseURL: PUBLIC_SERVER_URL,
-                                credentials: "include",
-                            });
+                            const { player } = (await getCOCPlayer({ path: { tag: acc.cocAccountTag } }).unwrap()).data;
                             return {
                                 cocAccountTag: acc.cocAccountTag,
                                 isExternal: acc.isExternal,
-                                name: playerData.data.player.name,
-                                icon: townHallUrl(playerData.data.player.townHallLevel),
+                                name: player.name,
+                                icon: townHallUrl(player.townHallLevel),
                             };
                         } catch {
                             return { cocAccountTag: acc.cocAccountTag, isExternal: acc.isExternal };
@@ -307,11 +303,10 @@
         const seasonId = registerSeasonValue ? Number(registerSeasonValue) : undefined;
         registerSubmitting = true;
         try {
-            const resp = await createCwlApplication(
-                { userId: selectedUser.id, tag: registerCocTag, preferenceNum: registerPreference || 1, seasonId },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await createCwlApplication({
+                body: { userId: selectedUser.id, tag: registerCocTag, preferenceNum: registerPreference || 1, seasonId },
+            });
+            if (resp.data) {
                 toast.success("CWL application registered");
                 // Jump to the season we registered into (the effect reloads the roster),
                 // or just reload if we're already viewing it.
@@ -386,19 +381,18 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getCwlApplications(
-                {
+            const resp = await getCwlApplications({
+                query: {
                     seasonId: selectedSeasonValue ? Number(selectedSeasonValue) : undefined,
                     unassigned: filterMode === "unassigned" ? true : undefined,
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            );
-            if (resp.success) {
-                let list = resp.data.applications;
+            });
+            if (resp.data) {
+                let list = resp.data.data.applications;
                 if (filterMode === "assigned") list = list.filter((a) => a.assignedTo);
                 applications = list.map((a) => ({ ...a }));
-                total = resp.data.total;
-                if (!selectedSeasonValue && resp.data.seasonId != null) selectedSeasonValue = String(resp.data.seasonId);
+                total = resp.data.data.total;
+                if (!selectedSeasonValue && resp.data.data.seasonId != null) selectedSeasonValue = String(resp.data.data.seasonId);
             } else {
                 toast.error("Failed to load CWL applications");
             }
@@ -426,14 +420,10 @@
 
     async function assign(id: number, clanTag: string) {
         try {
-            const resp = await assignCwlApplication(
-                id,
-                { clanTag: clanTag || null },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await assignCwlApplication({ path: { id }, body: { clanTag: clanTag || null } });
+            if (resp.data) {
                 toast.success(clanTag ? "Application assigned" : "Application unassigned");
-                return resp.data.application.assignedTo ?? "";
+                return resp.data.data.application.assignedTo ?? "";
             }
             toast.error("Failed to assign application");
         } catch (e) {
@@ -447,14 +437,11 @@
         bulkProcessing = true;
         const ids = selectedIds;
         try {
-            const resp = await assignCwlApplicationsBulk(
-                { ids, clanTag: bulkClan },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error("Failed to assign applications");
+            const resp = await assignCwlApplicationsBulk({ body: { ids, clanTag: bulkClan } });
+            if (!resp.data) throw new Error("Failed to assign applications");
             const idSet = new Set(ids);
             applications = applications.map((a) => (idSet.has(a.id) ? { ...a, assignedTo: bulkClan } : a));
-            toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
+            toast.success(`${resp.data.data.count} application${resp.data.data.count === 1 ? "" : "s"} assigned to ${clanLabel(bulkClan)}`);
             clearSelection();
             bulkClan = "";
         } catch (e) {
@@ -470,15 +457,12 @@
         bulkProcessing = true;
         const ids = selectedIds;
         try {
-            const resp = await deleteCwlApplicationsBulk(
-                { ids },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error("Failed to delete applications");
+            const resp = await deleteCwlApplicationsBulk({ body: { ids } });
+            if (!resp.data) throw new Error("Failed to delete applications");
             const idSet = new Set(ids);
             applications = applications.filter((a) => !idSet.has(a.id));
-            total = Math.max(0, total - resp.data.count);
-            toast.success(`${resp.data.count} application${resp.data.count === 1 ? "" : "s"} deleted`);
+            total = Math.max(0, total - resp.data.data.count);
+            toast.success(`${resp.data.data.count} application${resp.data.data.count === 1 ? "" : "s"} deleted`);
             clearSelection();
         } catch (e) {
             toast.error("Failed to delete applications", { description: errorMessage(e) });
@@ -523,9 +507,9 @@
             const results = await Promise.all(
                 missing.map(async (tag): Promise<readonly [string, RosterEntry]> => {
                     try {
-                        const resp = await getCOCClanMembers(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                        if (resp.success) {
-                            return [tag, { ok: true, tags: new Set(resp.data.clanMembers.items.map((m) => normalizeTag(m.tag))) }];
+                        const resp = await getCOCClanMembers({ path: { tag } });
+                        if (resp.data) {
+                            return [tag, { ok: true, tags: new Set(resp.data.data.clanMembers.items.map((m) => normalizeTag(m.tag))) }];
                         }
                     } catch {
                         // fetch failed — recorded below
@@ -612,13 +596,9 @@
             (applications = applications.map((a) => (a.cocAccountId === app.cocAccountId ? { ...a, cocAccountWeight: w } : a)));
         setWeight(warWeight);
         try {
-            const resp = await updateCocAccountWarWeight(
-                app.cocAccountId,
-                { warWeight },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            setWeight(resp.data.account.warWeight);
+            const resp = await updateCocAccountWarWeight({ path: { id: app.cocAccountId }, body: { warWeight } });
+            if (!resp.data) throw new Error();
+            setWeight(resp.data.data.account.warWeight);
             toast.success(`Weight updated for ${app.cocAccountName}`);
         } catch (e) {
             setWeight(previous);

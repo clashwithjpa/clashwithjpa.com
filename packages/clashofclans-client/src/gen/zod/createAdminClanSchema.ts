@@ -5,17 +5,14 @@
 
 import * as z from "zod";
 
-/**
- * @description Created clan.
- */
-export const createAdminClan200Schema = z.object({
+export const createAdminClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             id: z.number(),
             cocClanCode: z.string(),
-            cocClanName: z.union([z.string(), z.null()]),
-            cocClanLevel: z.union([z.number(), z.null()]),
+            cocClanName: z.string().nullable(),
+            cocClanLevel: z.number().nullable(),
             cocClanTag: z.string(),
             discordClanRoleId: z.string(),
             discordClanChannelId: z.string(),
@@ -31,50 +28,52 @@ export const createAdminClan200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const createAdminClan401Schema = z.object({
+export const createAdminClanStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Duplicate.
- */
-export const createAdminClan409Schema = z.object({
+export const createAdminClanStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Invalid Discord IDs.
- */
-export const createAdminClan422Schema = z.object({
+export const createAdminClanStatus409Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const createAdminClan500Schema = z.object({
+export const createAdminClanStatus422Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Discord verification unavailable.
- */
-export const createAdminClan503Schema = z.object({
+export const createAdminClanStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const createAdminClanMutationRequestSchema = z.object({
+export const createAdminClanStatus503Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const createAdminClanResponseSchema = createAdminClanStatus200Schema;
+
+export const createAdminClanErrorSchema = z.union([
+    createAdminClanStatus400Schema,
+    createAdminClanStatus401Schema,
+    createAdminClanStatus409Schema,
+    createAdminClanStatus422Schema,
+    createAdminClanStatus500Schema,
+    createAdminClanStatus503Schema,
+]);
+
+export const createAdminClanBodySchema = z.object({
     cocClanCode: z.string().min(1),
-    cocClanName: z.optional(z.union([z.string(), z.null()])),
-    cocClanLevel: z.optional(z.union([z.number().int(), z.null()])),
+    cocClanName: z.string().nullish(),
+    cocClanLevel: z.union([z.int().min(-9007199254740991).max(9007199254740991), z.null()]).optional(),
     cocClanTag: z.string().min(1).regex(/^#.*/),
     discordClanRoleId: z.string().min(1),
     discordClanChannelId: z.string().min(1),
@@ -83,9 +82,7 @@ export const createAdminClanMutationRequestSchema = z.object({
     discordColeaderRoleId: z.string().min(1),
     discordLeaderRoleId: z.string().min(1),
     discordLeaderId: z.string().min(1),
-    attacksRequirement: z.number().int().min(0).max(9007199254740991),
-    donationsRequirement: z.number().int().min(0).max(9007199254740991),
-    clangamesRequirement: z.number().int().min(0).max(9007199254740991),
+    attacksRequirement: z.int().min(0).max(9007199254740991),
+    donationsRequirement: z.int().min(0).max(9007199254740991),
+    clangamesRequirement: z.int().min(0).max(9007199254740991),
 });
-
-export const createAdminClanMutationResponseSchema = z.lazy(() => createAdminClan200Schema);

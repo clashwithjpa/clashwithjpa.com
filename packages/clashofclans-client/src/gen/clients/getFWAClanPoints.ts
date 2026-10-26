@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetFWAClanPoints502, GetFWAClanPointsPathParams, GetFWAClanPointsQueryResponse } from "../models/GetFWAClanPoints.ts";
-
-function getGetFWAClanPointsUrl(tag: GetFWAClanPointsPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/clan/${tag}/fwa-points` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetFWAClanPointsOptions, GetFWAClanPointsResponses } from "../models/GetFWAClanPoints.ts";
 
 /**
  * @description Fetches a clan's FWA point balance, current win-calculator matchup and recent point history from points.fwafarm.com, cached for five minutes. `points` is null when the clan isn't in the FWA database.
  * {@link /coc/clan/:tag/fwa-points}
  */
-export async function getFWAClanPoints(tag: GetFWAClanPointsPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getFWAClanPoints<ThrowOnError extends boolean = false>(
+    options: Options<GetFWAClanPointsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetFWAClanPointsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetFWAClanPointsQueryResponse, ResponseErrorConfig<GetFWAClanPoints502>, unknown>({
-        method: "GET",
-        url: getGetFWAClanPointsUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/clan/{tag}/fwa-points", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetFWAClanPointsResponses, ThrowOnError>
+        >,
+    );
 }

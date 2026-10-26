@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetWarLogWarPathParams = {
+export type GetWarLogWarPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -19,348 +21,138 @@ export type GetWarLogWarPathParams = {
     id: number;
 };
 
-export const attacksSideEnum = {
+export const getWarLogWarStatus200DataWarAttacksSideEnum = {
     clan: "clan",
     opponent: "opponent",
 } as const;
 
-export type AttacksSideEnumKey = (typeof attacksSideEnum)[keyof typeof attacksSideEnum];
+export type GetWarLogWarStatus200DataWarAttacksSideEnumKey =
+    (typeof getWarLogWarStatus200DataWarAttacksSideEnum)[keyof typeof getWarLogWarStatus200DataWarAttacksSideEnum];
 
-/**
- * @description The war.
- */
-export type GetWarLogWar200 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogWarStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         war: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             clanTag: string;
-            /**
-             * @type string
-             */
             state: string;
-            /**
-             * @type string,null
-             */
             result: string | null;
-            /**
-             * @type string
-             */
             source: string;
-            /**
-             * @type number
-             */
             teamSize: number;
-            /**
-             * @type number
-             */
             attacksPerMember: number;
-            /**
-             * @type string,null
-             */
             battleModifier: string | null;
-            /**
-             * @type string,null
-             */
             preparationStartTime: string | null;
-            /**
-             * @type string,null
-             */
             startTime: string | null;
-            /**
-             * @type string
-             */
             endTime: string;
-            /**
-             * @type string,null
-             */
             trackedSince: string | null;
-            /**
-             * @type string
-             */
             updatedAt: string;
-            /**
-             * @type boolean
-             */
             hasDetail: boolean;
-            /**
-             * @type object
-             */
             clan: {
-                /**
-                 * @type string,null
-                 */
                 tag: string | null;
-                /**
-                 * @type string,null
-                 */
                 name: string | null;
-                /**
-                 * @type string,null
-                 */
                 badge: string | null;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destruction: number;
-                /**
-                 * @type number
-                 */
                 attacks: number;
-                /**
-                 * @type array
-                 */
                 members: {
-                    /**
-                     * @type string
-                     */
                     tag: string;
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     th: number;
-                    /**
-                     * @type number
-                     */
                     pos: number;
-                    /**
-                     * @type number
-                     */
                     attacks: number;
-                    /**
-                     * @type number
-                     */
                     stars: number;
-                    /**
-                     * @type number
-                     */
                     newStars: number;
-                    /**
-                     * @type number
-                     */
                     destruction: number;
-                    /**
-                     * @type number
-                     */
                     defenses: number;
                     bestDefense: {
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         destruction: number;
                     } | null;
                 }[];
             };
-            /**
-             * @type object
-             */
             opponent: {
-                /**
-                 * @type string,null
-                 */
                 tag: string | null;
-                /**
-                 * @type string,null
-                 */
                 name: string | null;
-                /**
-                 * @type string,null
-                 */
                 badge: string | null;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destruction: number;
-                /**
-                 * @type number
-                 */
                 attacks: number;
-                /**
-                 * @type array
-                 */
                 members: {
-                    /**
-                     * @type string
-                     */
                     tag: string;
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     th: number;
-                    /**
-                     * @type number
-                     */
                     pos: number;
-                    /**
-                     * @type number
-                     */
                     attacks: number;
-                    /**
-                     * @type number
-                     */
                     stars: number;
-                    /**
-                     * @type number
-                     */
                     newStars: number;
-                    /**
-                     * @type number
-                     */
                     destruction: number;
-                    /**
-                     * @type number
-                     */
                     defenses: number;
                     bestDefense: {
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         destruction: number;
                     } | null;
                 }[];
             };
-            /**
-             * @type array
-             */
             attacks: {
-                /**
-                 * @type number
-                 */
                 order: number;
-                /**
-                 * @type string
-                 */
-                side: AttacksSideEnumKey;
-                /**
-                 * @type string
-                 */
+                side: GetWarLogWarStatus200DataWarAttacksSideEnumKey;
                 attackerTag: string;
-                /**
-                 * @type string
-                 */
                 defenderTag: string;
-                /**
-                 * @type number
-                 */
                 attackerPos: number;
-                /**
-                 * @type number
-                 */
                 defenderPos: number;
-                /**
-                 * @type number
-                 */
                 attackerTh: number;
-                /**
-                 * @type number
-                 */
                 defenderTh: number;
-                /**
-                 * @type number
-                 */
                 attackNo: number;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 newStars: number;
-                /**
-                 * @type number
-                 */
                 destruction: number;
-                /**
-                 * @type number
-                 */
                 duration: number;
-                /**
-                 * @type boolean
-                 */
                 fresh: boolean;
-                /**
-                 * @type string,null
-                 */
                 seenAt: string | null;
             }[];
         };
     };
 };
 
-/**
- * @description Not a family clan, or no such war.
- */
-export type GetWarLogWar404 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogWarStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetWarLogWarStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetWarLogWar500 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogWarStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetWarLogWarQueryResponse = GetWarLogWar200;
-
-export type GetWarLogWarQuery = {
-    Response: GetWarLogWar200;
-    PathParams: GetWarLogWarPathParams;
-    Errors: GetWarLogWar404 | GetWarLogWar500;
+export type GetWarLogWarOptions = {
+    body?: never;
+    path: GetWarLogWarPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetWarLogWarResponses = {
+    "200": GetWarLogWarStatus200;
+    "400": GetWarLogWarStatus400;
+    "404": GetWarLogWarStatus404;
+    "500": GetWarLogWarStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetWarLogWarResponse = GetWarLogWarStatus200;

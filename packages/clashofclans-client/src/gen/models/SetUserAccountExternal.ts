@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type SetUserAccountExternalPathParams = {
+export type SetUserAccountExternalPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,95 +12,68 @@ export type SetUserAccountExternalPathParams = {
     id: number;
 };
 
-/**
- * @description Account converted to external successfully.
- */
-export type SetUserAccountExternal200 = {
-    /**
-     * @type boolean
-     */
+export type SetUserAccountExternalStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SetUserAccountExternal401 = {
-    /**
-     * @type boolean
-     */
+export type SetUserAccountExternalStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type SetUserAccountExternalStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Account not found or not linked to the current user.
- */
-export type SetUserAccountExternal404 = {
-    /**
-     * @type boolean
-     */
+export type SetUserAccountExternalStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type SetUserAccountExternal500 = {
-    /**
-     * @type boolean
-     */
+export type SetUserAccountExternalStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SetUserAccountExternalMutationResponse = SetUserAccountExternal200;
-
-export type SetUserAccountExternalMutation = {
-    Response: SetUserAccountExternal200;
-    PathParams: SetUserAccountExternalPathParams;
-    Errors: SetUserAccountExternal401 | SetUserAccountExternal404 | SetUserAccountExternal500;
+export type SetUserAccountExternalOptions = {
+    body?: never;
+    path: SetUserAccountExternalPath;
+    query?: never;
+    headers?: never;
 };
+
+export type SetUserAccountExternalResponses = {
+    "200": SetUserAccountExternalStatus200;
+    "400": SetUserAccountExternalStatus400;
+    "401": SetUserAccountExternalStatus401;
+    "404": SetUserAccountExternalStatus404;
+    "500": SetUserAccountExternalStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SetUserAccountExternalResponse = SetUserAccountExternalStatus200;

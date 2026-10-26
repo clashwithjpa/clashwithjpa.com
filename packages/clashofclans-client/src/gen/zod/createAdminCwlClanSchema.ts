@@ -5,13 +5,10 @@
 
 import * as z from "zod";
 
-/**
- * @description Created CWL clan.
- */
-export const createAdminCwlClan200Schema = z.object({
+export const createAdminCwlClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             cocClanTag: z.string(),
             cocClanName: z.string(),
             cocClanLeague: z.string(),
@@ -20,40 +17,35 @@ export const createAdminCwlClan200Schema = z.object({
     }),
 });
 
-/**
- * @description Invalid clan tag.
- */
-export const createAdminCwlClan400Schema = z.object({
+export const createAdminCwlClanStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const createAdminCwlClan401Schema = z.object({
+export const createAdminCwlClanStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Duplicate.
- */
-export const createAdminCwlClan409Schema = z.object({
+export const createAdminCwlClanStatus409Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const createAdminCwlClan500Schema = z.object({
+export const createAdminCwlClanStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const createAdminCwlClanMutationRequestSchema = z.object({
+export const createAdminCwlClanResponseSchema = createAdminCwlClanStatus200Schema;
+
+export const createAdminCwlClanErrorSchema = z.union([
+    createAdminCwlClanStatus400Schema,
+    createAdminCwlClanStatus401Schema,
+    createAdminCwlClanStatus409Schema,
+    createAdminCwlClanStatus500Schema,
+]);
+
+export const createAdminCwlClanBodySchema = z.object({
     cocClanTag: z.string().min(1).regex(/^#.*/),
 });
-
-export const createAdminCwlClanMutationResponseSchema = z.lazy(() => createAdminCwlClan200Schema);

@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteCocAccount401,
-    DeleteCocAccount404,
-    DeleteCocAccount500,
-    DeleteCocAccountMutationResponse,
-    DeleteCocAccountPathParams,
-} from "../models/DeleteCocAccount.ts";
-
-function getDeleteCocAccountUrl(id: DeleteCocAccountPathParams["id"]) {
-    const res = { method: "DELETE", url: `/admin/coc-accounts/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteCocAccountOptions, DeleteCocAccountResponses } from "../models/DeleteCocAccount.ts";
 
 /**
  * @description Permanently deletes a Clash of Clans account. Cascades to that account's CWL applications and cannot be undone.
  * {@link /admin/coc-accounts/:id}
  */
-export async function deleteCocAccount(id: DeleteCocAccountPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteCocAccount<ThrowOnError extends boolean = false>(
+    options: Options<DeleteCocAccountOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteCocAccountResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        DeleteCocAccountMutationResponse,
-        ResponseErrorConfig<DeleteCocAccount401 | DeleteCocAccount404 | DeleteCocAccount500>,
-        unknown
-    >({ method: "DELETE", url: getDeleteCocAccountUrl(id).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/coc-accounts/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteCocAccountResponses, ThrowOnError>>,
+    );
 }

@@ -7,14 +7,13 @@
     import Icon from "#lib/components/ui/Icon.svelte";
     import Seo from "#lib/components/ui/Seo.svelte";
     import { LINKS } from "#lib/utils/links.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { getCOCClan, type GetCOCClan200 } from "@repo/clashofclans-client";
+    import { getCOCClan, type GetCOCClanStatus200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import type { PageProps } from "./$types";
 
-    type Clan = GetCOCClan200["data"]["clan"];
+    type Clan = GetCOCClanStatus200["data"]["clan"];
 
     let { data }: PageProps = $props();
 
@@ -28,10 +27,10 @@
             failed = true;
             return;
         }
-        const results = await Promise.allSettled(data.clanTags.map((tag) => getCOCClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL })));
+        const results = await Promise.allSettled(data.clanTags.map((tag) => getCOCClan({ path: { tag } })));
         const loaded: Clan[] = [];
         for (const r of results) {
-            if (r.status === "fulfilled" && r.value.success && r.value.data?.clan) loaded.push(r.value.data.clan);
+            if (r.status === "fulfilled" && r.value.data && r.value.data?.data.clan) loaded.push(r.value.data.data.clan);
         }
         clans = loaded.sort((a, b) => b.clanLevel - a.clanLevel);
         loading = false;

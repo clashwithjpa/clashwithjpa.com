@@ -5,21 +5,16 @@
 
 import * as z from "zod";
 
-export const updateAdminClanPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const updateAdminClanPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Updated clan.
- */
-export const updateAdminClan200Schema = z.object({
+export const updateAdminClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             id: z.number(),
             cocClanCode: z.string(),
-            cocClanName: z.union([z.string(), z.null()]),
-            cocClanLevel: z.union([z.number(), z.null()]),
+            cocClanName: z.string().nullable(),
+            cocClanLevel: z.number().nullable(),
             cocClanTag: z.string(),
             discordClanRoleId: z.string(),
             discordClanChannelId: z.string(),
@@ -35,61 +30,67 @@ export const updateAdminClan200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const updateAdminClan401Schema = z.object({
+export const updateAdminClanStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const updateAdminClan404Schema = z.object({
+export const updateAdminClanStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Invalid Discord IDs.
- */
-export const updateAdminClan422Schema = z.object({
+export const updateAdminClanStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const updateAdminClan500Schema = z.object({
+export const updateAdminClanStatus422Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Discord verification unavailable.
- */
-export const updateAdminClan503Schema = z.object({
+export const updateAdminClanStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateAdminClanMutationRequestSchema = z.object({
-    cocClanCode: z.optional(z.string().min(1)),
-    cocClanName: z.optional(z.union([z.string(), z.null()])),
-    cocClanLevel: z.optional(z.union([z.number().int(), z.null()])),
-    cocClanTag: z.optional(z.string().min(1).regex(/^#.*/)),
-    discordClanRoleId: z.optional(z.string().min(1)),
-    discordClanChannelId: z.optional(z.string().min(1)),
-    discordMemberRoleId: z.optional(z.string().min(1)),
-    discordElderRoleId: z.optional(z.string().min(1)),
-    discordColeaderRoleId: z.optional(z.string().min(1)),
-    discordLeaderRoleId: z.optional(z.string().min(1)),
-    discordLeaderId: z.optional(z.string().min(1)),
-    attacksRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
-    donationsRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
-    clangamesRequirement: z.optional(z.number().int().min(0).max(9007199254740991)),
+export const updateAdminClanStatus503Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateAdminClanMutationResponseSchema = z.lazy(() => updateAdminClan200Schema);
+export const updateAdminClanResponseSchema = updateAdminClanStatus200Schema;
+
+export const updateAdminClanErrorSchema = z.union([
+    updateAdminClanStatus400Schema,
+    updateAdminClanStatus401Schema,
+    updateAdminClanStatus404Schema,
+    updateAdminClanStatus422Schema,
+    updateAdminClanStatus500Schema,
+    updateAdminClanStatus503Schema,
+]);
+
+export const updateAdminClanBodySchema = z
+    .object({
+        cocClanCode: z.string().min(1).optional(),
+        cocClanName: z.string().nullish(),
+        cocClanLevel: z.union([z.int().min(-9007199254740991).max(9007199254740991), z.null()]).optional(),
+        cocClanTag: z.string().min(1).regex(/^#.*/).optional(),
+        discordClanRoleId: z.string().min(1).optional(),
+        discordClanChannelId: z.string().min(1).optional(),
+        discordMemberRoleId: z.string().min(1).optional(),
+        discordElderRoleId: z.string().min(1).optional(),
+        discordColeaderRoleId: z.string().min(1).optional(),
+        discordLeaderRoleId: z.string().min(1).optional(),
+        discordLeaderId: z.string().min(1).optional(),
+        attacksRequirement: z.int().min(0).max(9007199254740991).optional(),
+        donationsRequirement: z.int().min(0).max(9007199254740991).optional(),
+        clangamesRequirement: z.int().min(0).max(9007199254740991).optional(),
+    })
+    .optional();
+
+export const updateAdminClanPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

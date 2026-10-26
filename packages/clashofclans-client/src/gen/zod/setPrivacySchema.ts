@@ -5,34 +5,33 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the updated privacy policy content.
- */
-export const setPrivacy200Schema = z.object({
+export const setPrivacyStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         privacy: z.string(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const setPrivacy401Schema = z.object({
+export const setPrivacyStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const setPrivacy500Schema = z.object({
+export const setPrivacyStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const setPrivacyMutationRequestSchema = z.object({
+export const setPrivacyStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const setPrivacyResponseSchema = setPrivacyStatus200Schema;
+
+export const setPrivacyErrorSchema = z.union([setPrivacyStatus400Schema, setPrivacyStatus401Schema, setPrivacyStatus500Schema]);
+
+export const setPrivacyBodySchema = z.object({
     privacy: z.string().min(1).max(100000),
 });
-
-export const setPrivacyMutationResponseSchema = z.lazy(() => setPrivacy200Schema);

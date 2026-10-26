@@ -3,27 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminUsers401, GetAdminUsers500, GetAdminUsersQueryParams, GetAdminUsersQueryResponse } from "../models/GetAdminUsers.ts";
-
-function getGetAdminUsersUrl() {
-    const res = { method: "GET", url: `/admin/users` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAdminUsersOptions, GetAdminUsersResponses } from "../models/GetAdminUsers.ts";
 
 /**
  * @description Lists users with case-insensitive search across name and Discord id. Filter by role, and by apiAccess=true/false.
  * {@link /admin/users}
  */
-export async function getAdminUsers(params?: GetAdminUsersQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAdminUsers<ThrowOnError extends boolean = false>(
+    options: Options<GetAdminUsersOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAdminUsersResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAdminUsersQueryResponse, ResponseErrorConfig<GetAdminUsers401 | GetAdminUsers500>, unknown>({
-        method: "GET",
-        url: getGetAdminUsersUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/users",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAdminUsersResponses, ThrowOnError>>,
+    );
 }

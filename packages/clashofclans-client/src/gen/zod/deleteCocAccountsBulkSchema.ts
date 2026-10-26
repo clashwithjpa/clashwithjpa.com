@@ -5,34 +5,37 @@
 
 import * as z from "zod";
 
-/**
- * @description Number of accounts deleted.
- */
-export const deleteCocAccountsBulk200Schema = z.object({
+export const deleteCocAccountsBulkStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         count: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteCocAccountsBulk401Schema = z.object({
+export const deleteCocAccountsBulkStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const deleteCocAccountsBulk500Schema = z.object({
+export const deleteCocAccountsBulkStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteCocAccountsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.number().int().min(1).max(9007199254740991)).min(1).max(200),
+export const deleteCocAccountsBulkStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteCocAccountsBulkMutationResponseSchema = z.lazy(() => deleteCocAccountsBulk200Schema);
+export const deleteCocAccountsBulkResponseSchema = deleteCocAccountsBulkStatus200Schema;
+
+export const deleteCocAccountsBulkErrorSchema = z.union([
+    deleteCocAccountsBulkStatus400Schema,
+    deleteCocAccountsBulkStatus401Schema,
+    deleteCocAccountsBulkStatus500Schema,
+]);
+
+export const deleteCocAccountsBulkBodySchema = z.object({
+    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(200),
+});

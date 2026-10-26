@@ -3,29 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { SetRules500, SetRulesMutationRequest, SetRulesMutationResponse } from "../models/SetRules.ts";
-
-function getSetRulesUrl() {
-    const res = { method: "PUT", url: `/manage/rules` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SetRulesOptions, SetRulesResponses } from "../models/SetRules.ts";
 
 /**
  * @description Updates the rules content.
  * {@link /manage/rules}
  */
-export async function setRules(data: SetRulesMutationRequest, config: Partial<RequestConfig<SetRulesMutationRequest>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function setRules<ThrowOnError extends boolean = false>(
+    options: Options<SetRulesOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SetRulesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<SetRulesMutationResponse, ResponseErrorConfig<SetRules500>, SetRulesMutationRequest>({
-        method: "PUT",
-        url: getSetRulesUrl().url.toString(),
-        data: requestData,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/manage/rules",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SetRulesResponses, ThrowOnError>>,
+    );
 }

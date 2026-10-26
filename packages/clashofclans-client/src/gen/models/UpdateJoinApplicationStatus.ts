@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateJoinApplicationStatusPathParams = {
+export type UpdateJoinApplicationStatusPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,49 +12,28 @@ export type UpdateJoinApplicationStatusPathParams = {
     id: number;
 };
 
-export const applicationStatusEnum = {
+export const updateJoinApplicationStatusStatus200DataApplicationStatusEnum = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type ApplicationStatusEnumKey = (typeof applicationStatusEnum)[keyof typeof applicationStatusEnum];
+export type UpdateJoinApplicationStatusStatus200DataApplicationStatusEnumKey =
+    (typeof updateJoinApplicationStatusStatus200DataApplicationStatusEnum)[keyof typeof updateJoinApplicationStatusStatus200DataApplicationStatusEnum];
 
-/**
- * @description Updated application.
- */
-export type UpdateJoinApplicationStatus200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateJoinApplicationStatusStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         application: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            cocAccountData: any;
-            /**
-             * @type string
-             */
+            cocAccountData: unknown;
             discordUserId: string;
+            status: UpdateJoinApplicationStatusStatus200DataApplicationStatusEnumKey;
             /**
+             * @description
+             * Format: `date-time`
              * @type string
-             */
-            status: ApplicationStatusEnumKey;
-            /**
-             * @type string, date-time
              */
             createdAt: string;
             image: string | null;
@@ -64,72 +43,68 @@ export type UpdateJoinApplicationStatus200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateJoinApplicationStatus401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateJoinApplicationStatusStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type UpdateJoinApplicationStatusStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type UpdateJoinApplicationStatus404 = {
-    /**
-     * @type boolean
-     */
+export type UpdateJoinApplicationStatusStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateJoinApplicationStatus500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateJoinApplicationStatusStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export const updateJoinApplicationStatusMutationRequestStatusEnum = {
+export const updateJoinApplicationStatusRequestStatusEnum = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type UpdateJoinApplicationStatusMutationRequestStatusEnumKey =
-    (typeof updateJoinApplicationStatusMutationRequestStatusEnum)[keyof typeof updateJoinApplicationStatusMutationRequestStatusEnum];
+export type UpdateJoinApplicationStatusRequestStatusEnumKey =
+    (typeof updateJoinApplicationStatusRequestStatusEnum)[keyof typeof updateJoinApplicationStatusRequestStatusEnum];
 
-export type UpdateJoinApplicationStatusMutationRequest = {
-    /**
-     * @type string
-     */
-    status: UpdateJoinApplicationStatusMutationRequestStatusEnumKey;
+export type UpdateJoinApplicationStatusBody = {
+    status: UpdateJoinApplicationStatusRequestStatusEnumKey;
 };
 
-export type UpdateJoinApplicationStatusMutationResponse = UpdateJoinApplicationStatus200;
-
-export type UpdateJoinApplicationStatusMutation = {
-    Response: UpdateJoinApplicationStatus200;
-    Request: UpdateJoinApplicationStatusMutationRequest;
-    PathParams: UpdateJoinApplicationStatusPathParams;
-    Errors: UpdateJoinApplicationStatus401 | UpdateJoinApplicationStatus404 | UpdateJoinApplicationStatus500;
+export type UpdateJoinApplicationStatusOptions = {
+    body: UpdateJoinApplicationStatusBody;
+    path: UpdateJoinApplicationStatusPath;
+    query?: never;
+    headers?: never;
 };
+
+export type UpdateJoinApplicationStatusResponses = {
+    "200": UpdateJoinApplicationStatusStatus200;
+    "400": UpdateJoinApplicationStatusStatus400;
+    "401": UpdateJoinApplicationStatusStatus401;
+    "404": UpdateJoinApplicationStatusStatus404;
+    "500": UpdateJoinApplicationStatusStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateJoinApplicationStatusResponse = UpdateJoinApplicationStatusStatus200;

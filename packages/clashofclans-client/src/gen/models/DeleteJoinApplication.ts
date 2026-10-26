@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeleteJoinApplicationPathParams = {
+export type DeleteJoinApplicationPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,49 +12,28 @@ export type DeleteJoinApplicationPathParams = {
     id: number;
 };
 
-export const applicationStatusEnum2 = {
+export const deleteJoinApplicationStatus200DataApplicationStatusEnum = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type ApplicationStatusEnum2Key = (typeof applicationStatusEnum2)[keyof typeof applicationStatusEnum2];
+export type DeleteJoinApplicationStatus200DataApplicationStatusEnumKey =
+    (typeof deleteJoinApplicationStatus200DataApplicationStatusEnum)[keyof typeof deleteJoinApplicationStatus200DataApplicationStatusEnum];
 
-/**
- * @description Deleted application.
- */
-export type DeleteJoinApplication200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteJoinApplicationStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         application: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            cocAccountData: any;
-            /**
-             * @type string
-             */
+            cocAccountData: unknown;
             discordUserId: string;
+            status: DeleteJoinApplicationStatus200DataApplicationStatusEnumKey;
             /**
+             * @description
+             * Format: `date-time`
              * @type string
-             */
-            status: ApplicationStatusEnum2Key;
-            /**
-             * @type string, date-time
              */
             createdAt: string;
             image: string | null;
@@ -64,55 +43,55 @@ export type DeleteJoinApplication200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteJoinApplication401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteJoinApplicationStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteJoinApplicationStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type DeleteJoinApplication404 = {
-    /**
-     * @type boolean
-     */
+export type DeleteJoinApplicationStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteJoinApplication500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteJoinApplicationStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteJoinApplicationMutationResponse = DeleteJoinApplication200;
-
-export type DeleteJoinApplicationMutation = {
-    Response: DeleteJoinApplication200;
-    PathParams: DeleteJoinApplicationPathParams;
-    Errors: DeleteJoinApplication401 | DeleteJoinApplication404 | DeleteJoinApplication500;
+export type DeleteJoinApplicationOptions = {
+    body?: never;
+    path: DeleteJoinApplicationPath;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteJoinApplicationResponses = {
+    "200": DeleteJoinApplicationStatus200;
+    "400": DeleteJoinApplicationStatus400;
+    "401": DeleteJoinApplicationStatus401;
+    "404": DeleteJoinApplicationStatus404;
+    "500": DeleteJoinApplicationStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteJoinApplicationResponse = DeleteJoinApplicationStatus200;

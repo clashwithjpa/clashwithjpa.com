@@ -3,68 +3,49 @@
  * Do not edit manually.
  */
 
-/**
- * @description Bonus ledger.
- */
-export type GetBonusLedger200 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusLedgerStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         bonuses: {
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type number
-             */
             seasonId: number;
             cocAccountTag: string | null;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetBonusLedger401 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusLedgerStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetBonusLedger500 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusLedgerStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetBonusLedgerQueryResponse = GetBonusLedger200;
-
-export type GetBonusLedgerQuery = {
-    Response: GetBonusLedger200;
-    Errors: GetBonusLedger401 | GetBonusLedger500;
+export type GetBonusLedgerOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetBonusLedgerResponses = {
+    "200": GetBonusLedgerStatus200;
+    "401": GetBonusLedgerStatus401;
+    "500": GetBonusLedgerStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetBonusLedgerResponse = GetBonusLedgerStatus200;

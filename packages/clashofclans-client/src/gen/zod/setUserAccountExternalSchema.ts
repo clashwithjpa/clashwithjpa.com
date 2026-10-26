@@ -5,17 +5,12 @@
 
 import * as z from "zod";
 
-export const setUserAccountExternalPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const setUserAccountExternalPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Account converted to external successfully.
- */
-export const setUserAccountExternal200Schema = z.object({
+export const setUserAccountExternalStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        account: z.object({
+    data: z.strictObject({
+        account: z.strictObject({
             id: z.number(),
             discordUserId: z.string(),
             cocAccountTag: z.string(),
@@ -25,28 +20,36 @@ export const setUserAccountExternal200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const setUserAccountExternal401Schema = z.object({
+export const setUserAccountExternalStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Account not found or not linked to the current user.
- */
-export const setUserAccountExternal404Schema = z.object({
+export const setUserAccountExternalStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const setUserAccountExternal500Schema = z.object({
+export const setUserAccountExternalStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const setUserAccountExternalMutationResponseSchema = z.lazy(() => setUserAccountExternal200Schema);
+export const setUserAccountExternalStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const setUserAccountExternalResponseSchema = setUserAccountExternalStatus200Schema;
+
+export const setUserAccountExternalErrorSchema = z.union([
+    setUserAccountExternalStatus400Schema,
+    setUserAccountExternalStatus401Schema,
+    setUserAccountExternalStatus404Schema,
+    setUserAccountExternalStatus500Schema,
+]);
+
+export const setUserAccountExternalPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

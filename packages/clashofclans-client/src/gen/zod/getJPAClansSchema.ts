@@ -5,19 +5,17 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the JPA clans.
- */
-export const getJPAClans200Schema = z.object({
+export const getJPAClansStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clans: z.object({}).catchall(
-            z.object({
+    data: z.strictObject({
+        clans: z.record(
+            z.string(),
+            z.strictObject({
                 clanTag: z.string(),
                 clanCode: z.string(),
-                clanName: z.union([z.string(), z.null()]),
-                clanLevel: z.union([z.number(), z.null()]),
-                discord: z.object({
+                clanName: z.string().nullable(),
+                clanLevel: z.number().nullable(),
+                discord: z.strictObject({
                     clanRoleId: z.string(),
                     clanChannelId: z.string(),
                     memberRoleId: z.string(),
@@ -26,7 +24,7 @@ export const getJPAClans200Schema = z.object({
                     leaderRoleId: z.string(),
                     leaderId: z.string(),
                 }),
-                requirements: z.object({
+                requirements: z.strictObject({
                     attacks: z.number(),
                     donations: z.number(),
                     clangames: z.number(),
@@ -36,12 +34,11 @@ export const getJPAClans200Schema = z.object({
     }),
 });
 
-/**
- * @description Server error response when fetching JPA clans fails.
- */
-export const getJPAClans500Schema = z.object({
+export const getJPAClansStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getJPAClansQueryResponseSchema = z.lazy(() => getJPAClans200Schema);
+export const getJPAClansResponseSchema = getJPAClansStatus200Schema;
+
+export const getJPAClansErrorSchema = getJPAClansStatus500Schema;

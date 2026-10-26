@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteCwlSeason401,
-    DeleteCwlSeason404,
-    DeleteCwlSeason500,
-    DeleteCwlSeasonMutationResponse,
-    DeleteCwlSeasonPathParams,
-} from "../models/DeleteCwlSeason.ts";
-
-function getDeleteCwlSeasonUrl(id: DeleteCwlSeasonPathParams["id"]) {
-    const res = { method: "DELETE", url: `/admin/cwl-seasons/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteCwlSeasonOptions, DeleteCwlSeasonResponses } from "../models/DeleteCwlSeason.ts";
 
 /**
  * @description Deletes a CWL season; cascades to its applications and bonuses.
  * {@link /admin/cwl-seasons/:id}
  */
-export async function deleteCwlSeason(id: DeleteCwlSeasonPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteCwlSeason<ThrowOnError extends boolean = false>(
+    options: Options<DeleteCwlSeasonOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteCwlSeasonResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        DeleteCwlSeasonMutationResponse,
-        ResponseErrorConfig<DeleteCwlSeason401 | DeleteCwlSeason404 | DeleteCwlSeason500>,
-        unknown
-    >({ method: "DELETE", url: getDeleteCwlSeasonUrl(id).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/cwl-seasons/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteCwlSeasonResponses, ThrowOnError>>,
+    );
 }

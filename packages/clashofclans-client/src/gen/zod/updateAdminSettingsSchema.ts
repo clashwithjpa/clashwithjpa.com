@@ -5,48 +5,53 @@
 
 import * as z from "zod";
 
-/**
- * @description Updated settings.
- */
-export const updateAdminSettings200Schema = z.object({
+export const updateAdminSettingsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        settings: z.object({
+    data: z.strictObject({
+        settings: z.strictObject({
             id: z.number(),
             applicationsEnabled: z.boolean(),
             cwlEnabled: z.boolean(),
             siteMaintenanceMode: z.boolean(),
-            rulesContent: z.union([z.string(), z.null()]),
-            privacyContent: z.union([z.string(), z.null()]),
-            guildId: z.union([z.string(), z.null()]),
-            currentCwlSeasonId: z.union([z.number(), z.null()]),
-            updatedAt: z.union([z.string().datetime(), z.null()]),
+            rulesContent: z.string().nullable(),
+            privacyContent: z.string().nullable(),
+            guildId: z.string().nullable(),
+            currentCwlSeasonId: z.number().nullable(),
+            updatedAt: z.union([z.iso.datetime(), z.null()]),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const updateAdminSettings401Schema = z.object({
+export const updateAdminSettingsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const updateAdminSettings500Schema = z.object({
+export const updateAdminSettingsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateAdminSettingsMutationRequestSchema = z.object({
-    applicationsEnabled: z.optional(z.boolean()),
-    cwlEnabled: z.optional(z.boolean()),
-    siteMaintenanceMode: z.optional(z.boolean()),
-    guildId: z.optional(z.union([z.string(), z.null()])),
-    currentCwlSeasonId: z.optional(z.union([z.number().int(), z.null()])),
+export const updateAdminSettingsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateAdminSettingsMutationResponseSchema = z.lazy(() => updateAdminSettings200Schema);
+export const updateAdminSettingsResponseSchema = updateAdminSettingsStatus200Schema;
+
+export const updateAdminSettingsErrorSchema = z.union([
+    updateAdminSettingsStatus400Schema,
+    updateAdminSettingsStatus401Schema,
+    updateAdminSettingsStatus500Schema,
+]);
+
+export const updateAdminSettingsBodySchema = z
+    .object({
+        applicationsEnabled: z.boolean().optional(),
+        cwlEnabled: z.boolean().optional(),
+        siteMaintenanceMode: z.boolean().optional(),
+        guildId: z.string().nullish(),
+        currentCwlSeasonId: z.union([z.int().min(-9007199254740991).max(9007199254740991), z.null()]).optional(),
+    })
+    .optional();

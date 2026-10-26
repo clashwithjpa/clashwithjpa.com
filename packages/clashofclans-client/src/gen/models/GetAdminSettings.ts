@@ -3,34 +3,13 @@
  * Do not edit manually.
  */
 
-/**
- * @description Settings.
- */
-export type GetAdminSettings200 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminSettingsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         settings: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type boolean
-             */
             applicationsEnabled: boolean;
-            /**
-             * @type boolean
-             */
             cwlEnabled: boolean;
-            /**
-             * @type boolean
-             */
             siteMaintenanceMode: boolean;
             rulesContent: string | null;
             privacyContent: string | null;
@@ -41,39 +20,38 @@ export type GetAdminSettings200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAdminSettings401 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminSettingsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAdminSettings500 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminSettingsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAdminSettingsQueryResponse = GetAdminSettings200;
-
-export type GetAdminSettingsQuery = {
-    Response: GetAdminSettings200;
-    Errors: GetAdminSettings401 | GetAdminSettings500;
+export type GetAdminSettingsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAdminSettingsResponses = {
+    "200": GetAdminSettingsStatus200;
+    "401": GetAdminSettingsStatus401;
+    "500": GetAdminSettingsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAdminSettingsResponse = GetAdminSettingsStatus200;

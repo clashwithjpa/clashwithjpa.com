@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetCwlApplications401,
-    GetCwlApplications500,
-    GetCwlApplicationsQueryParams,
-    GetCwlApplicationsQueryResponse,
-} from "../models/GetCwlApplications.ts";
-
-function getGetCwlApplicationsUrl() {
-    const res = { method: "GET", url: `/admin/cwl-applications` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCwlApplicationsOptions, GetCwlApplicationsResponses } from "../models/GetCwlApplications.ts";
 
 /**
  * @description Lists CWL applications for a season (defaults to the current season). Filter by seasonId/assignedTo or unassigned=true.
  * {@link /admin/cwl-applications}
  */
-export async function getCwlApplications(params?: GetCwlApplicationsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCwlApplications<ThrowOnError extends boolean = false>(
+    options: Options<GetCwlApplicationsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCwlApplicationsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCwlApplicationsQueryResponse, ResponseErrorConfig<GetCwlApplications401 | GetCwlApplications500>, unknown>({
-        method: "GET",
-        url: getGetCwlApplicationsUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/cwl-applications",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCwlApplicationsResponses, ThrowOnError>>,
+    );
 }

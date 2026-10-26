@@ -3,105 +3,59 @@
  * Do not edit manually.
  */
 
-/**
- * @description Overview.
- */
-export type GetAnalyticsOverview200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsOverviewStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         users: {
-            /**
-             * @type number
-             */
             total: number;
-            /**
-             * @type number
-             */
             newLast30d: number;
-            /**
-             * @type number
-             */
             banned: number;
         };
-        /**
-         * @type object
-         */
         cocAccounts: {
-            /**
-             * @type number
-             */
             total: number;
-            /**
-             * @type number
-             */
             external: number;
         };
-        /**
-         * @type number
-         */
         pendingJoinApplications: number;
-        /**
-         * @type object
-         */
         status: {
-            /**
-             * @type boolean
-             */
             applicationsEnabled: boolean;
-            /**
-             * @type boolean
-             */
             cwlEnabled: boolean;
-            /**
-             * @type boolean
-             */
             maintenance: boolean;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsOverview401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsOverviewStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsOverview500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsOverviewStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsOverviewQueryResponse = GetAnalyticsOverview200;
-
-export type GetAnalyticsOverviewQuery = {
-    Response: GetAnalyticsOverview200;
-    Errors: GetAnalyticsOverview401 | GetAnalyticsOverview500;
+export type GetAnalyticsOverviewOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAnalyticsOverviewResponses = {
+    "200": GetAnalyticsOverviewStatus200;
+    "401": GetAnalyticsOverviewStatus401;
+    "500": GetAnalyticsOverviewStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsOverviewResponse = GetAnalyticsOverviewStatus200;

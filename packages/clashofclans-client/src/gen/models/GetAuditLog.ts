@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export const getAuditLogQueryParamsActionEnum = {
+export const getAuditLogAction = {
     "clan_application.create": "clan_application.create",
     "clan_application.accepted": "clan_application.accepted",
     "clan_application.rejected": "clan_application.rejected",
@@ -59,9 +59,9 @@ export const getAuditLogQueryParamsActionEnum = {
     "api_key.delete": "api_key.delete",
 } as const;
 
-export type GetAuditLogQueryParamsActionEnumKey = (typeof getAuditLogQueryParamsActionEnum)[keyof typeof getAuditLogQueryParamsActionEnum];
+export type GetAuditLogActionKey = (typeof getAuditLogAction)[keyof typeof getAuditLogAction];
 
-export const getAuditLogQueryParamsTargetTypeEnum = {
+export const getAuditLogTargetType = {
     clan_application: "clan_application",
     cwl_application: "cwl_application",
     cwl_bonus: "cwl_bonus",
@@ -76,43 +76,31 @@ export const getAuditLogQueryParamsTargetTypeEnum = {
     api_key: "api_key",
 } as const;
 
-export type GetAuditLogQueryParamsTargetTypeEnumKey =
-    (typeof getAuditLogQueryParamsTargetTypeEnum)[keyof typeof getAuditLogQueryParamsTargetTypeEnum];
+export type GetAuditLogTargetTypeKey = (typeof getAuditLogTargetType)[keyof typeof getAuditLogTargetType];
 
-export const getAuditLogQueryParamsSourceEnum = {
+export const getAuditLogSource = {
     web: "web",
     api: "api",
 } as const;
 
-export type GetAuditLogQueryParamsSourceEnumKey = (typeof getAuditLogQueryParamsSourceEnum)[keyof typeof getAuditLogQueryParamsSourceEnum];
+export type GetAuditLogSourceKey = (typeof getAuditLogSource)[keyof typeof getAuditLogSource];
 
-export type GetAuditLogQueryParams = {
-    /**
-     * @type string | undefined
-     */
+export type GetAuditLogQuery = {
     actorId?: string;
-    /**
-     * @type string | undefined
-     */
-    action?: GetAuditLogQueryParamsActionEnumKey;
-    /**
-     * @type string | undefined
-     */
-    targetType?: GetAuditLogQueryParamsTargetTypeEnumKey;
-    /**
-     * @type string | undefined
-     */
+    action?: GetAuditLogActionKey;
+    targetType?: GetAuditLogTargetTypeKey;
     targetId?: string;
+    source?: GetAuditLogSourceKey;
     /**
+     * @description
+     * Format: `date-time`
      * @type string | undefined
-     */
-    source?: GetAuditLogQueryParamsSourceEnumKey;
-    /**
-     * @type string | undefined, date-time
      */
     before?: string;
     /**
-     * @type string | undefined, date-time
+     * @description
+     * Format: `date-time`
+     * @type string | undefined
      */
     after?: string;
     /**
@@ -131,7 +119,7 @@ export type GetAuditLogQueryParams = {
     offset?: number;
 };
 
-export const entriesActorCurrentRoleEnum = {
+export const getAuditLogStatus200DataEntriesActorCurrentRole = {
     unverified: "unverified",
     verified: "verified",
     reviewer: "reviewer",
@@ -140,9 +128,10 @@ export const entriesActorCurrentRoleEnum = {
     superadmin: "superadmin",
 } as const;
 
-export type EntriesActorCurrentRoleEnumKey = (typeof entriesActorCurrentRoleEnum)[keyof typeof entriesActorCurrentRoleEnum];
+export type GetAuditLogStatus200DataEntriesActorCurrentRoleKey =
+    (typeof getAuditLogStatus200DataEntriesActorCurrentRole)[keyof typeof getAuditLogStatus200DataEntriesActorCurrentRole];
 
-export const entriesActionEnum = {
+export const getAuditLogStatus200DataEntriesActionEnum = {
     "clan_application.create": "clan_application.create",
     "clan_application.accepted": "clan_application.accepted",
     "clan_application.rejected": "clan_application.rejected",
@@ -198,9 +187,10 @@ export const entriesActionEnum = {
     "api_key.delete": "api_key.delete",
 } as const;
 
-export type EntriesActionEnumKey = (typeof entriesActionEnum)[keyof typeof entriesActionEnum];
+export type GetAuditLogStatus200DataEntriesActionEnumKey =
+    (typeof getAuditLogStatus200DataEntriesActionEnum)[keyof typeof getAuditLogStatus200DataEntriesActionEnum];
 
-export const entriesTargetTypeEnum = {
+export const getAuditLogStatus200DataEntriesTargetType = {
     clan_application: "clan_application",
     cwl_application: "cwl_application",
     cwl_bonus: "cwl_bonus",
@@ -215,100 +205,85 @@ export const entriesTargetTypeEnum = {
     api_key: "api_key",
 } as const;
 
-export type EntriesTargetTypeEnumKey = (typeof entriesTargetTypeEnum)[keyof typeof entriesTargetTypeEnum];
+export type GetAuditLogStatus200DataEntriesTargetTypeKey =
+    (typeof getAuditLogStatus200DataEntriesTargetType)[keyof typeof getAuditLogStatus200DataEntriesTargetType];
 
-export const entriesSourceEnum = {
+export const getAuditLogStatus200DataEntriesSourceEnum = {
     web: "web",
     api: "api",
 } as const;
 
-export type EntriesSourceEnumKey = (typeof entriesSourceEnum)[keyof typeof entriesSourceEnum];
+export type GetAuditLogStatus200DataEntriesSourceEnumKey =
+    (typeof getAuditLogStatus200DataEntriesSourceEnum)[keyof typeof getAuditLogStatus200DataEntriesSourceEnum];
 
-/**
- * @description Audit log entries.
- */
-export type GetAuditLog200 = {
-    /**
-     * @type boolean
-     */
+export type GetAuditLogStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         entries: {
-            /**
-             * @type number
-             */
             id: number;
             actorId: string | null;
             actorName: string | null;
             actorCurrentName: string | null;
             actorCurrentImage: string | null;
-            actorCurrentRole: EntriesActorCurrentRoleEnumKey | null;
+            actorCurrentRole: GetAuditLogStatus200DataEntriesActorCurrentRoleKey | null;
             actorDiscordId: string | null;
-            /**
-             * @type string
-             */
-            action: EntriesActionEnumKey;
-            targetType: EntriesTargetTypeEnumKey | null;
+            action: GetAuditLogStatus200DataEntriesActionEnumKey;
+            targetType: GetAuditLogStatus200DataEntriesTargetTypeKey | null;
             targetId: string | null;
-            metadata: any | null;
-            /**
-             * @type string
-             */
-            source: EntriesSourceEnumKey;
+            metadata: unknown | null;
+            source: GetAuditLogStatus200DataEntriesSourceEnumKey;
             apiKeyId: string | null;
             apiKeyName: string | null;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             createdAt: string;
         }[];
-        /**
-         * @type number
-         */
         total: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAuditLog401 = {
-    /**
-     * @type boolean
-     */
+export type GetAuditLogStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAuditLogStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAuditLog500 = {
-    /**
-     * @type boolean
-     */
+export type GetAuditLogStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAuditLogQueryResponse = GetAuditLog200;
-
-export type GetAuditLogQuery = {
-    Response: GetAuditLog200;
-    QueryParams: GetAuditLogQueryParams;
-    Errors: GetAuditLog401 | GetAuditLog500;
+export type GetAuditLogOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAuditLogQuery;
+    headers?: never;
 };
+
+export type GetAuditLogResponses = {
+    "200": GetAuditLogStatus200;
+    "400": GetAuditLogStatus400;
+    "401": GetAuditLogStatus401;
+    "500": GetAuditLogStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAuditLogResponse = GetAuditLogStatus200;

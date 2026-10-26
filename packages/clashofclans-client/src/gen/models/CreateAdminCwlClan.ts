@@ -3,104 +3,58 @@
  * Do not edit manually.
  */
 
-/**
- * @description Created CWL clan.
- */
-export type CreateAdminCwlClan200 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminCwlClanStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clan: {
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             cocClanName: string;
-            /**
-             * @type string
-             */
             cocClanLeague: string;
-            /**
-             * @type string
-             */
             cocClanLeader: string;
         };
     };
 };
 
-/**
- * @description Invalid clan tag.
- */
-export type CreateAdminCwlClan400 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminCwlClanStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateAdminCwlClan401 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminCwlClanStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Duplicate.
- */
-export type CreateAdminCwlClan409 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminCwlClanStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateAdminCwlClan500 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminCwlClanStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type CreateAdminCwlClanMutationRequest = {
+export type CreateAdminCwlClanBody = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @pattern ^#.*
      * @type string
@@ -108,10 +62,22 @@ export type CreateAdminCwlClanMutationRequest = {
     cocClanTag: string;
 };
 
-export type CreateAdminCwlClanMutationResponse = CreateAdminCwlClan200;
-
-export type CreateAdminCwlClanMutation = {
-    Response: CreateAdminCwlClan200;
-    Request: CreateAdminCwlClanMutationRequest;
-    Errors: CreateAdminCwlClan400 | CreateAdminCwlClan401 | CreateAdminCwlClan409 | CreateAdminCwlClan500;
+export type CreateAdminCwlClanOptions = {
+    body: CreateAdminCwlClanBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateAdminCwlClanResponses = {
+    "200": CreateAdminCwlClanStatus200;
+    "400": CreateAdminCwlClanStatus400;
+    "401": CreateAdminCwlClanStatus401;
+    "409": CreateAdminCwlClanStatus409;
+    "500": CreateAdminCwlClanStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateAdminCwlClanResponse = CreateAdminCwlClanStatus200;

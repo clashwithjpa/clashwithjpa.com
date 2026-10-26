@@ -3,76 +3,44 @@
  * Do not edit manually.
  */
 
-/**
- * @description Run summary.
- */
-export type PreviewCwlPing200 = {
-    /**
-     * @type boolean
-     */
+export type PreviewCwlPingStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number,null
-         */
         seasonId: number | null;
-        /**
-         * @type number
-         */
         clansChecked: number;
-        /**
-         * @type number
-         */
         clansPinged: number;
-        /**
-         * @type number
-         */
         usersPinged: number;
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type number
-             */
             pending: number;
         }[];
-        /**
-         * @type string | undefined
-         */
         skippedReason?: string;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type PreviewCwlPing401 = {
-    /**
-     * @type boolean
-     */
+export type PreviewCwlPingStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type PreviewCwlPingQueryResponse = PreviewCwlPing200;
-
-export type PreviewCwlPingQuery = {
-    Response: PreviewCwlPing200;
-    Errors: PreviewCwlPing401;
+export type PreviewCwlPingOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type PreviewCwlPingResponses = {
+    "200": PreviewCwlPingStatus200;
+    "401": PreviewCwlPingStatus401;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type PreviewCwlPingResponse = PreviewCwlPingStatus200;

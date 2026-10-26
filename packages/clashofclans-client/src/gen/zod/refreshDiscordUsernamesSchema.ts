@@ -5,40 +5,34 @@
 
 import * as z from "zod";
 
-/**
- * @description Backfill result.
- */
-export const refreshDiscordUsernames200Schema = z.object({
+export const refreshDiscordUsernamesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         total: z.number(),
         matched: z.number(),
         updated: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const refreshDiscordUsernames401Schema = z.object({
+export const refreshDiscordUsernamesStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const refreshDiscordUsernames500Schema = z.object({
+export const refreshDiscordUsernamesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Discord unavailable.
- */
-export const refreshDiscordUsernames503Schema = z.object({
+export const refreshDiscordUsernamesStatus503Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const refreshDiscordUsernamesMutationResponseSchema = z.lazy(() => refreshDiscordUsernames200Schema);
+export const refreshDiscordUsernamesResponseSchema = refreshDiscordUsernamesStatus200Schema;
+
+export const refreshDiscordUsernamesErrorSchema = z.union([
+    refreshDiscordUsernamesStatus401Schema,
+    refreshDiscordUsernamesStatus500Schema,
+    refreshDiscordUsernamesStatus503Schema,
+]);

@@ -3,27 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAuditLog401, GetAuditLog500, GetAuditLogQueryParams, GetAuditLogQueryResponse } from "../models/GetAuditLog.ts";
-
-function getGetAuditLogUrl() {
-    const res = { method: "GET", url: `/admin/audit-log` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAuditLogOptions, GetAuditLogResponses } from "../models/GetAuditLog.ts";
 
 /**
  * @description Lists audit log entries with optional filters (actorId, action, targetType, targetId, source, date range) and pagination.
  * {@link /admin/audit-log}
  */
-export async function getAuditLog(params?: GetAuditLogQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAuditLog<ThrowOnError extends boolean = false>(
+    options: Options<GetAuditLogOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAuditLogResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAuditLogQueryResponse, ResponseErrorConfig<GetAuditLog401 | GetAuditLog500>, unknown>({
-        method: "GET",
-        url: getGetAuditLogUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/audit-log",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAuditLogResponses, ThrowOnError>>,
+    );
 }

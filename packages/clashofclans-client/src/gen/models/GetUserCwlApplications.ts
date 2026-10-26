@@ -3,73 +3,27 @@
  * Do not edit manually.
  */
 
-/**
- * @description CWL applications fetched successfully.
- */
-export type GetUserCwlApplications200 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCwlApplicationsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         applications: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             discordUsername: string;
-            /**
-             * @type string
-             */
             cocAccountName: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             cocAccountWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
-            /**
-             * @type number
-             */
             seasonId: number;
-            /**
-             * @type string
-             */
             seasonName: string;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
-            /**
-             * @type number
-             */
             preferenceNum: number;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             appliedAt: string;
             assignedTo: string | null;
@@ -78,39 +32,38 @@ export type GetUserCwlApplications200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetUserCwlApplications401 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCwlApplicationsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type GetUserCwlApplications500 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCwlApplicationsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetUserCwlApplicationsQueryResponse = GetUserCwlApplications200;
-
-export type GetUserCwlApplicationsQuery = {
-    Response: GetUserCwlApplications200;
-    Errors: GetUserCwlApplications401 | GetUserCwlApplications500;
+export type GetUserCwlApplicationsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetUserCwlApplicationsResponses = {
+    "200": GetUserCwlApplicationsStatus200;
+    "401": GetUserCwlApplicationsStatus401;
+    "500": GetUserCwlApplicationsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserCwlApplicationsResponse = GetUserCwlApplicationsStatus200;

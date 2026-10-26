@@ -5,49 +5,58 @@
 
 import * as z from "zod";
 
-export const getJoinApplicationsQueryParamsSchema = z.object({
-    status: z.optional(z.enum(["pending", "accepted", "rejected"])),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
-    offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
-});
+export const getJoinApplicationsQueryStatusSchema = z.enum(["pending", "accepted", "rejected"]).optional();
 
-/**
- * @description Applications.
- */
-export const getJoinApplications200Schema = z.object({
+export const getJoinApplicationsQueryLimitSchema = z.int().min(1).max(200).optional().default(50);
+
+export const getJoinApplicationsQueryOffsetSchema = z.int().min(0).max(9007199254740991).optional().default(0);
+
+export const getJoinApplicationsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         applications: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 cocAccountTag: z.string(),
-                cocAccountData: z.any(),
+                cocAccountData: z.unknown(),
                 discordUserId: z.string(),
                 status: z.enum(["pending", "accepted", "rejected"]),
-                createdAt: z.string().datetime(),
-                image: z.union([z.string(), z.null()]),
-                discordUsername: z.union([z.string(), z.null()]),
-                discordRole: z.union([z.string(), z.null()]),
+                createdAt: z.iso.datetime(),
+                image: z.string().nullable(),
+                discordUsername: z.string().nullable(),
+                discordRole: z.string().nullable(),
             }),
         ),
         total: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getJoinApplications401Schema = z.object({
+export const getJoinApplicationsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getJoinApplications500Schema = z.object({
+export const getJoinApplicationsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getJoinApplicationsQueryResponseSchema = z.lazy(() => getJoinApplications200Schema);
+export const getJoinApplicationsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getJoinApplicationsResponseSchema = getJoinApplicationsStatus200Schema;
+
+export const getJoinApplicationsErrorSchema = z.union([
+    getJoinApplicationsStatus400Schema,
+    getJoinApplicationsStatus401Schema,
+    getJoinApplicationsStatus500Schema,
+]);
+
+export const getJoinApplicationsQuerySchema = z.object({
+    status: z.enum(["pending", "accepted", "rejected"]).optional(),
+    limit: z.int().min(1).max(200).optional().default(50),
+    offset: z.int().min(0).max(9007199254740991).optional().default(0),
+});

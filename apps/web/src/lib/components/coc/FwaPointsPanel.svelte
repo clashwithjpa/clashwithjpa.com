@@ -1,11 +1,10 @@
 <script lang="ts">
     import Icon from "#lib/components/ui/Icon.svelte";
     import { cn } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
-    import { getFWAClanPoints, type GetFWAClanPoints200 } from "@repo/clashofclans-client";
+    import { getFWAClanPoints, type GetFWAClanPointsStatus200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
 
-    type Points = NonNullable<GetFWAClanPoints200["data"]["points"]>;
+    type Points = NonNullable<GetFWAClanPointsStatus200["data"]["points"]>;
 
     let { tag }: { tag: string } = $props();
 
@@ -16,8 +15,9 @@
 
     onMount(async () => {
         try {
-            const res = await getFWAClanPoints(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL });
-            points = res.data.points;
+            const res = await getFWAClanPoints({ path: { tag } });
+            if (!res.data) throw new Error(`FWA points request failed with ${res.status}`);
+            points = res.data.data.points;
             status = points ? "ready" : "missing";
         } catch {
             status = "failed";

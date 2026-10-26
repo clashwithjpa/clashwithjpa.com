@@ -5,20 +5,13 @@
 
 import * as z from "zod";
 
-export const getCwlStatsQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
-    })
-    .optional();
+export const getCwlStatsQuerySeasonIdSchema = z.int().min(-9007199254740991).max(9007199254740991).optional();
 
-/**
- * @description CWL stats.
- */
-export const getCwlStats200Schema = z.object({
+export const getCwlStatsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         stats: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 name: z.string(),
                 clanTag: z.string(),
@@ -26,7 +19,7 @@ export const getCwlStats200Schema = z.object({
                 stars: z.number(),
                 rounds: z.array(z.number()),
                 details: z.array(
-                    z.object({
+                    z.strictObject({
                         round: z.number(),
                         stars: z.number(),
                         destruction: z.number(),
@@ -34,13 +27,13 @@ export const getCwlStats200Schema = z.object({
                         defenderName: z.string(),
                         defenderTh: z.number(),
                         defenderPosition: z.number(),
-                        firstOpenPosition: z.nullable(z.number()),
+                        firstOpenPosition: z.number().nullable(),
                     }),
                 ),
             }),
         ),
         clans: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 endedRounds: z.array(z.number()),
                 wins: z.number(),
@@ -51,20 +44,26 @@ export const getCwlStats200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getCwlStats401Schema = z.object({
+export const getCwlStatsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getCwlStats500Schema = z.object({
+export const getCwlStatsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getCwlStatsQueryResponseSchema = z.lazy(() => getCwlStats200Schema);
+export const getCwlStatsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCwlStatsResponseSchema = getCwlStatsStatus200Schema;
+
+export const getCwlStatsErrorSchema = z.union([getCwlStatsStatus400Schema, getCwlStatsStatus401Schema, getCwlStatsStatus500Schema]);
+
+export const getCwlStatsQuerySchema = z.object({
+    seasonId: z.int().min(-9007199254740991).max(9007199254740991).optional(),
+});

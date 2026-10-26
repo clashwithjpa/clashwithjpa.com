@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SyncCocAccounts400,
-    SyncCocAccounts401,
-    SyncCocAccounts500,
-    SyncCocAccountsMutationRequest,
-    SyncCocAccountsMutationResponse,
-} from "../models/SyncCocAccounts.ts";
-
-function getSyncCocAccountsUrl() {
-    const res = { method: "POST", url: `/admin/coc-accounts/sync` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SyncCocAccountsOptions, SyncCocAccountsResponses } from "../models/SyncCocAccounts.ts";
 
 /**
  * @description Syncs Clash of Clans account stats from a link-viewable Google Sheet. Reads the sheet's CSV export (no API key), matches rows to accounts by tag, and updates clan, town hall, donations, clan games, capital gold and activity columns.
  * {@link /admin/coc-accounts/sync}
  */
-export async function syncCocAccounts(
-    data: SyncCocAccountsMutationRequest,
-    config: Partial<RequestConfig<SyncCocAccountsMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function syncCocAccounts<ThrowOnError extends boolean = false>(
+    options: Options<SyncCocAccountsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SyncCocAccountsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        SyncCocAccountsMutationResponse,
-        ResponseErrorConfig<SyncCocAccounts400 | SyncCocAccounts401 | SyncCocAccounts500>,
-        SyncCocAccountsMutationRequest
-    >({ method: "POST", url: getSyncCocAccountsUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/coc-accounts/sync",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SyncCocAccountsResponses, ThrowOnError>>,
+    );
 }

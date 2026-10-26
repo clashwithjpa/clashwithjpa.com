@@ -5,27 +5,23 @@
 
 import * as z from "zod";
 
-export const getAnalyticsAdminActivityQueryParamsSchema = z.object({
-    limit: z.coerce.number().int().min(1).max(20).default(8),
-    days: z.optional(z.coerce.number().int().min(1).max(365)),
-});
+export const getAnalyticsAdminActivityQueryLimitSchema = z.int().min(1).max(20).optional().default(8);
 
-/**
- * @description Top admin activity.
- */
-export const getAnalyticsAdminActivity200Schema = z.object({
+export const getAnalyticsAdminActivityQueryDaysSchema = z.int().min(1).max(365).optional();
+
+export const getAnalyticsAdminActivityStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 actorId: z.string(),
                 name: z.string(),
-                image: z.nullable(z.string()),
-                role: z.nullable(z.string()),
-                discordId: z.nullable(z.string()),
+                image: z.string().nullable(),
+                role: z.string().nullable(),
+                discordId: z.string().nullable(),
                 count: z.number(),
                 topActions: z.array(
-                    z.object({
+                    z.strictObject({
                         action: z.string(),
                         count: z.number(),
                     }),
@@ -35,20 +31,31 @@ export const getAnalyticsAdminActivity200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsAdminActivity401Schema = z.object({
+export const getAnalyticsAdminActivityStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsAdminActivity500Schema = z.object({
+export const getAnalyticsAdminActivityStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsAdminActivityQueryResponseSchema = z.lazy(() => getAnalyticsAdminActivity200Schema);
+export const getAnalyticsAdminActivityStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsAdminActivityResponseSchema = getAnalyticsAdminActivityStatus200Schema;
+
+export const getAnalyticsAdminActivityErrorSchema = z.union([
+    getAnalyticsAdminActivityStatus400Schema,
+    getAnalyticsAdminActivityStatus401Schema,
+    getAnalyticsAdminActivityStatus500Schema,
+]);
+
+export const getAnalyticsAdminActivityQuerySchema = z.object({
+    limit: z.int().min(1).max(20).optional().default(8),
+    days: z.int().min(1).max(365).optional(),
+});

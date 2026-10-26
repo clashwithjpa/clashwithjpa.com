@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    TestCwlPing400,
-    TestCwlPing401,
-    TestCwlPing502,
-    TestCwlPingMutationRequest,
-    TestCwlPingMutationResponse,
-} from "../models/TestCwlPing.ts";
-
-function getTestCwlPingUrl() {
-    const res = { method: "POST", url: `/admin/settings/cwl-ping/test` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { TestCwlPingOptions, TestCwlPingResponses } from "../models/TestCwlPing.ts";
 
 /**
  * @description Has the bot post a test message in the given (or currently saved) CWL ping channel.
  * {@link /admin/settings/cwl-ping/test}
  */
-export async function testCwlPing(
-    data: TestCwlPingMutationRequest,
-    config: Partial<RequestConfig<TestCwlPingMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function testCwlPing<ThrowOnError extends boolean = false>(
+    options: Options<TestCwlPingOptions, ThrowOnError>,
+): Unwrappable<RequestResult<TestCwlPingResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        TestCwlPingMutationResponse,
-        ResponseErrorConfig<TestCwlPing400 | TestCwlPing401 | TestCwlPing502>,
-        TestCwlPingMutationRequest
-    >({ method: "POST", url: getTestCwlPingUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/settings/cwl-ping/test",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<TestCwlPingResponses, ThrowOnError>>,
+    );
 }

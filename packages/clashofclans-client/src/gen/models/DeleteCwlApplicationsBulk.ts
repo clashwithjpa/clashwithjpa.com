@@ -3,66 +3,56 @@
  * Do not edit manually.
  */
 
-/**
- * @description Number of applications deleted.
- */
-export type DeleteCwlApplicationsBulk200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlApplicationsBulkStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         count: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteCwlApplicationsBulk401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlApplicationsBulkStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteCwlApplicationsBulkStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteCwlApplicationsBulk500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlApplicationsBulkStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteCwlApplicationsBulkMutationRequest = {
-    /**
-     * @type array
-     */
+export type DeleteCwlApplicationsBulkBody = {
     ids: number[];
 };
 
-export type DeleteCwlApplicationsBulkMutationResponse = DeleteCwlApplicationsBulk200;
-
-export type DeleteCwlApplicationsBulkMutation = {
-    Response: DeleteCwlApplicationsBulk200;
-    Request: DeleteCwlApplicationsBulkMutationRequest;
-    Errors: DeleteCwlApplicationsBulk401 | DeleteCwlApplicationsBulk500;
+export type DeleteCwlApplicationsBulkOptions = {
+    body: DeleteCwlApplicationsBulkBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteCwlApplicationsBulkResponses = {
+    "200": DeleteCwlApplicationsBulkStatus200;
+    "400": DeleteCwlApplicationsBulkStatus400;
+    "401": DeleteCwlApplicationsBulkStatus401;
+    "500": DeleteCwlApplicationsBulkStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteCwlApplicationsBulkResponse = DeleteCwlApplicationsBulkStatus200;

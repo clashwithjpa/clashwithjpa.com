@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetUserCocAccountsByUserIdPathParams = {
+export type GetUserCocAccountsByUserIdPath = {
     /**
      * @minLength 1
      * @type string
@@ -11,80 +11,58 @@ export type GetUserCocAccountsByUserIdPathParams = {
     userid: string;
 };
 
-/**
- * @description User\'s COC accounts.
- */
-export type GetUserCocAccountsByUserId200 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCocAccountsByUserIdStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         accounts: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetUserCocAccountsByUserId401 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCocAccountsByUserIdStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetUserCocAccountsByUserIdStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetUserCocAccountsByUserId500 = {
-    /**
-     * @type boolean
-     */
+export type GetUserCocAccountsByUserIdStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetUserCocAccountsByUserIdQueryResponse = GetUserCocAccountsByUserId200;
-
-export type GetUserCocAccountsByUserIdQuery = {
-    Response: GetUserCocAccountsByUserId200;
-    PathParams: GetUserCocAccountsByUserIdPathParams;
-    Errors: GetUserCocAccountsByUserId401 | GetUserCocAccountsByUserId500;
+export type GetUserCocAccountsByUserIdOptions = {
+    body?: never;
+    path: GetUserCocAccountsByUserIdPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetUserCocAccountsByUserIdResponses = {
+    "200": GetUserCocAccountsByUserIdStatus200;
+    "400": GetUserCocAccountsByUserIdStatus400;
+    "401": GetUserCocAccountsByUserIdStatus401;
+    "500": GetUserCocAccountsByUserIdStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserCocAccountsByUserIdResponse = GetUserCocAccountsByUserIdStatus200;

@@ -5,14 +5,11 @@
 
 import * as z from "zod";
 
-/**
- * @description Audit categories.
- */
-export const getAnalyticsAuditCategories200Schema = z.object({
+export const getAnalyticsAuditCategoriesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 category: z.string(),
                 count: z.number(),
             }),
@@ -20,20 +17,19 @@ export const getAnalyticsAuditCategories200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsAuditCategories401Schema = z.object({
+export const getAnalyticsAuditCategoriesStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsAuditCategories500Schema = z.object({
+export const getAnalyticsAuditCategoriesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsAuditCategoriesQueryResponseSchema = z.lazy(() => getAnalyticsAuditCategories200Schema);
+export const getAnalyticsAuditCategoriesResponseSchema = getAnalyticsAuditCategoriesStatus200Schema;
+
+export const getAnalyticsAuditCategoriesErrorSchema = z.union([
+    getAnalyticsAuditCategoriesStatus401Schema,
+    getAnalyticsAuditCategoriesStatus500Schema,
+]);

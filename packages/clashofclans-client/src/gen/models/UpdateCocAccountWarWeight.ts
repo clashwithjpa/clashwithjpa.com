@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateCocAccountWarWeightPathParams = {
+export type UpdateCocAccountWarWeightPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,70 +12,22 @@ export type UpdateCocAccountWarWeightPathParams = {
     id: number;
 };
 
-/**
- * @description Updated COC account.
- */
-export type UpdateCocAccountWarWeight200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountWarWeightStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
@@ -85,52 +37,40 @@ export type UpdateCocAccountWarWeight200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateCocAccountWarWeight401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountWarWeightStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type UpdateCocAccountWarWeightStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type UpdateCocAccountWarWeight404 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountWarWeightStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateCocAccountWarWeight500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateCocAccountWarWeightStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateCocAccountWarWeightMutationRequest = {
+export type UpdateCocAccountWarWeightBody = {
     /**
      * @minLength 0
      * @maxLength 9007199254740991
@@ -139,11 +79,22 @@ export type UpdateCocAccountWarWeightMutationRequest = {
     warWeight: number;
 };
 
-export type UpdateCocAccountWarWeightMutationResponse = UpdateCocAccountWarWeight200;
-
-export type UpdateCocAccountWarWeightMutation = {
-    Response: UpdateCocAccountWarWeight200;
-    Request: UpdateCocAccountWarWeightMutationRequest;
-    PathParams: UpdateCocAccountWarWeightPathParams;
-    Errors: UpdateCocAccountWarWeight401 | UpdateCocAccountWarWeight404 | UpdateCocAccountWarWeight500;
+export type UpdateCocAccountWarWeightOptions = {
+    body: UpdateCocAccountWarWeightBody;
+    path: UpdateCocAccountWarWeightPath;
+    query?: never;
+    headers?: never;
 };
+
+export type UpdateCocAccountWarWeightResponses = {
+    "200": UpdateCocAccountWarWeightStatus200;
+    "400": UpdateCocAccountWarWeightStatus400;
+    "401": UpdateCocAccountWarWeightStatus401;
+    "404": UpdateCocAccountWarWeightStatus404;
+    "500": UpdateCocAccountWarWeightStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateCocAccountWarWeightResponse = UpdateCocAccountWarWeightStatus200;

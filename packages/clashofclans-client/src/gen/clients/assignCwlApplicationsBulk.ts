@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    AssignCwlApplicationsBulk400,
-    AssignCwlApplicationsBulk401,
-    AssignCwlApplicationsBulk500,
-    AssignCwlApplicationsBulkMutationRequest,
-    AssignCwlApplicationsBulkMutationResponse,
-} from "../models/AssignCwlApplicationsBulk.ts";
-
-function getAssignCwlApplicationsBulkUrl() {
-    const res = { method: "POST", url: `/admin/cwl-applications/assign-bulk` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { AssignCwlApplicationsBulkOptions, AssignCwlApplicationsBulkResponses } from "../models/AssignCwlApplicationsBulk.ts";
 
 /**
  * @description Assigns (or unassigns when clanTag is null) many CWL applications to a CWL clan in one request.
  * {@link /admin/cwl-applications/assign-bulk}
  */
-export async function assignCwlApplicationsBulk(
-    data: AssignCwlApplicationsBulkMutationRequest,
-    config: Partial<RequestConfig<AssignCwlApplicationsBulkMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function assignCwlApplicationsBulk<ThrowOnError extends boolean = false>(
+    options: Options<AssignCwlApplicationsBulkOptions, ThrowOnError>,
+): Unwrappable<RequestResult<AssignCwlApplicationsBulkResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        AssignCwlApplicationsBulkMutationResponse,
-        ResponseErrorConfig<AssignCwlApplicationsBulk400 | AssignCwlApplicationsBulk401 | AssignCwlApplicationsBulk500>,
-        AssignCwlApplicationsBulkMutationRequest
-    >({ method: "POST", url: getAssignCwlApplicationsBulkUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-applications/assign-bulk",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<AssignCwlApplicationsBulkResponses, ThrowOnError>>,
+    );
 }

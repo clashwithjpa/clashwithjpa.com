@@ -1,820 +1,912 @@
-export type { ApplyCwlMutationKey } from "./hooks/createApplyCwl.ts";
-export type { ApplyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
-export type { AssignCwlApplicationMutationKey } from "./hooks/createAssignCwlApplication.ts";
-export type { AssignCwlApplicationsBulkMutationKey } from "./hooks/createAssignCwlApplicationsBulk.ts";
-export type { ClearAcceptedJoinApplicationsMutationKey } from "./hooks/createClearAcceptedJoinApplications.ts";
-export type { CreateAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
-export type { CreateAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
-export type { CreateApiKeyMutationKey } from "./hooks/createCreateApiKey.ts";
-export type { CreateCocAccountMutationKey } from "./hooks/createCreateCocAccount.ts";
-export type { CreateCwlApplicationMutationKey } from "./hooks/createCreateCwlApplication.ts";
-export type { CreateCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
-export type { DeleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
-export type { DeleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
-export type { DeleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
-export type { DeleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
-export type { DeleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
-export type { DeleteCwlSeasonMutationKey } from "./hooks/createDeleteCwlSeason.ts";
-export type { DeleteJoinApplicationMutationKey } from "./hooks/createDeleteJoinApplication.ts";
-export type { GetAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
-export type { GetAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
-export type { GetAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
-export type { GetAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
-export type { GetAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
-export type { GetAnalyticsAdminActivityQueryKey } from "./hooks/createGetAnalyticsAdminActivity.ts";
-export type { GetAnalyticsAuditCategoriesQueryKey } from "./hooks/createGetAnalyticsAuditCategories.ts";
-export type { GetAnalyticsAuditTrendQueryKey } from "./hooks/createGetAnalyticsAuditTrend.ts";
-export type { GetAnalyticsCwlAssignmentQueryKey } from "./hooks/createGetAnalyticsCwlAssignment.ts";
-export type { GetAnalyticsCwlParticipationQueryKey } from "./hooks/createGetAnalyticsCwlParticipation.ts";
-export type { GetAnalyticsCwlSeasonOverviewQueryKey } from "./hooks/createGetAnalyticsCwlSeasonOverview.ts";
-export type { GetAnalyticsCwlSeasonsQueryKey } from "./hooks/createGetAnalyticsCwlSeasons.ts";
-export type { GetAnalyticsOverviewQueryKey } from "./hooks/createGetAnalyticsOverview.ts";
-export type { GetAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
-export type { GetApiKeyUsageDailyQueryKey } from "./hooks/createGetApiKeyUsageDaily.ts";
-export type { GetApiKeyUsageEndpointsQueryKey } from "./hooks/createGetApiKeyUsageEndpoints.ts";
-export type { GetApiKeyUsageStatusQueryKey } from "./hooks/createGetApiKeyUsageStatus.ts";
-export type { GetApiKeyUsageSummaryQueryKey } from "./hooks/createGetApiKeyUsageSummary.ts";
-export type { GetAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
-export type { GetBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
-export type { GetBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
-export type { GetCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
-export type { GetCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
-export type { GetCOCClanCWLGroupQueryKey } from "./hooks/createGetCOCClanCWLGroup.ts";
-export type { GetCOCClanCurrentWarQueryKey } from "./hooks/createGetCOCClanCurrentWar.ts";
-export type { GetCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.ts";
-export type { GetCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
-export type { GetCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
-export type { GetCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
-export type { GetCwlPingChannelsQueryKey } from "./hooks/createGetCwlPingChannels.ts";
-export type { GetCwlPingSettingsQueryKey } from "./hooks/createGetCwlPingSettings.ts";
-export type { GetCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
-export type { GetCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
-export type { GetFWAClanPointsQueryKey } from "./hooks/createGetFWAClanPoints.ts";
-export type { GetGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
-export type { GetJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
-export type { GetJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
-export type { GetJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
-export type { GetJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
-export type { GetPrivacyQueryKey } from "./hooks/createGetPrivacy.ts";
-export type { GetRulesQueryKey } from "./hooks/createGetRules.ts";
-export type { GetUserQueryKey } from "./hooks/createGetUser.ts";
-export type { GetUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
-export type { GetUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCocAccountsByUserId.ts";
-export type { GetUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
-export type { GetUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
-export type { GetWarLogClansQueryKey } from "./hooks/createGetWarLogClans.ts";
-export type { GetWarLogPlayersQueryKey } from "./hooks/createGetWarLogPlayers.ts";
-export type { GetWarLogWarQueryKey } from "./hooks/createGetWarLogWar.ts";
-export type { GetWarLogWarsQueryKey } from "./hooks/createGetWarLogWars.ts";
-export type { ImportUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
-export type { PostCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
-export type { PreviewCwlPingQueryKey } from "./hooks/createPreviewCwlPing.ts";
-export type { RefreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
-export type { RenameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
-export type { RunCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
-export type { SetPrivacyMutationKey } from "./hooks/createSetPrivacy.ts";
-export type { SetRulesMutationKey } from "./hooks/createSetRules.ts";
-export type { SetUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
-export type { SetUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
-export type { SetUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
-export type { SyncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
-export type { SyncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
-export type { SyncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
-export type { TestCwlPingMutationKey } from "./hooks/createTestCwlPing.ts";
-export type { UpdateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
-export type { UpdateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
-export type { UpdateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
-export type { UpdateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
-export type { UpdateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
-export type { UpdateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
-export type { UpdateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
-export type { VerifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
+export * from "./.kubb/client.ts";
+export * from "./.kubb/serializers.ts";
+export * from "./.kubb/standardSchema.ts";
 export type {
-    ApplyCwl200,
-    ApplyCwl400,
-    ApplyCwl401,
-    ApplyCwl409,
-    ApplyCwl500,
-    ApplyCwlMutation,
-    ApplyCwlMutationRequest,
-    ApplyCwlMutationResponse,
+    ApplyCwlBody,
+    ApplyCwlOptions,
+    ApplyCwlResponse,
+    ApplyCwlResponses,
+    ApplyCwlStatus200,
+    ApplyCwlStatus400,
+    ApplyCwlStatus401,
+    ApplyCwlStatus409,
+    ApplyCwlStatus500,
 } from "./models/ApplyCwl.ts";
 export type {
-    ApplyUserAccount200,
-    ApplyUserAccount400,
-    ApplyUserAccount401,
-    ApplyUserAccount403,
-    ApplyUserAccount409,
-    ApplyUserAccount500,
-    ApplyUserAccountMutation,
-    ApplyUserAccountMutationRequest,
-    ApplyUserAccountMutationResponse,
+    ApplyUserAccountBody,
+    ApplyUserAccountOptions,
+    ApplyUserAccountResponse,
+    ApplyUserAccountResponses,
+    ApplyUserAccountStatus200,
+    ApplyUserAccountStatus400,
+    ApplyUserAccountStatus401,
+    ApplyUserAccountStatus403,
+    ApplyUserAccountStatus409,
+    ApplyUserAccountStatus500,
 } from "./models/ApplyUserAccount.ts";
 export type {
-    AssignCwlApplication200,
-    AssignCwlApplication400,
-    AssignCwlApplication401,
-    AssignCwlApplication404,
-    AssignCwlApplication500,
-    AssignCwlApplicationMutation,
-    AssignCwlApplicationMutationRequest,
-    AssignCwlApplicationMutationResponse,
-    AssignCwlApplicationPathParams,
+    AssignCwlApplicationBody,
+    AssignCwlApplicationOptions,
+    AssignCwlApplicationPath,
+    AssignCwlApplicationResponse,
+    AssignCwlApplicationResponses,
+    AssignCwlApplicationStatus200,
+    AssignCwlApplicationStatus400,
+    AssignCwlApplicationStatus401,
+    AssignCwlApplicationStatus404,
+    AssignCwlApplicationStatus500,
 } from "./models/AssignCwlApplication.ts";
 export type {
-    AssignCwlApplicationsBulk200,
-    AssignCwlApplicationsBulk400,
-    AssignCwlApplicationsBulk401,
-    AssignCwlApplicationsBulk500,
-    AssignCwlApplicationsBulkMutation,
-    AssignCwlApplicationsBulkMutationRequest,
-    AssignCwlApplicationsBulkMutationResponse,
+    AssignCwlApplicationsBulkBody,
+    AssignCwlApplicationsBulkOptions,
+    AssignCwlApplicationsBulkResponse,
+    AssignCwlApplicationsBulkResponses,
+    AssignCwlApplicationsBulkStatus200,
+    AssignCwlApplicationsBulkStatus400,
+    AssignCwlApplicationsBulkStatus401,
+    AssignCwlApplicationsBulkStatus500,
 } from "./models/AssignCwlApplicationsBulk.ts";
 export type {
-    ClearAcceptedJoinApplications200,
-    ClearAcceptedJoinApplications401,
-    ClearAcceptedJoinApplications500,
-    ClearAcceptedJoinApplicationsMutation,
-    ClearAcceptedJoinApplicationsMutationResponse,
+    ClearAcceptedJoinApplicationsOptions,
+    ClearAcceptedJoinApplicationsResponse,
+    ClearAcceptedJoinApplicationsResponses,
+    ClearAcceptedJoinApplicationsStatus200,
+    ClearAcceptedJoinApplicationsStatus401,
+    ClearAcceptedJoinApplicationsStatus500,
 } from "./models/ClearAcceptedJoinApplications.ts";
 export type {
-    CreateAdminClan200,
-    CreateAdminClan401,
-    CreateAdminClan409,
-    CreateAdminClan422,
-    CreateAdminClan500,
-    CreateAdminClan503,
-    CreateAdminClanMutation,
-    CreateAdminClanMutationRequest,
-    CreateAdminClanMutationResponse,
+    CreateAdminClanBody,
+    CreateAdminClanOptions,
+    CreateAdminClanResponse,
+    CreateAdminClanResponses,
+    CreateAdminClanStatus200,
+    CreateAdminClanStatus400,
+    CreateAdminClanStatus401,
+    CreateAdminClanStatus409,
+    CreateAdminClanStatus422,
+    CreateAdminClanStatus500,
+    CreateAdminClanStatus503,
 } from "./models/CreateAdminClan.ts";
 export type {
-    CreateAdminCwlClan200,
-    CreateAdminCwlClan400,
-    CreateAdminCwlClan401,
-    CreateAdminCwlClan409,
-    CreateAdminCwlClan500,
-    CreateAdminCwlClanMutation,
-    CreateAdminCwlClanMutationRequest,
-    CreateAdminCwlClanMutationResponse,
+    CreateAdminCwlClanBody,
+    CreateAdminCwlClanOptions,
+    CreateAdminCwlClanResponse,
+    CreateAdminCwlClanResponses,
+    CreateAdminCwlClanStatus200,
+    CreateAdminCwlClanStatus400,
+    CreateAdminCwlClanStatus401,
+    CreateAdminCwlClanStatus409,
+    CreateAdminCwlClanStatus500,
 } from "./models/CreateAdminCwlClan.ts";
 export type {
-    CreateApiKey200,
-    CreateApiKey401,
-    CreateApiKey403,
-    CreateApiKey404,
-    CreateApiKey500,
-    CreateApiKeyMutation,
-    CreateApiKeyMutationRequest,
-    CreateApiKeyMutationRequestScopeEnumKey,
-    CreateApiKeyMutationResponse,
+    CreateApiKeyBody,
+    CreateApiKeyOptions,
+    CreateApiKeyRequestScopeEnumKey,
+    CreateApiKeyResponse,
+    CreateApiKeyResponses,
+    CreateApiKeyStatus200,
+    CreateApiKeyStatus400,
+    CreateApiKeyStatus401,
+    CreateApiKeyStatus403,
+    CreateApiKeyStatus404,
+    CreateApiKeyStatus500,
 } from "./models/CreateApiKey.ts";
 export type {
-    CreateCocAccount200,
-    CreateCocAccount400,
-    CreateCocAccount401,
-    CreateCocAccount404,
-    CreateCocAccount409,
-    CreateCocAccount500,
-    CreateCocAccountMutation,
-    CreateCocAccountMutationRequest,
-    CreateCocAccountMutationResponse,
+    CreateCocAccountBody,
+    CreateCocAccountOptions,
+    CreateCocAccountResponse,
+    CreateCocAccountResponses,
+    CreateCocAccountStatus200,
+    CreateCocAccountStatus400,
+    CreateCocAccountStatus401,
+    CreateCocAccountStatus404,
+    CreateCocAccountStatus409,
+    CreateCocAccountStatus500,
 } from "./models/CreateCocAccount.ts";
 export type {
-    CreateCwlApplication200,
-    CreateCwlApplication400,
-    CreateCwlApplication401,
-    CreateCwlApplication404,
-    CreateCwlApplication409,
-    CreateCwlApplication500,
-    CreateCwlApplicationMutation,
-    CreateCwlApplicationMutationRequest,
-    CreateCwlApplicationMutationResponse,
+    CreateCwlApplicationBody,
+    CreateCwlApplicationOptions,
+    CreateCwlApplicationResponse,
+    CreateCwlApplicationResponses,
+    CreateCwlApplicationStatus200,
+    CreateCwlApplicationStatus400,
+    CreateCwlApplicationStatus401,
+    CreateCwlApplicationStatus404,
+    CreateCwlApplicationStatus409,
+    CreateCwlApplicationStatus500,
 } from "./models/CreateCwlApplication.ts";
 export type {
-    CreateCwlSeason200,
-    CreateCwlSeason401,
-    CreateCwlSeason500,
-    CreateCwlSeasonMutation,
-    CreateCwlSeasonMutationRequest,
-    CreateCwlSeasonMutationResponse,
+    CreateCwlSeasonBody,
+    CreateCwlSeasonOptions,
+    CreateCwlSeasonResponse,
+    CreateCwlSeasonResponses,
+    CreateCwlSeasonStatus200,
+    CreateCwlSeasonStatus400,
+    CreateCwlSeasonStatus401,
+    CreateCwlSeasonStatus500,
 } from "./models/CreateCwlSeason.ts";
 export type {
-    DeleteAdminClan200,
-    DeleteAdminClan401,
-    DeleteAdminClan404,
-    DeleteAdminClan500,
-    DeleteAdminClanMutation,
-    DeleteAdminClanMutationResponse,
-    DeleteAdminClanPathParams,
+    DeleteAdminClanOptions,
+    DeleteAdminClanPath,
+    DeleteAdminClanResponse,
+    DeleteAdminClanResponses,
+    DeleteAdminClanStatus200,
+    DeleteAdminClanStatus400,
+    DeleteAdminClanStatus401,
+    DeleteAdminClanStatus404,
+    DeleteAdminClanStatus500,
 } from "./models/DeleteAdminClan.ts";
 export type {
-    DeleteAdminCwlClan200,
-    DeleteAdminCwlClan401,
-    DeleteAdminCwlClan404,
-    DeleteAdminCwlClan500,
-    DeleteAdminCwlClanMutation,
-    DeleteAdminCwlClanMutationResponse,
-    DeleteAdminCwlClanPathParams,
+    DeleteAdminCwlClanOptions,
+    DeleteAdminCwlClanPath,
+    DeleteAdminCwlClanResponse,
+    DeleteAdminCwlClanResponses,
+    DeleteAdminCwlClanStatus200,
+    DeleteAdminCwlClanStatus400,
+    DeleteAdminCwlClanStatus401,
+    DeleteAdminCwlClanStatus404,
+    DeleteAdminCwlClanStatus500,
 } from "./models/DeleteAdminCwlClan.ts";
 export type {
-    DeleteCocAccount200,
-    DeleteCocAccount401,
-    DeleteCocAccount404,
-    DeleteCocAccount500,
-    DeleteCocAccountMutation,
-    DeleteCocAccountMutationResponse,
-    DeleteCocAccountPathParams,
+    DeleteCocAccountOptions,
+    DeleteCocAccountPath,
+    DeleteCocAccountResponse,
+    DeleteCocAccountResponses,
+    DeleteCocAccountStatus200,
+    DeleteCocAccountStatus400,
+    DeleteCocAccountStatus401,
+    DeleteCocAccountStatus404,
+    DeleteCocAccountStatus500,
 } from "./models/DeleteCocAccount.ts";
 export type {
-    DeleteCocAccountsBulk200,
-    DeleteCocAccountsBulk401,
-    DeleteCocAccountsBulk500,
-    DeleteCocAccountsBulkMutation,
-    DeleteCocAccountsBulkMutationRequest,
-    DeleteCocAccountsBulkMutationResponse,
+    DeleteCocAccountsBulkBody,
+    DeleteCocAccountsBulkOptions,
+    DeleteCocAccountsBulkResponse,
+    DeleteCocAccountsBulkResponses,
+    DeleteCocAccountsBulkStatus200,
+    DeleteCocAccountsBulkStatus400,
+    DeleteCocAccountsBulkStatus401,
+    DeleteCocAccountsBulkStatus500,
 } from "./models/DeleteCocAccountsBulk.ts";
 export type {
-    DeleteCwlApplicationsBulk200,
-    DeleteCwlApplicationsBulk401,
-    DeleteCwlApplicationsBulk500,
-    DeleteCwlApplicationsBulkMutation,
-    DeleteCwlApplicationsBulkMutationRequest,
-    DeleteCwlApplicationsBulkMutationResponse,
+    DeleteCwlApplicationsBulkBody,
+    DeleteCwlApplicationsBulkOptions,
+    DeleteCwlApplicationsBulkResponse,
+    DeleteCwlApplicationsBulkResponses,
+    DeleteCwlApplicationsBulkStatus200,
+    DeleteCwlApplicationsBulkStatus400,
+    DeleteCwlApplicationsBulkStatus401,
+    DeleteCwlApplicationsBulkStatus500,
 } from "./models/DeleteCwlApplicationsBulk.ts";
 export type {
-    DeleteCwlSeason200,
-    DeleteCwlSeason401,
-    DeleteCwlSeason404,
-    DeleteCwlSeason500,
-    DeleteCwlSeasonMutation,
-    DeleteCwlSeasonMutationResponse,
-    DeleteCwlSeasonPathParams,
+    DeleteCwlSeasonOptions,
+    DeleteCwlSeasonPath,
+    DeleteCwlSeasonResponse,
+    DeleteCwlSeasonResponses,
+    DeleteCwlSeasonStatus200,
+    DeleteCwlSeasonStatus400,
+    DeleteCwlSeasonStatus401,
+    DeleteCwlSeasonStatus404,
+    DeleteCwlSeasonStatus500,
 } from "./models/DeleteCwlSeason.ts";
 export type {
-    ApplicationStatusEnum2Key,
-    DeleteJoinApplication200,
-    DeleteJoinApplication401,
-    DeleteJoinApplication404,
-    DeleteJoinApplication500,
-    DeleteJoinApplicationMutation,
-    DeleteJoinApplicationMutationResponse,
-    DeleteJoinApplicationPathParams,
+    DeleteJoinApplicationOptions,
+    DeleteJoinApplicationPath,
+    DeleteJoinApplicationResponse,
+    DeleteJoinApplicationResponses,
+    DeleteJoinApplicationStatus200,
+    DeleteJoinApplicationStatus200DataApplicationStatusEnumKey,
+    DeleteJoinApplicationStatus400,
+    DeleteJoinApplicationStatus401,
+    DeleteJoinApplicationStatus404,
+    DeleteJoinApplicationStatus500,
 } from "./models/DeleteJoinApplication.ts";
-export type { GetAdminClans200, GetAdminClans401, GetAdminClans500, GetAdminClansQuery, GetAdminClansQueryResponse } from "./models/GetAdminClans.ts";
 export type {
-    GetAdminCocAccounts200,
-    GetAdminCocAccounts401,
-    GetAdminCocAccounts500,
+    GetAdminClansOptions,
+    GetAdminClansResponse,
+    GetAdminClansResponses,
+    GetAdminClansStatus200,
+    GetAdminClansStatus401,
+    GetAdminClansStatus500,
+} from "./models/GetAdminClans.ts";
+export type {
+    GetAdminCocAccountsOptions,
     GetAdminCocAccountsQuery,
-    GetAdminCocAccountsQueryParams,
-    GetAdminCocAccountsQueryParamsSortDirEnumKey,
-    GetAdminCocAccountsQueryResponse,
+    GetAdminCocAccountsResponse,
+    GetAdminCocAccountsResponses,
+    GetAdminCocAccountsSortDirKey,
+    GetAdminCocAccountsStatus200,
+    GetAdminCocAccountsStatus400,
+    GetAdminCocAccountsStatus401,
+    GetAdminCocAccountsStatus500,
 } from "./models/GetAdminCocAccounts.ts";
 export type {
-    GetAdminCwlClans200,
-    GetAdminCwlClans401,
-    GetAdminCwlClans500,
-    GetAdminCwlClansQuery,
-    GetAdminCwlClansQueryResponse,
+    GetAdminCwlClansOptions,
+    GetAdminCwlClansResponse,
+    GetAdminCwlClansResponses,
+    GetAdminCwlClansStatus200,
+    GetAdminCwlClansStatus401,
+    GetAdminCwlClansStatus500,
 } from "./models/GetAdminCwlClans.ts";
 export type {
-    GetAdminSettings200,
-    GetAdminSettings401,
-    GetAdminSettings500,
-    GetAdminSettingsQuery,
-    GetAdminSettingsQueryResponse,
+    GetAdminSettingsOptions,
+    GetAdminSettingsResponse,
+    GetAdminSettingsResponses,
+    GetAdminSettingsStatus200,
+    GetAdminSettingsStatus401,
+    GetAdminSettingsStatus500,
 } from "./models/GetAdminSettings.ts";
 export type {
-    GetAdminUsers200,
-    GetAdminUsers401,
-    GetAdminUsers500,
+    GetAdminUsersOptions,
     GetAdminUsersQuery,
-    GetAdminUsersQueryParams,
-    GetAdminUsersQueryParamsSortDirectionEnumKey,
-    GetAdminUsersQueryResponse,
+    GetAdminUsersResponse,
+    GetAdminUsersResponses,
+    GetAdminUsersSortDirectionKey,
+    GetAdminUsersStatus200,
+    GetAdminUsersStatus400,
+    GetAdminUsersStatus401,
+    GetAdminUsersStatus500,
 } from "./models/GetAdminUsers.ts";
 export type {
-    GetAnalyticsAdminActivity200,
-    GetAnalyticsAdminActivity401,
-    GetAnalyticsAdminActivity500,
+    GetAnalyticsAdminActivityOptions,
     GetAnalyticsAdminActivityQuery,
-    GetAnalyticsAdminActivityQueryParams,
-    GetAnalyticsAdminActivityQueryResponse,
+    GetAnalyticsAdminActivityResponse,
+    GetAnalyticsAdminActivityResponses,
+    GetAnalyticsAdminActivityStatus200,
+    GetAnalyticsAdminActivityStatus400,
+    GetAnalyticsAdminActivityStatus401,
+    GetAnalyticsAdminActivityStatus500,
 } from "./models/GetAnalyticsAdminActivity.ts";
 export type {
-    GetAnalyticsAuditCategories200,
-    GetAnalyticsAuditCategories401,
-    GetAnalyticsAuditCategories500,
-    GetAnalyticsAuditCategoriesQuery,
-    GetAnalyticsAuditCategoriesQueryResponse,
+    GetAnalyticsAuditCategoriesOptions,
+    GetAnalyticsAuditCategoriesResponse,
+    GetAnalyticsAuditCategoriesResponses,
+    GetAnalyticsAuditCategoriesStatus200,
+    GetAnalyticsAuditCategoriesStatus401,
+    GetAnalyticsAuditCategoriesStatus500,
 } from "./models/GetAnalyticsAuditCategories.ts";
 export type {
-    GetAnalyticsAuditTrend200,
-    GetAnalyticsAuditTrend401,
-    GetAnalyticsAuditTrend500,
+    GetAnalyticsAuditTrendOptions,
     GetAnalyticsAuditTrendQuery,
-    GetAnalyticsAuditTrendQueryParams,
-    GetAnalyticsAuditTrendQueryResponse,
+    GetAnalyticsAuditTrendResponse,
+    GetAnalyticsAuditTrendResponses,
+    GetAnalyticsAuditTrendStatus200,
+    GetAnalyticsAuditTrendStatus400,
+    GetAnalyticsAuditTrendStatus401,
+    GetAnalyticsAuditTrendStatus500,
 } from "./models/GetAnalyticsAuditTrend.ts";
 export type {
-    GetAnalyticsCwlAssignment200,
-    GetAnalyticsCwlAssignment401,
-    GetAnalyticsCwlAssignment500,
+    GetAnalyticsCwlAssignmentOptions,
     GetAnalyticsCwlAssignmentQuery,
-    GetAnalyticsCwlAssignmentQueryParams,
-    GetAnalyticsCwlAssignmentQueryResponse,
+    GetAnalyticsCwlAssignmentResponse,
+    GetAnalyticsCwlAssignmentResponses,
+    GetAnalyticsCwlAssignmentStatus200,
+    GetAnalyticsCwlAssignmentStatus400,
+    GetAnalyticsCwlAssignmentStatus401,
+    GetAnalyticsCwlAssignmentStatus500,
 } from "./models/GetAnalyticsCwlAssignment.ts";
 export type {
-    GetAnalyticsCwlParticipation200,
-    GetAnalyticsCwlParticipation401,
-    GetAnalyticsCwlParticipation500,
+    GetAnalyticsCwlParticipationOptions,
     GetAnalyticsCwlParticipationQuery,
-    GetAnalyticsCwlParticipationQueryParams,
-    GetAnalyticsCwlParticipationQueryResponse,
+    GetAnalyticsCwlParticipationResponse,
+    GetAnalyticsCwlParticipationResponses,
+    GetAnalyticsCwlParticipationStatus200,
+    GetAnalyticsCwlParticipationStatus400,
+    GetAnalyticsCwlParticipationStatus401,
+    GetAnalyticsCwlParticipationStatus500,
 } from "./models/GetAnalyticsCwlParticipation.ts";
 export type {
-    GetAnalyticsCwlSeasonOverview200,
-    GetAnalyticsCwlSeasonOverview401,
-    GetAnalyticsCwlSeasonOverview500,
+    GetAnalyticsCwlSeasonOverviewOptions,
     GetAnalyticsCwlSeasonOverviewQuery,
-    GetAnalyticsCwlSeasonOverviewQueryParams,
-    GetAnalyticsCwlSeasonOverviewQueryResponse,
+    GetAnalyticsCwlSeasonOverviewResponse,
+    GetAnalyticsCwlSeasonOverviewResponses,
+    GetAnalyticsCwlSeasonOverviewStatus200,
+    GetAnalyticsCwlSeasonOverviewStatus400,
+    GetAnalyticsCwlSeasonOverviewStatus401,
+    GetAnalyticsCwlSeasonOverviewStatus500,
 } from "./models/GetAnalyticsCwlSeasonOverview.ts";
 export type {
-    GetAnalyticsCwlSeasons200,
-    GetAnalyticsCwlSeasons401,
-    GetAnalyticsCwlSeasons500,
-    GetAnalyticsCwlSeasonsQuery,
-    GetAnalyticsCwlSeasonsQueryResponse,
+    GetAnalyticsCwlSeasonsOptions,
+    GetAnalyticsCwlSeasonsResponse,
+    GetAnalyticsCwlSeasonsResponses,
+    GetAnalyticsCwlSeasonsStatus200,
+    GetAnalyticsCwlSeasonsStatus401,
+    GetAnalyticsCwlSeasonsStatus500,
 } from "./models/GetAnalyticsCwlSeasons.ts";
 export type {
-    GetAnalyticsOverview200,
-    GetAnalyticsOverview401,
-    GetAnalyticsOverview500,
-    GetAnalyticsOverviewQuery,
-    GetAnalyticsOverviewQueryResponse,
+    GetAnalyticsOverviewOptions,
+    GetAnalyticsOverviewResponse,
+    GetAnalyticsOverviewResponses,
+    GetAnalyticsOverviewStatus200,
+    GetAnalyticsOverviewStatus401,
+    GetAnalyticsOverviewStatus500,
 } from "./models/GetAnalyticsOverview.ts";
 export type {
-    GetAnalyticsUserJoins200,
-    GetAnalyticsUserJoins401,
-    GetAnalyticsUserJoins500,
+    GetAnalyticsUserJoinsOptions,
     GetAnalyticsUserJoinsQuery,
-    GetAnalyticsUserJoinsQueryParams,
-    GetAnalyticsUserJoinsQueryResponse,
+    GetAnalyticsUserJoinsResponse,
+    GetAnalyticsUserJoinsResponses,
+    GetAnalyticsUserJoinsStatus200,
+    GetAnalyticsUserJoinsStatus400,
+    GetAnalyticsUserJoinsStatus401,
+    GetAnalyticsUserJoinsStatus500,
 } from "./models/GetAnalyticsUserJoins.ts";
 export type {
-    GetApiKeyUsageDaily200,
-    GetApiKeyUsageDaily401,
-    GetApiKeyUsageDaily404,
-    GetApiKeyUsageDaily500,
+    GetApiKeyUsageDailyOptions,
     GetApiKeyUsageDailyQuery,
-    GetApiKeyUsageDailyQueryParams,
-    GetApiKeyUsageDailyQueryResponse,
+    GetApiKeyUsageDailyResponse,
+    GetApiKeyUsageDailyResponses,
+    GetApiKeyUsageDailyStatus200,
+    GetApiKeyUsageDailyStatus400,
+    GetApiKeyUsageDailyStatus401,
+    GetApiKeyUsageDailyStatus404,
+    GetApiKeyUsageDailyStatus500,
 } from "./models/GetApiKeyUsageDaily.ts";
 export type {
-    GetApiKeyUsageEndpoints200,
-    GetApiKeyUsageEndpoints401,
-    GetApiKeyUsageEndpoints404,
-    GetApiKeyUsageEndpoints500,
+    GetApiKeyUsageEndpointsOptions,
     GetApiKeyUsageEndpointsQuery,
-    GetApiKeyUsageEndpointsQueryParams,
-    GetApiKeyUsageEndpointsQueryResponse,
+    GetApiKeyUsageEndpointsResponse,
+    GetApiKeyUsageEndpointsResponses,
+    GetApiKeyUsageEndpointsStatus200,
+    GetApiKeyUsageEndpointsStatus400,
+    GetApiKeyUsageEndpointsStatus401,
+    GetApiKeyUsageEndpointsStatus404,
+    GetApiKeyUsageEndpointsStatus500,
 } from "./models/GetApiKeyUsageEndpoints.ts";
 export type {
-    GetApiKeyUsageStatus200,
-    GetApiKeyUsageStatus401,
-    GetApiKeyUsageStatus404,
-    GetApiKeyUsageStatus500,
+    GetApiKeyUsageStatusOptions,
     GetApiKeyUsageStatusQuery,
-    GetApiKeyUsageStatusQueryParams,
-    GetApiKeyUsageStatusQueryResponse,
+    GetApiKeyUsageStatusResponse,
+    GetApiKeyUsageStatusResponses,
+    GetApiKeyUsageStatusStatus200,
+    GetApiKeyUsageStatusStatus400,
+    GetApiKeyUsageStatusStatus401,
+    GetApiKeyUsageStatusStatus404,
+    GetApiKeyUsageStatusStatus500,
 } from "./models/GetApiKeyUsageStatus.ts";
 export type {
-    GetApiKeyUsageSummary200,
-    GetApiKeyUsageSummary401,
-    GetApiKeyUsageSummary404,
-    GetApiKeyUsageSummary500,
+    GetApiKeyUsageSummaryOptions,
     GetApiKeyUsageSummaryQuery,
-    GetApiKeyUsageSummaryQueryParams,
-    GetApiKeyUsageSummaryQueryResponse,
+    GetApiKeyUsageSummaryResponse,
+    GetApiKeyUsageSummaryResponses,
+    GetApiKeyUsageSummaryStatus200,
+    GetApiKeyUsageSummaryStatus400,
+    GetApiKeyUsageSummaryStatus401,
+    GetApiKeyUsageSummaryStatus404,
+    GetApiKeyUsageSummaryStatus500,
 } from "./models/GetApiKeyUsageSummary.ts";
 export type {
-    EntriesActionEnumKey,
-    EntriesActorCurrentRoleEnumKey,
-    EntriesSourceEnumKey,
-    EntriesTargetTypeEnumKey,
-    GetAuditLog200,
-    GetAuditLog401,
-    GetAuditLog500,
+    GetAuditLogActionKey,
+    GetAuditLogOptions,
     GetAuditLogQuery,
-    GetAuditLogQueryParams,
-    GetAuditLogQueryParamsActionEnumKey,
-    GetAuditLogQueryParamsSourceEnumKey,
-    GetAuditLogQueryParamsTargetTypeEnumKey,
-    GetAuditLogQueryResponse,
+    GetAuditLogResponse,
+    GetAuditLogResponses,
+    GetAuditLogSourceKey,
+    GetAuditLogStatus200,
+    GetAuditLogStatus200DataEntriesActionEnumKey,
+    GetAuditLogStatus200DataEntriesActorCurrentRoleKey,
+    GetAuditLogStatus200DataEntriesSourceEnumKey,
+    GetAuditLogStatus200DataEntriesTargetTypeKey,
+    GetAuditLogStatus400,
+    GetAuditLogStatus401,
+    GetAuditLogStatus500,
+    GetAuditLogTargetTypeKey,
 } from "./models/GetAuditLog.ts";
 export type {
-    GetBonusData200,
-    GetBonusData401,
-    GetBonusData500,
+    GetBonusDataOptions,
     GetBonusDataQuery,
-    GetBonusDataQueryParams,
-    GetBonusDataQueryResponse,
+    GetBonusDataResponse,
+    GetBonusDataResponses,
+    GetBonusDataStatus200,
+    GetBonusDataStatus400,
+    GetBonusDataStatus401,
+    GetBonusDataStatus500,
 } from "./models/GetBonusData.ts";
 export type {
-    GetBonusLedger200,
-    GetBonusLedger401,
-    GetBonusLedger500,
-    GetBonusLedgerQuery,
-    GetBonusLedgerQueryResponse,
+    GetBonusLedgerOptions,
+    GetBonusLedgerResponse,
+    GetBonusLedgerResponses,
+    GetBonusLedgerStatus200,
+    GetBonusLedgerStatus401,
+    GetBonusLedgerStatus500,
 } from "./models/GetBonusLedger.ts";
 export type {
-    GetCOCCWLWar200,
-    GetCOCCWLWar500,
-    GetCOCCWLWarPathParams,
-    GetCOCCWLWarQuery,
-    GetCOCCWLWarQueryResponse,
-    WarBattleModifierEnumKey,
-    WarStateEnumKey,
+    GetCOCCWLWarOptions,
+    GetCOCCWLWarPath,
+    GetCOCCWLWarResponse,
+    GetCOCCWLWarResponses,
+    GetCOCCWLWarStatus200,
+    GetCOCCWLWarStatus200DataWarBattleModifierEnumKey,
+    GetCOCCWLWarStatus200DataWarStateEnumKey,
+    GetCOCCWLWarStatus400,
+    GetCOCCWLWarStatus500,
 } from "./models/GetCOCCWLWar.ts";
 export type {
-    ClanTypeEnumKey,
-    ClanWarFrequencyEnumKey,
-    GetCOCClan200,
-    GetCOCClan500,
-    GetCOCClanPathParams,
-    GetCOCClanQuery,
-    GetCOCClanQueryResponse,
-    MemberListRoleEnumKey,
+    GetCOCClanOptions,
+    GetCOCClanPath,
+    GetCOCClanResponse,
+    GetCOCClanResponses,
+    GetCOCClanStatus200,
+    GetCOCClanStatus200DataClanMemberListRoleEnumKey,
+    GetCOCClanStatus200DataClanTypeEnumKey,
+    GetCOCClanStatus200DataClanWarFrequencyEnumKey,
+    GetCOCClanStatus400,
+    GetCOCClanStatus500,
 } from "./models/GetCOCClan.ts";
 export type {
-    GetCOCClanCWLGroup200,
-    GetCOCClanCWLGroup500,
-    GetCOCClanCWLGroupPathParams,
-    GetCOCClanCWLGroupQuery,
-    GetCOCClanCWLGroupQueryResponse,
-    LeagueGroupStateEnumKey,
+    GetCOCClanCWLGroupOptions,
+    GetCOCClanCWLGroupPath,
+    GetCOCClanCWLGroupResponse,
+    GetCOCClanCWLGroupResponses,
+    GetCOCClanCWLGroupStatus200,
+    GetCOCClanCWLGroupStatus200DataLeagueGroupStateEnumKey,
+    GetCOCClanCWLGroupStatus400,
+    GetCOCClanCWLGroupStatus500,
 } from "./models/GetCOCClanCWLGroup.ts";
 export type {
-    CurrentWarBattleModifierEnumKey,
-    CurrentWarStateEnumKey,
-    GetCOCClanCurrentWar200,
-    GetCOCClanCurrentWar500,
-    GetCOCClanCurrentWarPathParams,
-    GetCOCClanCurrentWarQuery,
-    GetCOCClanCurrentWarQueryResponse,
+    GetCOCClanCurrentWarOptions,
+    GetCOCClanCurrentWarPath,
+    GetCOCClanCurrentWarResponse,
+    GetCOCClanCurrentWarResponses,
+    GetCOCClanCurrentWarStatus200,
+    GetCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnumKey,
+    GetCOCClanCurrentWarStatus200DataCurrentWarStateEnumKey,
+    GetCOCClanCurrentWarStatus400,
+    GetCOCClanCurrentWarStatus500,
 } from "./models/GetCOCClanCurrentWar.ts";
 export type {
-    GetCOCClanMembers200,
-    GetCOCClanMembers500,
-    GetCOCClanMembersPathParams,
-    GetCOCClanMembersQuery,
-    GetCOCClanMembersQueryResponse,
-    ItemsRoleEnumKey,
+    GetCOCClanMembersOptions,
+    GetCOCClanMembersPath,
+    GetCOCClanMembersResponse,
+    GetCOCClanMembersResponses,
+    GetCOCClanMembersStatus200,
+    GetCOCClanMembersStatus200DataClanMembersItemsRoleEnumKey,
+    GetCOCClanMembersStatus400,
+    GetCOCClanMembersStatus500,
 } from "./models/GetCOCClanMembers.ts";
 export type {
-    AchievementsVillageEnumKey,
-    EquipmentVillageEnumKey,
-    GetCOCPlayer200,
-    GetCOCPlayer500,
-    GetCOCPlayerPathParams,
-    GetCOCPlayerQuery,
-    GetCOCPlayerQueryResponse,
-    HeroEquipmentVillageEnumKey,
-    HeroesVillageEnumKey,
-    PlayerWarPreferenceEnumKey,
-    SpellsVillageEnumKey,
-    TroopsVillageEnumKey,
+    GetCOCPlayerOptions,
+    GetCOCPlayerPath,
+    GetCOCPlayerResponse,
+    GetCOCPlayerResponses,
+    GetCOCPlayerStatus200,
+    GetCOCPlayerStatus200DataPlayerAchievementsVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerHeroesVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerSpellsVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerTroopsVillageEnumKey,
+    GetCOCPlayerStatus200DataPlayerWarPreferenceEnumKey,
+    GetCOCPlayerStatus400,
+    GetCOCPlayerStatus500,
 } from "./models/GetCOCPlayer.ts";
 export type {
-    GetCOCPlayerBattleLog200,
-    GetCOCPlayerBattleLog500,
-    GetCOCPlayerBattleLogPathParams,
-    GetCOCPlayerBattleLogQuery,
-    GetCOCPlayerBattleLogQueryResponse,
-    ItemsBattleTypeEnumKey,
+    GetCOCPlayerBattleLogOptions,
+    GetCOCPlayerBattleLogPath,
+    GetCOCPlayerBattleLogResponse,
+    GetCOCPlayerBattleLogResponses,
+    GetCOCPlayerBattleLogStatus200,
+    GetCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnumKey,
+    GetCOCPlayerBattleLogStatus400,
+    GetCOCPlayerBattleLogStatus500,
 } from "./models/GetCOCPlayerBattleLog.ts";
 export type {
-    GetCwlApplications200,
-    GetCwlApplications401,
-    GetCwlApplications500,
+    GetCwlApplicationsOptions,
     GetCwlApplicationsQuery,
-    GetCwlApplicationsQueryParams,
-    GetCwlApplicationsQueryResponse,
+    GetCwlApplicationsResponse,
+    GetCwlApplicationsResponses,
+    GetCwlApplicationsStatus200,
+    GetCwlApplicationsStatus400,
+    GetCwlApplicationsStatus401,
+    GetCwlApplicationsStatus500,
 } from "./models/GetCwlApplications.ts";
 export type {
-    GetCwlPingChannels200,
-    GetCwlPingChannels401,
-    GetCwlPingChannels503,
-    GetCwlPingChannelsQuery,
-    GetCwlPingChannelsQueryResponse,
+    GetCwlPingChannelsOptions,
+    GetCwlPingChannelsResponse,
+    GetCwlPingChannelsResponses,
+    GetCwlPingChannelsStatus200,
+    GetCwlPingChannelsStatus401,
+    GetCwlPingChannelsStatus503,
 } from "./models/GetCwlPingChannels.ts";
 export type {
-    GetCwlPingSettings200,
-    GetCwlPingSettings401,
-    GetCwlPingSettings500,
-    GetCwlPingSettingsQuery,
-    GetCwlPingSettingsQueryResponse,
+    GetCwlPingSettingsOptions,
+    GetCwlPingSettingsResponse,
+    GetCwlPingSettingsResponses,
+    GetCwlPingSettingsStatus200,
+    GetCwlPingSettingsStatus401,
+    GetCwlPingSettingsStatus500,
 } from "./models/GetCwlPingSettings.ts";
-export type { GetCwlSeasons200, GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQuery, GetCwlSeasonsQueryResponse } from "./models/GetCwlSeasons.ts";
 export type {
-    GetCwlStats200,
-    GetCwlStats401,
-    GetCwlStats500,
+    GetCwlSeasonsOptions,
+    GetCwlSeasonsResponse,
+    GetCwlSeasonsResponses,
+    GetCwlSeasonsStatus200,
+    GetCwlSeasonsStatus401,
+    GetCwlSeasonsStatus500,
+} from "./models/GetCwlSeasons.ts";
+export type {
+    GetCwlStatsOptions,
     GetCwlStatsQuery,
-    GetCwlStatsQueryParams,
-    GetCwlStatsQueryResponse,
+    GetCwlStatsResponse,
+    GetCwlStatsResponses,
+    GetCwlStatsStatus200,
+    GetCwlStatsStatus400,
+    GetCwlStatsStatus401,
+    GetCwlStatsStatus500,
 } from "./models/GetCwlStats.ts";
 export type {
-    GetFWAClanPoints200,
-    GetFWAClanPoints502,
-    GetFWAClanPointsPathParams,
-    GetFWAClanPointsQuery,
-    GetFWAClanPointsQueryResponse,
-    HistoryResultEnumKey,
-    MatchupWinnerEnumKey,
+    GetFWAClanPointsOptions,
+    GetFWAClanPointsPath,
+    GetFWAClanPointsResponse,
+    GetFWAClanPointsResponses,
+    GetFWAClanPointsStatus200,
+    GetFWAClanPointsStatus200DataPointsHistoryResultKey,
+    GetFWAClanPointsStatus200DataPointsMatchupWinnerKey,
+    GetFWAClanPointsStatus400,
+    GetFWAClanPointsStatus502,
 } from "./models/GetFWAClanPoints.ts";
 export type {
-    GetGuildNicknames200,
-    GetGuildNicknames401,
-    GetGuildNicknames500,
-    GetGuildNicknamesQuery,
-    GetGuildNicknamesQueryResponse,
+    GetGuildNicknamesOptions,
+    GetGuildNicknamesResponse,
+    GetGuildNicknamesResponses,
+    GetGuildNicknamesStatus200,
+    GetGuildNicknamesStatus401,
+    GetGuildNicknamesStatus500,
 } from "./models/GetGuildNicknames.ts";
 export type {
-    GetJPAClanRequirements200,
-    GetJPAClanRequirements500,
-    GetJPAClanRequirementsQuery,
-    GetJPAClanRequirementsQueryResponse,
+    GetJPAClanRequirementsOptions,
+    GetJPAClanRequirementsResponse,
+    GetJPAClanRequirementsResponses,
+    GetJPAClanRequirementsStatus200,
+    GetJPAClanRequirementsStatus500,
 } from "./models/GetJPAClanRequirements.ts";
-export type { GetJPAClans200, GetJPAClans500, GetJPAClansQuery, GetJPAClansQueryResponse } from "./models/GetJPAClans.ts";
-export type { GetJPACwlClans200, GetJPACwlClans500, GetJPACwlClansQuery, GetJPACwlClansQueryResponse } from "./models/GetJPACwlClans.ts";
 export type {
-    ApplicationsStatusEnumKey,
-    GetJoinApplications200,
-    GetJoinApplications401,
-    GetJoinApplications500,
+    GetJPAClansOptions,
+    GetJPAClansResponse,
+    GetJPAClansResponses,
+    GetJPAClansStatus200,
+    GetJPAClansStatus500,
+} from "./models/GetJPAClans.ts";
+export type {
+    GetJPACwlClansOptions,
+    GetJPACwlClansResponse,
+    GetJPACwlClansResponses,
+    GetJPACwlClansStatus200,
+    GetJPACwlClansStatus500,
+} from "./models/GetJPACwlClans.ts";
+export type {
+    GetJoinApplicationsOptions,
     GetJoinApplicationsQuery,
-    GetJoinApplicationsQueryParams,
-    GetJoinApplicationsQueryParamsStatusEnumKey,
-    GetJoinApplicationsQueryResponse,
+    GetJoinApplicationsResponse,
+    GetJoinApplicationsResponses,
+    GetJoinApplicationsStatus200,
+    GetJoinApplicationsStatus200DataApplicationsStatusEnumKey,
+    GetJoinApplicationsStatus400,
+    GetJoinApplicationsStatus401,
+    GetJoinApplicationsStatus500,
+    GetJoinApplicationsStatusKey,
 } from "./models/GetJoinApplications.ts";
-export type { GetPrivacy200, GetPrivacy500, GetPrivacyQuery, GetPrivacyQueryResponse } from "./models/GetPrivacy.ts";
-export type { GetRules200, GetRules500, GetRulesQuery, GetRulesQueryResponse } from "./models/GetRules.ts";
-export type { GetUser200, GetUser401, GetUser500, GetUserQuery, GetUserQueryResponse } from "./models/GetUser.ts";
+export type { GetPrivacyOptions, GetPrivacyResponse, GetPrivacyResponses, GetPrivacyStatus200, GetPrivacyStatus500 } from "./models/GetPrivacy.ts";
+export type { GetRulesOptions, GetRulesResponse, GetRulesResponses, GetRulesStatus200, GetRulesStatus500 } from "./models/GetRules.ts";
+export type { GetUserOptions, GetUserResponse, GetUserResponses, GetUserStatus200, GetUserStatus401, GetUserStatus500 } from "./models/GetUser.ts";
 export type {
-    GetUserAccounts200,
-    GetUserAccounts401,
-    GetUserAccounts500,
-    GetUserAccountsQuery,
-    GetUserAccountsQueryResponse,
+    GetUserAccountsOptions,
+    GetUserAccountsResponse,
+    GetUserAccountsResponses,
+    GetUserAccountsStatus200,
+    GetUserAccountsStatus401,
+    GetUserAccountsStatus500,
 } from "./models/GetUserAccounts.ts";
 export type {
-    GetUserCocAccountsByUserId200,
-    GetUserCocAccountsByUserId401,
-    GetUserCocAccountsByUserId500,
-    GetUserCocAccountsByUserIdPathParams,
-    GetUserCocAccountsByUserIdQuery,
-    GetUserCocAccountsByUserIdQueryResponse,
+    GetUserCocAccountsByUserIdOptions,
+    GetUserCocAccountsByUserIdPath,
+    GetUserCocAccountsByUserIdResponse,
+    GetUserCocAccountsByUserIdResponses,
+    GetUserCocAccountsByUserIdStatus200,
+    GetUserCocAccountsByUserIdStatus400,
+    GetUserCocAccountsByUserIdStatus401,
+    GetUserCocAccountsByUserIdStatus500,
 } from "./models/GetUserCocAccountsByUserId.ts";
 export type {
-    GetUserCwlApplications200,
-    GetUserCwlApplications401,
-    GetUserCwlApplications500,
-    GetUserCwlApplicationsQuery,
-    GetUserCwlApplicationsQueryResponse,
+    GetUserCwlApplicationsOptions,
+    GetUserCwlApplicationsResponse,
+    GetUserCwlApplicationsResponses,
+    GetUserCwlApplicationsStatus200,
+    GetUserCwlApplicationsStatus401,
+    GetUserCwlApplicationsStatus500,
 } from "./models/GetUserCwlApplications.ts";
 export type {
-    GetUserFeatures200,
-    GetUserFeatures401,
-    GetUserFeatures500,
-    GetUserFeaturesQuery,
-    GetUserFeaturesQueryResponse,
+    GetUserFeaturesOptions,
+    GetUserFeaturesResponse,
+    GetUserFeaturesResponses,
+    GetUserFeaturesStatus200,
+    GetUserFeaturesStatus401,
+    GetUserFeaturesStatus500,
 } from "./models/GetUserFeatures.ts";
 export type {
-    GetWarLogClans200,
-    GetWarLogClans404,
-    GetWarLogClans500,
-    GetWarLogClansQuery,
-    GetWarLogClansQueryResponse,
+    GetWarLogClansOptions,
+    GetWarLogClansResponse,
+    GetWarLogClansResponses,
+    GetWarLogClansStatus200,
+    GetWarLogClansStatus404,
+    GetWarLogClansStatus500,
 } from "./models/GetWarLogClans.ts";
 export type {
-    GetWarLogPlayers200,
-    GetWarLogPlayers404,
-    GetWarLogPlayers500,
-    GetWarLogPlayersPathParams,
+    GetWarLogPlayersOptions,
+    GetWarLogPlayersPath,
     GetWarLogPlayersQuery,
-    GetWarLogPlayersQueryParams,
-    GetWarLogPlayersQueryResponse,
+    GetWarLogPlayersResponse,
+    GetWarLogPlayersResponses,
+    GetWarLogPlayersStatus200,
+    GetWarLogPlayersStatus400,
+    GetWarLogPlayersStatus404,
+    GetWarLogPlayersStatus500,
 } from "./models/GetWarLogPlayers.ts";
 export type {
-    AttacksSideEnumKey,
-    GetWarLogWar200,
-    GetWarLogWar404,
-    GetWarLogWar500,
-    GetWarLogWarPathParams,
-    GetWarLogWarQuery,
-    GetWarLogWarQueryResponse,
+    GetWarLogWarOptions,
+    GetWarLogWarPath,
+    GetWarLogWarResponse,
+    GetWarLogWarResponses,
+    GetWarLogWarStatus200,
+    GetWarLogWarStatus200DataWarAttacksSideEnumKey,
+    GetWarLogWarStatus400,
+    GetWarLogWarStatus404,
+    GetWarLogWarStatus500,
 } from "./models/GetWarLogWar.ts";
 export type {
-    GetWarLogWars200,
-    GetWarLogWars404,
-    GetWarLogWars500,
-    GetWarLogWarsPathParams,
+    GetWarLogWarsOptions,
+    GetWarLogWarsPath,
     GetWarLogWarsQuery,
-    GetWarLogWarsQueryParams,
-    GetWarLogWarsQueryResponse,
+    GetWarLogWarsResponse,
+    GetWarLogWarsResponses,
+    GetWarLogWarsStatus200,
+    GetWarLogWarsStatus400,
+    GetWarLogWarsStatus404,
+    GetWarLogWarsStatus500,
 } from "./models/GetWarLogWars.ts";
 export type {
-    ImportUserAccounts200,
-    ImportUserAccounts401,
-    ImportUserAccounts500,
-    ImportUserAccountsMutation,
-    ImportUserAccountsMutationResponse,
+    ImportUserAccountsOptions,
+    ImportUserAccountsResponse,
+    ImportUserAccountsResponses,
+    ImportUserAccountsStatus200,
+    ImportUserAccountsStatus401,
+    ImportUserAccountsStatus500,
 } from "./models/ImportUserAccounts.ts";
 export type {
-    PostCOCPlayerVerify200,
-    PostCOCPlayerVerify500,
-    PostCOCPlayerVerifyMutation,
-    PostCOCPlayerVerifyMutationRequest,
-    PostCOCPlayerVerifyMutationResponse,
-    PostCOCPlayerVerifyPathParams,
-    VerifyTokenStatusEnumKey,
+    PostCOCPlayerVerifyBody,
+    PostCOCPlayerVerifyOptions,
+    PostCOCPlayerVerifyPath,
+    PostCOCPlayerVerifyResponse,
+    PostCOCPlayerVerifyResponses,
+    PostCOCPlayerVerifyStatus200,
+    PostCOCPlayerVerifyStatus200DataVerifyTokenStatusEnumKey,
+    PostCOCPlayerVerifyStatus400,
+    PostCOCPlayerVerifyStatus500,
 } from "./models/PostCOCPlayerVerify.ts";
-export type { PreviewCwlPing200, PreviewCwlPing401, PreviewCwlPingQuery, PreviewCwlPingQueryResponse } from "./models/PreviewCwlPing.ts";
 export type {
-    RefreshDiscordUsernames200,
-    RefreshDiscordUsernames401,
-    RefreshDiscordUsernames500,
-    RefreshDiscordUsernames503,
-    RefreshDiscordUsernamesMutation,
-    RefreshDiscordUsernamesMutationResponse,
+    PreviewCwlPingOptions,
+    PreviewCwlPingResponse,
+    PreviewCwlPingResponses,
+    PreviewCwlPingStatus200,
+    PreviewCwlPingStatus401,
+} from "./models/PreviewCwlPing.ts";
+export type {
+    RefreshDiscordUsernamesOptions,
+    RefreshDiscordUsernamesResponse,
+    RefreshDiscordUsernamesResponses,
+    RefreshDiscordUsernamesStatus200,
+    RefreshDiscordUsernamesStatus401,
+    RefreshDiscordUsernamesStatus500,
+    RefreshDiscordUsernamesStatus503,
 } from "./models/RefreshDiscordUsernames.ts";
 export type {
-    RenameCwlSeason200,
-    RenameCwlSeason401,
-    RenameCwlSeason404,
-    RenameCwlSeason409,
-    RenameCwlSeason500,
-    RenameCwlSeasonMutation,
-    RenameCwlSeasonMutationRequest,
-    RenameCwlSeasonMutationResponse,
-    RenameCwlSeasonPathParams,
+    RenameCwlSeasonBody,
+    RenameCwlSeasonOptions,
+    RenameCwlSeasonPath,
+    RenameCwlSeasonResponse,
+    RenameCwlSeasonResponses,
+    RenameCwlSeasonStatus200,
+    RenameCwlSeasonStatus400,
+    RenameCwlSeasonStatus401,
+    RenameCwlSeasonStatus404,
+    RenameCwlSeasonStatus409,
+    RenameCwlSeasonStatus500,
 } from "./models/RenameCwlSeason.ts";
-export type { RunCwlPingNow200, RunCwlPingNow401, RunCwlPingNowMutation, RunCwlPingNowMutationResponse } from "./models/RunCwlPingNow.ts";
 export type {
-    SetPrivacy200,
-    SetPrivacy401,
-    SetPrivacy500,
-    SetPrivacyMutation,
-    SetPrivacyMutationRequest,
-    SetPrivacyMutationResponse,
+    RunCwlPingNowOptions,
+    RunCwlPingNowResponse,
+    RunCwlPingNowResponses,
+    RunCwlPingNowStatus200,
+    RunCwlPingNowStatus401,
+} from "./models/RunCwlPingNow.ts";
+export type {
+    SetPrivacyBody,
+    SetPrivacyOptions,
+    SetPrivacyResponse,
+    SetPrivacyResponses,
+    SetPrivacyStatus200,
+    SetPrivacyStatus400,
+    SetPrivacyStatus401,
+    SetPrivacyStatus500,
 } from "./models/SetPrivacy.ts";
-export type { SetRules200, SetRules500, SetRulesMutation, SetRulesMutationRequest, SetRulesMutationResponse } from "./models/SetRules.ts";
 export type {
-    SetUserAccountExternal200,
-    SetUserAccountExternal401,
-    SetUserAccountExternal404,
-    SetUserAccountExternal500,
-    SetUserAccountExternalMutation,
-    SetUserAccountExternalMutationResponse,
-    SetUserAccountExternalPathParams,
+    SetRulesBody,
+    SetRulesOptions,
+    SetRulesResponse,
+    SetRulesResponses,
+    SetRulesStatus200,
+    SetRulesStatus400,
+    SetRulesStatus500,
+} from "./models/SetRules.ts";
+export type {
+    SetUserAccountExternalOptions,
+    SetUserAccountExternalPath,
+    SetUserAccountExternalResponse,
+    SetUserAccountExternalResponses,
+    SetUserAccountExternalStatus200,
+    SetUserAccountExternalStatus400,
+    SetUserAccountExternalStatus401,
+    SetUserAccountExternalStatus404,
+    SetUserAccountExternalStatus500,
 } from "./models/SetUserAccountExternal.ts";
 export type {
-    SetUserApiAccess200,
-    SetUserApiAccess401,
-    SetUserApiAccess404,
-    SetUserApiAccess500,
-    SetUserApiAccessMutation,
-    SetUserApiAccessMutationRequest,
-    SetUserApiAccessMutationResponse,
-    SetUserApiAccessPathParams,
+    SetUserApiAccessBody,
+    SetUserApiAccessOptions,
+    SetUserApiAccessPath,
+    SetUserApiAccessResponse,
+    SetUserApiAccessResponses,
+    SetUserApiAccessStatus200,
+    SetUserApiAccessStatus400,
+    SetUserApiAccessStatus401,
+    SetUserApiAccessStatus404,
+    SetUserApiAccessStatus500,
 } from "./models/SetUserApiAccess.ts";
 export type {
-    SetUserSeasonBonus200,
-    SetUserSeasonBonus400,
-    SetUserSeasonBonus401,
-    SetUserSeasonBonus500,
-    SetUserSeasonBonusMutation,
-    SetUserSeasonBonusMutationRequest,
-    SetUserSeasonBonusMutationResponse,
+    SetUserSeasonBonusBody,
+    SetUserSeasonBonusOptions,
+    SetUserSeasonBonusResponse,
+    SetUserSeasonBonusResponses,
+    SetUserSeasonBonusStatus200,
+    SetUserSeasonBonusStatus400,
+    SetUserSeasonBonusStatus401,
+    SetUserSeasonBonusStatus500,
 } from "./models/SetUserSeasonBonus.ts";
 export type {
-    SyncAdminCwlClanLeagues200,
-    SyncAdminCwlClanLeagues401,
-    SyncAdminCwlClanLeagues500,
-    SyncAdminCwlClanLeaguesMutation,
-    SyncAdminCwlClanLeaguesMutationResponse,
+    SyncAdminCwlClanLeaguesOptions,
+    SyncAdminCwlClanLeaguesResponse,
+    SyncAdminCwlClanLeaguesResponses,
+    SyncAdminCwlClanLeaguesStatus200,
+    SyncAdminCwlClanLeaguesStatus401,
+    SyncAdminCwlClanLeaguesStatus500,
 } from "./models/SyncAdminCwlClanLeagues.ts";
 export type {
-    SyncCocAccountWarWeights200,
-    SyncCocAccountWarWeights400,
-    SyncCocAccountWarWeights401,
-    SyncCocAccountWarWeights500,
-    SyncCocAccountWarWeightsMutation,
-    SyncCocAccountWarWeightsMutationRequest,
-    SyncCocAccountWarWeightsMutationResponse,
+    SyncCocAccountWarWeightsBody,
+    SyncCocAccountWarWeightsOptions,
+    SyncCocAccountWarWeightsResponse,
+    SyncCocAccountWarWeightsResponses,
+    SyncCocAccountWarWeightsStatus200,
+    SyncCocAccountWarWeightsStatus400,
+    SyncCocAccountWarWeightsStatus401,
+    SyncCocAccountWarWeightsStatus500,
 } from "./models/SyncCocAccountWarWeights.ts";
 export type {
-    SyncCocAccounts200,
-    SyncCocAccounts400,
-    SyncCocAccounts401,
-    SyncCocAccounts500,
-    SyncCocAccountsMutation,
-    SyncCocAccountsMutationRequest,
-    SyncCocAccountsMutationResponse,
+    SyncCocAccountsBody,
+    SyncCocAccountsOptions,
+    SyncCocAccountsResponse,
+    SyncCocAccountsResponses,
+    SyncCocAccountsStatus200,
+    SyncCocAccountsStatus400,
+    SyncCocAccountsStatus401,
+    SyncCocAccountsStatus500,
 } from "./models/SyncCocAccounts.ts";
 export type {
-    TestCwlPing200,
-    TestCwlPing400,
-    TestCwlPing401,
-    TestCwlPing502,
-    TestCwlPingMutation,
-    TestCwlPingMutationRequest,
-    TestCwlPingMutationResponse,
+    TestCwlPingBody,
+    TestCwlPingOptions,
+    TestCwlPingResponse,
+    TestCwlPingResponses,
+    TestCwlPingStatus200,
+    TestCwlPingStatus400,
+    TestCwlPingStatus401,
+    TestCwlPingStatus502,
 } from "./models/TestCwlPing.ts";
 export type {
-    UpdateAdminClan200,
-    UpdateAdminClan401,
-    UpdateAdminClan404,
-    UpdateAdminClan422,
-    UpdateAdminClan500,
-    UpdateAdminClan503,
-    UpdateAdminClanMutation,
-    UpdateAdminClanMutationRequest,
-    UpdateAdminClanMutationResponse,
-    UpdateAdminClanPathParams,
+    UpdateAdminClanBody,
+    UpdateAdminClanOptions,
+    UpdateAdminClanPath,
+    UpdateAdminClanResponse,
+    UpdateAdminClanResponses,
+    UpdateAdminClanStatus200,
+    UpdateAdminClanStatus400,
+    UpdateAdminClanStatus401,
+    UpdateAdminClanStatus404,
+    UpdateAdminClanStatus422,
+    UpdateAdminClanStatus500,
+    UpdateAdminClanStatus503,
 } from "./models/UpdateAdminClan.ts";
 export type {
-    UpdateAdminSettings200,
-    UpdateAdminSettings401,
-    UpdateAdminSettings500,
-    UpdateAdminSettingsMutation,
-    UpdateAdminSettingsMutationRequest,
-    UpdateAdminSettingsMutationResponse,
+    UpdateAdminSettingsBody,
+    UpdateAdminSettingsOptions,
+    UpdateAdminSettingsResponse,
+    UpdateAdminSettingsResponses,
+    UpdateAdminSettingsStatus200,
+    UpdateAdminSettingsStatus400,
+    UpdateAdminSettingsStatus401,
+    UpdateAdminSettingsStatus500,
 } from "./models/UpdateAdminSettings.ts";
 export type {
-    UpdateCocAccountExternal200,
-    UpdateCocAccountExternal401,
-    UpdateCocAccountExternal404,
-    UpdateCocAccountExternal500,
-    UpdateCocAccountExternalMutation,
-    UpdateCocAccountExternalMutationRequest,
-    UpdateCocAccountExternalMutationResponse,
-    UpdateCocAccountExternalPathParams,
+    UpdateCocAccountExternalBody,
+    UpdateCocAccountExternalOptions,
+    UpdateCocAccountExternalPath,
+    UpdateCocAccountExternalResponse,
+    UpdateCocAccountExternalResponses,
+    UpdateCocAccountExternalStatus200,
+    UpdateCocAccountExternalStatus400,
+    UpdateCocAccountExternalStatus401,
+    UpdateCocAccountExternalStatus404,
+    UpdateCocAccountExternalStatus500,
 } from "./models/UpdateCocAccountExternal.ts";
 export type {
-    UpdateCocAccountStats200,
-    UpdateCocAccountStats400,
-    UpdateCocAccountStats401,
-    UpdateCocAccountStats404,
-    UpdateCocAccountStats500,
-    UpdateCocAccountStatsMutation,
-    UpdateCocAccountStatsMutationRequest,
-    UpdateCocAccountStatsMutationResponse,
-    UpdateCocAccountStatsPathParams,
+    UpdateCocAccountStatsBody,
+    UpdateCocAccountStatsOptions,
+    UpdateCocAccountStatsPath,
+    UpdateCocAccountStatsResponse,
+    UpdateCocAccountStatsResponses,
+    UpdateCocAccountStatsStatus200,
+    UpdateCocAccountStatsStatus400,
+    UpdateCocAccountStatsStatus401,
+    UpdateCocAccountStatsStatus404,
+    UpdateCocAccountStatsStatus500,
 } from "./models/UpdateCocAccountStats.ts";
 export type {
-    UpdateCocAccountWarWeight200,
-    UpdateCocAccountWarWeight401,
-    UpdateCocAccountWarWeight404,
-    UpdateCocAccountWarWeight500,
-    UpdateCocAccountWarWeightMutation,
-    UpdateCocAccountWarWeightMutationRequest,
-    UpdateCocAccountWarWeightMutationResponse,
-    UpdateCocAccountWarWeightPathParams,
+    UpdateCocAccountWarWeightBody,
+    UpdateCocAccountWarWeightOptions,
+    UpdateCocAccountWarWeightPath,
+    UpdateCocAccountWarWeightResponse,
+    UpdateCocAccountWarWeightResponses,
+    UpdateCocAccountWarWeightStatus200,
+    UpdateCocAccountWarWeightStatus400,
+    UpdateCocAccountWarWeightStatus401,
+    UpdateCocAccountWarWeightStatus404,
+    UpdateCocAccountWarWeightStatus500,
 } from "./models/UpdateCocAccountWarWeight.ts";
 export type {
-    UpdateCwlPingSettings200,
-    UpdateCwlPingSettings400,
-    UpdateCwlPingSettings401,
-    UpdateCwlPingSettings500,
-    UpdateCwlPingSettings503,
-    UpdateCwlPingSettingsMutation,
-    UpdateCwlPingSettingsMutationRequest,
-    UpdateCwlPingSettingsMutationResponse,
+    UpdateCwlPingSettingsBody,
+    UpdateCwlPingSettingsOptions,
+    UpdateCwlPingSettingsResponse,
+    UpdateCwlPingSettingsResponses,
+    UpdateCwlPingSettingsStatus200,
+    UpdateCwlPingSettingsStatus400,
+    UpdateCwlPingSettingsStatus401,
+    UpdateCwlPingSettingsStatus500,
+    UpdateCwlPingSettingsStatus503,
 } from "./models/UpdateCwlPingSettings.ts";
 export type {
-    ApplicationStatusEnumKey,
-    UpdateJoinApplicationStatus200,
-    UpdateJoinApplicationStatus401,
-    UpdateJoinApplicationStatus404,
-    UpdateJoinApplicationStatus500,
-    UpdateJoinApplicationStatusMutation,
-    UpdateJoinApplicationStatusMutationRequest,
-    UpdateJoinApplicationStatusMutationRequestStatusEnumKey,
-    UpdateJoinApplicationStatusMutationResponse,
-    UpdateJoinApplicationStatusPathParams,
+    UpdateJoinApplicationStatusBody,
+    UpdateJoinApplicationStatusOptions,
+    UpdateJoinApplicationStatusPath,
+    UpdateJoinApplicationStatusRequestStatusEnumKey,
+    UpdateJoinApplicationStatusResponse,
+    UpdateJoinApplicationStatusResponses,
+    UpdateJoinApplicationStatusStatus200,
+    UpdateJoinApplicationStatusStatus200DataApplicationStatusEnumKey,
+    UpdateJoinApplicationStatusStatus400,
+    UpdateJoinApplicationStatusStatus401,
+    UpdateJoinApplicationStatusStatus404,
+    UpdateJoinApplicationStatusStatus500,
 } from "./models/UpdateJoinApplicationStatus.ts";
 export type {
-    VerifyAdminClanDiscord200,
-    VerifyAdminClanDiscord401,
-    VerifyAdminClanDiscord500,
-    VerifyAdminClanDiscord503,
-    VerifyAdminClanDiscordMutation,
-    VerifyAdminClanDiscordMutationRequest,
-    VerifyAdminClanDiscordMutationResponse,
+    VerifyAdminClanDiscordBody,
+    VerifyAdminClanDiscordOptions,
+    VerifyAdminClanDiscordResponse,
+    VerifyAdminClanDiscordResponses,
+    VerifyAdminClanDiscordStatus200,
+    VerifyAdminClanDiscordStatus400,
+    VerifyAdminClanDiscordStatus401,
+    VerifyAdminClanDiscordStatus500,
+    VerifyAdminClanDiscordStatus503,
 } from "./models/VerifyAdminClanDiscord.ts";
 export { applyCwl } from "./clients/applyCwl.ts";
 export { applyUserAccount } from "./clients/applyUserAccount.ts";
@@ -907,887 +999,913 @@ export { updateCocAccountWarWeight } from "./clients/updateCocAccountWarWeight.t
 export { updateCwlPingSettings } from "./clients/updateCwlPingSettings.ts";
 export { updateJoinApplicationStatus } from "./clients/updateJoinApplicationStatus.ts";
 export { verifyAdminClanDiscord } from "./clients/verifyAdminClanDiscord.ts";
-export { applyCwlMutationKey } from "./hooks/createApplyCwl.ts";
-export { createApplyCwl } from "./hooks/createApplyCwl.ts";
-export { applyUserAccountMutationKey } from "./hooks/createApplyUserAccount.ts";
-export { createApplyUserAccount } from "./hooks/createApplyUserAccount.ts";
-export { assignCwlApplicationMutationKey } from "./hooks/createAssignCwlApplication.ts";
-export { createAssignCwlApplication } from "./hooks/createAssignCwlApplication.ts";
-export { assignCwlApplicationsBulkMutationKey } from "./hooks/createAssignCwlApplicationsBulk.ts";
-export { createAssignCwlApplicationsBulk } from "./hooks/createAssignCwlApplicationsBulk.ts";
-export { clearAcceptedJoinApplicationsMutationKey } from "./hooks/createClearAcceptedJoinApplications.ts";
-export { createClearAcceptedJoinApplications } from "./hooks/createClearAcceptedJoinApplications.ts";
-export { createAdminClanMutationKey } from "./hooks/createCreateAdminClan.ts";
-export { createCreateAdminClan } from "./hooks/createCreateAdminClan.ts";
-export { createAdminCwlClanMutationKey } from "./hooks/createCreateAdminCwlClan.ts";
-export { createCreateAdminCwlClan } from "./hooks/createCreateAdminCwlClan.ts";
-export { createApiKeyMutationKey } from "./hooks/createCreateApiKey.ts";
-export { createCreateApiKey } from "./hooks/createCreateApiKey.ts";
-export { createCocAccountMutationKey } from "./hooks/createCreateCocAccount.ts";
-export { createCreateCocAccount } from "./hooks/createCreateCocAccount.ts";
-export { createCreateCwlApplication } from "./hooks/createCreateCwlApplication.ts";
-export { createCwlApplicationMutationKey } from "./hooks/createCreateCwlApplication.ts";
-export { createCreateCwlSeason } from "./hooks/createCreateCwlSeason.ts";
-export { createCwlSeasonMutationKey } from "./hooks/createCreateCwlSeason.ts";
-export { createDeleteAdminClan } from "./hooks/createDeleteAdminClan.ts";
-export { deleteAdminClanMutationKey } from "./hooks/createDeleteAdminClan.ts";
-export { createDeleteAdminCwlClan } from "./hooks/createDeleteAdminCwlClan.ts";
-export { deleteAdminCwlClanMutationKey } from "./hooks/createDeleteAdminCwlClan.ts";
-export { createDeleteCocAccount } from "./hooks/createDeleteCocAccount.ts";
-export { deleteCocAccountMutationKey } from "./hooks/createDeleteCocAccount.ts";
-export { createDeleteCocAccountsBulk } from "./hooks/createDeleteCocAccountsBulk.ts";
-export { deleteCocAccountsBulkMutationKey } from "./hooks/createDeleteCocAccountsBulk.ts";
-export { createDeleteCwlApplicationsBulk } from "./hooks/createDeleteCwlApplicationsBulk.ts";
-export { deleteCwlApplicationsBulkMutationKey } from "./hooks/createDeleteCwlApplicationsBulk.ts";
-export { createDeleteCwlSeason } from "./hooks/createDeleteCwlSeason.ts";
-export { deleteCwlSeasonMutationKey } from "./hooks/createDeleteCwlSeason.ts";
-export { createDeleteJoinApplication } from "./hooks/createDeleteJoinApplication.ts";
-export { deleteJoinApplicationMutationKey } from "./hooks/createDeleteJoinApplication.ts";
-export { createGetAdminClans } from "./hooks/createGetAdminClans.ts";
-export { getAdminClansQueryKey } from "./hooks/createGetAdminClans.ts";
-export { getAdminClansQueryOptions } from "./hooks/createGetAdminClans.ts";
-export { createGetAdminCocAccounts } from "./hooks/createGetAdminCocAccounts.ts";
-export { getAdminCocAccountsQueryKey } from "./hooks/createGetAdminCocAccounts.ts";
-export { getAdminCocAccountsQueryOptions } from "./hooks/createGetAdminCocAccounts.ts";
-export { createGetAdminCwlClans } from "./hooks/createGetAdminCwlClans.ts";
-export { getAdminCwlClansQueryKey } from "./hooks/createGetAdminCwlClans.ts";
-export { getAdminCwlClansQueryOptions } from "./hooks/createGetAdminCwlClans.ts";
-export { createGetAdminSettings } from "./hooks/createGetAdminSettings.ts";
-export { getAdminSettingsQueryKey } from "./hooks/createGetAdminSettings.ts";
-export { getAdminSettingsQueryOptions } from "./hooks/createGetAdminSettings.ts";
-export { createGetAdminUsers } from "./hooks/createGetAdminUsers.ts";
-export { getAdminUsersQueryKey } from "./hooks/createGetAdminUsers.ts";
-export { getAdminUsersQueryOptions } from "./hooks/createGetAdminUsers.ts";
-export { createGetAnalyticsAdminActivity } from "./hooks/createGetAnalyticsAdminActivity.ts";
-export { getAnalyticsAdminActivityQueryKey } from "./hooks/createGetAnalyticsAdminActivity.ts";
-export { getAnalyticsAdminActivityQueryOptions } from "./hooks/createGetAnalyticsAdminActivity.ts";
-export { createGetAnalyticsAuditCategories } from "./hooks/createGetAnalyticsAuditCategories.ts";
-export { getAnalyticsAuditCategoriesQueryKey } from "./hooks/createGetAnalyticsAuditCategories.ts";
-export { getAnalyticsAuditCategoriesQueryOptions } from "./hooks/createGetAnalyticsAuditCategories.ts";
-export { createGetAnalyticsAuditTrend } from "./hooks/createGetAnalyticsAuditTrend.ts";
-export { getAnalyticsAuditTrendQueryKey } from "./hooks/createGetAnalyticsAuditTrend.ts";
-export { getAnalyticsAuditTrendQueryOptions } from "./hooks/createGetAnalyticsAuditTrend.ts";
-export { createGetAnalyticsCwlAssignment } from "./hooks/createGetAnalyticsCwlAssignment.ts";
-export { getAnalyticsCwlAssignmentQueryKey } from "./hooks/createGetAnalyticsCwlAssignment.ts";
-export { getAnalyticsCwlAssignmentQueryOptions } from "./hooks/createGetAnalyticsCwlAssignment.ts";
-export { createGetAnalyticsCwlParticipation } from "./hooks/createGetAnalyticsCwlParticipation.ts";
-export { getAnalyticsCwlParticipationQueryKey } from "./hooks/createGetAnalyticsCwlParticipation.ts";
-export { getAnalyticsCwlParticipationQueryOptions } from "./hooks/createGetAnalyticsCwlParticipation.ts";
-export { createGetAnalyticsCwlSeasonOverview } from "./hooks/createGetAnalyticsCwlSeasonOverview.ts";
-export { getAnalyticsCwlSeasonOverviewQueryKey } from "./hooks/createGetAnalyticsCwlSeasonOverview.ts";
-export { getAnalyticsCwlSeasonOverviewQueryOptions } from "./hooks/createGetAnalyticsCwlSeasonOverview.ts";
-export { createGetAnalyticsCwlSeasons } from "./hooks/createGetAnalyticsCwlSeasons.ts";
-export { getAnalyticsCwlSeasonsQueryKey } from "./hooks/createGetAnalyticsCwlSeasons.ts";
-export { getAnalyticsCwlSeasonsQueryOptions } from "./hooks/createGetAnalyticsCwlSeasons.ts";
-export { createGetAnalyticsOverview } from "./hooks/createGetAnalyticsOverview.ts";
-export { getAnalyticsOverviewQueryKey } from "./hooks/createGetAnalyticsOverview.ts";
-export { getAnalyticsOverviewQueryOptions } from "./hooks/createGetAnalyticsOverview.ts";
-export { createGetAnalyticsUserJoins } from "./hooks/createGetAnalyticsUserJoins.ts";
-export { getAnalyticsUserJoinsQueryKey } from "./hooks/createGetAnalyticsUserJoins.ts";
-export { getAnalyticsUserJoinsQueryOptions } from "./hooks/createGetAnalyticsUserJoins.ts";
-export { createGetApiKeyUsageDaily } from "./hooks/createGetApiKeyUsageDaily.ts";
-export { getApiKeyUsageDailyQueryKey } from "./hooks/createGetApiKeyUsageDaily.ts";
-export { getApiKeyUsageDailyQueryOptions } from "./hooks/createGetApiKeyUsageDaily.ts";
-export { createGetApiKeyUsageEndpoints } from "./hooks/createGetApiKeyUsageEndpoints.ts";
-export { getApiKeyUsageEndpointsQueryKey } from "./hooks/createGetApiKeyUsageEndpoints.ts";
-export { getApiKeyUsageEndpointsQueryOptions } from "./hooks/createGetApiKeyUsageEndpoints.ts";
-export { createGetApiKeyUsageStatus } from "./hooks/createGetApiKeyUsageStatus.ts";
-export { getApiKeyUsageStatusQueryKey } from "./hooks/createGetApiKeyUsageStatus.ts";
-export { getApiKeyUsageStatusQueryOptions } from "./hooks/createGetApiKeyUsageStatus.ts";
-export { createGetApiKeyUsageSummary } from "./hooks/createGetApiKeyUsageSummary.ts";
-export { getApiKeyUsageSummaryQueryKey } from "./hooks/createGetApiKeyUsageSummary.ts";
-export { getApiKeyUsageSummaryQueryOptions } from "./hooks/createGetApiKeyUsageSummary.ts";
-export { createGetAuditLog } from "./hooks/createGetAuditLog.ts";
-export { getAuditLogQueryKey } from "./hooks/createGetAuditLog.ts";
-export { getAuditLogQueryOptions } from "./hooks/createGetAuditLog.ts";
-export { createGetBonusData } from "./hooks/createGetBonusData.ts";
-export { getBonusDataQueryKey } from "./hooks/createGetBonusData.ts";
-export { getBonusDataQueryOptions } from "./hooks/createGetBonusData.ts";
-export { createGetBonusLedger } from "./hooks/createGetBonusLedger.ts";
-export { getBonusLedgerQueryKey } from "./hooks/createGetBonusLedger.ts";
-export { getBonusLedgerQueryOptions } from "./hooks/createGetBonusLedger.ts";
-export { createGetCOCCWLWar } from "./hooks/createGetCOCCWLWar.ts";
-export { getCOCCWLWarQueryKey } from "./hooks/createGetCOCCWLWar.ts";
-export { getCOCCWLWarQueryOptions } from "./hooks/createGetCOCCWLWar.ts";
-export { createGetCOCClan } from "./hooks/createGetCOCClan.ts";
-export { getCOCClanQueryKey } from "./hooks/createGetCOCClan.ts";
-export { getCOCClanQueryOptions } from "./hooks/createGetCOCClan.ts";
-export { createGetCOCClanCWLGroup } from "./hooks/createGetCOCClanCWLGroup.ts";
-export { getCOCClanCWLGroupQueryKey } from "./hooks/createGetCOCClanCWLGroup.ts";
-export { getCOCClanCWLGroupQueryOptions } from "./hooks/createGetCOCClanCWLGroup.ts";
-export { createGetCOCClanCurrentWar } from "./hooks/createGetCOCClanCurrentWar.ts";
-export { getCOCClanCurrentWarQueryKey } from "./hooks/createGetCOCClanCurrentWar.ts";
-export { getCOCClanCurrentWarQueryOptions } from "./hooks/createGetCOCClanCurrentWar.ts";
-export { createGetCOCClanMembers } from "./hooks/createGetCOCClanMembers.ts";
-export { getCOCClanMembersQueryKey } from "./hooks/createGetCOCClanMembers.ts";
-export { getCOCClanMembersQueryOptions } from "./hooks/createGetCOCClanMembers.ts";
-export { createGetCOCPlayer } from "./hooks/createGetCOCPlayer.ts";
-export { getCOCPlayerQueryKey } from "./hooks/createGetCOCPlayer.ts";
-export { getCOCPlayerQueryOptions } from "./hooks/createGetCOCPlayer.ts";
-export { createGetCOCPlayerBattleLog } from "./hooks/createGetCOCPlayerBattleLog.ts";
-export { getCOCPlayerBattleLogQueryKey } from "./hooks/createGetCOCPlayerBattleLog.ts";
-export { getCOCPlayerBattleLogQueryOptions } from "./hooks/createGetCOCPlayerBattleLog.ts";
-export { createGetCwlApplications } from "./hooks/createGetCwlApplications.ts";
-export { getCwlApplicationsQueryKey } from "./hooks/createGetCwlApplications.ts";
-export { getCwlApplicationsQueryOptions } from "./hooks/createGetCwlApplications.ts";
-export { createGetCwlPingChannels } from "./hooks/createGetCwlPingChannels.ts";
-export { getCwlPingChannelsQueryKey } from "./hooks/createGetCwlPingChannels.ts";
-export { getCwlPingChannelsQueryOptions } from "./hooks/createGetCwlPingChannels.ts";
-export { createGetCwlPingSettings } from "./hooks/createGetCwlPingSettings.ts";
-export { getCwlPingSettingsQueryKey } from "./hooks/createGetCwlPingSettings.ts";
-export { getCwlPingSettingsQueryOptions } from "./hooks/createGetCwlPingSettings.ts";
-export { createGetCwlSeasons } from "./hooks/createGetCwlSeasons.ts";
-export { getCwlSeasonsQueryKey } from "./hooks/createGetCwlSeasons.ts";
-export { getCwlSeasonsQueryOptions } from "./hooks/createGetCwlSeasons.ts";
-export { createGetCwlStats } from "./hooks/createGetCwlStats.ts";
-export { getCwlStatsQueryKey } from "./hooks/createGetCwlStats.ts";
-export { getCwlStatsQueryOptions } from "./hooks/createGetCwlStats.ts";
-export { createGetFWAClanPoints } from "./hooks/createGetFWAClanPoints.ts";
-export { getFWAClanPointsQueryKey } from "./hooks/createGetFWAClanPoints.ts";
-export { getFWAClanPointsQueryOptions } from "./hooks/createGetFWAClanPoints.ts";
-export { createGetGuildNicknames } from "./hooks/createGetGuildNicknames.ts";
-export { getGuildNicknamesQueryKey } from "./hooks/createGetGuildNicknames.ts";
-export { getGuildNicknamesQueryOptions } from "./hooks/createGetGuildNicknames.ts";
-export { createGetJPAClanRequirements } from "./hooks/createGetJPAClanRequirements.ts";
-export { getJPAClanRequirementsQueryKey } from "./hooks/createGetJPAClanRequirements.ts";
-export { getJPAClanRequirementsQueryOptions } from "./hooks/createGetJPAClanRequirements.ts";
-export { createGetJPAClans } from "./hooks/createGetJPAClans.ts";
-export { getJPAClansQueryKey } from "./hooks/createGetJPAClans.ts";
-export { getJPAClansQueryOptions } from "./hooks/createGetJPAClans.ts";
-export { createGetJPACwlClans } from "./hooks/createGetJPACwlClans.ts";
-export { getJPACwlClansQueryKey } from "./hooks/createGetJPACwlClans.ts";
-export { getJPACwlClansQueryOptions } from "./hooks/createGetJPACwlClans.ts";
-export { createGetJoinApplications } from "./hooks/createGetJoinApplications.ts";
-export { getJoinApplicationsQueryKey } from "./hooks/createGetJoinApplications.ts";
-export { getJoinApplicationsQueryOptions } from "./hooks/createGetJoinApplications.ts";
-export { createGetPrivacy } from "./hooks/createGetPrivacy.ts";
-export { getPrivacyQueryKey } from "./hooks/createGetPrivacy.ts";
-export { getPrivacyQueryOptions } from "./hooks/createGetPrivacy.ts";
-export { createGetRules } from "./hooks/createGetRules.ts";
-export { getRulesQueryKey } from "./hooks/createGetRules.ts";
-export { getRulesQueryOptions } from "./hooks/createGetRules.ts";
-export { createGetUser } from "./hooks/createGetUser.ts";
-export { getUserQueryKey } from "./hooks/createGetUser.ts";
-export { getUserQueryOptions } from "./hooks/createGetUser.ts";
-export { createGetUserAccounts } from "./hooks/createGetUserAccounts.ts";
-export { getUserAccountsQueryKey } from "./hooks/createGetUserAccounts.ts";
-export { getUserAccountsQueryOptions } from "./hooks/createGetUserAccounts.ts";
-export { createGetUserCocAccountsByUserId } from "./hooks/createGetUserCocAccountsByUserId.ts";
-export { getUserCocAccountsByUserIdQueryKey } from "./hooks/createGetUserCocAccountsByUserId.ts";
-export { getUserCocAccountsByUserIdQueryOptions } from "./hooks/createGetUserCocAccountsByUserId.ts";
-export { createGetUserCwlApplications } from "./hooks/createGetUserCwlApplications.ts";
-export { getUserCwlApplicationsQueryKey } from "./hooks/createGetUserCwlApplications.ts";
-export { getUserCwlApplicationsQueryOptions } from "./hooks/createGetUserCwlApplications.ts";
-export { createGetUserFeatures } from "./hooks/createGetUserFeatures.ts";
-export { getUserFeaturesQueryKey } from "./hooks/createGetUserFeatures.ts";
-export { getUserFeaturesQueryOptions } from "./hooks/createGetUserFeatures.ts";
-export { createGetWarLogClans } from "./hooks/createGetWarLogClans.ts";
-export { getWarLogClansQueryKey } from "./hooks/createGetWarLogClans.ts";
-export { getWarLogClansQueryOptions } from "./hooks/createGetWarLogClans.ts";
-export { createGetWarLogPlayers } from "./hooks/createGetWarLogPlayers.ts";
-export { getWarLogPlayersQueryKey } from "./hooks/createGetWarLogPlayers.ts";
-export { getWarLogPlayersQueryOptions } from "./hooks/createGetWarLogPlayers.ts";
-export { createGetWarLogWar } from "./hooks/createGetWarLogWar.ts";
-export { getWarLogWarQueryKey } from "./hooks/createGetWarLogWar.ts";
-export { getWarLogWarQueryOptions } from "./hooks/createGetWarLogWar.ts";
-export { createGetWarLogWars } from "./hooks/createGetWarLogWars.ts";
-export { getWarLogWarsQueryKey } from "./hooks/createGetWarLogWars.ts";
-export { getWarLogWarsQueryOptions } from "./hooks/createGetWarLogWars.ts";
-export { createImportUserAccounts } from "./hooks/createImportUserAccounts.ts";
-export { importUserAccountsMutationKey } from "./hooks/createImportUserAccounts.ts";
-export { createPostCOCPlayerVerify } from "./hooks/createPostCOCPlayerVerify.ts";
-export { postCOCPlayerVerifyMutationKey } from "./hooks/createPostCOCPlayerVerify.ts";
-export { createPreviewCwlPing } from "./hooks/createPreviewCwlPing.ts";
-export { previewCwlPingQueryKey } from "./hooks/createPreviewCwlPing.ts";
-export { previewCwlPingQueryOptions } from "./hooks/createPreviewCwlPing.ts";
-export { createRefreshDiscordUsernames } from "./hooks/createRefreshDiscordUsernames.ts";
-export { refreshDiscordUsernamesMutationKey } from "./hooks/createRefreshDiscordUsernames.ts";
-export { createRenameCwlSeason } from "./hooks/createRenameCwlSeason.ts";
-export { renameCwlSeasonMutationKey } from "./hooks/createRenameCwlSeason.ts";
-export { createRunCwlPingNow } from "./hooks/createRunCwlPingNow.ts";
-export { runCwlPingNowMutationKey } from "./hooks/createRunCwlPingNow.ts";
-export { createSetPrivacy } from "./hooks/createSetPrivacy.ts";
-export { setPrivacyMutationKey } from "./hooks/createSetPrivacy.ts";
-export { createSetRules } from "./hooks/createSetRules.ts";
-export { setRulesMutationKey } from "./hooks/createSetRules.ts";
-export { createSetUserAccountExternal } from "./hooks/createSetUserAccountExternal.ts";
-export { setUserAccountExternalMutationKey } from "./hooks/createSetUserAccountExternal.ts";
-export { createSetUserApiAccess } from "./hooks/createSetUserApiAccess.ts";
-export { setUserApiAccessMutationKey } from "./hooks/createSetUserApiAccess.ts";
-export { createSetUserSeasonBonus } from "./hooks/createSetUserSeasonBonus.ts";
-export { setUserSeasonBonusMutationKey } from "./hooks/createSetUserSeasonBonus.ts";
-export { createSyncAdminCwlClanLeagues } from "./hooks/createSyncAdminCwlClanLeagues.ts";
-export { syncAdminCwlClanLeaguesMutationKey } from "./hooks/createSyncAdminCwlClanLeagues.ts";
-export { createSyncCocAccountWarWeights } from "./hooks/createSyncCocAccountWarWeights.ts";
-export { syncCocAccountWarWeightsMutationKey } from "./hooks/createSyncCocAccountWarWeights.ts";
-export { createSyncCocAccounts } from "./hooks/createSyncCocAccounts.ts";
-export { syncCocAccountsMutationKey } from "./hooks/createSyncCocAccounts.ts";
-export { createTestCwlPing } from "./hooks/createTestCwlPing.ts";
-export { testCwlPingMutationKey } from "./hooks/createTestCwlPing.ts";
-export { createUpdateAdminClan } from "./hooks/createUpdateAdminClan.ts";
-export { updateAdminClanMutationKey } from "./hooks/createUpdateAdminClan.ts";
-export { createUpdateAdminSettings } from "./hooks/createUpdateAdminSettings.ts";
-export { updateAdminSettingsMutationKey } from "./hooks/createUpdateAdminSettings.ts";
-export { createUpdateCocAccountExternal } from "./hooks/createUpdateCocAccountExternal.ts";
-export { updateCocAccountExternalMutationKey } from "./hooks/createUpdateCocAccountExternal.ts";
-export { createUpdateCocAccountStats } from "./hooks/createUpdateCocAccountStats.ts";
-export { updateCocAccountStatsMutationKey } from "./hooks/createUpdateCocAccountStats.ts";
-export { createUpdateCocAccountWarWeight } from "./hooks/createUpdateCocAccountWarWeight.ts";
-export { updateCocAccountWarWeightMutationKey } from "./hooks/createUpdateCocAccountWarWeight.ts";
-export { createUpdateCwlPingSettings } from "./hooks/createUpdateCwlPingSettings.ts";
-export { updateCwlPingSettingsMutationKey } from "./hooks/createUpdateCwlPingSettings.ts";
-export { createUpdateJoinApplicationStatus } from "./hooks/createUpdateJoinApplicationStatus.ts";
-export { updateJoinApplicationStatusMutationKey } from "./hooks/createUpdateJoinApplicationStatus.ts";
-export { createVerifyAdminClanDiscord } from "./hooks/createVerifyAdminClanDiscord.ts";
-export { verifyAdminClanDiscordMutationKey } from "./hooks/createVerifyAdminClanDiscord.ts";
-export { createApiKeyMutationRequestScopeEnum } from "./models/CreateApiKey.ts";
-export { applicationStatusEnum2 } from "./models/DeleteJoinApplication.ts";
-export { getAdminCocAccountsQueryParamsSortDirEnum } from "./models/GetAdminCocAccounts.ts";
-export { getAdminUsersQueryParamsSortDirectionEnum } from "./models/GetAdminUsers.ts";
-export { entriesActionEnum } from "./models/GetAuditLog.ts";
-export { entriesActorCurrentRoleEnum } from "./models/GetAuditLog.ts";
-export { entriesSourceEnum } from "./models/GetAuditLog.ts";
-export { entriesTargetTypeEnum } from "./models/GetAuditLog.ts";
-export { getAuditLogQueryParamsActionEnum } from "./models/GetAuditLog.ts";
-export { getAuditLogQueryParamsSourceEnum } from "./models/GetAuditLog.ts";
-export { getAuditLogQueryParamsTargetTypeEnum } from "./models/GetAuditLog.ts";
-export { warBattleModifierEnum } from "./models/GetCOCCWLWar.ts";
-export { warStateEnum } from "./models/GetCOCCWLWar.ts";
-export { clanTypeEnum } from "./models/GetCOCClan.ts";
-export { clanWarFrequencyEnum } from "./models/GetCOCClan.ts";
-export { memberListRoleEnum } from "./models/GetCOCClan.ts";
-export { leagueGroupStateEnum } from "./models/GetCOCClanCWLGroup.ts";
-export { currentWarBattleModifierEnum } from "./models/GetCOCClanCurrentWar.ts";
-export { currentWarStateEnum } from "./models/GetCOCClanCurrentWar.ts";
-export { itemsRoleEnum } from "./models/GetCOCClanMembers.ts";
-export { achievementsVillageEnum } from "./models/GetCOCPlayer.ts";
-export { equipmentVillageEnum } from "./models/GetCOCPlayer.ts";
-export { heroEquipmentVillageEnum } from "./models/GetCOCPlayer.ts";
-export { heroesVillageEnum } from "./models/GetCOCPlayer.ts";
-export { playerWarPreferenceEnum } from "./models/GetCOCPlayer.ts";
-export { spellsVillageEnum } from "./models/GetCOCPlayer.ts";
-export { troopsVillageEnum } from "./models/GetCOCPlayer.ts";
-export { itemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
-export { historyResultEnum } from "./models/GetFWAClanPoints.ts";
-export { matchupWinnerEnum } from "./models/GetFWAClanPoints.ts";
-export { applicationsStatusEnum } from "./models/GetJoinApplications.ts";
-export { getJoinApplicationsQueryParamsStatusEnum } from "./models/GetJoinApplications.ts";
-export { attacksSideEnum } from "./models/GetWarLogWar.ts";
-export { verifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
-export { applicationStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
-export { updateJoinApplicationStatusMutationRequestStatusEnum } from "./models/UpdateJoinApplicationStatus.ts";
+export { createApiKeyRequestScopeEnum } from "./models/CreateApiKey.ts";
+export { deleteJoinApplicationStatus200DataApplicationStatusEnum } from "./models/DeleteJoinApplication.ts";
+export { getAdminCocAccountsSortDir } from "./models/GetAdminCocAccounts.ts";
+export { getAdminUsersSortDirection } from "./models/GetAdminUsers.ts";
 export {
-    applyCwl200Schema,
-    applyCwl400Schema,
-    applyCwl401Schema,
-    applyCwl409Schema,
-    applyCwl500Schema,
-    applyCwlMutationRequestSchema,
-    applyCwlMutationResponseSchema,
+    getAuditLogAction,
+    getAuditLogSource,
+    getAuditLogStatus200DataEntriesActionEnum,
+    getAuditLogStatus200DataEntriesActorCurrentRole,
+    getAuditLogStatus200DataEntriesSourceEnum,
+    getAuditLogStatus200DataEntriesTargetType,
+    getAuditLogTargetType,
+} from "./models/GetAuditLog.ts";
+export { getCOCCWLWarStatus200DataWarBattleModifierEnum, getCOCCWLWarStatus200DataWarStateEnum } from "./models/GetCOCCWLWar.ts";
+export {
+    getCOCClanStatus200DataClanMemberListRoleEnum,
+    getCOCClanStatus200DataClanTypeEnum,
+    getCOCClanStatus200DataClanWarFrequencyEnum,
+} from "./models/GetCOCClan.ts";
+export { getCOCClanCWLGroupStatus200DataLeagueGroupStateEnum } from "./models/GetCOCClanCWLGroup.ts";
+export {
+    getCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnum,
+    getCOCClanCurrentWarStatus200DataCurrentWarStateEnum,
+} from "./models/GetCOCClanCurrentWar.ts";
+export { getCOCClanMembersStatus200DataClanMembersItemsRoleEnum } from "./models/GetCOCClanMembers.ts";
+export {
+    getCOCPlayerStatus200DataPlayerAchievementsVillageEnum,
+    getCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnum,
+    getCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnum,
+    getCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnum,
+    getCOCPlayerStatus200DataPlayerHeroesVillageEnum,
+    getCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnum,
+    getCOCPlayerStatus200DataPlayerSpellsVillageEnum,
+    getCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnum,
+    getCOCPlayerStatus200DataPlayerTroopsVillageEnum,
+    getCOCPlayerStatus200DataPlayerWarPreferenceEnum,
+} from "./models/GetCOCPlayer.ts";
+export { getCOCPlayerBattleLogStatus200DataBattleLogItemsBattleTypeEnum } from "./models/GetCOCPlayerBattleLog.ts";
+export { getFWAClanPointsStatus200DataPointsHistoryResult, getFWAClanPointsStatus200DataPointsMatchupWinner } from "./models/GetFWAClanPoints.ts";
+export { getJoinApplicationsStatus, getJoinApplicationsStatus200DataApplicationsStatusEnum } from "./models/GetJoinApplications.ts";
+export { getWarLogWarStatus200DataWarAttacksSideEnum } from "./models/GetWarLogWar.ts";
+export { postCOCPlayerVerifyStatus200DataVerifyTokenStatusEnum } from "./models/PostCOCPlayerVerify.ts";
+export {
+    updateJoinApplicationStatusRequestStatusEnum,
+    updateJoinApplicationStatusStatus200DataApplicationStatusEnum,
+} from "./models/UpdateJoinApplicationStatus.ts";
+export {
+    applyCwlBodySchema,
+    applyCwlErrorSchema,
+    applyCwlResponseSchema,
+    applyCwlStatus200Schema,
+    applyCwlStatus400Schema,
+    applyCwlStatus401Schema,
+    applyCwlStatus409Schema,
+    applyCwlStatus500Schema,
 } from "./zod/applyCwlSchema.ts";
 export {
-    applyUserAccount200Schema,
-    applyUserAccount400Schema,
-    applyUserAccount401Schema,
-    applyUserAccount403Schema,
-    applyUserAccount409Schema,
-    applyUserAccount500Schema,
-    applyUserAccountMutationRequestSchema,
-    applyUserAccountMutationResponseSchema,
+    applyUserAccountBodySchema,
+    applyUserAccountErrorSchema,
+    applyUserAccountResponseSchema,
+    applyUserAccountStatus200Schema,
+    applyUserAccountStatus400Schema,
+    applyUserAccountStatus401Schema,
+    applyUserAccountStatus403Schema,
+    applyUserAccountStatus409Schema,
+    applyUserAccountStatus500Schema,
 } from "./zod/applyUserAccountSchema.ts";
 export {
-    assignCwlApplication200Schema,
-    assignCwlApplication400Schema,
-    assignCwlApplication401Schema,
-    assignCwlApplication404Schema,
-    assignCwlApplication500Schema,
-    assignCwlApplicationMutationRequestSchema,
-    assignCwlApplicationMutationResponseSchema,
-    assignCwlApplicationPathParamsSchema,
+    assignCwlApplicationBodySchema,
+    assignCwlApplicationErrorSchema,
+    assignCwlApplicationPathIdSchema,
+    assignCwlApplicationPathSchema,
+    assignCwlApplicationResponseSchema,
+    assignCwlApplicationStatus200Schema,
+    assignCwlApplicationStatus400Schema,
+    assignCwlApplicationStatus401Schema,
+    assignCwlApplicationStatus404Schema,
+    assignCwlApplicationStatus500Schema,
 } from "./zod/assignCwlApplicationSchema.ts";
 export {
-    assignCwlApplicationsBulk200Schema,
-    assignCwlApplicationsBulk400Schema,
-    assignCwlApplicationsBulk401Schema,
-    assignCwlApplicationsBulk500Schema,
-    assignCwlApplicationsBulkMutationRequestSchema,
-    assignCwlApplicationsBulkMutationResponseSchema,
+    assignCwlApplicationsBulkBodySchema,
+    assignCwlApplicationsBulkErrorSchema,
+    assignCwlApplicationsBulkResponseSchema,
+    assignCwlApplicationsBulkStatus200Schema,
+    assignCwlApplicationsBulkStatus400Schema,
+    assignCwlApplicationsBulkStatus401Schema,
+    assignCwlApplicationsBulkStatus500Schema,
 } from "./zod/assignCwlApplicationsBulkSchema.ts";
 export {
-    clearAcceptedJoinApplications200Schema,
-    clearAcceptedJoinApplications401Schema,
-    clearAcceptedJoinApplications500Schema,
-    clearAcceptedJoinApplicationsMutationResponseSchema,
+    clearAcceptedJoinApplicationsErrorSchema,
+    clearAcceptedJoinApplicationsResponseSchema,
+    clearAcceptedJoinApplicationsStatus200Schema,
+    clearAcceptedJoinApplicationsStatus401Schema,
+    clearAcceptedJoinApplicationsStatus500Schema,
 } from "./zod/clearAcceptedJoinApplicationsSchema.ts";
 export {
-    createAdminClan200Schema,
-    createAdminClan401Schema,
-    createAdminClan409Schema,
-    createAdminClan422Schema,
-    createAdminClan500Schema,
-    createAdminClan503Schema,
-    createAdminClanMutationRequestSchema,
-    createAdminClanMutationResponseSchema,
+    createAdminClanBodySchema,
+    createAdminClanErrorSchema,
+    createAdminClanResponseSchema,
+    createAdminClanStatus200Schema,
+    createAdminClanStatus400Schema,
+    createAdminClanStatus401Schema,
+    createAdminClanStatus409Schema,
+    createAdminClanStatus422Schema,
+    createAdminClanStatus500Schema,
+    createAdminClanStatus503Schema,
 } from "./zod/createAdminClanSchema.ts";
 export {
-    createAdminCwlClan200Schema,
-    createAdminCwlClan400Schema,
-    createAdminCwlClan401Schema,
-    createAdminCwlClan409Schema,
-    createAdminCwlClan500Schema,
-    createAdminCwlClanMutationRequestSchema,
-    createAdminCwlClanMutationResponseSchema,
+    createAdminCwlClanBodySchema,
+    createAdminCwlClanErrorSchema,
+    createAdminCwlClanResponseSchema,
+    createAdminCwlClanStatus200Schema,
+    createAdminCwlClanStatus400Schema,
+    createAdminCwlClanStatus401Schema,
+    createAdminCwlClanStatus409Schema,
+    createAdminCwlClanStatus500Schema,
 } from "./zod/createAdminCwlClanSchema.ts";
 export {
-    createApiKey200Schema,
-    createApiKey401Schema,
-    createApiKey403Schema,
-    createApiKey404Schema,
-    createApiKey500Schema,
-    createApiKeyMutationRequestSchema,
-    createApiKeyMutationResponseSchema,
+    createApiKeyBodySchema,
+    createApiKeyErrorSchema,
+    createApiKeyResponseSchema,
+    createApiKeyStatus200Schema,
+    createApiKeyStatus400Schema,
+    createApiKeyStatus401Schema,
+    createApiKeyStatus403Schema,
+    createApiKeyStatus404Schema,
+    createApiKeyStatus500Schema,
 } from "./zod/createApiKeySchema.ts";
 export {
-    createCocAccount200Schema,
-    createCocAccount400Schema,
-    createCocAccount401Schema,
-    createCocAccount404Schema,
-    createCocAccount409Schema,
-    createCocAccount500Schema,
-    createCocAccountMutationRequestSchema,
-    createCocAccountMutationResponseSchema,
+    createCocAccountBodySchema,
+    createCocAccountErrorSchema,
+    createCocAccountResponseSchema,
+    createCocAccountStatus200Schema,
+    createCocAccountStatus400Schema,
+    createCocAccountStatus401Schema,
+    createCocAccountStatus404Schema,
+    createCocAccountStatus409Schema,
+    createCocAccountStatus500Schema,
 } from "./zod/createCocAccountSchema.ts";
 export {
-    createCwlApplication200Schema,
-    createCwlApplication400Schema,
-    createCwlApplication401Schema,
-    createCwlApplication404Schema,
-    createCwlApplication409Schema,
-    createCwlApplication500Schema,
-    createCwlApplicationMutationRequestSchema,
-    createCwlApplicationMutationResponseSchema,
+    createCwlApplicationBodySchema,
+    createCwlApplicationErrorSchema,
+    createCwlApplicationResponseSchema,
+    createCwlApplicationStatus200Schema,
+    createCwlApplicationStatus400Schema,
+    createCwlApplicationStatus401Schema,
+    createCwlApplicationStatus404Schema,
+    createCwlApplicationStatus409Schema,
+    createCwlApplicationStatus500Schema,
 } from "./zod/createCwlApplicationSchema.ts";
 export {
-    createCwlSeason200Schema,
-    createCwlSeason401Schema,
-    createCwlSeason500Schema,
-    createCwlSeasonMutationRequestSchema,
-    createCwlSeasonMutationResponseSchema,
+    createCwlSeasonBodySchema,
+    createCwlSeasonErrorSchema,
+    createCwlSeasonResponseSchema,
+    createCwlSeasonStatus200Schema,
+    createCwlSeasonStatus400Schema,
+    createCwlSeasonStatus401Schema,
+    createCwlSeasonStatus500Schema,
 } from "./zod/createCwlSeasonSchema.ts";
 export {
-    deleteAdminClan200Schema,
-    deleteAdminClan401Schema,
-    deleteAdminClan404Schema,
-    deleteAdminClan500Schema,
-    deleteAdminClanMutationResponseSchema,
-    deleteAdminClanPathParamsSchema,
+    deleteAdminClanErrorSchema,
+    deleteAdminClanPathIdSchema,
+    deleteAdminClanPathSchema,
+    deleteAdminClanResponseSchema,
+    deleteAdminClanStatus200Schema,
+    deleteAdminClanStatus400Schema,
+    deleteAdminClanStatus401Schema,
+    deleteAdminClanStatus404Schema,
+    deleteAdminClanStatus500Schema,
 } from "./zod/deleteAdminClanSchema.ts";
 export {
-    deleteAdminCwlClan200Schema,
-    deleteAdminCwlClan401Schema,
-    deleteAdminCwlClan404Schema,
-    deleteAdminCwlClan500Schema,
-    deleteAdminCwlClanMutationResponseSchema,
-    deleteAdminCwlClanPathParamsSchema,
+    deleteAdminCwlClanErrorSchema,
+    deleteAdminCwlClanPathSchema,
+    deleteAdminCwlClanPathTagSchema,
+    deleteAdminCwlClanResponseSchema,
+    deleteAdminCwlClanStatus200Schema,
+    deleteAdminCwlClanStatus400Schema,
+    deleteAdminCwlClanStatus401Schema,
+    deleteAdminCwlClanStatus404Schema,
+    deleteAdminCwlClanStatus500Schema,
 } from "./zod/deleteAdminCwlClanSchema.ts";
 export {
-    deleteCocAccount200Schema,
-    deleteCocAccount401Schema,
-    deleteCocAccount404Schema,
-    deleteCocAccount500Schema,
-    deleteCocAccountMutationResponseSchema,
-    deleteCocAccountPathParamsSchema,
+    deleteCocAccountErrorSchema,
+    deleteCocAccountPathIdSchema,
+    deleteCocAccountPathSchema,
+    deleteCocAccountResponseSchema,
+    deleteCocAccountStatus200Schema,
+    deleteCocAccountStatus400Schema,
+    deleteCocAccountStatus401Schema,
+    deleteCocAccountStatus404Schema,
+    deleteCocAccountStatus500Schema,
 } from "./zod/deleteCocAccountSchema.ts";
 export {
-    deleteCocAccountsBulk200Schema,
-    deleteCocAccountsBulk401Schema,
-    deleteCocAccountsBulk500Schema,
-    deleteCocAccountsBulkMutationRequestSchema,
-    deleteCocAccountsBulkMutationResponseSchema,
+    deleteCocAccountsBulkBodySchema,
+    deleteCocAccountsBulkErrorSchema,
+    deleteCocAccountsBulkResponseSchema,
+    deleteCocAccountsBulkStatus200Schema,
+    deleteCocAccountsBulkStatus400Schema,
+    deleteCocAccountsBulkStatus401Schema,
+    deleteCocAccountsBulkStatus500Schema,
 } from "./zod/deleteCocAccountsBulkSchema.ts";
 export {
-    deleteCwlApplicationsBulk200Schema,
-    deleteCwlApplicationsBulk401Schema,
-    deleteCwlApplicationsBulk500Schema,
-    deleteCwlApplicationsBulkMutationRequestSchema,
-    deleteCwlApplicationsBulkMutationResponseSchema,
+    deleteCwlApplicationsBulkBodySchema,
+    deleteCwlApplicationsBulkErrorSchema,
+    deleteCwlApplicationsBulkResponseSchema,
+    deleteCwlApplicationsBulkStatus200Schema,
+    deleteCwlApplicationsBulkStatus400Schema,
+    deleteCwlApplicationsBulkStatus401Schema,
+    deleteCwlApplicationsBulkStatus500Schema,
 } from "./zod/deleteCwlApplicationsBulkSchema.ts";
 export {
-    deleteCwlSeason200Schema,
-    deleteCwlSeason401Schema,
-    deleteCwlSeason404Schema,
-    deleteCwlSeason500Schema,
-    deleteCwlSeasonMutationResponseSchema,
-    deleteCwlSeasonPathParamsSchema,
+    deleteCwlSeasonErrorSchema,
+    deleteCwlSeasonPathIdSchema,
+    deleteCwlSeasonPathSchema,
+    deleteCwlSeasonResponseSchema,
+    deleteCwlSeasonStatus200Schema,
+    deleteCwlSeasonStatus400Schema,
+    deleteCwlSeasonStatus401Schema,
+    deleteCwlSeasonStatus404Schema,
+    deleteCwlSeasonStatus500Schema,
 } from "./zod/deleteCwlSeasonSchema.ts";
 export {
-    deleteJoinApplication200Schema,
-    deleteJoinApplication401Schema,
-    deleteJoinApplication404Schema,
-    deleteJoinApplication500Schema,
-    deleteJoinApplicationMutationResponseSchema,
-    deleteJoinApplicationPathParamsSchema,
+    deleteJoinApplicationErrorSchema,
+    deleteJoinApplicationPathIdSchema,
+    deleteJoinApplicationPathSchema,
+    deleteJoinApplicationResponseSchema,
+    deleteJoinApplicationStatus200Schema,
+    deleteJoinApplicationStatus400Schema,
+    deleteJoinApplicationStatus401Schema,
+    deleteJoinApplicationStatus404Schema,
+    deleteJoinApplicationStatus500Schema,
 } from "./zod/deleteJoinApplicationSchema.ts";
 export {
-    getAdminClans200Schema,
-    getAdminClans401Schema,
-    getAdminClans500Schema,
-    getAdminClansQueryResponseSchema,
+    getAdminClansErrorSchema,
+    getAdminClansResponseSchema,
+    getAdminClansStatus200Schema,
+    getAdminClansStatus401Schema,
+    getAdminClansStatus500Schema,
 } from "./zod/getAdminClansSchema.ts";
 export {
-    getAdminCocAccounts200Schema,
-    getAdminCocAccounts401Schema,
-    getAdminCocAccounts500Schema,
-    getAdminCocAccountsQueryParamsSchema,
-    getAdminCocAccountsQueryResponseSchema,
+    getAdminCocAccountsErrorSchema,
+    getAdminCocAccountsQueryLimitSchema,
+    getAdminCocAccountsQueryOffsetSchema,
+    getAdminCocAccountsQuerySchema,
+    getAdminCocAccountsQuerySearchSchema,
+    getAdminCocAccountsQuerySortBySchema,
+    getAdminCocAccountsQuerySortDirSchema,
+    getAdminCocAccountsResponseSchema,
+    getAdminCocAccountsStatus200Schema,
+    getAdminCocAccountsStatus400Schema,
+    getAdminCocAccountsStatus401Schema,
+    getAdminCocAccountsStatus500Schema,
 } from "./zod/getAdminCocAccountsSchema.ts";
 export {
-    getAdminCwlClans200Schema,
-    getAdminCwlClans401Schema,
-    getAdminCwlClans500Schema,
-    getAdminCwlClansQueryResponseSchema,
+    getAdminCwlClansErrorSchema,
+    getAdminCwlClansResponseSchema,
+    getAdminCwlClansStatus200Schema,
+    getAdminCwlClansStatus401Schema,
+    getAdminCwlClansStatus500Schema,
 } from "./zod/getAdminCwlClansSchema.ts";
 export {
-    getAdminSettings200Schema,
-    getAdminSettings401Schema,
-    getAdminSettings500Schema,
-    getAdminSettingsQueryResponseSchema,
+    getAdminSettingsErrorSchema,
+    getAdminSettingsResponseSchema,
+    getAdminSettingsStatus200Schema,
+    getAdminSettingsStatus401Schema,
+    getAdminSettingsStatus500Schema,
 } from "./zod/getAdminSettingsSchema.ts";
 export {
-    getAdminUsers200Schema,
-    getAdminUsers401Schema,
-    getAdminUsers500Schema,
-    getAdminUsersQueryParamsSchema,
-    getAdminUsersQueryResponseSchema,
+    getAdminUsersErrorSchema,
+    getAdminUsersQueryApiAccessSchema,
+    getAdminUsersQueryLimitSchema,
+    getAdminUsersQueryOffsetSchema,
+    getAdminUsersQueryRoleSchema,
+    getAdminUsersQuerySchema,
+    getAdminUsersQuerySearchSchema,
+    getAdminUsersQuerySortBySchema,
+    getAdminUsersQuerySortDirectionSchema,
+    getAdminUsersResponseSchema,
+    getAdminUsersStatus200Schema,
+    getAdminUsersStatus400Schema,
+    getAdminUsersStatus401Schema,
+    getAdminUsersStatus500Schema,
 } from "./zod/getAdminUsersSchema.ts";
 export {
-    getAnalyticsAdminActivity200Schema,
-    getAnalyticsAdminActivity401Schema,
-    getAnalyticsAdminActivity500Schema,
-    getAnalyticsAdminActivityQueryParamsSchema,
-    getAnalyticsAdminActivityQueryResponseSchema,
+    getAnalyticsAdminActivityErrorSchema,
+    getAnalyticsAdminActivityQueryDaysSchema,
+    getAnalyticsAdminActivityQueryLimitSchema,
+    getAnalyticsAdminActivityQuerySchema,
+    getAnalyticsAdminActivityResponseSchema,
+    getAnalyticsAdminActivityStatus200Schema,
+    getAnalyticsAdminActivityStatus400Schema,
+    getAnalyticsAdminActivityStatus401Schema,
+    getAnalyticsAdminActivityStatus500Schema,
 } from "./zod/getAnalyticsAdminActivitySchema.ts";
 export {
-    getAnalyticsAuditCategories200Schema,
-    getAnalyticsAuditCategories401Schema,
-    getAnalyticsAuditCategories500Schema,
-    getAnalyticsAuditCategoriesQueryResponseSchema,
+    getAnalyticsAuditCategoriesErrorSchema,
+    getAnalyticsAuditCategoriesResponseSchema,
+    getAnalyticsAuditCategoriesStatus200Schema,
+    getAnalyticsAuditCategoriesStatus401Schema,
+    getAnalyticsAuditCategoriesStatus500Schema,
 } from "./zod/getAnalyticsAuditCategoriesSchema.ts";
 export {
-    getAnalyticsAuditTrend200Schema,
-    getAnalyticsAuditTrend401Schema,
-    getAnalyticsAuditTrend500Schema,
-    getAnalyticsAuditTrendQueryParamsSchema,
-    getAnalyticsAuditTrendQueryResponseSchema,
+    getAnalyticsAuditTrendErrorSchema,
+    getAnalyticsAuditTrendQueryDaysSchema,
+    getAnalyticsAuditTrendQuerySchema,
+    getAnalyticsAuditTrendResponseSchema,
+    getAnalyticsAuditTrendStatus200Schema,
+    getAnalyticsAuditTrendStatus400Schema,
+    getAnalyticsAuditTrendStatus401Schema,
+    getAnalyticsAuditTrendStatus500Schema,
 } from "./zod/getAnalyticsAuditTrendSchema.ts";
 export {
-    getAnalyticsCwlAssignment200Schema,
-    getAnalyticsCwlAssignment401Schema,
-    getAnalyticsCwlAssignment500Schema,
-    getAnalyticsCwlAssignmentQueryParamsSchema,
-    getAnalyticsCwlAssignmentQueryResponseSchema,
+    getAnalyticsCwlAssignmentErrorSchema,
+    getAnalyticsCwlAssignmentQuerySchema,
+    getAnalyticsCwlAssignmentQuerySeasonIdSchema,
+    getAnalyticsCwlAssignmentResponseSchema,
+    getAnalyticsCwlAssignmentStatus200Schema,
+    getAnalyticsCwlAssignmentStatus400Schema,
+    getAnalyticsCwlAssignmentStatus401Schema,
+    getAnalyticsCwlAssignmentStatus500Schema,
 } from "./zod/getAnalyticsCwlAssignmentSchema.ts";
 export {
-    getAnalyticsCwlParticipation200Schema,
-    getAnalyticsCwlParticipation401Schema,
-    getAnalyticsCwlParticipation500Schema,
-    getAnalyticsCwlParticipationQueryParamsSchema,
-    getAnalyticsCwlParticipationQueryResponseSchema,
+    getAnalyticsCwlParticipationErrorSchema,
+    getAnalyticsCwlParticipationQuerySchema,
+    getAnalyticsCwlParticipationQuerySeasonIdSchema,
+    getAnalyticsCwlParticipationResponseSchema,
+    getAnalyticsCwlParticipationStatus200Schema,
+    getAnalyticsCwlParticipationStatus400Schema,
+    getAnalyticsCwlParticipationStatus401Schema,
+    getAnalyticsCwlParticipationStatus500Schema,
 } from "./zod/getAnalyticsCwlParticipationSchema.ts";
 export {
-    getAnalyticsCwlSeasonOverview200Schema,
-    getAnalyticsCwlSeasonOverview401Schema,
-    getAnalyticsCwlSeasonOverview500Schema,
-    getAnalyticsCwlSeasonOverviewQueryParamsSchema,
-    getAnalyticsCwlSeasonOverviewQueryResponseSchema,
+    getAnalyticsCwlSeasonOverviewErrorSchema,
+    getAnalyticsCwlSeasonOverviewQuerySchema,
+    getAnalyticsCwlSeasonOverviewQuerySeasonIdSchema,
+    getAnalyticsCwlSeasonOverviewResponseSchema,
+    getAnalyticsCwlSeasonOverviewStatus200Schema,
+    getAnalyticsCwlSeasonOverviewStatus400Schema,
+    getAnalyticsCwlSeasonOverviewStatus401Schema,
+    getAnalyticsCwlSeasonOverviewStatus500Schema,
 } from "./zod/getAnalyticsCwlSeasonOverviewSchema.ts";
 export {
-    getAnalyticsCwlSeasons200Schema,
-    getAnalyticsCwlSeasons401Schema,
-    getAnalyticsCwlSeasons500Schema,
-    getAnalyticsCwlSeasonsQueryResponseSchema,
+    getAnalyticsCwlSeasonsErrorSchema,
+    getAnalyticsCwlSeasonsResponseSchema,
+    getAnalyticsCwlSeasonsStatus200Schema,
+    getAnalyticsCwlSeasonsStatus401Schema,
+    getAnalyticsCwlSeasonsStatus500Schema,
 } from "./zod/getAnalyticsCwlSeasonsSchema.ts";
 export {
-    getAnalyticsOverview200Schema,
-    getAnalyticsOverview401Schema,
-    getAnalyticsOverview500Schema,
-    getAnalyticsOverviewQueryResponseSchema,
+    getAnalyticsOverviewErrorSchema,
+    getAnalyticsOverviewResponseSchema,
+    getAnalyticsOverviewStatus200Schema,
+    getAnalyticsOverviewStatus401Schema,
+    getAnalyticsOverviewStatus500Schema,
 } from "./zod/getAnalyticsOverviewSchema.ts";
 export {
-    getAnalyticsUserJoins200Schema,
-    getAnalyticsUserJoins401Schema,
-    getAnalyticsUserJoins500Schema,
-    getAnalyticsUserJoinsQueryParamsSchema,
-    getAnalyticsUserJoinsQueryResponseSchema,
+    getAnalyticsUserJoinsErrorSchema,
+    getAnalyticsUserJoinsQueryDaysSchema,
+    getAnalyticsUserJoinsQuerySchema,
+    getAnalyticsUserJoinsResponseSchema,
+    getAnalyticsUserJoinsStatus200Schema,
+    getAnalyticsUserJoinsStatus400Schema,
+    getAnalyticsUserJoinsStatus401Schema,
+    getAnalyticsUserJoinsStatus500Schema,
 } from "./zod/getAnalyticsUserJoinsSchema.ts";
 export {
-    getApiKeyUsageDaily200Schema,
-    getApiKeyUsageDaily401Schema,
-    getApiKeyUsageDaily404Schema,
-    getApiKeyUsageDaily500Schema,
-    getApiKeyUsageDailyQueryParamsSchema,
-    getApiKeyUsageDailyQueryResponseSchema,
+    getApiKeyUsageDailyErrorSchema,
+    getApiKeyUsageDailyQueryDaysSchema,
+    getApiKeyUsageDailyQueryKeyIdSchema,
+    getApiKeyUsageDailyQuerySchema,
+    getApiKeyUsageDailyResponseSchema,
+    getApiKeyUsageDailyStatus200Schema,
+    getApiKeyUsageDailyStatus400Schema,
+    getApiKeyUsageDailyStatus401Schema,
+    getApiKeyUsageDailyStatus404Schema,
+    getApiKeyUsageDailyStatus500Schema,
 } from "./zod/getApiKeyUsageDailySchema.ts";
 export {
-    getApiKeyUsageEndpoints200Schema,
-    getApiKeyUsageEndpoints401Schema,
-    getApiKeyUsageEndpoints404Schema,
-    getApiKeyUsageEndpoints500Schema,
-    getApiKeyUsageEndpointsQueryParamsSchema,
-    getApiKeyUsageEndpointsQueryResponseSchema,
+    getApiKeyUsageEndpointsErrorSchema,
+    getApiKeyUsageEndpointsQueryDaysSchema,
+    getApiKeyUsageEndpointsQueryKeyIdSchema,
+    getApiKeyUsageEndpointsQueryLimitSchema,
+    getApiKeyUsageEndpointsQuerySchema,
+    getApiKeyUsageEndpointsResponseSchema,
+    getApiKeyUsageEndpointsStatus200Schema,
+    getApiKeyUsageEndpointsStatus400Schema,
+    getApiKeyUsageEndpointsStatus401Schema,
+    getApiKeyUsageEndpointsStatus404Schema,
+    getApiKeyUsageEndpointsStatus500Schema,
 } from "./zod/getApiKeyUsageEndpointsSchema.ts";
 export {
-    getApiKeyUsageStatus200Schema,
-    getApiKeyUsageStatus401Schema,
-    getApiKeyUsageStatus404Schema,
-    getApiKeyUsageStatus500Schema,
-    getApiKeyUsageStatusQueryParamsSchema,
-    getApiKeyUsageStatusQueryResponseSchema,
+    getApiKeyUsageStatusErrorSchema,
+    getApiKeyUsageStatusQueryDaysSchema,
+    getApiKeyUsageStatusQueryKeyIdSchema,
+    getApiKeyUsageStatusQuerySchema,
+    getApiKeyUsageStatusResponseSchema,
+    getApiKeyUsageStatusStatus200Schema,
+    getApiKeyUsageStatusStatus400Schema,
+    getApiKeyUsageStatusStatus401Schema,
+    getApiKeyUsageStatusStatus404Schema,
+    getApiKeyUsageStatusStatus500Schema,
 } from "./zod/getApiKeyUsageStatusSchema.ts";
 export {
-    getApiKeyUsageSummary200Schema,
-    getApiKeyUsageSummary401Schema,
-    getApiKeyUsageSummary404Schema,
-    getApiKeyUsageSummary500Schema,
-    getApiKeyUsageSummaryQueryParamsSchema,
-    getApiKeyUsageSummaryQueryResponseSchema,
+    getApiKeyUsageSummaryErrorSchema,
+    getApiKeyUsageSummaryQueryDaysSchema,
+    getApiKeyUsageSummaryQueryKeyIdSchema,
+    getApiKeyUsageSummaryQuerySchema,
+    getApiKeyUsageSummaryResponseSchema,
+    getApiKeyUsageSummaryStatus200Schema,
+    getApiKeyUsageSummaryStatus400Schema,
+    getApiKeyUsageSummaryStatus401Schema,
+    getApiKeyUsageSummaryStatus404Schema,
+    getApiKeyUsageSummaryStatus500Schema,
 } from "./zod/getApiKeyUsageSummarySchema.ts";
 export {
-    getAuditLog200Schema,
-    getAuditLog401Schema,
-    getAuditLog500Schema,
-    getAuditLogQueryParamsSchema,
-    getAuditLogQueryResponseSchema,
+    getAuditLogErrorSchema,
+    getAuditLogQueryActionSchema,
+    getAuditLogQueryActorIdSchema,
+    getAuditLogQueryAfterSchema,
+    getAuditLogQueryBeforeSchema,
+    getAuditLogQueryLimitSchema,
+    getAuditLogQueryOffsetSchema,
+    getAuditLogQuerySchema,
+    getAuditLogQuerySourceSchema,
+    getAuditLogQueryTargetIdSchema,
+    getAuditLogQueryTargetTypeSchema,
+    getAuditLogResponseSchema,
+    getAuditLogStatus200Schema,
+    getAuditLogStatus400Schema,
+    getAuditLogStatus401Schema,
+    getAuditLogStatus500Schema,
 } from "./zod/getAuditLogSchema.ts";
 export {
-    getBonusData200Schema,
-    getBonusData401Schema,
-    getBonusData500Schema,
-    getBonusDataQueryParamsSchema,
-    getBonusDataQueryResponseSchema,
+    getBonusDataErrorSchema,
+    getBonusDataQuerySchema,
+    getBonusDataQuerySeasonIdSchema,
+    getBonusDataResponseSchema,
+    getBonusDataStatus200Schema,
+    getBonusDataStatus400Schema,
+    getBonusDataStatus401Schema,
+    getBonusDataStatus500Schema,
 } from "./zod/getBonusDataSchema.ts";
 export {
-    getBonusLedger200Schema,
-    getBonusLedger401Schema,
-    getBonusLedger500Schema,
-    getBonusLedgerQueryResponseSchema,
+    getBonusLedgerErrorSchema,
+    getBonusLedgerResponseSchema,
+    getBonusLedgerStatus200Schema,
+    getBonusLedgerStatus401Schema,
+    getBonusLedgerStatus500Schema,
 } from "./zod/getBonusLedgerSchema.ts";
 export {
-    getCOCCWLWar200Schema,
-    getCOCCWLWar500Schema,
-    getCOCCWLWarPathParamsSchema,
-    getCOCCWLWarQueryResponseSchema,
+    getCOCCWLWarErrorSchema,
+    getCOCCWLWarPathSchema,
+    getCOCCWLWarPathWarTagSchema,
+    getCOCCWLWarResponseSchema,
+    getCOCCWLWarStatus200Schema,
+    getCOCCWLWarStatus400Schema,
+    getCOCCWLWarStatus500Schema,
 } from "./zod/getCOCCWLWarSchema.ts";
 export {
-    getCOCClanCWLGroup200Schema,
-    getCOCClanCWLGroup500Schema,
-    getCOCClanCWLGroupPathParamsSchema,
-    getCOCClanCWLGroupQueryResponseSchema,
+    getCOCClanCWLGroupErrorSchema,
+    getCOCClanCWLGroupPathSchema,
+    getCOCClanCWLGroupPathTagSchema,
+    getCOCClanCWLGroupResponseSchema,
+    getCOCClanCWLGroupStatus200Schema,
+    getCOCClanCWLGroupStatus400Schema,
+    getCOCClanCWLGroupStatus500Schema,
 } from "./zod/getCOCClanCWLGroupSchema.ts";
 export {
-    getCOCClanCurrentWar200Schema,
-    getCOCClanCurrentWar500Schema,
-    getCOCClanCurrentWarPathParamsSchema,
-    getCOCClanCurrentWarQueryResponseSchema,
+    getCOCClanCurrentWarErrorSchema,
+    getCOCClanCurrentWarPathSchema,
+    getCOCClanCurrentWarPathTagSchema,
+    getCOCClanCurrentWarResponseSchema,
+    getCOCClanCurrentWarStatus200Schema,
+    getCOCClanCurrentWarStatus400Schema,
+    getCOCClanCurrentWarStatus500Schema,
 } from "./zod/getCOCClanCurrentWarSchema.ts";
 export {
-    getCOCClanMembers200Schema,
-    getCOCClanMembers500Schema,
-    getCOCClanMembersPathParamsSchema,
-    getCOCClanMembersQueryResponseSchema,
+    getCOCClanMembersErrorSchema,
+    getCOCClanMembersPathSchema,
+    getCOCClanMembersPathTagSchema,
+    getCOCClanMembersResponseSchema,
+    getCOCClanMembersStatus200Schema,
+    getCOCClanMembersStatus400Schema,
+    getCOCClanMembersStatus500Schema,
 } from "./zod/getCOCClanMembersSchema.ts";
-export { getCOCClan200Schema, getCOCClan500Schema, getCOCClanPathParamsSchema, getCOCClanQueryResponseSchema } from "./zod/getCOCClanSchema.ts";
 export {
-    getCOCPlayerBattleLog200Schema,
-    getCOCPlayerBattleLog500Schema,
-    getCOCPlayerBattleLogPathParamsSchema,
-    getCOCPlayerBattleLogQueryResponseSchema,
+    getCOCClanErrorSchema,
+    getCOCClanPathSchema,
+    getCOCClanPathTagSchema,
+    getCOCClanResponseSchema,
+    getCOCClanStatus200Schema,
+    getCOCClanStatus400Schema,
+    getCOCClanStatus500Schema,
+} from "./zod/getCOCClanSchema.ts";
+export {
+    getCOCPlayerBattleLogErrorSchema,
+    getCOCPlayerBattleLogPathSchema,
+    getCOCPlayerBattleLogPathTagSchema,
+    getCOCPlayerBattleLogResponseSchema,
+    getCOCPlayerBattleLogStatus200Schema,
+    getCOCPlayerBattleLogStatus400Schema,
+    getCOCPlayerBattleLogStatus500Schema,
 } from "./zod/getCOCPlayerBattleLogSchema.ts";
 export {
-    getCOCPlayer200Schema,
-    getCOCPlayer500Schema,
-    getCOCPlayerPathParamsSchema,
-    getCOCPlayerQueryResponseSchema,
+    getCOCPlayerErrorSchema,
+    getCOCPlayerPathSchema,
+    getCOCPlayerPathTagSchema,
+    getCOCPlayerResponseSchema,
+    getCOCPlayerStatus200Schema,
+    getCOCPlayerStatus400Schema,
+    getCOCPlayerStatus500Schema,
 } from "./zod/getCOCPlayerSchema.ts";
 export {
-    getCwlApplications200Schema,
-    getCwlApplications401Schema,
-    getCwlApplications500Schema,
-    getCwlApplicationsQueryParamsSchema,
-    getCwlApplicationsQueryResponseSchema,
+    getCwlApplicationsErrorSchema,
+    getCwlApplicationsQueryAssignedToSchema,
+    getCwlApplicationsQueryLimitSchema,
+    getCwlApplicationsQueryOffsetSchema,
+    getCwlApplicationsQuerySchema,
+    getCwlApplicationsQuerySeasonIdSchema,
+    getCwlApplicationsQueryUnassignedSchema,
+    getCwlApplicationsResponseSchema,
+    getCwlApplicationsStatus200Schema,
+    getCwlApplicationsStatus400Schema,
+    getCwlApplicationsStatus401Schema,
+    getCwlApplicationsStatus500Schema,
 } from "./zod/getCwlApplicationsSchema.ts";
 export {
-    getCwlPingChannels200Schema,
-    getCwlPingChannels401Schema,
-    getCwlPingChannels503Schema,
-    getCwlPingChannelsQueryResponseSchema,
+    getCwlPingChannelsErrorSchema,
+    getCwlPingChannelsResponseSchema,
+    getCwlPingChannelsStatus200Schema,
+    getCwlPingChannelsStatus401Schema,
+    getCwlPingChannelsStatus503Schema,
 } from "./zod/getCwlPingChannelsSchema.ts";
 export {
-    getCwlPingSettings200Schema,
-    getCwlPingSettings401Schema,
-    getCwlPingSettings500Schema,
-    getCwlPingSettingsQueryResponseSchema,
+    getCwlPingSettingsErrorSchema,
+    getCwlPingSettingsResponseSchema,
+    getCwlPingSettingsStatus200Schema,
+    getCwlPingSettingsStatus401Schema,
+    getCwlPingSettingsStatus500Schema,
 } from "./zod/getCwlPingSettingsSchema.ts";
 export {
-    getCwlSeasons200Schema,
-    getCwlSeasons401Schema,
-    getCwlSeasons500Schema,
-    getCwlSeasonsQueryResponseSchema,
+    getCwlSeasonsErrorSchema,
+    getCwlSeasonsResponseSchema,
+    getCwlSeasonsStatus200Schema,
+    getCwlSeasonsStatus401Schema,
+    getCwlSeasonsStatus500Schema,
 } from "./zod/getCwlSeasonsSchema.ts";
 export {
-    getCwlStats200Schema,
-    getCwlStats401Schema,
-    getCwlStats500Schema,
-    getCwlStatsQueryParamsSchema,
-    getCwlStatsQueryResponseSchema,
+    getCwlStatsErrorSchema,
+    getCwlStatsQuerySchema,
+    getCwlStatsQuerySeasonIdSchema,
+    getCwlStatsResponseSchema,
+    getCwlStatsStatus200Schema,
+    getCwlStatsStatus400Schema,
+    getCwlStatsStatus401Schema,
+    getCwlStatsStatus500Schema,
 } from "./zod/getCwlStatsSchema.ts";
 export {
-    getFWAClanPoints200Schema,
-    getFWAClanPoints502Schema,
-    getFWAClanPointsPathParamsSchema,
-    getFWAClanPointsQueryResponseSchema,
+    getFWAClanPointsErrorSchema,
+    getFWAClanPointsPathSchema,
+    getFWAClanPointsPathTagSchema,
+    getFWAClanPointsResponseSchema,
+    getFWAClanPointsStatus200Schema,
+    getFWAClanPointsStatus400Schema,
+    getFWAClanPointsStatus502Schema,
 } from "./zod/getFWAClanPointsSchema.ts";
 export {
-    getGuildNicknames200Schema,
-    getGuildNicknames401Schema,
-    getGuildNicknames500Schema,
-    getGuildNicknamesQueryResponseSchema,
+    getGuildNicknamesErrorSchema,
+    getGuildNicknamesResponseSchema,
+    getGuildNicknamesStatus200Schema,
+    getGuildNicknamesStatus401Schema,
+    getGuildNicknamesStatus500Schema,
 } from "./zod/getGuildNicknamesSchema.ts";
 export {
-    getJPAClanRequirements200Schema,
-    getJPAClanRequirements500Schema,
-    getJPAClanRequirementsQueryResponseSchema,
+    getJPAClanRequirementsErrorSchema,
+    getJPAClanRequirementsResponseSchema,
+    getJPAClanRequirementsStatus200Schema,
+    getJPAClanRequirementsStatus500Schema,
 } from "./zod/getJPAClanRequirementsSchema.ts";
-export { getJPAClans200Schema, getJPAClans500Schema, getJPAClansQueryResponseSchema } from "./zod/getJPAClansSchema.ts";
-export { getJPACwlClans200Schema, getJPACwlClans500Schema, getJPACwlClansQueryResponseSchema } from "./zod/getJPACwlClansSchema.ts";
 export {
-    getJoinApplications200Schema,
-    getJoinApplications401Schema,
-    getJoinApplications500Schema,
-    getJoinApplicationsQueryParamsSchema,
-    getJoinApplicationsQueryResponseSchema,
+    getJPAClansErrorSchema,
+    getJPAClansResponseSchema,
+    getJPAClansStatus200Schema,
+    getJPAClansStatus500Schema,
+} from "./zod/getJPAClansSchema.ts";
+export {
+    getJPACwlClansErrorSchema,
+    getJPACwlClansResponseSchema,
+    getJPACwlClansStatus200Schema,
+    getJPACwlClansStatus500Schema,
+} from "./zod/getJPACwlClansSchema.ts";
+export {
+    getJoinApplicationsErrorSchema,
+    getJoinApplicationsQueryLimitSchema,
+    getJoinApplicationsQueryOffsetSchema,
+    getJoinApplicationsQuerySchema,
+    getJoinApplicationsQueryStatusSchema,
+    getJoinApplicationsResponseSchema,
+    getJoinApplicationsStatus200Schema,
+    getJoinApplicationsStatus400Schema,
+    getJoinApplicationsStatus401Schema,
+    getJoinApplicationsStatus500Schema,
 } from "./zod/getJoinApplicationsSchema.ts";
-export { getPrivacy200Schema, getPrivacy500Schema, getPrivacyQueryResponseSchema } from "./zod/getPrivacySchema.ts";
-export { getRules200Schema, getRules500Schema, getRulesQueryResponseSchema } from "./zod/getRulesSchema.ts";
+export { getPrivacyErrorSchema, getPrivacyResponseSchema, getPrivacyStatus200Schema, getPrivacyStatus500Schema } from "./zod/getPrivacySchema.ts";
+export { getRulesErrorSchema, getRulesResponseSchema, getRulesStatus200Schema, getRulesStatus500Schema } from "./zod/getRulesSchema.ts";
 export {
-    getUserAccounts200Schema,
-    getUserAccounts401Schema,
-    getUserAccounts500Schema,
-    getUserAccountsQueryResponseSchema,
+    getUserAccountsErrorSchema,
+    getUserAccountsResponseSchema,
+    getUserAccountsStatus200Schema,
+    getUserAccountsStatus401Schema,
+    getUserAccountsStatus500Schema,
 } from "./zod/getUserAccountsSchema.ts";
 export {
-    getUserCocAccountsByUserId200Schema,
-    getUserCocAccountsByUserId401Schema,
-    getUserCocAccountsByUserId500Schema,
-    getUserCocAccountsByUserIdPathParamsSchema,
-    getUserCocAccountsByUserIdQueryResponseSchema,
+    getUserCocAccountsByUserIdErrorSchema,
+    getUserCocAccountsByUserIdPathSchema,
+    getUserCocAccountsByUserIdPathUseridSchema,
+    getUserCocAccountsByUserIdResponseSchema,
+    getUserCocAccountsByUserIdStatus200Schema,
+    getUserCocAccountsByUserIdStatus400Schema,
+    getUserCocAccountsByUserIdStatus401Schema,
+    getUserCocAccountsByUserIdStatus500Schema,
 } from "./zod/getUserCocAccountsByUserIdSchema.ts";
 export {
-    getUserCwlApplications200Schema,
-    getUserCwlApplications401Schema,
-    getUserCwlApplications500Schema,
-    getUserCwlApplicationsQueryResponseSchema,
+    getUserCwlApplicationsErrorSchema,
+    getUserCwlApplicationsResponseSchema,
+    getUserCwlApplicationsStatus200Schema,
+    getUserCwlApplicationsStatus401Schema,
+    getUserCwlApplicationsStatus500Schema,
 } from "./zod/getUserCwlApplicationsSchema.ts";
 export {
-    getUserFeatures200Schema,
-    getUserFeatures401Schema,
-    getUserFeatures500Schema,
-    getUserFeaturesQueryResponseSchema,
+    getUserFeaturesErrorSchema,
+    getUserFeaturesResponseSchema,
+    getUserFeaturesStatus200Schema,
+    getUserFeaturesStatus401Schema,
+    getUserFeaturesStatus500Schema,
 } from "./zod/getUserFeaturesSchema.ts";
-export { getUser200Schema, getUser401Schema, getUser500Schema, getUserQueryResponseSchema } from "./zod/getUserSchema.ts";
 export {
-    getWarLogClans200Schema,
-    getWarLogClans404Schema,
-    getWarLogClans500Schema,
-    getWarLogClansQueryResponseSchema,
+    getUserErrorSchema,
+    getUserResponseSchema,
+    getUserStatus200Schema,
+    getUserStatus401Schema,
+    getUserStatus500Schema,
+} from "./zod/getUserSchema.ts";
+export {
+    getWarLogClansErrorSchema,
+    getWarLogClansResponseSchema,
+    getWarLogClansStatus200Schema,
+    getWarLogClansStatus404Schema,
+    getWarLogClansStatus500Schema,
 } from "./zod/getWarLogClansSchema.ts";
 export {
-    getWarLogPlayers200Schema,
-    getWarLogPlayers404Schema,
-    getWarLogPlayers500Schema,
-    getWarLogPlayersPathParamsSchema,
-    getWarLogPlayersQueryParamsSchema,
-    getWarLogPlayersQueryResponseSchema,
+    getWarLogPlayersErrorSchema,
+    getWarLogPlayersPathSchema,
+    getWarLogPlayersPathTagSchema,
+    getWarLogPlayersQuerySchema,
+    getWarLogPlayersQueryWarsSchema,
+    getWarLogPlayersResponseSchema,
+    getWarLogPlayersStatus200Schema,
+    getWarLogPlayersStatus400Schema,
+    getWarLogPlayersStatus404Schema,
+    getWarLogPlayersStatus500Schema,
 } from "./zod/getWarLogPlayersSchema.ts";
 export {
-    getWarLogWar200Schema,
-    getWarLogWar404Schema,
-    getWarLogWar500Schema,
-    getWarLogWarPathParamsSchema,
-    getWarLogWarQueryResponseSchema,
+    getWarLogWarErrorSchema,
+    getWarLogWarPathIdSchema,
+    getWarLogWarPathSchema,
+    getWarLogWarPathTagSchema,
+    getWarLogWarResponseSchema,
+    getWarLogWarStatus200Schema,
+    getWarLogWarStatus400Schema,
+    getWarLogWarStatus404Schema,
+    getWarLogWarStatus500Schema,
 } from "./zod/getWarLogWarSchema.ts";
 export {
-    getWarLogWars200Schema,
-    getWarLogWars404Schema,
-    getWarLogWars500Schema,
-    getWarLogWarsPathParamsSchema,
-    getWarLogWarsQueryParamsSchema,
-    getWarLogWarsQueryResponseSchema,
+    getWarLogWarsErrorSchema,
+    getWarLogWarsPathSchema,
+    getWarLogWarsPathTagSchema,
+    getWarLogWarsQueryBeforeSchema,
+    getWarLogWarsQueryLimitSchema,
+    getWarLogWarsQuerySchema,
+    getWarLogWarsResponseSchema,
+    getWarLogWarsStatus200Schema,
+    getWarLogWarsStatus400Schema,
+    getWarLogWarsStatus404Schema,
+    getWarLogWarsStatus500Schema,
 } from "./zod/getWarLogWarsSchema.ts";
 export {
-    importUserAccounts200Schema,
-    importUserAccounts401Schema,
-    importUserAccounts500Schema,
-    importUserAccountsMutationResponseSchema,
+    importUserAccountsErrorSchema,
+    importUserAccountsResponseSchema,
+    importUserAccountsStatus200Schema,
+    importUserAccountsStatus401Schema,
+    importUserAccountsStatus500Schema,
 } from "./zod/importUserAccountsSchema.ts";
 export {
-    postCOCPlayerVerify200Schema,
-    postCOCPlayerVerify500Schema,
-    postCOCPlayerVerifyMutationRequestSchema,
-    postCOCPlayerVerifyMutationResponseSchema,
-    postCOCPlayerVerifyPathParamsSchema,
+    postCOCPlayerVerifyBodySchema,
+    postCOCPlayerVerifyErrorSchema,
+    postCOCPlayerVerifyPathSchema,
+    postCOCPlayerVerifyPathTagSchema,
+    postCOCPlayerVerifyResponseSchema,
+    postCOCPlayerVerifyStatus200Schema,
+    postCOCPlayerVerifyStatus400Schema,
+    postCOCPlayerVerifyStatus500Schema,
 } from "./zod/postCOCPlayerVerifySchema.ts";
-export { previewCwlPing200Schema, previewCwlPing401Schema, previewCwlPingQueryResponseSchema } from "./zod/previewCwlPingSchema.ts";
 export {
-    refreshDiscordUsernames200Schema,
-    refreshDiscordUsernames401Schema,
-    refreshDiscordUsernames500Schema,
-    refreshDiscordUsernames503Schema,
-    refreshDiscordUsernamesMutationResponseSchema,
+    previewCwlPingErrorSchema,
+    previewCwlPingResponseSchema,
+    previewCwlPingStatus200Schema,
+    previewCwlPingStatus401Schema,
+} from "./zod/previewCwlPingSchema.ts";
+export {
+    refreshDiscordUsernamesErrorSchema,
+    refreshDiscordUsernamesResponseSchema,
+    refreshDiscordUsernamesStatus200Schema,
+    refreshDiscordUsernamesStatus401Schema,
+    refreshDiscordUsernamesStatus500Schema,
+    refreshDiscordUsernamesStatus503Schema,
 } from "./zod/refreshDiscordUsernamesSchema.ts";
 export {
-    renameCwlSeason200Schema,
-    renameCwlSeason401Schema,
-    renameCwlSeason404Schema,
-    renameCwlSeason409Schema,
-    renameCwlSeason500Schema,
-    renameCwlSeasonMutationRequestSchema,
-    renameCwlSeasonMutationResponseSchema,
-    renameCwlSeasonPathParamsSchema,
+    renameCwlSeasonBodySchema,
+    renameCwlSeasonErrorSchema,
+    renameCwlSeasonPathIdSchema,
+    renameCwlSeasonPathSchema,
+    renameCwlSeasonResponseSchema,
+    renameCwlSeasonStatus200Schema,
+    renameCwlSeasonStatus400Schema,
+    renameCwlSeasonStatus401Schema,
+    renameCwlSeasonStatus404Schema,
+    renameCwlSeasonStatus409Schema,
+    renameCwlSeasonStatus500Schema,
 } from "./zod/renameCwlSeasonSchema.ts";
-export { runCwlPingNow200Schema, runCwlPingNow401Schema, runCwlPingNowMutationResponseSchema } from "./zod/runCwlPingNowSchema.ts";
 export {
-    setPrivacy200Schema,
-    setPrivacy401Schema,
-    setPrivacy500Schema,
-    setPrivacyMutationRequestSchema,
-    setPrivacyMutationResponseSchema,
+    runCwlPingNowErrorSchema,
+    runCwlPingNowResponseSchema,
+    runCwlPingNowStatus200Schema,
+    runCwlPingNowStatus401Schema,
+} from "./zod/runCwlPingNowSchema.ts";
+export {
+    setPrivacyBodySchema,
+    setPrivacyErrorSchema,
+    setPrivacyResponseSchema,
+    setPrivacyStatus200Schema,
+    setPrivacyStatus400Schema,
+    setPrivacyStatus401Schema,
+    setPrivacyStatus500Schema,
 } from "./zod/setPrivacySchema.ts";
-export { setRules200Schema, setRules500Schema, setRulesMutationRequestSchema, setRulesMutationResponseSchema } from "./zod/setRulesSchema.ts";
 export {
-    setUserAccountExternal200Schema,
-    setUserAccountExternal401Schema,
-    setUserAccountExternal404Schema,
-    setUserAccountExternal500Schema,
-    setUserAccountExternalMutationResponseSchema,
-    setUserAccountExternalPathParamsSchema,
+    setRulesBodySchema,
+    setRulesErrorSchema,
+    setRulesResponseSchema,
+    setRulesStatus200Schema,
+    setRulesStatus400Schema,
+    setRulesStatus500Schema,
+} from "./zod/setRulesSchema.ts";
+export {
+    setUserAccountExternalErrorSchema,
+    setUserAccountExternalPathIdSchema,
+    setUserAccountExternalPathSchema,
+    setUserAccountExternalResponseSchema,
+    setUserAccountExternalStatus200Schema,
+    setUserAccountExternalStatus400Schema,
+    setUserAccountExternalStatus401Schema,
+    setUserAccountExternalStatus404Schema,
+    setUserAccountExternalStatus500Schema,
 } from "./zod/setUserAccountExternalSchema.ts";
 export {
-    setUserApiAccess200Schema,
-    setUserApiAccess401Schema,
-    setUserApiAccess404Schema,
-    setUserApiAccess500Schema,
-    setUserApiAccessMutationRequestSchema,
-    setUserApiAccessMutationResponseSchema,
-    setUserApiAccessPathParamsSchema,
+    setUserApiAccessBodySchema,
+    setUserApiAccessErrorSchema,
+    setUserApiAccessPathSchema,
+    setUserApiAccessPathUseridSchema,
+    setUserApiAccessResponseSchema,
+    setUserApiAccessStatus200Schema,
+    setUserApiAccessStatus400Schema,
+    setUserApiAccessStatus401Schema,
+    setUserApiAccessStatus404Schema,
+    setUserApiAccessStatus500Schema,
 } from "./zod/setUserApiAccessSchema.ts";
 export {
-    setUserSeasonBonus200Schema,
-    setUserSeasonBonus400Schema,
-    setUserSeasonBonus401Schema,
-    setUserSeasonBonus500Schema,
-    setUserSeasonBonusMutationRequestSchema,
-    setUserSeasonBonusMutationResponseSchema,
+    setUserSeasonBonusBodySchema,
+    setUserSeasonBonusErrorSchema,
+    setUserSeasonBonusResponseSchema,
+    setUserSeasonBonusStatus200Schema,
+    setUserSeasonBonusStatus400Schema,
+    setUserSeasonBonusStatus401Schema,
+    setUserSeasonBonusStatus500Schema,
 } from "./zod/setUserSeasonBonusSchema.ts";
 export {
-    syncAdminCwlClanLeagues200Schema,
-    syncAdminCwlClanLeagues401Schema,
-    syncAdminCwlClanLeagues500Schema,
-    syncAdminCwlClanLeaguesMutationResponseSchema,
+    syncAdminCwlClanLeaguesErrorSchema,
+    syncAdminCwlClanLeaguesResponseSchema,
+    syncAdminCwlClanLeaguesStatus200Schema,
+    syncAdminCwlClanLeaguesStatus401Schema,
+    syncAdminCwlClanLeaguesStatus500Schema,
 } from "./zod/syncAdminCwlClanLeaguesSchema.ts";
 export {
-    syncCocAccountWarWeights200Schema,
-    syncCocAccountWarWeights400Schema,
-    syncCocAccountWarWeights401Schema,
-    syncCocAccountWarWeights500Schema,
-    syncCocAccountWarWeightsMutationRequestSchema,
-    syncCocAccountWarWeightsMutationResponseSchema,
+    syncCocAccountWarWeightsBodySchema,
+    syncCocAccountWarWeightsErrorSchema,
+    syncCocAccountWarWeightsResponseSchema,
+    syncCocAccountWarWeightsStatus200Schema,
+    syncCocAccountWarWeightsStatus400Schema,
+    syncCocAccountWarWeightsStatus401Schema,
+    syncCocAccountWarWeightsStatus500Schema,
 } from "./zod/syncCocAccountWarWeightsSchema.ts";
 export {
-    syncCocAccounts200Schema,
-    syncCocAccounts400Schema,
-    syncCocAccounts401Schema,
-    syncCocAccounts500Schema,
-    syncCocAccountsMutationRequestSchema,
-    syncCocAccountsMutationResponseSchema,
+    syncCocAccountsBodySchema,
+    syncCocAccountsErrorSchema,
+    syncCocAccountsResponseSchema,
+    syncCocAccountsStatus200Schema,
+    syncCocAccountsStatus400Schema,
+    syncCocAccountsStatus401Schema,
+    syncCocAccountsStatus500Schema,
 } from "./zod/syncCocAccountsSchema.ts";
 export {
-    testCwlPing200Schema,
-    testCwlPing400Schema,
-    testCwlPing401Schema,
-    testCwlPing502Schema,
-    testCwlPingMutationRequestSchema,
-    testCwlPingMutationResponseSchema,
+    testCwlPingBodySchema,
+    testCwlPingErrorSchema,
+    testCwlPingResponseSchema,
+    testCwlPingStatus200Schema,
+    testCwlPingStatus400Schema,
+    testCwlPingStatus401Schema,
+    testCwlPingStatus502Schema,
 } from "./zod/testCwlPingSchema.ts";
 export {
-    updateAdminClan200Schema,
-    updateAdminClan401Schema,
-    updateAdminClan404Schema,
-    updateAdminClan422Schema,
-    updateAdminClan500Schema,
-    updateAdminClan503Schema,
-    updateAdminClanMutationRequestSchema,
-    updateAdminClanMutationResponseSchema,
-    updateAdminClanPathParamsSchema,
+    updateAdminClanBodySchema,
+    updateAdminClanErrorSchema,
+    updateAdminClanPathIdSchema,
+    updateAdminClanPathSchema,
+    updateAdminClanResponseSchema,
+    updateAdminClanStatus200Schema,
+    updateAdminClanStatus400Schema,
+    updateAdminClanStatus401Schema,
+    updateAdminClanStatus404Schema,
+    updateAdminClanStatus422Schema,
+    updateAdminClanStatus500Schema,
+    updateAdminClanStatus503Schema,
 } from "./zod/updateAdminClanSchema.ts";
 export {
-    updateAdminSettings200Schema,
-    updateAdminSettings401Schema,
-    updateAdminSettings500Schema,
-    updateAdminSettingsMutationRequestSchema,
-    updateAdminSettingsMutationResponseSchema,
+    updateAdminSettingsBodySchema,
+    updateAdminSettingsErrorSchema,
+    updateAdminSettingsResponseSchema,
+    updateAdminSettingsStatus200Schema,
+    updateAdminSettingsStatus400Schema,
+    updateAdminSettingsStatus401Schema,
+    updateAdminSettingsStatus500Schema,
 } from "./zod/updateAdminSettingsSchema.ts";
 export {
-    updateCocAccountExternal200Schema,
-    updateCocAccountExternal401Schema,
-    updateCocAccountExternal404Schema,
-    updateCocAccountExternal500Schema,
-    updateCocAccountExternalMutationRequestSchema,
-    updateCocAccountExternalMutationResponseSchema,
-    updateCocAccountExternalPathParamsSchema,
+    updateCocAccountExternalBodySchema,
+    updateCocAccountExternalErrorSchema,
+    updateCocAccountExternalPathIdSchema,
+    updateCocAccountExternalPathSchema,
+    updateCocAccountExternalResponseSchema,
+    updateCocAccountExternalStatus200Schema,
+    updateCocAccountExternalStatus400Schema,
+    updateCocAccountExternalStatus401Schema,
+    updateCocAccountExternalStatus404Schema,
+    updateCocAccountExternalStatus500Schema,
 } from "./zod/updateCocAccountExternalSchema.ts";
 export {
-    updateCocAccountStats200Schema,
-    updateCocAccountStats400Schema,
-    updateCocAccountStats401Schema,
-    updateCocAccountStats404Schema,
-    updateCocAccountStats500Schema,
-    updateCocAccountStatsMutationRequestSchema,
-    updateCocAccountStatsMutationResponseSchema,
-    updateCocAccountStatsPathParamsSchema,
+    updateCocAccountStatsBodySchema,
+    updateCocAccountStatsErrorSchema,
+    updateCocAccountStatsPathIdSchema,
+    updateCocAccountStatsPathSchema,
+    updateCocAccountStatsResponseSchema,
+    updateCocAccountStatsStatus200Schema,
+    updateCocAccountStatsStatus400Schema,
+    updateCocAccountStatsStatus401Schema,
+    updateCocAccountStatsStatus404Schema,
+    updateCocAccountStatsStatus500Schema,
 } from "./zod/updateCocAccountStatsSchema.ts";
 export {
-    updateCocAccountWarWeight200Schema,
-    updateCocAccountWarWeight401Schema,
-    updateCocAccountWarWeight404Schema,
-    updateCocAccountWarWeight500Schema,
-    updateCocAccountWarWeightMutationRequestSchema,
-    updateCocAccountWarWeightMutationResponseSchema,
-    updateCocAccountWarWeightPathParamsSchema,
+    updateCocAccountWarWeightBodySchema,
+    updateCocAccountWarWeightErrorSchema,
+    updateCocAccountWarWeightPathIdSchema,
+    updateCocAccountWarWeightPathSchema,
+    updateCocAccountWarWeightResponseSchema,
+    updateCocAccountWarWeightStatus200Schema,
+    updateCocAccountWarWeightStatus400Schema,
+    updateCocAccountWarWeightStatus401Schema,
+    updateCocAccountWarWeightStatus404Schema,
+    updateCocAccountWarWeightStatus500Schema,
 } from "./zod/updateCocAccountWarWeightSchema.ts";
 export {
-    updateCwlPingSettings200Schema,
-    updateCwlPingSettings400Schema,
-    updateCwlPingSettings401Schema,
-    updateCwlPingSettings500Schema,
-    updateCwlPingSettings503Schema,
-    updateCwlPingSettingsMutationRequestSchema,
-    updateCwlPingSettingsMutationResponseSchema,
+    updateCwlPingSettingsBodySchema,
+    updateCwlPingSettingsErrorSchema,
+    updateCwlPingSettingsResponseSchema,
+    updateCwlPingSettingsStatus200Schema,
+    updateCwlPingSettingsStatus400Schema,
+    updateCwlPingSettingsStatus401Schema,
+    updateCwlPingSettingsStatus500Schema,
+    updateCwlPingSettingsStatus503Schema,
 } from "./zod/updateCwlPingSettingsSchema.ts";
 export {
-    updateJoinApplicationStatus200Schema,
-    updateJoinApplicationStatus401Schema,
-    updateJoinApplicationStatus404Schema,
-    updateJoinApplicationStatus500Schema,
-    updateJoinApplicationStatusMutationRequestSchema,
-    updateJoinApplicationStatusMutationResponseSchema,
-    updateJoinApplicationStatusPathParamsSchema,
+    updateJoinApplicationStatusBodySchema,
+    updateJoinApplicationStatusErrorSchema,
+    updateJoinApplicationStatusPathIdSchema,
+    updateJoinApplicationStatusPathSchema,
+    updateJoinApplicationStatusResponseSchema,
+    updateJoinApplicationStatusStatus200Schema,
+    updateJoinApplicationStatusStatus400Schema,
+    updateJoinApplicationStatusStatus401Schema,
+    updateJoinApplicationStatusStatus404Schema,
+    updateJoinApplicationStatusStatus500Schema,
 } from "./zod/updateJoinApplicationStatusSchema.ts";
 export {
-    verifyAdminClanDiscord200Schema,
-    verifyAdminClanDiscord401Schema,
-    verifyAdminClanDiscord500Schema,
-    verifyAdminClanDiscord503Schema,
-    verifyAdminClanDiscordMutationRequestSchema,
-    verifyAdminClanDiscordMutationResponseSchema,
+    verifyAdminClanDiscordBodySchema,
+    verifyAdminClanDiscordErrorSchema,
+    verifyAdminClanDiscordResponseSchema,
+    verifyAdminClanDiscordStatus200Schema,
+    verifyAdminClanDiscordStatus400Schema,
+    verifyAdminClanDiscordStatus401Schema,
+    verifyAdminClanDiscordStatus500Schema,
+    verifyAdminClanDiscordStatus503Schema,
 } from "./zod/verifyAdminClanDiscordSchema.ts";

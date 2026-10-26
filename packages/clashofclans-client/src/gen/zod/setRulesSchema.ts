@@ -5,26 +5,28 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the updated rules content.
- */
-export const setRules200Schema = z.object({
+export const setRulesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         rules: z.string(),
     }),
 });
 
-/**
- * @description Server error response when updating rules fails.
- */
-export const setRules500Schema = z.object({
+export const setRulesStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const setRulesMutationRequestSchema = z.object({
+export const setRulesStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const setRulesResponseSchema = setRulesStatus200Schema;
+
+export const setRulesErrorSchema = z.union([setRulesStatus400Schema, setRulesStatus500Schema]);
+
+export const setRulesBodySchema = z.object({
     rules: z.string().min(1).max(100000),
 });
-
-export const setRulesMutationResponseSchema = z.lazy(() => setRules200Schema);

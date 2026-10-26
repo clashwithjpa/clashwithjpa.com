@@ -3,124 +3,81 @@
  * Do not edit manually.
  */
 
-/**
- * @description Per-field verification result.
- */
-export type VerifyAdminClanDiscord200 = {
-    /**
-     * @type boolean
-     */
+export type VerifyAdminClanDiscordStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type boolean
-         */
         ok: boolean;
-        /**
-         * @type object
-         */
         results: {
             [key: string]: {
-                /**
-                 * @type boolean
-                 */
                 valid: boolean;
-                /**
-                 * @type string | undefined
-                 */
                 name?: string;
-                /**
-                 * @type string | undefined
-                 */
                 reason?: string;
             };
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type VerifyAdminClanDiscord401 = {
-    /**
-     * @type boolean
-     */
+export type VerifyAdminClanDiscordStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type VerifyAdminClanDiscordStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type VerifyAdminClanDiscord500 = {
-    /**
-     * @type boolean
-     */
+export type VerifyAdminClanDiscordStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord verification unavailable.
- */
-export type VerifyAdminClanDiscord503 = {
-    /**
-     * @type boolean
-     */
+export type VerifyAdminClanDiscordStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type VerifyAdminClanDiscordMutationRequest = {
-    /**
-     * @type string | undefined
-     */
-    discordClanRoleId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordMemberRoleId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordElderRoleId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordColeaderRoleId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordLeaderRoleId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordClanChannelId?: string;
-    /**
-     * @type string | undefined
-     */
-    discordLeaderId?: string;
+export type VerifyAdminClanDiscordBody =
+    | {
+          discordClanRoleId?: string;
+          discordMemberRoleId?: string;
+          discordElderRoleId?: string;
+          discordColeaderRoleId?: string;
+          discordLeaderRoleId?: string;
+          discordClanChannelId?: string;
+          discordLeaderId?: string;
+      }
+    | undefined;
+
+export type VerifyAdminClanDiscordOptions = {
+    body: VerifyAdminClanDiscordBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
 
-export type VerifyAdminClanDiscordMutationResponse = VerifyAdminClanDiscord200;
-
-export type VerifyAdminClanDiscordMutation = {
-    Response: VerifyAdminClanDiscord200;
-    Request: VerifyAdminClanDiscordMutationRequest;
-    Errors: VerifyAdminClanDiscord401 | VerifyAdminClanDiscord500 | VerifyAdminClanDiscord503;
+export type VerifyAdminClanDiscordResponses = {
+    "200": VerifyAdminClanDiscordStatus200;
+    "400": VerifyAdminClanDiscordStatus400;
+    "401": VerifyAdminClanDiscordStatus401;
+    "500": VerifyAdminClanDiscordStatus500;
+    "503": VerifyAdminClanDiscordStatus503;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type VerifyAdminClanDiscordResponse = VerifyAdminClanDiscordStatus200;

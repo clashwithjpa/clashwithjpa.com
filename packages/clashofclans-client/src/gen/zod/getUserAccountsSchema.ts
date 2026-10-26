@@ -5,14 +5,11 @@
 
 import * as z from "zod";
 
-/**
- * @description User accounts fetched successfully.
- */
-export const getUserAccounts200Schema = z.object({
+export const getUserAccountsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         accounts: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
@@ -23,20 +20,16 @@ export const getUserAccounts200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getUserAccounts401Schema = z.object({
+export const getUserAccountsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const getUserAccounts500Schema = z.object({
+export const getUserAccountsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getUserAccountsQueryResponseSchema = z.lazy(() => getUserAccounts200Schema);
+export const getUserAccountsResponseSchema = getUserAccountsStatus200Schema;
+
+export const getUserAccountsErrorSchema = z.union([getUserAccountsStatus401Schema, getUserAccountsStatus500Schema]);

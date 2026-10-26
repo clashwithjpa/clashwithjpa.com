@@ -5,9 +5,9 @@
     import Spinner from "#lib/components/ui/Spinner.svelte";
     import { toast } from "#lib/toast.js";
     import { errorMessage } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL, PUBLIC_TURNSTILE_SITE_KEY } from "$app/env/public";
+    import { PUBLIC_TURNSTILE_SITE_KEY } from "$app/env/public";
     import { Field } from "@ark-ui/svelte/field";
-    import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
+    import { applyUserAccount } from "@repo/clashofclans-client";
     import { Turnstile } from "svelte-turnstile";
     import TablerArrowRight from "~icons/tabler/arrow-right";
 
@@ -71,18 +71,17 @@
 
         isLoading = true;
         try {
-            const data = await applyUserAccount(
-                {
+            const data = await applyUserAccount({
+                body: {
                     cocAccountTag,
                     apiToken,
                     captchaToken,
                     isExternal,
                     ...(isExternal ? { warWeight: Number(warWeight) } : {}),
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
+            });
 
-            if (data.success) {
+            if (data.data) {
                 toast.success(isExternal ? "External account added successfully!" : "Application submitted successfully!");
                 cocAccountTag = "";
                 apiToken = "";
@@ -91,7 +90,7 @@
                 fieldErrors = {};
             } else {
                 console.log(data);
-                const errorData = (data as unknown as ApplyUserAccount500).error;
+                const errorData = data.error?.error;
 
                 if (Array.isArray(errorData)) {
                     fieldErrors = parseErrors(errorData);

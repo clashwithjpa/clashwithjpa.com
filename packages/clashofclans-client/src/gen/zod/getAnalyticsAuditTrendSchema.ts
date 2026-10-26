@@ -5,18 +5,13 @@
 
 import * as z from "zod";
 
-export const getAnalyticsAuditTrendQueryParamsSchema = z.object({
-    days: z.coerce.number().int().min(1).max(90).default(14),
-});
+export const getAnalyticsAuditTrendQueryDaysSchema = z.int().min(1).max(90).optional().default(14);
 
-/**
- * @description Audit trend.
- */
-export const getAnalyticsAuditTrend200Schema = z.object({
+export const getAnalyticsAuditTrendStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 date: z.string(),
                 count: z.number(),
             }),
@@ -24,20 +19,30 @@ export const getAnalyticsAuditTrend200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsAuditTrend401Schema = z.object({
+export const getAnalyticsAuditTrendStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsAuditTrend500Schema = z.object({
+export const getAnalyticsAuditTrendStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsAuditTrendQueryResponseSchema = z.lazy(() => getAnalyticsAuditTrend200Schema);
+export const getAnalyticsAuditTrendStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsAuditTrendResponseSchema = getAnalyticsAuditTrendStatus200Schema;
+
+export const getAnalyticsAuditTrendErrorSchema = z.union([
+    getAnalyticsAuditTrendStatus400Schema,
+    getAnalyticsAuditTrendStatus401Schema,
+    getAnalyticsAuditTrendStatus500Schema,
+]);
+
+export const getAnalyticsAuditTrendQuerySchema = z.object({
+    days: z.int().min(1).max(90).optional().default(14),
+});

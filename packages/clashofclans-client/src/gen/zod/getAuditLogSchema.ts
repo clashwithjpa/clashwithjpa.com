@@ -5,104 +5,107 @@
 
 import * as z from "zod";
 
-export const getAuditLogQueryParamsSchema = z.object({
-    actorId: z.optional(z.string()),
-    action: z.optional(
-        z.enum([
-            "clan_application.create",
-            "clan_application.accepted",
-            "clan_application.rejected",
-            "clan_application.pending",
-            "clan_application.delete",
-            "clan_application.clear_accepted",
-            "cwl_application.create",
-            "cwl_application.assign",
-            "cwl_application.unassign",
-            "cwl_application.bulk_assign",
-            "cwl_application.bulk_unassign",
-            "cwl_application.bulk_delete",
-            "cwl_application.update_notes",
-            "cwl_bonus.tick",
-            "cwl_bonus.untick",
-            "cwl_season.create",
-            "cwl_season.rename",
-            "cwl_season.delete",
-            "settings.update",
-            "cwl_ping.settings_update",
-            "cwl_ping.manual_run",
-            "rules.update",
-            "privacy.update",
-            "clan.create",
-            "clan.update",
-            "clan.delete",
-            "cwl_clan.create",
-            "cwl_clan.update",
-            "cwl_clan.delete",
-            "cwl_clan.sync_leagues",
-            "coc_account.create",
-            "coc_account.import",
-            "coc_account.stats_update",
-            "coc_account.mark_main",
-            "coc_account.mark_external",
-            "coc_account.sync",
-            "coc_account.sync_war_weights",
-            "coc_account.delete",
-            "coc_account.bulk_delete",
-            "user.role_set",
-            "user.create",
-            "user.update",
-            "user.ban",
-            "user.unban",
-            "user.remove",
-            "user.password_set",
-            "user.session_revoked",
-            "user.sessions_revoked",
-            "user.api_access_granted",
-            "user.api_access_revoked",
-            "api_key.create",
-            "api_key.update",
-            "api_key.delete",
-        ]),
-    ),
-    targetType: z.optional(
-        z.enum([
-            "clan_application",
-            "cwl_application",
-            "cwl_bonus",
-            "cwl_season",
-            "settings",
-            "rules",
-            "privacy",
-            "clan",
-            "cwl_clan",
-            "coc_account",
-            "user",
-            "api_key",
-        ]),
-    ),
-    targetId: z.optional(z.string()),
-    source: z.optional(z.enum(["web", "api"])),
-    before: z.optional(z.string().datetime()),
-    after: z.optional(z.string().datetime()),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
-    offset: z.coerce.number().int().min(0).max(9007199254740991).default(0),
-});
+export const getAuditLogQueryActorIdSchema = z.string().optional();
 
-/**
- * @description Audit log entries.
- */
-export const getAuditLog200Schema = z.object({
+export const getAuditLogQueryActionSchema = z
+    .enum([
+        "clan_application.create",
+        "clan_application.accepted",
+        "clan_application.rejected",
+        "clan_application.pending",
+        "clan_application.delete",
+        "clan_application.clear_accepted",
+        "cwl_application.create",
+        "cwl_application.assign",
+        "cwl_application.unassign",
+        "cwl_application.bulk_assign",
+        "cwl_application.bulk_unassign",
+        "cwl_application.bulk_delete",
+        "cwl_application.update_notes",
+        "cwl_bonus.tick",
+        "cwl_bonus.untick",
+        "cwl_season.create",
+        "cwl_season.rename",
+        "cwl_season.delete",
+        "settings.update",
+        "cwl_ping.settings_update",
+        "cwl_ping.manual_run",
+        "rules.update",
+        "privacy.update",
+        "clan.create",
+        "clan.update",
+        "clan.delete",
+        "cwl_clan.create",
+        "cwl_clan.update",
+        "cwl_clan.delete",
+        "cwl_clan.sync_leagues",
+        "coc_account.create",
+        "coc_account.import",
+        "coc_account.stats_update",
+        "coc_account.mark_main",
+        "coc_account.mark_external",
+        "coc_account.sync",
+        "coc_account.sync_war_weights",
+        "coc_account.delete",
+        "coc_account.bulk_delete",
+        "user.role_set",
+        "user.create",
+        "user.update",
+        "user.ban",
+        "user.unban",
+        "user.remove",
+        "user.password_set",
+        "user.session_revoked",
+        "user.sessions_revoked",
+        "user.api_access_granted",
+        "user.api_access_revoked",
+        "api_key.create",
+        "api_key.update",
+        "api_key.delete",
+    ])
+    .optional();
+
+export const getAuditLogQueryTargetTypeSchema = z
+    .enum([
+        "clan_application",
+        "cwl_application",
+        "cwl_bonus",
+        "cwl_season",
+        "settings",
+        "rules",
+        "privacy",
+        "clan",
+        "cwl_clan",
+        "coc_account",
+        "user",
+        "api_key",
+    ])
+    .optional();
+
+export const getAuditLogQueryTargetIdSchema = z.string().optional();
+
+export const getAuditLogQuerySourceSchema = z.enum(["web", "api"]).optional();
+
+export const getAuditLogQueryBeforeSchema = z.iso.datetime().optional();
+
+export const getAuditLogQueryAfterSchema = z.iso.datetime().optional();
+
+export const getAuditLogQueryLimitSchema = z.int().min(1).max(200).optional().default(50);
+
+export const getAuditLogQueryOffsetSchema = z.int().min(0).max(9007199254740991).optional().default(0);
+
+export const getAuditLogStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         entries: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
-                actorId: z.union([z.string(), z.null()]),
-                actorName: z.union([z.string(), z.null()]),
-                actorCurrentName: z.union([z.string(), z.null()]),
-                actorCurrentImage: z.union([z.string(), z.null()]),
+                actorId: z.string().nullable(),
+                actorName: z.string().nullable(),
+                actorCurrentName: z.string().nullable(),
+                actorCurrentImage: z.string().nullable(),
                 actorCurrentRole: z.union([z.enum(["unverified", "verified", "reviewer", "manager", "admin", "superadmin"]), z.null()]),
-                actorDiscordId: z.union([z.string(), z.null()]),
+                actorDiscordId: z.string().nullable(),
                 action: z.enum([
                     "clan_application.create",
                     "clan_application.accepted",
@@ -175,32 +178,117 @@ export const getAuditLog200Schema = z.object({
                     ]),
                     z.null(),
                 ]),
-                targetId: z.union([z.string(), z.null()]),
-                metadata: z.union([z.any(), z.null()]),
+                targetId: z.string().nullable(),
+                metadata: z.union([z.unknown(), z.null()]),
                 source: z.enum(["web", "api"]),
-                apiKeyId: z.union([z.string(), z.null()]),
-                apiKeyName: z.union([z.string(), z.null()]),
-                createdAt: z.string().datetime(),
+                apiKeyId: z.string().nullable(),
+                apiKeyName: z.string().nullable(),
+                createdAt: z.iso.datetime(),
             }),
         ),
         total: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAuditLog401Schema = z.object({
+export const getAuditLogStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAuditLog500Schema = z.object({
+export const getAuditLogStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAuditLogQueryResponseSchema = z.lazy(() => getAuditLog200Schema);
+export const getAuditLogStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAuditLogResponseSchema = getAuditLogStatus200Schema;
+
+export const getAuditLogErrorSchema = z.union([getAuditLogStatus400Schema, getAuditLogStatus401Schema, getAuditLogStatus500Schema]);
+
+export const getAuditLogQuerySchema = z.object({
+    actorId: z.string().optional(),
+    action: z
+        .enum([
+            "clan_application.create",
+            "clan_application.accepted",
+            "clan_application.rejected",
+            "clan_application.pending",
+            "clan_application.delete",
+            "clan_application.clear_accepted",
+            "cwl_application.create",
+            "cwl_application.assign",
+            "cwl_application.unassign",
+            "cwl_application.bulk_assign",
+            "cwl_application.bulk_unassign",
+            "cwl_application.bulk_delete",
+            "cwl_application.update_notes",
+            "cwl_bonus.tick",
+            "cwl_bonus.untick",
+            "cwl_season.create",
+            "cwl_season.rename",
+            "cwl_season.delete",
+            "settings.update",
+            "cwl_ping.settings_update",
+            "cwl_ping.manual_run",
+            "rules.update",
+            "privacy.update",
+            "clan.create",
+            "clan.update",
+            "clan.delete",
+            "cwl_clan.create",
+            "cwl_clan.update",
+            "cwl_clan.delete",
+            "cwl_clan.sync_leagues",
+            "coc_account.create",
+            "coc_account.import",
+            "coc_account.stats_update",
+            "coc_account.mark_main",
+            "coc_account.mark_external",
+            "coc_account.sync",
+            "coc_account.sync_war_weights",
+            "coc_account.delete",
+            "coc_account.bulk_delete",
+            "user.role_set",
+            "user.create",
+            "user.update",
+            "user.ban",
+            "user.unban",
+            "user.remove",
+            "user.password_set",
+            "user.session_revoked",
+            "user.sessions_revoked",
+            "user.api_access_granted",
+            "user.api_access_revoked",
+            "api_key.create",
+            "api_key.update",
+            "api_key.delete",
+        ])
+        .optional(),
+    targetType: z
+        .enum([
+            "clan_application",
+            "cwl_application",
+            "cwl_bonus",
+            "cwl_season",
+            "settings",
+            "rules",
+            "privacy",
+            "clan",
+            "cwl_clan",
+            "coc_account",
+            "user",
+            "api_key",
+        ])
+        .optional(),
+    targetId: z.string().optional(),
+    source: z.enum(["web", "api"]).optional(),
+    before: z.iso.datetime().optional(),
+    after: z.iso.datetime().optional(),
+    limit: z.int().min(1).max(200).optional().default(50),
+    offset: z.int().min(0).max(9007199254740991).optional().default(0),
+});

@@ -3,34 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsAdminActivity401,
-    GetAnalyticsAdminActivity500,
-    GetAnalyticsAdminActivityQueryParams,
-    GetAnalyticsAdminActivityQueryResponse,
-} from "../models/GetAnalyticsAdminActivity.ts";
-
-function getGetAnalyticsAdminActivityUrl() {
-    const res = { method: "GET", url: `/analytics/admin-activity` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsAdminActivityOptions, GetAnalyticsAdminActivityResponses } from "../models/GetAnalyticsAdminActivity.ts";
 
 /**
  * @description Admins ranked by audit log action count, with profile info. All time unless `days` is given.
  * {@link /analytics/admin-activity}
  */
-export async function getAnalyticsAdminActivity(
-    params?: GetAnalyticsAdminActivityQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsAdminActivity<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsAdminActivityOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsAdminActivityResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsAdminActivityQueryResponse,
-        ResponseErrorConfig<GetAnalyticsAdminActivity401 | GetAnalyticsAdminActivity500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsAdminActivityUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/admin-activity",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsAdminActivityResponses, ThrowOnError>>,
+    );
 }

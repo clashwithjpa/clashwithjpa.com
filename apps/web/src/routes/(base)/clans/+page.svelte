@@ -7,19 +7,18 @@
     import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
     import Icon from "#lib/components/ui/Icon.svelte";
     import Seo from "#lib/components/ui/Seo.svelte";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { getCOCClan, type GetCOCClan200 } from "@repo/clashofclans-client";
+    import { getCOCClan, type GetCOCClanStatus200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import TablerSearch from "~icons/tabler/search";
     import type { PageProps } from "./$types";
 
-    type Clan = GetCOCClan200["data"]["clan"];
+    type Clan = GetCOCClanStatus200["data"]["clan"];
     type SortKey = "level" | "trophies" | "space";
 
     let { data }: PageProps = $props();
 
-    const requirements = $derived(data.clans?.success ? data.clans.data.clans : {});
+    const requirements = $derived(data.clans?.data ? data.clans.data.data.clans : {});
     const tags = $derived(Object.keys(requirements));
 
     let clans = $state<Clan[]>([]);
@@ -28,8 +27,8 @@
     let sort = $state<SortKey>("level");
 
     onMount(async () => {
-        const results = await Promise.allSettled(tags.map((tag) => getCOCClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL })));
-        clans = results.flatMap((r) => (r.status === "fulfilled" && r.value.success && r.value.data?.clan ? [r.value.data.clan] : []));
+        const results = await Promise.allSettled(tags.map((tag) => getCOCClan({ path: { tag } })));
+        clans = results.flatMap((r) => (r.status === "fulfilled" && r.value.data && r.value.data?.data.clan ? [r.value.data.data.clan] : []));
         loading = false;
     });
 

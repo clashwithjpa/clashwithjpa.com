@@ -3,40 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    RenameCwlSeason401,
-    RenameCwlSeason404,
-    RenameCwlSeason409,
-    RenameCwlSeason500,
-    RenameCwlSeasonMutationRequest,
-    RenameCwlSeasonMutationResponse,
-    RenameCwlSeasonPathParams,
-} from "../models/RenameCwlSeason.ts";
-
-function getRenameCwlSeasonUrl(id: RenameCwlSeasonPathParams["id"]) {
-    const res = { method: "PATCH", url: `/admin/cwl-seasons/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { RenameCwlSeasonOptions, RenameCwlSeasonResponses } from "../models/RenameCwlSeason.ts";
 
 /**
  * @description Renames a CWL season.
  * {@link /admin/cwl-seasons/:id}
  */
-export async function renameCwlSeason(
-    id: RenameCwlSeasonPathParams["id"],
-    data: RenameCwlSeasonMutationRequest,
-    config: Partial<RequestConfig<RenameCwlSeasonMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function renameCwlSeason<ThrowOnError extends boolean = false>(
+    options: Options<RenameCwlSeasonOptions, ThrowOnError>,
+): Unwrappable<RequestResult<RenameCwlSeasonResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        RenameCwlSeasonMutationResponse,
-        ResponseErrorConfig<RenameCwlSeason401 | RenameCwlSeason404 | RenameCwlSeason409 | RenameCwlSeason500>,
-        RenameCwlSeasonMutationRequest
-    >({ method: "PATCH", url: getRenameCwlSeasonUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PATCH",
+            url: "/admin/cwl-seasons/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<RenameCwlSeasonResponses, ThrowOnError>>,
+    );
 }

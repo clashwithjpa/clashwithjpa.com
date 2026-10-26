@@ -5,19 +5,15 @@
 
 import * as z from "zod";
 
-export const getApiKeyUsageStatusQueryParamsSchema = z.object({
-    keyId: z.string().min(1),
-    days: z.optional(z.coerce.number().int().min(1).max(90).default(30)),
-});
+export const getApiKeyUsageStatusQueryKeyIdSchema = z.string().min(1);
 
-/**
- * @description Status breakdown.
- */
-export const getApiKeyUsageStatus200Schema = z.object({
+export const getApiKeyUsageStatusQueryDaysSchema = z.int().min(1).max(90).optional().default(30);
+
+export const getApiKeyUsageStatusStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 statusClass: z.string(),
                 count: z.number(),
             }),
@@ -25,28 +21,37 @@ export const getApiKeyUsageStatus200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getApiKeyUsageStatus401Schema = z.object({
+export const getApiKeyUsageStatusStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description API key not found.
- */
-export const getApiKeyUsageStatus404Schema = z.object({
+export const getApiKeyUsageStatusStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getApiKeyUsageStatus500Schema = z.object({
+export const getApiKeyUsageStatusStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getApiKeyUsageStatusQueryResponseSchema = z.lazy(() => getApiKeyUsageStatus200Schema);
+export const getApiKeyUsageStatusStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getApiKeyUsageStatusResponseSchema = getApiKeyUsageStatusStatus200Schema;
+
+export const getApiKeyUsageStatusErrorSchema = z.union([
+    getApiKeyUsageStatusStatus400Schema,
+    getApiKeyUsageStatusStatus401Schema,
+    getApiKeyUsageStatusStatus404Schema,
+    getApiKeyUsageStatusStatus500Schema,
+]);
+
+export const getApiKeyUsageStatusQuerySchema = z.object({
+    keyId: z.string().min(1),
+    days: z.int().min(1).max(90).optional().default(30),
+});

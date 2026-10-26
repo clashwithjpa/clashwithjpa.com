@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SetUserAccountExternal401,
-    SetUserAccountExternal404,
-    SetUserAccountExternal500,
-    SetUserAccountExternalMutationResponse,
-    SetUserAccountExternalPathParams,
-} from "../models/SetUserAccountExternal.ts";
-
-function getSetUserAccountExternalUrl(id: SetUserAccountExternalPathParams["id"]) {
-    const res = { method: "PUT", url: `/user/accounts/${id}/external` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SetUserAccountExternalOptions, SetUserAccountExternalResponses } from "../models/SetUserAccountExternal.ts";
 
 /**
  * @description Converts one of the current user's own Clash of Clans accounts to external. One-way — this endpoint cannot revert an account to main; use PUT /admin/coc-accounts/{id}/external for that. War weight is left unchanged.
  * {@link /user/accounts/:id/external}
  */
-export async function setUserAccountExternal(id: SetUserAccountExternalPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function setUserAccountExternal<ThrowOnError extends boolean = false>(
+    options: Options<SetUserAccountExternalOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SetUserAccountExternalResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        SetUserAccountExternalMutationResponse,
-        ResponseErrorConfig<SetUserAccountExternal401 | SetUserAccountExternal404 | SetUserAccountExternal500>,
-        unknown
-    >({ method: "PUT", url: getSetUserAccountExternalUrl(id).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/user/accounts/{id}/external",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SetUserAccountExternalResponses, ThrowOnError>>,
+    );
 }

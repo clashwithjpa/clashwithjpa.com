@@ -5,18 +5,13 @@
 
 import * as z from "zod";
 
-export const getUserCocAccountsByUserIdPathParamsSchema = z.object({
-    userid: z.string().min(1),
-});
+export const getUserCocAccountsByUserIdPathUseridSchema = z.string().min(1);
 
-/**
- * @description User\'s COC accounts.
- */
-export const getUserCocAccountsByUserId200Schema = z.object({
+export const getUserCocAccountsByUserIdStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         accounts: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 discordUserId: z.string(),
                 cocAccountTag: z.string(),
@@ -27,20 +22,30 @@ export const getUserCocAccountsByUserId200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getUserCocAccountsByUserId401Schema = z.object({
+export const getUserCocAccountsByUserIdStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getUserCocAccountsByUserId500Schema = z.object({
+export const getUserCocAccountsByUserIdStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getUserCocAccountsByUserIdQueryResponseSchema = z.lazy(() => getUserCocAccountsByUserId200Schema);
+export const getUserCocAccountsByUserIdStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getUserCocAccountsByUserIdResponseSchema = getUserCocAccountsByUserIdStatus200Schema;
+
+export const getUserCocAccountsByUserIdErrorSchema = z.union([
+    getUserCocAccountsByUserIdStatus400Schema,
+    getUserCocAccountsByUserIdStatus401Schema,
+    getUserCocAccountsByUserIdStatus500Schema,
+]);
+
+export const getUserCocAccountsByUserIdPathSchema = z.object({
+    userid: z.string().min(1),
+});

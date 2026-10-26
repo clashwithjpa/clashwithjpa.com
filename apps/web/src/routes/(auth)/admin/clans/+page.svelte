@@ -13,7 +13,6 @@
     import type { TableColumn } from "#lib/components/ui/table/features.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         createAdminClan,
         deleteAdminClan,
@@ -21,26 +20,11 @@
         getCOCClan,
         updateAdminClan,
         verifyAdminClanDiscord,
-        type CreateAdminClan401,
-        type CreateAdminClan409,
-        type CreateAdminClan422,
-        type CreateAdminClan500,
-        type CreateAdminClan503,
-        type CreateAdminClanMutationRequest,
-        type DeleteAdminClan401,
-        type DeleteAdminClan404,
-        type DeleteAdminClan500,
-        type GetAdminClans200,
-        type GetCOCClan200,
-        type UpdateAdminClan401,
-        type UpdateAdminClan404,
-        type UpdateAdminClan422,
-        type UpdateAdminClan500,
-        type UpdateAdminClan503,
-        type UpdateAdminClanMutationRequest,
-        type VerifyAdminClanDiscord200,
-        type VerifyAdminClanDiscord500,
-        type VerifyAdminClanDiscord503,
+        type CreateAdminClanBody,
+        type GetAdminClansStatus200,
+        type GetCOCClanStatus200,
+        type UpdateAdminClanBody,
+        type VerifyAdminClanDiscordStatus200,
     } from "@repo/clashofclans-client";
     import { renderSnippet } from "@tanstack/svelte-table";
     import TablerPencil from "~icons/tabler/pencil";
@@ -48,8 +32,8 @@
     import TablerShield from "~icons/tabler/shield";
     import TablerTrash from "~icons/tabler/trash";
 
-    type Clan = GetAdminClans200["data"]["clans"][number];
-    type LiveClan = GetCOCClan200["data"]["clan"];
+    type Clan = GetAdminClansStatus200["data"]["clans"][number];
+    type LiveClan = GetCOCClanStatus200["data"]["clan"];
     // A clan plus its live game data: undefined while loading, null when the CoC API had nothing.
     type Row = Clan & { live: LiveClan | null | undefined };
 
@@ -89,7 +73,7 @@
 
     let form = $state<ClanForm>(emptyForm());
 
-    type DiscordResults = VerifyAdminClanDiscord200["data"]["results"];
+    type DiscordResults = VerifyAdminClanDiscordStatus200["data"]["results"];
     let discordResults = $state<DiscordResults | null>(null);
     let verifying = $state(false);
     let verified = $state(false);
@@ -126,16 +110,12 @@
         if (Object.keys(fields).length === 0) return true;
         verifying = true;
         try {
-            const resp = (await verifyAdminClanDiscord(fields, {
-                baseURL: PUBLIC_SERVER_URL,
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            })) as Awaited<ReturnType<typeof verifyAdminClanDiscord>> | VerifyAdminClanDiscord500 | VerifyAdminClanDiscord503;
-            if (resp.success) {
-                discordResults = resp.data.results;
-                return resp.data.ok;
+            const resp = await verifyAdminClanDiscord({ body: fields });
+            if (resp.data) {
+                discordResults = resp.data.data.results;
+                return resp.data.data.ok;
             }
-            toast.error(errMsg(resp.error, "Failed to verify Discord IDs"));
+            toast.error(errMsg(resp.error?.error, "Failed to verify Discord IDs"));
             return false;
         } catch (e) {
             toast.error("Failed to verify Discord IDs", { description: errorMessage(e) });
@@ -153,8 +133,8 @@
         await Promise.all(
             tags.map(async (tag) => {
                 try {
-                    const resp = await getCOCClan(encodeURIComponent(tag), { baseURL: PUBLIC_SERVER_URL });
-                    live[tag] = resp.success && resp.data?.clan ? resp.data.clan : null;
+                    const resp = await getCOCClan({ path: { tag } });
+                    live[tag] = resp.data?.data.clan ?? null;
                 } catch {
                     live[tag] = null;
                 }
@@ -229,9 +209,9 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getAdminClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                clans = resp.data.clans;
+            const resp = await getAdminClans({});
+            if (resp.data) {
+                clans = resp.data.data.clans;
                 loadLive(clans.map((c) => c.cocClanTag));
             } else {
                 toast.error("Failed to load clans");
@@ -299,7 +279,7 @@
     }
 
     // Validate + normalise the form into a create payload (null if invalid).
-    function buildPayload(): CreateAdminClanMutationRequest | null {
+    function buildPayload(): CreateAdminClanBody | null {
         let tag = form.cocClanTag.trim().toUpperCase();
         if (tag && !tag.startsWith("#")) tag = `#${tag}`;
         const code = form.cocClanCode.trim();
@@ -350,24 +330,14 @@
 
         saving = true;
         try {
-            const resp = (await createAdminClan(payload, {
-                baseURL: PUBLIC_SERVER_URL,
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            })) as
-                | Awaited<ReturnType<typeof createAdminClan>>
-                | CreateAdminClan401
-                | CreateAdminClan409
-                | CreateAdminClan422
-                | CreateAdminClan500
-                | CreateAdminClan503;
-            if (resp.success) {
-                clans = [...clans, resp.data.clan].sort((a, b) => a.cocClanCode.localeCompare(b.cocClanCode));
-                loadLive([resp.data.clan.cocClanTag]);
-                toast.success(`Added ${resp.data.clan.cocClanName ?? resp.data.clan.cocClanTag}`);
+            const resp = await createAdminClan({ body: payload });
+            if (resp.data) {
+                clans = [...clans, resp.data.data.clan].sort((a, b) => a.cocClanCode.localeCompare(b.cocClanCode));
+                loadLive([resp.data.data.clan.cocClanTag]);
+                toast.success(`Added ${resp.data.data.clan.cocClanName ?? resp.data.data.clan.cocClanTag}`);
                 closeSidebar();
             } else {
-                toast.error(errMsg(resp.error, "Failed to add clan"));
+                toast.error(errMsg(resp.error?.error, "Failed to add clan"));
             }
         } catch (e) {
             toast.error("Failed to add clan", { description: errorMessage(e) });
@@ -382,9 +352,9 @@
 
         // Send only changed fields so the audit log is accurate.
         const original = clans.find((c) => c.id === id);
-        const diff: UpdateAdminClanMutationRequest = {};
+        const diff: UpdateAdminClanBody = {};
         if (original) {
-            for (const key of Object.keys(payload) as (keyof CreateAdminClanMutationRequest)[]) {
+            for (const key of Object.keys(payload) as (keyof CreateAdminClanBody)[]) {
                 if (original[key as keyof Clan] !== payload[key]) (diff as Record<string, unknown>)[key] = payload[key];
             }
         }
@@ -397,24 +367,14 @@
         const outgoing = original ? diff : payload;
         saving = true;
         try {
-            const resp = (await updateAdminClan(id, outgoing, {
-                baseURL: PUBLIC_SERVER_URL,
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            })) as
-                | Awaited<ReturnType<typeof updateAdminClan>>
-                | UpdateAdminClan401
-                | UpdateAdminClan404
-                | UpdateAdminClan422
-                | UpdateAdminClan500
-                | UpdateAdminClan503;
-            if (resp.success) {
-                clans = clans.map((c) => (c.id === id ? resp.data.clan : c));
-                if (!(resp.data.clan.cocClanTag in live)) loadLive([resp.data.clan.cocClanTag]);
-                toast.success(`Updated ${resp.data.clan.cocClanName ?? resp.data.clan.cocClanTag}`);
+            const resp = await updateAdminClan({ path: { id }, body: outgoing });
+            if (resp.data) {
+                clans = clans.map((c) => (c.id === id ? resp.data.data.clan : c));
+                if (!(resp.data.data.clan.cocClanTag in live)) loadLive([resp.data.data.clan.cocClanTag]);
+                toast.success(`Updated ${resp.data.data.clan.cocClanName ?? resp.data.data.clan.cocClanTag}`);
                 closeSidebar();
             } else {
-                toast.error(errMsg(resp.error, "Failed to update clan"));
+                toast.error(errMsg(resp.error?.error, "Failed to update clan"));
             }
         } catch (e) {
             toast.error("Failed to update clan", { description: errorMessage(e) });
@@ -426,13 +386,12 @@
     async function removeClan(clan: Clan) {
         removing = clan.id;
         try {
-            const resp = (await deleteAdminClan(clan.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })) as
-                Awaited<ReturnType<typeof deleteAdminClan>> | DeleteAdminClan401 | DeleteAdminClan404 | DeleteAdminClan500;
-            if (resp.success) {
+            const resp = await deleteAdminClan({ path: { id: clan.id } });
+            if (resp.data) {
                 clans = clans.filter((c) => c.id !== clan.id);
                 toast.success("Clan removed");
             } else {
-                toast.error(errMsg(resp.error, "Failed to remove clan"));
+                toast.error(errMsg(resp.error?.error, "Failed to remove clan"));
             }
         } catch (e) {
             toast.error("Failed to remove clan", { description: errorMessage(e) });

@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCwlSeasons401, GetCwlSeasons500, GetCwlSeasonsQueryResponse } from "../models/GetCwlSeasons.ts";
-
-function getGetCwlSeasonsUrl() {
-    const res = { method: "GET", url: `/admin/cwl-seasons` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCwlSeasonsOptions, GetCwlSeasonsResponses } from "../models/GetCwlSeasons.ts";
 
 /**
  * @description Lists all CWL seasons (newest first).
  * {@link /admin/cwl-seasons}
  */
-export async function getCwlSeasons(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCwlSeasons<ThrowOnError extends boolean = false>(
+    options: Options<GetCwlSeasonsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCwlSeasonsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCwlSeasonsQueryResponse, ResponseErrorConfig<GetCwlSeasons401 | GetCwlSeasons500>, unknown>({
-        method: "GET",
-        url: getGetCwlSeasonsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/cwl-seasons",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCwlSeasonsResponses, ThrowOnError>>,
+    );
 }

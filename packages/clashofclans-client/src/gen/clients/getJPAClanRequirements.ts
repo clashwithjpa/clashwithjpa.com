@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetJPAClanRequirements500, GetJPAClanRequirementsQueryResponse } from "../models/GetJPAClanRequirements.ts";
-
-function getGetJPAClanRequirementsUrl() {
-    const res = { method: "GET", url: `/coc/jpa/clans/requirements` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetJPAClanRequirementsOptions, GetJPAClanRequirementsResponses } from "../models/GetJPAClanRequirements.ts";
 
 /**
  * @description Fetches all JPA clans and their requirements.
  * {@link /coc/jpa/clans/requirements}
  */
-export async function getJPAClanRequirements(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getJPAClanRequirements<ThrowOnError extends boolean = false>(
+    options: Options<GetJPAClanRequirementsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetJPAClanRequirementsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetJPAClanRequirementsQueryResponse, ResponseErrorConfig<GetJPAClanRequirements500>, unknown>({
-        method: "GET",
-        url: getGetJPAClanRequirementsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/jpa/clans/requirements", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetJPAClanRequirementsResponses, ThrowOnError>
+        >,
+    );
 }

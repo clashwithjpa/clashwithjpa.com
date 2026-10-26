@@ -3,40 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateCocAccountStats400,
-    UpdateCocAccountStats401,
-    UpdateCocAccountStats404,
-    UpdateCocAccountStats500,
-    UpdateCocAccountStatsMutationRequest,
-    UpdateCocAccountStatsMutationResponse,
-    UpdateCocAccountStatsPathParams,
-} from "../models/UpdateCocAccountStats.ts";
-
-function getUpdateCocAccountStatsUrl(id: UpdateCocAccountStatsPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/coc-accounts/${id}/stats` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateCocAccountStatsOptions, UpdateCocAccountStatsResponses } from "../models/UpdateCocAccountStats.ts";
 
 /**
  * @description Manually edits the stat columns (clan, donations, clan games, capital gold, activity score) of a linked Clash of Clans account. Only the provided fields are written; the next Google Sheet sync overwrites them.
  * {@link /admin/coc-accounts/:id/stats}
  */
-export async function updateCocAccountStats(
-    id: UpdateCocAccountStatsPathParams["id"],
-    data: UpdateCocAccountStatsMutationRequest,
-    config: Partial<RequestConfig<UpdateCocAccountStatsMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateCocAccountStats<ThrowOnError extends boolean = false>(
+    options: Options<UpdateCocAccountStatsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateCocAccountStatsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateCocAccountStatsMutationResponse,
-        ResponseErrorConfig<UpdateCocAccountStats400 | UpdateCocAccountStats401 | UpdateCocAccountStats404 | UpdateCocAccountStats500>,
-        UpdateCocAccountStatsMutationRequest
-    >({ method: "PUT", url: getUpdateCocAccountStatsUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/coc-accounts/{id}/stats",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateCocAccountStatsResponses, ThrowOnError>>,
+    );
 }

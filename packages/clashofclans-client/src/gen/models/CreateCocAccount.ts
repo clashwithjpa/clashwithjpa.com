@@ -3,70 +3,22 @@
  * Do not edit manually.
  */
 
-/**
- * @description Linked COC account.
- */
-export type CreateCocAccount200 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         account: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
@@ -76,88 +28,60 @@ export type CreateCocAccount200 = {
     };
 };
 
-/**
- * @description Bad request.
- */
-export type CreateCocAccount400 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateCocAccount401 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Member not found.
- */
-export type CreateCocAccount404 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Account already linked.
- */
-export type CreateCocAccount409 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateCocAccount500 = {
-    /**
-     * @type boolean
-     */
+export type CreateCocAccountStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type CreateCocAccountMutationRequest = {
+export type CreateCocAccountBody = {
     /**
      * @minLength 1
      * @type string
      */
     userId: string;
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -178,10 +102,23 @@ export type CreateCocAccountMutationRequest = {
     isExternal?: boolean;
 };
 
-export type CreateCocAccountMutationResponse = CreateCocAccount200;
-
-export type CreateCocAccountMutation = {
-    Response: CreateCocAccount200;
-    Request: CreateCocAccountMutationRequest;
-    Errors: CreateCocAccount400 | CreateCocAccount401 | CreateCocAccount404 | CreateCocAccount409 | CreateCocAccount500;
+export type CreateCocAccountOptions = {
+    body: CreateCocAccountBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateCocAccountResponses = {
+    "200": CreateCocAccountStatus200;
+    "400": CreateCocAccountStatus400;
+    "401": CreateCocAccountStatus401;
+    "404": CreateCocAccountStatus404;
+    "409": CreateCocAccountStatus409;
+    "500": CreateCocAccountStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateCocAccountResponse = CreateCocAccountStatus200;

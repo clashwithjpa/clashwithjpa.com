@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SyncCocAccountWarWeights400,
-    SyncCocAccountWarWeights401,
-    SyncCocAccountWarWeights500,
-    SyncCocAccountWarWeightsMutationRequest,
-    SyncCocAccountWarWeightsMutationResponse,
-} from "../models/SyncCocAccountWarWeights.ts";
-
-function getSyncCocAccountWarWeightsUrl() {
-    const res = { method: "POST", url: `/admin/coc-accounts/sync-war-weights` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SyncCocAccountWarWeightsOptions, SyncCocAccountWarWeightsResponses } from "../models/SyncCocAccountWarWeights.ts";
 
 /**
  * @description Bulk-updates war weights from FWA stats. With no body the server fetches every JPA clan's members from fwastats.com; clans it can't reach are returned in failedClans so staff can paste their Members.json into the `members` field. Rows are matched to accounts by tag; 0/unknown weights are skipped.
  * {@link /admin/coc-accounts/sync-war-weights}
  */
-export async function syncCocAccountWarWeights(
-    data: SyncCocAccountWarWeightsMutationRequest,
-    config: Partial<RequestConfig<SyncCocAccountWarWeightsMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function syncCocAccountWarWeights<ThrowOnError extends boolean = false>(
+    options: Options<SyncCocAccountWarWeightsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SyncCocAccountWarWeightsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        SyncCocAccountWarWeightsMutationResponse,
-        ResponseErrorConfig<SyncCocAccountWarWeights400 | SyncCocAccountWarWeights401 | SyncCocAccountWarWeights500>,
-        SyncCocAccountWarWeightsMutationRequest
-    >({ method: "POST", url: getSyncCocAccountWarWeightsUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/coc-accounts/sync-war-weights",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SyncCocAccountWarWeightsResponses, ThrowOnError>>,
+    );
 }

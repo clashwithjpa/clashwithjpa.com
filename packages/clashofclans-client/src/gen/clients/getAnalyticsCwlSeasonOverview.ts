@@ -3,34 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsCwlSeasonOverview401,
-    GetAnalyticsCwlSeasonOverview500,
-    GetAnalyticsCwlSeasonOverviewQueryParams,
-    GetAnalyticsCwlSeasonOverviewQueryResponse,
-} from "../models/GetAnalyticsCwlSeasonOverview.ts";
-
-function getGetAnalyticsCwlSeasonOverviewUrl() {
-    const res = { method: "GET", url: `/analytics/cwl-season-overview` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsCwlSeasonOverviewOptions, GetAnalyticsCwlSeasonOverviewResponses } from "../models/GetAnalyticsCwlSeasonOverview.ts";
 
 /**
  * @description A CWL season's application totals, per-clan placement and town hall spread. Defaults to the current season.
  * {@link /analytics/cwl-season-overview}
  */
-export async function getAnalyticsCwlSeasonOverview(
-    params?: GetAnalyticsCwlSeasonOverviewQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsCwlSeasonOverview<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsCwlSeasonOverviewOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsCwlSeasonOverviewResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsCwlSeasonOverviewQueryResponse,
-        ResponseErrorConfig<GetAnalyticsCwlSeasonOverview401 | GetAnalyticsCwlSeasonOverview500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsCwlSeasonOverviewUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/cwl-season-overview",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsCwlSeasonOverviewResponses, ThrowOnError>>,
+    );
 }

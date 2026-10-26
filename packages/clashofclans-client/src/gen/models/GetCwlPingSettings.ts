@@ -3,73 +3,51 @@
  * Do not edit manually.
  */
 
-/**
- * @description Settings.
- */
-export type GetCwlPingSettings200 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingSettingsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         settings: {
-            /**
-             * @type boolean
-             */
             enabled: boolean;
-            /**
-             * @type string,null
-             */
             channelId: string | null;
-            /**
-             * @type number
-             */
             intervalMinutes: number;
             lastRunAt: string | null;
-            /**
-             * @type string,null
-             */
             lastRunSummary: string | null;
         } | null;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetCwlPingSettings401 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingSettingsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetCwlPingSettings500 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingSettingsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCwlPingSettingsQueryResponse = GetCwlPingSettings200;
-
-export type GetCwlPingSettingsQuery = {
-    Response: GetCwlPingSettings200;
-    Errors: GetCwlPingSettings401 | GetCwlPingSettings500;
+export type GetCwlPingSettingsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCwlPingSettingsResponses = {
+    "200": GetCwlPingSettingsStatus200;
+    "401": GetCwlPingSettingsStatus401;
+    "500": GetCwlPingSettingsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCwlPingSettingsResponse = GetCwlPingSettingsStatus200;

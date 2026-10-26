@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    ApplyUserAccount400,
-    ApplyUserAccount401,
-    ApplyUserAccount403,
-    ApplyUserAccount409,
-    ApplyUserAccount500,
-    ApplyUserAccountMutationRequest,
-    ApplyUserAccountMutationResponse,
-} from "../models/ApplyUserAccount.ts";
-
-function getApplyUserAccountUrl() {
-    const res = { method: "POST", url: `/user/accounts/apply` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { ApplyUserAccountOptions, ApplyUserAccountResponses } from "../models/ApplyUserAccount.ts";
 
 /**
  * @description Submits a clan application for a Clash of Clans account after verifying ownership.
  * {@link /user/accounts/apply}
  */
-export async function applyUserAccount(
-    data: ApplyUserAccountMutationRequest,
-    config: Partial<RequestConfig<ApplyUserAccountMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function applyUserAccount<ThrowOnError extends boolean = false>(
+    options: Options<ApplyUserAccountOptions, ThrowOnError>,
+): Unwrappable<RequestResult<ApplyUserAccountResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        ApplyUserAccountMutationResponse,
-        ResponseErrorConfig<ApplyUserAccount400 | ApplyUserAccount401 | ApplyUserAccount403 | ApplyUserAccount409 | ApplyUserAccount500>,
-        ApplyUserAccountMutationRequest
-    >({ method: "POST", url: getApplyUserAccountUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/user/accounts/apply",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<ApplyUserAccountResponses, ThrowOnError>>,
+    );
 }

@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetJoinApplications401,
-    GetJoinApplications500,
-    GetJoinApplicationsQueryParams,
-    GetJoinApplicationsQueryResponse,
-} from "../models/GetJoinApplications.ts";
-
-function getGetJoinApplicationsUrl() {
-    const res = { method: "GET", url: `/admin/join-applications` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetJoinApplicationsOptions, GetJoinApplicationsResponses } from "../models/GetJoinApplications.ts";
 
 /**
  * @description Lists clan join applications with optional status filter and pagination.
  * {@link /admin/join-applications}
  */
-export async function getJoinApplications(params?: GetJoinApplicationsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getJoinApplications<ThrowOnError extends boolean = false>(
+    options: Options<GetJoinApplicationsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetJoinApplicationsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetJoinApplicationsQueryResponse, ResponseErrorConfig<GetJoinApplications401 | GetJoinApplications500>, unknown>({
-        method: "GET",
-        url: getGetJoinApplicationsUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/join-applications",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetJoinApplicationsResponses, ThrowOnError>>,
+    );
 }

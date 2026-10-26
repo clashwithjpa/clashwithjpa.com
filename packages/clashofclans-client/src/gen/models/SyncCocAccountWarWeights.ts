@@ -3,114 +3,82 @@
  * Do not edit manually.
  */
 
-/**
- * @description Sync result.
- */
-export type SyncCocAccountWarWeights200 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountWarWeightsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         updated: number;
-        /**
-         * @type array
-         */
         notInFwa: {
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             ownerName: string | null;
         }[];
-        /**
-         * @type array
-         */
         failedClans: {
-            /**
-             * @type string
-             */
             tag: string;
             name: string | null;
         }[];
     };
 };
 
-/**
- * @description No JPA clans configured.
- */
-export type SyncCocAccountWarWeights400 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountWarWeightsStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SyncCocAccountWarWeights401 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountWarWeightsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SyncCocAccountWarWeights500 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountWarWeightsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SyncCocAccountWarWeightsMutationRequest = {
-    /**
-     * @type array | undefined
-     */
-    members?: {
-        /**
-         * @minLength 1
-         * @maxLength 20
-         * @type string
-         */
-        tag: string;
-        /**
-         * @minLength 0
-         * @maxLength 9007199254740991
-         * @type integer
-         */
-        weight: number;
-    }[];
+export type SyncCocAccountWarWeightsBody =
+    | {
+          members?: {
+              /**
+               * @minLength 1
+               * @maxLength 20
+               * @type string
+               */
+              tag: string;
+              /**
+               * @minLength 0
+               * @maxLength 9007199254740991
+               * @type integer
+               */
+              weight: number;
+          }[];
+      }
+    | undefined;
+
+export type SyncCocAccountWarWeightsOptions = {
+    body: SyncCocAccountWarWeightsBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
 
-export type SyncCocAccountWarWeightsMutationResponse = SyncCocAccountWarWeights200;
-
-export type SyncCocAccountWarWeightsMutation = {
-    Response: SyncCocAccountWarWeights200;
-    Request: SyncCocAccountWarWeightsMutationRequest;
-    Errors: SyncCocAccountWarWeights400 | SyncCocAccountWarWeights401 | SyncCocAccountWarWeights500;
+export type SyncCocAccountWarWeightsResponses = {
+    "200": SyncCocAccountWarWeightsStatus200;
+    "400": SyncCocAccountWarWeightsStatus400;
+    "401": SyncCocAccountWarWeightsStatus401;
+    "500": SyncCocAccountWarWeightsStatus500;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type SyncCocAccountWarWeightsResponse = SyncCocAccountWarWeightsStatus200;

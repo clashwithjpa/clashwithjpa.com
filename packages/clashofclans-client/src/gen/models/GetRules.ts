@@ -3,40 +3,35 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the rules content.
- */
-export type GetRules200 = {
-    /**
-     * @type boolean
-     */
+export type GetRulesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         rules: string | null;
     };
 };
 
-/**
- * @description Server error response when fetching rules fails.
- */
-export type GetRules500 = {
-    /**
-     * @type boolean
-     */
+export type GetRulesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetRulesQueryResponse = GetRules200;
-
-export type GetRulesQuery = {
-    Response: GetRules200;
-    Errors: GetRules500;
+export type GetRulesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetRulesResponses = {
+    "200": GetRulesStatus200;
+    "500": GetRulesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetRulesResponse = GetRulesStatus200;

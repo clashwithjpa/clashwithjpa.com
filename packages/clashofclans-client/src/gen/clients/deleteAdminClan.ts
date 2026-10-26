@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteAdminClan401,
-    DeleteAdminClan404,
-    DeleteAdminClan500,
-    DeleteAdminClanMutationResponse,
-    DeleteAdminClanPathParams,
-} from "../models/DeleteAdminClan.ts";
-
-function getDeleteAdminClanUrl(id: DeleteAdminClanPathParams["id"]) {
-    const res = { method: "DELETE", url: `/admin/clans/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteAdminClanOptions, DeleteAdminClanResponses } from "../models/DeleteAdminClan.ts";
 
 /**
  * @description Deletes a JPA clan.
  * {@link /admin/clans/:id}
  */
-export async function deleteAdminClan(id: DeleteAdminClanPathParams["id"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteAdminClan<ThrowOnError extends boolean = false>(
+    options: Options<DeleteAdminClanOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteAdminClanResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        DeleteAdminClanMutationResponse,
-        ResponseErrorConfig<DeleteAdminClan401 | DeleteAdminClan404 | DeleteAdminClan500>,
-        unknown
-    >({ method: "DELETE", url: getDeleteAdminClanUrl(id).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/clans/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteAdminClanResponses, ThrowOnError>>,
+    );
 }

@@ -15,7 +15,6 @@
     import { jobs } from "#lib/jobs.svelte.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { beforeNavigate, goto } from "$app/navigation";
     import {
         createCwlSeason,
@@ -31,10 +30,10 @@
         testCwlPing,
         updateAdminSettings,
         updateCwlPingSettings,
-        type GetAdminSettings200,
-        type GetCwlPingSettings200,
-        type GetCwlSeasons200,
-        type PreviewCwlPing200,
+        type GetAdminSettingsStatus200,
+        type GetCwlPingSettingsStatus200,
+        type GetCwlSeasonsStatus200,
+        type PreviewCwlPingStatus200,
     } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
@@ -59,10 +58,10 @@
 
     let { data }: PageProps = $props();
 
-    type Settings = GetAdminSettings200["data"]["settings"];
-    type CwlPingSettings = GetCwlPingSettings200["data"]["settings"];
-    type CwlPingPreview = PreviewCwlPing200["data"];
-    type Season = GetCwlSeasons200["data"]["seasons"][number];
+    type Settings = GetAdminSettingsStatus200["data"]["settings"];
+    type CwlPingSettings = GetCwlPingSettingsStatus200["data"]["settings"];
+    type CwlPingPreview = PreviewCwlPingStatus200["data"];
+    type Season = GetCwlSeasonsStatus200["data"]["seasons"][number];
 
     let settings = $state<Settings>(null);
     let cwlPingSettings = $state<CwlPingSettings>(null);
@@ -123,8 +122,8 @@
 
     async function loadSeasons() {
         try {
-            const resp = await getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) seasons = resp.data.seasons;
+            const resp = await getCwlSeasons({});
+            if (resp.data) seasons = resp.data.data.seasons;
         } catch {
             // season list stays as-is on failure
         }
@@ -133,9 +132,9 @@
     async function loadCwlPingSettings() {
         if (!data.isSuperadmin) return;
         try {
-            const resp = await getCwlPingSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                cwlPingSettings = resp.data.settings;
+            const resp = await getCwlPingSettings({});
+            if (resp.data) {
+                cwlPingSettings = resp.data.data.settings;
                 syncFromCwlPingSettings();
             }
         } catch {
@@ -146,10 +145,10 @@
     async function loadCwlPingChannels() {
         if (!data.isSuperadmin) return;
         try {
-            const resp = await getCwlPingChannels({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                pingGuildId = resp.data.guildId;
-                pingChannelOptions = resp.data.channels.map((ch) => ({
+            const resp = await getCwlPingChannels({});
+            if (resp.data) {
+                pingGuildId = resp.data.data.guildId;
+                pingChannelOptions = resp.data.data.channels.map((ch) => ({
                     label: ch.name,
                     value: ch.id,
                     icon: ch.announcement ? TablerSpeakerphone : TablerHash,
@@ -167,14 +166,9 @@
     async function load() {
         loading = true;
         try {
-            const [resp] = await Promise.all([
-                getAdminSettings({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-                loadSeasons(),
-                loadCwlPingSettings(),
-                loadCwlPingChannels(),
-            ]);
-            if (resp.success) {
-                settings = resp.data.settings;
+            const [resp] = await Promise.all([getAdminSettings({}), loadSeasons(), loadCwlPingSettings(), loadCwlPingChannels()]);
+            if (resp.data) {
+                settings = resp.data.data.settings;
                 syncFromSettings();
             } else {
                 toast.error("Failed to load settings");
@@ -208,11 +202,8 @@
         const name = nextAvailableName(base);
         creatingSeason = true;
         try {
-            const resp = await createCwlSeason(
-                { name, month: newMonth, year },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await createCwlSeason({ body: { name, month: newMonth, year } });
+            if (resp.data) {
                 toast.success(`Season "${name}" created`);
                 newName = "";
                 await loadSeasons();
@@ -238,12 +229,8 @@
         if (!name) return;
         renamingSeason = true;
         try {
-            const resp = await renameCwlSeason(
-                editingSeasonId,
-                { name },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await renameCwlSeason({ path: { id: editingSeasonId }, body: { name } });
+            if (resp.data) {
                 toast.success(`Season renamed to "${name}"`);
                 editDialogOpen = false;
                 await loadSeasons();
@@ -260,8 +247,8 @@
     async function deleteSeason(id: number) {
         deletingSeasonId = id;
         try {
-            const resp = await deleteCwlSeason(id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
+            const resp = await deleteCwlSeason({ path: { id } });
+            if (resp.data) {
                 toast.success("Season deleted");
                 await load();
             } else {
@@ -277,45 +264,42 @@
     async function save() {
         saving = true;
         try {
-            const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const, headers: { "Content-Type": "application/json" } };
             const [resp, cwlPingResp] = await Promise.all([
-                updateAdminSettings(
-                    {
+                updateAdminSettings({
+                    body: {
                         applicationsEnabled,
                         cwlEnabled,
                         siteMaintenanceMode,
                         guildId: guildId.trim() ? guildId.trim() : null,
                         currentCwlSeasonId: currentSeasonValue ? Number(currentSeasonValue) : null,
                     },
-                    opts,
-                ),
+                }),
                 data.isSuperadmin
-                    ? updateCwlPingSettings(
-                          {
+                    ? updateCwlPingSettings({
+                          body: {
                               enabled: cwlPingEnabled,
                               channelId: cwlPingChannelId || null,
                               intervalMinutes: Number(cwlPingIntervalMinutes) || 5,
                           },
-                          opts,
-                      )
+                      })
                     : null,
             ]);
 
-            if (resp.success) {
-                settings = resp.data.settings;
+            if (resp.data) {
+                settings = resp.data.data.settings;
                 syncFromSettings();
             } else {
                 toast.error("Failed to update settings");
             }
             if (cwlPingResp) {
-                if (cwlPingResp.success) {
-                    cwlPingSettings = cwlPingResp.data.settings;
+                if (cwlPingResp.data) {
+                    cwlPingSettings = cwlPingResp.data.data.settings;
                     syncFromCwlPingSettings();
                 } else {
                     toast.error(apiErrorMessage(cwlPingResp, "Failed to update CWL ping settings"));
                 }
             }
-            if (resp.success && (!cwlPingResp || cwlPingResp.success)) toast.success("Settings updated");
+            if (resp.data && (!cwlPingResp || cwlPingResp.data)) toast.success("Settings updated");
         } catch (e) {
             toast.error("Failed to update settings", { description: errorMessage(e) });
         } finally {
@@ -326,8 +310,8 @@
     function refreshUsernames() {
         jobs.start("discord:usernames", "Refreshing usernames", async () => {
             try {
-                const resp = await refreshDiscordUsernames({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (resp.success) toast.success(`Updated ${resp.data.updated} of ${resp.data.matched} guild members`);
+                const resp = await refreshDiscordUsernames({});
+                if (resp.data) toast.success(`Updated ${resp.data.data.updated} of ${resp.data.data.matched} guild members`);
                 else toast.error("Failed to refresh usernames");
             } catch (e) {
                 toast.error("Failed to refresh usernames", { description: errorMessage(e) });
@@ -339,11 +323,8 @@
         const channelId = cwlPingChannelId || undefined;
         jobs.start("cwl-ping:test", "Sending test ping", async () => {
             try {
-                const resp = await testCwlPing(
-                    { channelId },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                );
-                if (resp.success) toast.success("Test ping sent, check the channel.");
+                const resp = await testCwlPing({ body: { channelId } });
+                if (resp.data) toast.success("Test ping sent, check the channel.");
                 else toast.error(apiErrorMessage(resp, "Failed to send test ping"));
             } catch (e) {
                 toast.error("Failed to send test ping", { description: errorMessage(e) });
@@ -358,8 +339,8 @@
     function previewPing() {
         jobs.start("cwl-ping:preview", "Checking who'd be pinged", async () => {
             try {
-                const resp = await previewCwlPing({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (resp.success) return resp.data;
+                const resp = await previewCwlPing({});
+                if (resp.data) return resp.data;
                 toast.error("Failed to preview CWL ping");
             } catch (e) {
                 toast.error("Failed to preview CWL ping", { description: errorMessage(e) });
@@ -376,12 +357,12 @@
     function runPingNow() {
         jobs.start("cwl-ping:run", "Running CWL ping", async () => {
             try {
-                const resp = await runCwlPingNow({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (!resp.success) {
+                const resp = await runCwlPingNow({});
+                if (!resp.data) {
                     toast.error("Failed to run CWL ping");
                     return false;
                 }
-                const { usersPinged, clansPinged, skippedReason } = resp.data;
+                const { usersPinged, clansPinged, skippedReason } = resp.data.data;
                 toast.success(skippedReason ?? `Pinged ${usersPinged} user(s) across ${clansPinged} clan(s).`);
                 return true;
             } catch (e) {

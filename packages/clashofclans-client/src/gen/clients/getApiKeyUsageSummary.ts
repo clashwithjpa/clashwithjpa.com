@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetApiKeyUsageSummary401,
-    GetApiKeyUsageSummary404,
-    GetApiKeyUsageSummary500,
-    GetApiKeyUsageSummaryQueryParams,
-    GetApiKeyUsageSummaryQueryResponse,
-} from "../models/GetApiKeyUsageSummary.ts";
-
-function getGetApiKeyUsageSummaryUrl() {
-    const res = { method: "GET", url: `/api-keys/usage/summary` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetApiKeyUsageSummaryOptions, GetApiKeyUsageSummaryResponses } from "../models/GetApiKeyUsageSummary.ts";
 
 /**
  * @description Traffic totals, error rate, latency percentiles and remaining quota for one of your own API keys.
  * {@link /api-keys/usage/summary}
  */
-export async function getApiKeyUsageSummary(params: GetApiKeyUsageSummaryQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getApiKeyUsageSummary<ThrowOnError extends boolean = false>(
+    options: Options<GetApiKeyUsageSummaryOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetApiKeyUsageSummaryResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetApiKeyUsageSummaryQueryResponse,
-        ResponseErrorConfig<GetApiKeyUsageSummary401 | GetApiKeyUsageSummary404 | GetApiKeyUsageSummary500>,
-        unknown
-    >({ method: "GET", url: getGetApiKeyUsageSummaryUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/api-keys/usage/summary",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetApiKeyUsageSummaryResponses, ThrowOnError>>,
+    );
 }

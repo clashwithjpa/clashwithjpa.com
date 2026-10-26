@@ -5,27 +5,22 @@
 
 import * as z from "zod";
 
-export const getCOCClanCurrentWarPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCClanCurrentWarPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the clan\'s current war data.
- */
-export const getCOCClanCurrentWar200Schema = z.object({
+export const getCOCClanCurrentWarStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        currentWar: z.object({
+    data: z.strictObject({
+        currentWar: z.strictObject({
             state: z.enum(["notInWar", "preparation", "inWar", "warEnded"]),
             teamSize: z.number(),
             startTime: z.string(),
             preparationStartTime: z.string(),
-            battleModifier: z.optional(z.enum(["none", "hardMode"])),
+            battleModifier: z.enum(["none", "hardMode"]).optional(),
             endTime: z.string(),
-            clan: z.object({
+            clan: z.strictObject({
                 tag: z.string(),
                 name: z.string(),
-                badgeUrls: z.object({
+                badgeUrls: z.strictObject({
                     small: z.string(),
                     large: z.string(),
                     medium: z.string(),
@@ -35,25 +30,25 @@ export const getCOCClanCurrentWar200Schema = z.object({
                 stars: z.number(),
                 destructionPercentage: z.number(),
                 members: z.array(
-                    z.object({
+                    z.strictObject({
                         tag: z.string(),
                         name: z.string(),
                         mapPosition: z.number(),
                         townhallLevel: z.number(),
                         opponentAttacks: z.number(),
-                        bestOpponentAttack: z.optional(
-                            z.object({
+                        bestOpponentAttack: z
+                            .strictObject({
                                 order: z.number(),
                                 attackerTag: z.string(),
                                 defenderTag: z.string(),
                                 stars: z.number(),
                                 duration: z.number(),
                                 destructionPercentage: z.number(),
-                            }),
-                        ),
-                        attacks: z.optional(
-                            z.array(
-                                z.object({
+                            })
+                            .optional(),
+                        attacks: z
+                            .array(
+                                z.strictObject({
                                     order: z.number(),
                                     attackerTag: z.string(),
                                     defenderTag: z.string(),
@@ -61,15 +56,15 @@ export const getCOCClanCurrentWar200Schema = z.object({
                                     duration: z.number(),
                                     destructionPercentage: z.number(),
                                 }),
-                            ),
-                        ),
+                            )
+                            .optional(),
                     }),
                 ),
             }),
-            opponent: z.object({
+            opponent: z.strictObject({
                 tag: z.string(),
                 name: z.string(),
-                badgeUrls: z.object({
+                badgeUrls: z.strictObject({
                     small: z.string(),
                     large: z.string(),
                     medium: z.string(),
@@ -79,25 +74,25 @@ export const getCOCClanCurrentWar200Schema = z.object({
                 stars: z.number(),
                 destructionPercentage: z.number(),
                 members: z.array(
-                    z.object({
+                    z.strictObject({
                         tag: z.string(),
                         name: z.string(),
                         mapPosition: z.number(),
                         townhallLevel: z.number(),
                         opponentAttacks: z.number(),
-                        bestOpponentAttack: z.optional(
-                            z.object({
+                        bestOpponentAttack: z
+                            .strictObject({
                                 order: z.number(),
                                 attackerTag: z.string(),
                                 defenderTag: z.string(),
                                 stars: z.number(),
                                 duration: z.number(),
                                 destructionPercentage: z.number(),
-                            }),
-                        ),
-                        attacks: z.optional(
-                            z.array(
-                                z.object({
+                            })
+                            .optional(),
+                        attacks: z
+                            .array(
+                                z.strictObject({
                                     order: z.number(),
                                     attackerTag: z.string(),
                                     defenderTag: z.string(),
@@ -105,22 +100,31 @@ export const getCOCClanCurrentWar200Schema = z.object({
                                     duration: z.number(),
                                     destructionPercentage: z.number(),
                                 }),
-                            ),
-                        ),
+                            )
+                            .optional(),
                     }),
                 ),
             }),
-            attacksPerMember: z.optional(z.number()),
+            attacksPerMember: z.number().optional(),
         }),
     }),
 });
 
-/**
- * @description Server error response when fetching current war data fails.
- */
-export const getCOCClanCurrentWar500Schema = z.object({
+export const getCOCClanCurrentWarStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCClanCurrentWarQueryResponseSchema = z.lazy(() => getCOCClanCurrentWar200Schema);
+export const getCOCClanCurrentWarStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCClanCurrentWarResponseSchema = getCOCClanCurrentWarStatus200Schema;
+
+export const getCOCClanCurrentWarErrorSchema = z.union([getCOCClanCurrentWarStatus400Schema, getCOCClanCurrentWarStatus500Schema]);
+
+export const getCOCClanCurrentWarPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

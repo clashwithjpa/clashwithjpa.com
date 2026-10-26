@@ -5,38 +5,33 @@
 
 import * as z from "zod";
 
-export const getCOCClanPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCClanPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the clan\'s data.
- */
-export const getCOCClan200Schema = z.object({
+export const getCOCClanStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clan: z.object({
+    data: z.strictObject({
+        clan: z.strictObject({
             tag: z.string(),
             name: z.string(),
             type: z.enum(["open", "inviteOnly", "closed"]),
             description: z.string(),
-            location: z.optional(
-                z.object({
-                    localizedName: z.optional(z.string()),
+            location: z
+                .strictObject({
+                    localizedName: z.string().optional(),
                     id: z.number(),
                     name: z.string(),
                     isCountry: z.boolean(),
-                    countryCode: z.optional(z.string()),
-                }),
-            ),
-            chatLanguage: z.optional(
-                z.object({
+                    countryCode: z.string().optional(),
+                })
+                .optional(),
+            chatLanguage: z
+                .strictObject({
                     name: z.string(),
                     id: z.number(),
                     languageCode: z.string(),
-                }),
-            ),
-            badgeUrls: z.object({
+                })
+                .optional(),
+            badgeUrls: z.strictObject({
                 small: z.string(),
                 large: z.string(),
                 medium: z.string(),
@@ -45,103 +40,112 @@ export const getCOCClan200Schema = z.object({
             clanPoints: z.number(),
             clanBuilderBasePoints: z.number(),
             requiredTrophies: z.number(),
-            requiredTownhallLevel: z.optional(z.number()),
-            requiredBuilderBaseTrophies: z.optional(z.number()),
-            warFrequency: z.optional(z.enum(["always", "moreThanOncePerWeek", "oncePerWeek", "lessThanOncePerWeek", "never", "unknown"])),
+            requiredTownhallLevel: z.number().optional(),
+            requiredBuilderBaseTrophies: z.number().optional(),
+            warFrequency: z.enum(["always", "moreThanOncePerWeek", "oncePerWeek", "lessThanOncePerWeek", "never", "unknown"]).optional(),
             warWinStreak: z.number(),
             warWins: z.number(),
-            warTies: z.optional(z.number()),
-            warLosses: z.optional(z.number()),
+            warTies: z.number().optional(),
+            warLosses: z.number().optional(),
             isWarLogPublic: z.boolean(),
-            warLeague: z.optional(
-                z.object({
+            warLeague: z
+                .strictObject({
                     id: z.number(),
                     name: z.string(),
-                }),
-            ),
+                })
+                .optional(),
             members: z.number(),
             labels: z.array(
-                z.object({
+                z.strictObject({
                     id: z.number(),
                     name: z.string(),
-                    iconUrls: z.object({
+                    iconUrls: z.strictObject({
                         small: z.string(),
-                        tiny: z.optional(z.string()),
-                        medium: z.optional(z.string()),
+                        tiny: z.string().optional(),
+                        medium: z.string().optional(),
                     }),
                 }),
             ),
             memberList: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     tag: z.string(),
                     role: z.enum(["member", "admin", "coLeader", "leader"]),
                     expLevel: z.number(),
                     townHallLevel: z.number(),
-                    leagueTier: z.optional(
-                        z.object({
+                    leagueTier: z
+                        .strictObject({
                             id: z.number(),
                             name: z.string(),
-                            iconUrls: z.object({
+                            iconUrls: z.strictObject({
                                 small: z.string(),
                                 large: z.string(),
                             }),
-                        }),
-                    ),
-                    builderBaseLeague: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    builderBaseLeague: z
+                        .strictObject({
                             id: z.number(),
                             name: z.string(),
-                        }),
-                    ),
+                        })
+                        .optional(),
                     trophies: z.number(),
-                    builderBaseTrophies: z.optional(z.number()),
+                    builderBaseTrophies: z.number().optional(),
                     clanRank: z.number(),
                     previousClanRank: z.number(),
                     donations: z.number(),
                     donationsReceived: z.number(),
-                    playerHouse: z.optional(
-                        z.object({
+                    playerHouse: z
+                        .strictObject({
                             elements: z.array(
-                                z.object({
+                                z.strictObject({
                                     type: z.string(),
                                     id: z.number(),
                                 }),
                             ),
-                        }),
-                    ),
+                        })
+                        .optional(),
                 }),
             ),
-            clanCapital: z.object({
-                capitalHallLevel: z.optional(z.number()),
-                districts: z.optional(
-                    z.array(
-                        z.object({
+            clanCapital: z.strictObject({
+                capitalHallLevel: z.number().optional(),
+                districts: z
+                    .array(
+                        z.strictObject({
                             id: z.number(),
                             name: z.string(),
                             districtHallLevel: z.number(),
                         }),
-                    ),
-                ),
+                    )
+                    .optional(),
             }),
             isFamilyFriendly: z.boolean(),
             clanCapitalPoints: z.number(),
-            capitalLeague: z.optional(
-                z.object({
+            capitalLeague: z
+                .strictObject({
                     id: z.number(),
                     name: z.string(),
-                }),
-            ),
+                })
+                .optional(),
         }),
     }),
 });
 
-/**
- * @description Server error response when fetching clan data fails.
- */
-export const getCOCClan500Schema = z.object({
+export const getCOCClanStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCClanQueryResponseSchema = z.lazy(() => getCOCClan200Schema);
+export const getCOCClanStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCClanResponseSchema = getCOCClanStatus200Schema;
+
+export const getCOCClanErrorSchema = z.union([getCOCClanStatus400Schema, getCOCClanStatus500Schema]);
+
+export const getCOCClanPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

@@ -5,39 +5,42 @@
 
 import * as z from "zod";
 
-export const getAnalyticsCwlAssignmentQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().max(9007199254740991).gt(0)),
-    })
-    .optional();
+export const getAnalyticsCwlAssignmentQuerySeasonIdSchema = z.int().max(9007199254740991).gt(0).optional();
 
-/**
- * @description CWL assignment.
- */
-export const getAnalyticsCwlAssignment200Schema = z.object({
+export const getAnalyticsCwlAssignmentStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         assigned: z.number(),
         unassigned: z.number(),
-        seasonId: z.union([z.number(), z.null()]),
-        seasonName: z.union([z.string(), z.null()]),
+        seasonId: z.number().nullable(),
+        seasonName: z.string().nullable(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsCwlAssignment401Schema = z.object({
+export const getAnalyticsCwlAssignmentStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsCwlAssignment500Schema = z.object({
+export const getAnalyticsCwlAssignmentStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsCwlAssignmentQueryResponseSchema = z.lazy(() => getAnalyticsCwlAssignment200Schema);
+export const getAnalyticsCwlAssignmentStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsCwlAssignmentResponseSchema = getAnalyticsCwlAssignmentStatus200Schema;
+
+export const getAnalyticsCwlAssignmentErrorSchema = z.union([
+    getAnalyticsCwlAssignmentStatus400Schema,
+    getAnalyticsCwlAssignmentStatus401Schema,
+    getAnalyticsCwlAssignmentStatus500Schema,
+]);
+
+export const getAnalyticsCwlAssignmentQuerySchema = z.object({
+    seasonId: z.int().max(9007199254740991).gt(0).optional(),
+});

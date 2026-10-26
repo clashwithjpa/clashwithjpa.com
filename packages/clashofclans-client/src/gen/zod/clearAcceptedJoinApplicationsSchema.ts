@@ -5,30 +5,26 @@
 
 import * as z from "zod";
 
-/**
- * @description Number of deleted applications.
- */
-export const clearAcceptedJoinApplications200Schema = z.object({
+export const clearAcceptedJoinApplicationsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         deleted: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const clearAcceptedJoinApplications401Schema = z.object({
+export const clearAcceptedJoinApplicationsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const clearAcceptedJoinApplications500Schema = z.object({
+export const clearAcceptedJoinApplicationsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const clearAcceptedJoinApplicationsMutationResponseSchema = z.lazy(() => clearAcceptedJoinApplications200Schema);
+export const clearAcceptedJoinApplicationsResponseSchema = clearAcceptedJoinApplicationsStatus200Schema;
+
+export const clearAcceptedJoinApplicationsErrorSchema = z.union([
+    clearAcceptedJoinApplicationsStatus401Schema,
+    clearAcceptedJoinApplicationsStatus500Schema,
+]);

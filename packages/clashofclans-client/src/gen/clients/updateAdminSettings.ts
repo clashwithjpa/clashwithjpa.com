@@ -3,36 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateAdminSettings401,
-    UpdateAdminSettings500,
-    UpdateAdminSettingsMutationRequest,
-    UpdateAdminSettingsMutationResponse,
-} from "../models/UpdateAdminSettings.ts";
-
-function getUpdateAdminSettingsUrl() {
-    const res = { method: "PUT", url: `/admin/settings` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateAdminSettingsOptions, UpdateAdminSettingsResponses } from "../models/UpdateAdminSettings.ts";
 
 /**
  * @description Updates site settings.
  * {@link /admin/settings}
  */
-export async function updateAdminSettings(
-    data: UpdateAdminSettingsMutationRequest,
-    config: Partial<RequestConfig<UpdateAdminSettingsMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateAdminSettings<ThrowOnError extends boolean = false>(
+    options: Options<UpdateAdminSettingsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateAdminSettingsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateAdminSettingsMutationResponse,
-        ResponseErrorConfig<UpdateAdminSettings401 | UpdateAdminSettings500>,
-        UpdateAdminSettingsMutationRequest
-    >({ method: "PUT", url: getUpdateAdminSettingsUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/settings",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateAdminSettingsResponses, ThrowOnError>>,
+    );
 }

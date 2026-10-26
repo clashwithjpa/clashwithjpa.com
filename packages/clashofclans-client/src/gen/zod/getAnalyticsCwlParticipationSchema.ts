@@ -5,39 +5,42 @@
 
 import * as z from "zod";
 
-export const getAnalyticsCwlParticipationQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().max(9007199254740991).gt(0)),
-    })
-    .optional();
+export const getAnalyticsCwlParticipationQuerySeasonIdSchema = z.int().max(9007199254740991).gt(0).optional();
 
-/**
- * @description CWL participation.
- */
-export const getAnalyticsCwlParticipation200Schema = z.object({
+export const getAnalyticsCwlParticipationStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         participated: z.number(),
         totalUsers: z.number(),
-        seasonId: z.union([z.number(), z.null()]),
-        seasonName: z.union([z.string(), z.null()]),
+        seasonId: z.number().nullable(),
+        seasonName: z.string().nullable(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsCwlParticipation401Schema = z.object({
+export const getAnalyticsCwlParticipationStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsCwlParticipation500Schema = z.object({
+export const getAnalyticsCwlParticipationStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsCwlParticipationQueryResponseSchema = z.lazy(() => getAnalyticsCwlParticipation200Schema);
+export const getAnalyticsCwlParticipationStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsCwlParticipationResponseSchema = getAnalyticsCwlParticipationStatus200Schema;
+
+export const getAnalyticsCwlParticipationErrorSchema = z.union([
+    getAnalyticsCwlParticipationStatus400Schema,
+    getAnalyticsCwlParticipationStatus401Schema,
+    getAnalyticsCwlParticipationStatus500Schema,
+]);
+
+export const getAnalyticsCwlParticipationQuerySchema = z.object({
+    seasonId: z.int().max(9007199254740991).gt(0).optional(),
+});

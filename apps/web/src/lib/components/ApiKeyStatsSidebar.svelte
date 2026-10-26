@@ -5,8 +5,16 @@
     import Tooltip from "#lib/components/ui/Tooltip.svelte";
     import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, STATUS_CLASS_COLORS, type ApiKeyRow } from "#lib/config/apiKeys.js";
     import { formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
-    import { getApiKeyUsageDaily, getApiKeyUsageEndpoints, getApiKeyUsageStatus, getApiKeyUsageSummary } from "@repo/clashofclans-client";
+    import {
+        getApiKeyUsageDaily,
+        getApiKeyUsageEndpoints,
+        getApiKeyUsageStatus,
+        getApiKeyUsageSummary,
+        type GetApiKeyUsageDailyStatus200,
+        type GetApiKeyUsageEndpointsStatus200,
+        type GetApiKeyUsageStatusStatus200,
+        type GetApiKeyUsageSummaryStatus200,
+    } from "@repo/clashofclans-client";
     import { curveMonotoneX } from "d3-shape";
     import { AreaChart, BarChart, PieChart } from "layerchart";
     import TablerChartBarPopular from "~icons/tabler/chart-bar-popular";
@@ -14,29 +22,15 @@
 
     let { apiKey }: { apiKey: ApiKeyRow } = $props();
 
-    type DailyPoint = { date: string; count: number };
-    type EndpointPoint = { method: string; path: string; count: number; avgDurationMs: number };
-    type StatusPoint = { statusClass: string; count: number };
-    type Summary = {
-        requests: number;
-        errors: number;
-        errorRate: number;
-        p50DurationMs: number;
-        p95DurationMs: number;
-        windowRequests: number;
-        rateLimitRemaining: number | null;
-        rateLimitResetAt: string | Date | null;
-        remaining: number | null;
-        rateLimitMax: number | null;
-        rateLimitTimeWindow: number | null;
-        lastRequest: string | Date | null;
-    };
+    type Summary = GetApiKeyUsageSummaryStatus200["data"];
+    type DailyPoint = GetApiKeyUsageDailyStatus200["data"]["data"][number];
+    type EndpointPoint = GetApiKeyUsageEndpointsStatus200["data"]["data"][number];
+    type StatusPoint = GetApiKeyUsageStatusStatus200["data"]["data"][number];
 
     const WINDOW_DAYS = 30;
     // Known before the stats arrive, so the skeleton can show charts or the "no requests" line up front.
     const hadRecentTraffic = $derived(apiKey.lastRequest != null && Date.now() - new Date(apiKey.lastRequest).getTime() < WINDOW_DAYS * 86_400_000);
     const ENDPOINT_LIMIT = 8;
-    const opts = { baseURL: PUBLIC_SERVER_URL, credentials: "include" as const };
 
     let summary = $state<Summary | null>(null);
     let daily = $state<DailyPoint[] | null>(null);
@@ -50,18 +44,18 @@
 
     async function load(keyId: string) {
         const [summaryResp, dailyResp, endpointsResp, statusResp] = await Promise.allSettled([
-            getApiKeyUsageSummary({ keyId, days: WINDOW_DAYS }, opts),
-            getApiKeyUsageDaily({ keyId, days: WINDOW_DAYS }, opts),
-            getApiKeyUsageEndpoints({ keyId, days: WINDOW_DAYS, limit: ENDPOINT_LIMIT }, opts),
-            getApiKeyUsageStatus({ keyId, days: WINDOW_DAYS }, opts),
+            getApiKeyUsageSummary({ query: { keyId, days: WINDOW_DAYS } }),
+            getApiKeyUsageDaily({ query: { keyId, days: WINDOW_DAYS } }),
+            getApiKeyUsageEndpoints({ query: { keyId, days: WINDOW_DAYS, limit: ENDPOINT_LIMIT } }),
+            getApiKeyUsageStatus({ query: { keyId, days: WINDOW_DAYS } }),
         ]);
 
         // Ignore a response that landed after the user moved to another key.
         if (apiKey.id !== keyId) return;
-        if (summaryResp.status === "fulfilled" && summaryResp.value.success) summary = summaryResp.value.data as Summary;
-        if (dailyResp.status === "fulfilled" && dailyResp.value.success) daily = dailyResp.value.data.data;
-        if (endpointsResp.status === "fulfilled" && endpointsResp.value.success) endpoints = endpointsResp.value.data.data;
-        if (statusResp.status === "fulfilled" && statusResp.value.success) statuses = statusResp.value.data.data;
+        if (summaryResp.status === "fulfilled" && summaryResp.value.data) summary = summaryResp.value.data.data;
+        if (dailyResp.status === "fulfilled" && dailyResp.value.data) daily = dailyResp.value.data.data.data;
+        if (endpointsResp.status === "fulfilled" && endpointsResp.value.data) endpoints = endpointsResp.value.data.data.data;
+        if (statusResp.status === "fulfilled" && statusResp.value.data) statuses = statusResp.value.data.data.data;
     }
 
     // Refetches on key change: the sidebar is reused, not remounted.

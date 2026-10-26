@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsUserJoins401,
-    GetAnalyticsUserJoins500,
-    GetAnalyticsUserJoinsQueryParams,
-    GetAnalyticsUserJoinsQueryResponse,
-} from "../models/GetAnalyticsUserJoins.ts";
-
-function getGetAnalyticsUserJoinsUrl() {
-    const res = { method: "GET", url: `/analytics/user-joins` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsUserJoinsOptions, GetAnalyticsUserJoinsResponses } from "../models/GetAnalyticsUserJoins.ts";
 
 /**
  * @description Daily count of new users over the requested window.
  * {@link /analytics/user-joins}
  */
-export async function getAnalyticsUserJoins(params?: GetAnalyticsUserJoinsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsUserJoins<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsUserJoinsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsUserJoinsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAnalyticsUserJoinsQueryResponse, ResponseErrorConfig<GetAnalyticsUserJoins401 | GetAnalyticsUserJoins500>, unknown>({
-        method: "GET",
-        url: getGetAnalyticsUserJoinsUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/user-joins",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsUserJoinsResponses, ThrowOnError>>,
+    );
 }

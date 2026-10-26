@@ -3,62 +3,46 @@
  * Do not edit manually.
  */
 
-/**
- * @description Feature flags fetched successfully.
- */
-export type GetUserFeatures200 = {
-    /**
-     * @type boolean
-     */
+export type GetUserFeaturesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type boolean
-         */
         applicationsEnabled: boolean;
-        /**
-         * @type boolean
-         */
         cwlEnabled: boolean;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetUserFeatures401 = {
-    /**
-     * @type boolean
-     */
+export type GetUserFeaturesStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type GetUserFeatures500 = {
-    /**
-     * @type boolean
-     */
+export type GetUserFeaturesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetUserFeaturesQueryResponse = GetUserFeatures200;
-
-export type GetUserFeaturesQuery = {
-    Response: GetUserFeatures200;
-    Errors: GetUserFeatures401 | GetUserFeatures500;
+export type GetUserFeaturesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetUserFeaturesResponses = {
+    "200": GetUserFeaturesStatus200;
+    "401": GetUserFeaturesStatus401;
+    "500": GetUserFeaturesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserFeaturesResponse = GetUserFeaturesStatus200;

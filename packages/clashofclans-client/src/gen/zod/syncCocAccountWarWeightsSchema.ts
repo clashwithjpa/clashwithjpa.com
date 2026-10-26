@@ -5,63 +5,58 @@
 
 import * as z from "zod";
 
-/**
- * @description Sync result.
- */
-export const syncCocAccountWarWeights200Schema = z.object({
+export const syncCocAccountWarWeightsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         updated: z.number(),
         notInFwa: z.array(
-            z.object({
+            z.strictObject({
                 cocAccountTag: z.string(),
-                ownerName: z.union([z.string(), z.null()]),
+                ownerName: z.string().nullable(),
             }),
         ),
         failedClans: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
-                name: z.union([z.string(), z.null()]),
+                name: z.string().nullable(),
             }),
         ),
     }),
 });
 
-/**
- * @description No JPA clans configured.
- */
-export const syncCocAccountWarWeights400Schema = z.object({
+export const syncCocAccountWarWeightsStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const syncCocAccountWarWeights401Schema = z.object({
+export const syncCocAccountWarWeightsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const syncCocAccountWarWeights500Schema = z.object({
+export const syncCocAccountWarWeightsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const syncCocAccountWarWeightsMutationRequestSchema = z.object({
-    members: z.optional(
-        z
+export const syncCocAccountWarWeightsResponseSchema = syncCocAccountWarWeightsStatus200Schema;
+
+export const syncCocAccountWarWeightsErrorSchema = z.union([
+    syncCocAccountWarWeightsStatus400Schema,
+    syncCocAccountWarWeightsStatus401Schema,
+    syncCocAccountWarWeightsStatus500Schema,
+]);
+
+export const syncCocAccountWarWeightsBodySchema = z
+    .object({
+        members: z
             .array(
                 z.object({
                     tag: z.string().min(1).max(20),
-                    weight: z.number().int().min(0).max(9007199254740991),
+                    weight: z.int().min(0).max(9007199254740991),
                 }),
             )
-            .max(50000),
-    ),
-});
-
-export const syncCocAccountWarWeightsMutationResponseSchema = z.lazy(() => syncCocAccountWarWeights200Schema);
+            .max(50000)
+            .optional(),
+    })
+    .optional();

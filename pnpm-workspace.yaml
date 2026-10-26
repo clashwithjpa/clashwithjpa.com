@@ -14,14 +14,6 @@ peerDependencyRules:
 catalog:
   "@better-auth/api-key": ^1.7.12
   "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-  "@kubb/cli": ^4.39.3
-  "@kubb/core": ^4.39.3
-  "@kubb/plugin-client": ^4.39.3
-  "@kubb/plugin-oas": ^4.39.3
-  "@kubb/plugin-svelte-query": ^4.39.3
-  "@kubb/plugin-ts": ^4.39.3
-  "@kubb/plugin-zod": ^4.39.3
-  "@tanstack/svelte-query": ^5.90.2
   "@types/node": ^26.6.5
   better-auth: ^1.7.12
   eslint: ^10.13.0

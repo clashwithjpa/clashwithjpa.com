@@ -3,77 +3,63 @@
  * Do not edit manually.
  */
 
-/**
- * @description Test message sent.
- */
-export type TestCwlPing200 = {
-    /**
-     * @type boolean
-     */
+export type TestCwlPingStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: object;
 };
 
-/**
- * @description No channel to test.
- */
-export type TestCwlPing400 = {
-    /**
-     * @type boolean
-     */
+export type TestCwlPingStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type TestCwlPing401 = {
-    /**
-     * @type boolean
-     */
+export type TestCwlPingStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord rejected the message.
- */
-export type TestCwlPing502 = {
-    /**
-     * @type boolean
-     */
+export type TestCwlPingStatus502 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type TestCwlPingMutationRequest = {
-    /**
-     * @pattern ^\d{17,20}$
-     * @type string | undefined
-     */
-    channelId?: string;
+export type TestCwlPingBody =
+    | {
+          /**
+           * @pattern ^\d{17,20}$
+           * @type string | undefined
+           */
+          channelId?: string;
+      }
+    | undefined;
+
+export type TestCwlPingOptions = {
+    body: TestCwlPingBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
 
-export type TestCwlPingMutationResponse = TestCwlPing200;
-
-export type TestCwlPingMutation = {
-    Response: TestCwlPing200;
-    Request: TestCwlPingMutationRequest;
-    Errors: TestCwlPing400 | TestCwlPing401 | TestCwlPing502;
+export type TestCwlPingResponses = {
+    "200": TestCwlPingStatus200;
+    "400": TestCwlPingStatus400;
+    "401": TestCwlPingStatus401;
+    "502": TestCwlPingStatus502;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type TestCwlPingResponse = TestCwlPingStatus200;

@@ -3,41 +3,29 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the updated rules content.
- */
-export type SetRules200 = {
-    /**
-     * @type boolean
-     */
+export type SetRulesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type string
-         */
         rules: string;
     };
 };
 
-/**
- * @description Server error response when updating rules fails.
- */
-export type SetRules500 = {
-    /**
-     * @type boolean
-     */
+export type SetRulesStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type SetRulesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SetRulesMutationRequest = {
+export type SetRulesBody = {
     /**
      * @minLength 1
      * @maxLength 100000
@@ -46,10 +34,20 @@ export type SetRulesMutationRequest = {
     rules: string;
 };
 
-export type SetRulesMutationResponse = SetRules200;
-
-export type SetRulesMutation = {
-    Response: SetRules200;
-    Request: SetRulesMutationRequest;
-    Errors: SetRules500;
+export type SetRulesOptions = {
+    body: SetRulesBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type SetRulesResponses = {
+    "200": SetRulesStatus200;
+    "400": SetRulesStatus400;
+    "500": SetRulesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SetRulesResponse = SetRulesStatus200;

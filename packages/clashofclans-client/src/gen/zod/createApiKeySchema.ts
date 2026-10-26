@@ -5,54 +5,53 @@
 
 import * as z from "zod";
 
-/**
- * @description The created key.
- */
-export const createApiKey200Schema = z.object({
+export const createApiKeyStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         id: z.string(),
-        name: z.union([z.string(), z.null()]),
+        name: z.string().nullable(),
         key: z.string(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const createApiKey401Schema = z.object({
+export const createApiKeyStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description API access disabled, key limit reached, or scope above the caller\'s role.
- */
-export const createApiKey403Schema = z.object({
+export const createApiKeyStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description API key not found.
- */
-export const createApiKey404Schema = z.object({
+export const createApiKeyStatus403Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const createApiKey500Schema = z.object({
+export const createApiKeyStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const createApiKeyMutationRequestSchema = z.object({
+export const createApiKeyStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const createApiKeyResponseSchema = createApiKeyStatus200Schema;
+
+export const createApiKeyErrorSchema = z.union([
+    createApiKeyStatus400Schema,
+    createApiKeyStatus401Schema,
+    createApiKeyStatus403Schema,
+    createApiKeyStatus404Schema,
+    createApiKeyStatus500Schema,
+]);
+
+export const createApiKeyBodySchema = z.object({
     name: z.string().min(1).max(64),
     scope: z.enum(["apply", "cwl", "review", "manage", "sudo", "root"]),
-    expiresIn: z.optional(z.number().int().min(86400).max(31536000)),
+    expiresIn: z.int().min(86400).max(31536000).optional(),
 });
-
-export const createApiKeyMutationResponseSchema = z.lazy(() => createApiKey200Schema);

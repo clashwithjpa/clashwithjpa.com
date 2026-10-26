@@ -5,42 +5,41 @@
 
 import * as z from "zod";
 
-/**
- * @description Created season.
- */
-export const createCwlSeason200Schema = z.object({
+export const createCwlSeasonStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        season: z.object({
+    data: z.strictObject({
+        season: z.strictObject({
             id: z.number(),
             name: z.string(),
             month: z.string(),
             year: z.number(),
-            createdAt: z.union([z.string().datetime(), z.null()]),
+            createdAt: z.union([z.iso.datetime(), z.null()]),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const createCwlSeason401Schema = z.object({
+export const createCwlSeasonStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const createCwlSeason500Schema = z.object({
+export const createCwlSeasonStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const createCwlSeasonMutationRequestSchema = z.object({
+export const createCwlSeasonStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const createCwlSeasonResponseSchema = createCwlSeasonStatus200Schema;
+
+export const createCwlSeasonErrorSchema = z.union([createCwlSeasonStatus400Schema, createCwlSeasonStatus401Schema, createCwlSeasonStatus500Schema]);
+
+export const createCwlSeasonBodySchema = z.object({
     name: z.string().min(1),
     month: z.string().min(1),
-    year: z.number().int().min(-9007199254740991).max(9007199254740991),
+    year: z.int().min(-9007199254740991).max(9007199254740991),
 });
-
-export const createCwlSeasonMutationResponseSchema = z.lazy(() => createCwlSeason200Schema);

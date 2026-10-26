@@ -3,37 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SetUserSeasonBonus400,
-    SetUserSeasonBonus401,
-    SetUserSeasonBonus500,
-    SetUserSeasonBonusMutationRequest,
-    SetUserSeasonBonusMutationResponse,
-} from "../models/SetUserSeasonBonus.ts";
-
-function getSetUserSeasonBonusUrl() {
-    const res = { method: "PUT", url: `/admin/bonus` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SetUserSeasonBonusOptions, SetUserSeasonBonusResponses } from "../models/SetUserSeasonBonus.ts";
 
 /**
  * @description Awards or removes a user's bonus for a season.
  * {@link /admin/bonus}
  */
-export async function setUserSeasonBonus(
-    data: SetUserSeasonBonusMutationRequest,
-    config: Partial<RequestConfig<SetUserSeasonBonusMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function setUserSeasonBonus<ThrowOnError extends boolean = false>(
+    options: Options<SetUserSeasonBonusOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SetUserSeasonBonusResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        SetUserSeasonBonusMutationResponse,
-        ResponseErrorConfig<SetUserSeasonBonus400 | SetUserSeasonBonus401 | SetUserSeasonBonus500>,
-        SetUserSeasonBonusMutationRequest
-    >({ method: "PUT", url: getSetUserSeasonBonusUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/bonus",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SetUserSeasonBonusResponses, ThrowOnError>>,
+    );
 }

@@ -3,30 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsAuditCategories401,
-    GetAnalyticsAuditCategories500,
-    GetAnalyticsAuditCategoriesQueryResponse,
-} from "../models/GetAnalyticsAuditCategories.ts";
-
-function getGetAnalyticsAuditCategoriesUrl() {
-    const res = { method: "GET", url: `/analytics/audit-categories` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsAuditCategoriesOptions, GetAnalyticsAuditCategoriesResponses } from "../models/GetAnalyticsAuditCategories.ts";
 
 /**
  * @description Audit log action counts grouped by target type.
  * {@link /analytics/audit-categories}
  */
-export async function getAnalyticsAuditCategories(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsAuditCategories<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsAuditCategoriesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsAuditCategoriesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsAuditCategoriesQueryResponse,
-        ResponseErrorConfig<GetAnalyticsAuditCategories401 | GetAnalyticsAuditCategories500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsAuditCategoriesUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/audit-categories",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsAuditCategoriesResponses, ThrowOnError>>,
+    );
 }

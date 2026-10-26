@@ -14,7 +14,7 @@
     import { formatRelativeTime } from "#lib/utils.js";
     import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { type JpaPermission } from "@repo/auth-shared";
-    import { createApiKey, type CreateApiKey200, type CreateApiKey403 } from "@repo/clashofclans-client";
+    import { createApiKey } from "@repo/clashofclans-client";
     import TablerActivity from "~icons/tabler/activity";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerBook2 from "~icons/tabler/book-2";
@@ -31,8 +31,6 @@
     const MAX_KEYS = 5;
     // The generated client types only the 200 body, but returns whatever the
     // server sent — a refusal arrives as a value, not a throw.
-    type CreateApiKeyResult = CreateApiKey200 | CreateApiKey403;
-
     let keys = $state<ApiKeyRow[] | null>(null);
     let loading = $state(true);
     let creating = $state(false);
@@ -86,18 +84,15 @@
         }
         creating = true;
         try {
-            const resp = (await createApiKey(
-                { name, scope, ...(expiresIn ? { expiresIn } : {}) },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as CreateApiKeyResult;
+            const resp = await createApiKey({ body: { name, scope, ...(expiresIn ? { expiresIn } : {}) } });
 
-            if (!resp.success) {
-                toast.error("Failed to create API key", { description: typeof resp.error === "string" ? resp.error : undefined });
+            if (!resp.data) {
+                toast.error("Failed to create API key", { description: typeof resp.error?.error === "string" ? resp.error.error : undefined });
                 return;
             }
 
             createSidebar?.close();
-            revealedKey = resp.data.key;
+            revealedKey = resp.data.data.key;
             copied = false;
             revealOpen = true;
             await loadKeys();

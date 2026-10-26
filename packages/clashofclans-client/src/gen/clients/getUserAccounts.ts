@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetUserAccounts401, GetUserAccounts500, GetUserAccountsQueryResponse } from "../models/GetUserAccounts.ts";
-
-function getGetUserAccountsUrl() {
-    const res = { method: "GET", url: `/user/accounts` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetUserAccountsOptions, GetUserAccountsResponses } from "../models/GetUserAccounts.ts";
 
 /**
  * @description Fetches the current user's Clash of Clans accounts.
  * {@link /user/accounts}
  */
-export async function getUserAccounts(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getUserAccounts<ThrowOnError extends boolean = false>(
+    options: Options<GetUserAccountsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetUserAccountsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetUserAccountsQueryResponse, ResponseErrorConfig<GetUserAccounts401 | GetUserAccounts500>, unknown>({
-        method: "GET",
-        url: getGetUserAccountsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/user/accounts",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetUserAccountsResponses, ThrowOnError>>,
+    );
 }

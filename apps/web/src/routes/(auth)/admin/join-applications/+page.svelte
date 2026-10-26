@@ -15,13 +15,12 @@
     import type { Role } from "#lib/config/roles.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         clearAcceptedJoinApplications,
         deleteJoinApplication,
         getJoinApplications,
         updateJoinApplicationStatus,
-        type GetJoinApplications200,
+        type GetJoinApplicationsStatus200,
     } from "@repo/clashofclans-client";
     import TablerBolt from "~icons/tabler/bolt";
     import TablerCheck from "~icons/tabler/check";
@@ -36,7 +35,7 @@
 
     let { data }: { data: { canDelete: boolean } } = $props();
 
-    type Application = GetJoinApplications200["data"]["applications"][number];
+    type Application = GetJoinApplicationsStatus200["data"]["applications"][number];
     type Status = Application["status"];
 
     let applications = $state<Application[]>([]);
@@ -66,17 +65,16 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getJoinApplications(
-                {
+            const resp = await getJoinApplications({
+                query: {
                     status: (statusFilter || undefined) as Status | undefined,
                     limit: 100,
                     offset: 0,
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            );
-            if (resp.success) {
-                applications = resp.data.applications;
-                total = resp.data.total;
+            });
+            if (resp.data) {
+                applications = resp.data.data.applications;
+                total = resp.data.data.total;
                 revealInBatches();
             } else {
                 toast.error("Failed to load applications");
@@ -102,14 +100,10 @@
     async function updateStatus(id: number, status: Status) {
         processingId = id;
         try {
-            const resp = await updateJoinApplicationStatus(
-                id,
-                { status },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await updateJoinApplicationStatus({ path: { id }, body: { status } });
+            if (resp.data) {
                 // The update response omits the joined Discord profile fields; keep the existing ones.
-                applications = applications.map((a) => (a.id === id ? { ...a, ...resp.data.application } : a));
+                applications = applications.map((a) => (a.id === id ? { ...a, ...resp.data.data.application } : a));
                 toast.success(`Application ${status}`);
                 if (statusFilter && status !== statusFilter) {
                     applications = applications.filter((a) => a.id !== id);
@@ -133,8 +127,8 @@
     async function deleteApplication(id: number) {
         processingId = id;
         try {
-            const resp = await deleteJoinApplication(id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
+            const resp = await deleteJoinApplication({ path: { id } });
+            if (resp.data) {
                 applications = applications.filter((a) => a.id !== id);
                 total = Math.max(0, total - 1);
                 toast.success("Application deleted");
@@ -151,9 +145,9 @@
     async function clearAccepted() {
         clearingAccepted = true;
         try {
-            const resp = await clearAcceptedJoinApplications({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                toast.success(`Cleared ${resp.data.deleted} accepted application${resp.data.deleted === 1 ? "" : "s"}`);
+            const resp = await clearAcceptedJoinApplications({});
+            if (resp.data) {
+                toast.success(`Cleared ${resp.data.data.deleted} accepted application${resp.data.data.deleted === 1 ? "" : "s"}`);
                 await load();
             } else {
                 toast.error("Failed to clear accepted applications");

@@ -3,26 +3,16 @@
  * Do not edit manually.
  */
 
-export const getAdminUsersQueryParamsSortDirectionEnum = {
+export const getAdminUsersSortDirection = {
     asc: "asc",
     desc: "desc",
 } as const;
 
-export type GetAdminUsersQueryParamsSortDirectionEnumKey =
-    (typeof getAdminUsersQueryParamsSortDirectionEnum)[keyof typeof getAdminUsersQueryParamsSortDirectionEnum];
+export type GetAdminUsersSortDirectionKey = (typeof getAdminUsersSortDirection)[keyof typeof getAdminUsersSortDirection];
 
-export type GetAdminUsersQueryParams = {
-    /**
-     * @type string | undefined
-     */
+export type GetAdminUsersQuery = {
     search?: string;
-    /**
-     * @type string | undefined
-     */
     role?: string;
-    /**
-     * @type string | undefined
-     */
     apiAccess?: string;
     /**
      * @minLength 1
@@ -38,92 +28,64 @@ export type GetAdminUsersQueryParams = {
      * @type integer | undefined
      */
     offset?: number;
-    /**
-     * @type string | undefined
-     */
     sortBy?: string;
-    /**
-     * @type string | undefined
-     */
-    sortDirection?: GetAdminUsersQueryParamsSortDirectionEnumKey;
+    sortDirection?: GetAdminUsersSortDirectionKey;
 };
 
-/**
- * @description Users.
- */
-export type GetAdminUsers200 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminUsersStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
-        users: any[];
-        /**
-         * @type number
-         */
+        users: unknown[];
         total: number;
-        /**
-         * @type object
-         */
         roleCounts: {
             [key: string]: number;
         };
-        /**
-         * @type object
-         */
         apiAccessCounts: {
-            /**
-             * @type number
-             */
             granted: number;
-            /**
-             * @type number
-             */
             none: number;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAdminUsers401 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminUsersStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAdminUsersStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAdminUsers500 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminUsersStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAdminUsersQueryResponse = GetAdminUsers200;
-
-export type GetAdminUsersQuery = {
-    Response: GetAdminUsers200;
-    QueryParams: GetAdminUsersQueryParams;
-    Errors: GetAdminUsers401 | GetAdminUsers500;
+export type GetAdminUsersOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAdminUsersQuery;
+    headers?: never;
 };
+
+export type GetAdminUsersResponses = {
+    "200": GetAdminUsersStatus200;
+    "400": GetAdminUsersStatus400;
+    "401": GetAdminUsersStatus401;
+    "500": GetAdminUsersStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAdminUsersResponse = GetAdminUsersStatus200;

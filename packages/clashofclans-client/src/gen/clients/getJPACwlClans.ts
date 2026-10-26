@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetJPACwlClans500, GetJPACwlClansQueryResponse } from "../models/GetJPACwlClans.ts";
-
-function getGetJPACwlClansUrl() {
-    const res = { method: "GET", url: `/coc/jpa/clans/cwl` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetJPACwlClansOptions, GetJPACwlClansResponses } from "../models/GetJPACwlClans.ts";
 
 /**
  * @description Fetches all JPA CWL clans with their details.
  * {@link /coc/jpa/clans/cwl}
  */
-export async function getJPACwlClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getJPACwlClans<ThrowOnError extends boolean = false>(
+    options: Options<GetJPACwlClansOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetJPACwlClansResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetJPACwlClansQueryResponse, ResponseErrorConfig<GetJPACwlClans500>, unknown>({
-        method: "GET",
-        url: getGetJPACwlClansUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/coc/jpa/clans/cwl",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetJPACwlClansResponses, ThrowOnError>>,
+    );
 }

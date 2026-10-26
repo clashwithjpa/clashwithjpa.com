@@ -5,7 +5,6 @@
     import type { TableColumn } from "#lib/components/ui/table/features.js";
     import TownHall from "#lib/components/ui/TownHall.svelte";
     import { cn } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { getWarLogPlayers } from "@repo/clashofclans-client";
     import { renderSnippet, type SortingState } from "@tanstack/svelte-table";
     import TablerSearch from "~icons/tabler/search";
@@ -28,13 +27,13 @@
         void version;
         let cancelled = false;
         loading = true;
-        getWarLogPlayers(encodeURIComponent(tag), { wars }, { baseURL: PUBLIC_SERVER_URL })
+        getWarLogPlayers({ path: { tag }, query: { wars } })
             .then((r) => {
                 if (cancelled) return;
-                failed = !r.success;
-                if (r.success) {
-                    players = r.data.players;
-                    warCount = r.data.wars.length;
+                failed = !r.data;
+                if (r.data) {
+                    players = r.data.data.players;
+                    warCount = r.data.data.wars.length;
                 }
             })
             .catch(() => !cancelled && (failed = true))

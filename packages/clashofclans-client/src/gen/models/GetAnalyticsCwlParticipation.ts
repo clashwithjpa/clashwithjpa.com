@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsCwlParticipationQueryParams = {
+export type GetAnalyticsCwlParticipationQuery = {
     /**
      * @maxLength 9007199254740991
      * @type integer | undefined
@@ -11,65 +11,55 @@ export type GetAnalyticsCwlParticipationQueryParams = {
     seasonId?: number;
 };
 
-/**
- * @description CWL participation.
- */
-export type GetAnalyticsCwlParticipation200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlParticipationStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         participated: number;
-        /**
-         * @type number
-         */
         totalUsers: number;
         seasonId: number | null;
         seasonName: string | null;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsCwlParticipation401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlParticipationStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsCwlParticipationStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsCwlParticipation500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlParticipationStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsCwlParticipationQueryResponse = GetAnalyticsCwlParticipation200;
-
-export type GetAnalyticsCwlParticipationQuery = {
-    Response: GetAnalyticsCwlParticipation200;
-    QueryParams: GetAnalyticsCwlParticipationQueryParams;
-    Errors: GetAnalyticsCwlParticipation401 | GetAnalyticsCwlParticipation500;
+export type GetAnalyticsCwlParticipationOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsCwlParticipationQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsCwlParticipationResponses = {
+    "200": GetAnalyticsCwlParticipationStatus200;
+    "400": GetAnalyticsCwlParticipationStatus400;
+    "401": GetAnalyticsCwlParticipationStatus401;
+    "500": GetAnalyticsCwlParticipationStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsCwlParticipationResponse = GetAnalyticsCwlParticipationStatus200;

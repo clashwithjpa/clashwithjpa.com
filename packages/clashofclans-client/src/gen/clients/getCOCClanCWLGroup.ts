@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClanCWLGroup500, GetCOCClanCWLGroupPathParams, GetCOCClanCWLGroupQueryResponse } from "../models/GetCOCClanCWLGroup.ts";
-
-function getGetCOCClanCWLGroupUrl(tag: GetCOCClanCWLGroupPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/clan/${tag}/currentwar/leaguegroup` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCClanCWLGroupOptions, GetCOCClanCWLGroupResponses } from "../models/GetCOCClanCWLGroup.ts";
 
 /**
  * @description Fetches a Clash of Clans clan's current CWL league group by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/currentwar/leaguegroup}
  */
-export async function getCOCClanCWLGroup(tag: GetCOCClanCWLGroupPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCClanCWLGroup<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCClanCWLGroupOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCClanCWLGroupResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCClanCWLGroupQueryResponse, ResponseErrorConfig<GetCOCClanCWLGroup500>, unknown>({
-        method: "GET",
-        url: getGetCOCClanCWLGroupUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/coc/clan/{tag}/currentwar/leaguegroup",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCOCClanCWLGroupResponses, ThrowOnError>>,
+    );
 }

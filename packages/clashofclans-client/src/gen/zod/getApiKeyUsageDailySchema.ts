@@ -5,19 +5,15 @@
 
 import * as z from "zod";
 
-export const getApiKeyUsageDailyQueryParamsSchema = z.object({
-    keyId: z.string().min(1),
-    days: z.optional(z.coerce.number().int().min(1).max(90).default(30)),
-});
+export const getApiKeyUsageDailyQueryKeyIdSchema = z.string().min(1);
 
-/**
- * @description Daily usage.
- */
-export const getApiKeyUsageDaily200Schema = z.object({
+export const getApiKeyUsageDailyQueryDaysSchema = z.int().min(1).max(90).optional().default(30);
+
+export const getApiKeyUsageDailyStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         data: z.array(
-            z.object({
+            z.strictObject({
                 date: z.string(),
                 count: z.number(),
             }),
@@ -25,28 +21,37 @@ export const getApiKeyUsageDaily200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getApiKeyUsageDaily401Schema = z.object({
+export const getApiKeyUsageDailyStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description API key not found.
- */
-export const getApiKeyUsageDaily404Schema = z.object({
+export const getApiKeyUsageDailyStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getApiKeyUsageDaily500Schema = z.object({
+export const getApiKeyUsageDailyStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getApiKeyUsageDailyQueryResponseSchema = z.lazy(() => getApiKeyUsageDaily200Schema);
+export const getApiKeyUsageDailyStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getApiKeyUsageDailyResponseSchema = getApiKeyUsageDailyStatus200Schema;
+
+export const getApiKeyUsageDailyErrorSchema = z.union([
+    getApiKeyUsageDailyStatus400Schema,
+    getApiKeyUsageDailyStatus401Schema,
+    getApiKeyUsageDailyStatus404Schema,
+    getApiKeyUsageDailyStatus500Schema,
+]);
+
+export const getApiKeyUsageDailyQuerySchema = z.object({
+    keyId: z.string().min(1),
+    days: z.int().min(1).max(90).optional().default(30),
+});

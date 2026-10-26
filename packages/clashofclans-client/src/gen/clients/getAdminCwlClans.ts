@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminCwlClans401, GetAdminCwlClans500, GetAdminCwlClansQueryResponse } from "../models/GetAdminCwlClans.ts";
-
-function getGetAdminCwlClansUrl() {
-    const res = { method: "GET", url: `/admin/cwl-clans` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAdminCwlClansOptions, GetAdminCwlClansResponses } from "../models/GetAdminCwlClans.ts";
 
 /**
  * @description Lists all CWL clans.
  * {@link /admin/cwl-clans}
  */
-export async function getAdminCwlClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAdminCwlClans<ThrowOnError extends boolean = false>(
+    options: Options<GetAdminCwlClansOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAdminCwlClansResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAdminCwlClansQueryResponse, ResponseErrorConfig<GetAdminCwlClans401 | GetAdminCwlClans500>, unknown>({
-        method: "GET",
-        url: getGetAdminCwlClansUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/cwl-clans",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAdminCwlClansResponses, ThrowOnError>>,
+    );
 }

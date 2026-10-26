@@ -3,75 +3,50 @@
  * Do not edit manually.
  */
 
-/**
- * @description Clans.
- */
-export type GetAdminCwlClans200 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCwlClansStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             cocClanName: string;
-            /**
-             * @type string
-             */
             cocClanLeague: string;
-            /**
-             * @type string
-             */
             cocClanLeader: string;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAdminCwlClans401 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCwlClansStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAdminCwlClans500 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCwlClansStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAdminCwlClansQueryResponse = GetAdminCwlClans200;
-
-export type GetAdminCwlClansQuery = {
-    Response: GetAdminCwlClans200;
-    Errors: GetAdminCwlClans401 | GetAdminCwlClans500;
+export type GetAdminCwlClansOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAdminCwlClansResponses = {
+    "200": GetAdminCwlClansStatus200;
+    "401": GetAdminCwlClansStatus401;
+    "500": GetAdminCwlClansStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAdminCwlClansResponse = GetAdminCwlClansStatus200;

@@ -3,34 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAnalyticsCwlAssignment401,
-    GetAnalyticsCwlAssignment500,
-    GetAnalyticsCwlAssignmentQueryParams,
-    GetAnalyticsCwlAssignmentQueryResponse,
-} from "../models/GetAnalyticsCwlAssignment.ts";
-
-function getGetAnalyticsCwlAssignmentUrl() {
-    const res = { method: "GET", url: `/analytics/cwl-assignment` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAnalyticsCwlAssignmentOptions, GetAnalyticsCwlAssignmentResponses } from "../models/GetAnalyticsCwlAssignment.ts";
 
 /**
  * @description Assigned vs unassigned CWL application counts for a season.
  * {@link /analytics/cwl-assignment}
  */
-export async function getAnalyticsCwlAssignment(
-    params?: GetAnalyticsCwlAssignmentQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAnalyticsCwlAssignment<ThrowOnError extends boolean = false>(
+    options: Options<GetAnalyticsCwlAssignmentOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAnalyticsCwlAssignmentResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetAnalyticsCwlAssignmentQueryResponse,
-        ResponseErrorConfig<GetAnalyticsCwlAssignment401 | GetAnalyticsCwlAssignment500>,
-        unknown
-    >({ method: "GET", url: getGetAnalyticsCwlAssignmentUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/analytics/cwl-assignment",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAnalyticsCwlAssignmentResponses, ThrowOnError>>,
+    );
 }

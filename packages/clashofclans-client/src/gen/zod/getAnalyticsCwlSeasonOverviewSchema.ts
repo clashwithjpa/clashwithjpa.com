@@ -5,26 +5,19 @@
 
 import * as z from "zod";
 
-export const getAnalyticsCwlSeasonOverviewQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().max(9007199254740991).gt(0)),
-    })
-    .optional();
+export const getAnalyticsCwlSeasonOverviewQuerySeasonIdSchema = z.int().max(9007199254740991).gt(0).optional();
 
-/**
- * @description CWL season overview.
- */
-export const getAnalyticsCwlSeasonOverview200Schema = z.object({
+export const getAnalyticsCwlSeasonOverviewStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        seasonId: z.nullable(z.number()),
-        seasonName: z.nullable(z.string()),
+    data: z.strictObject({
+        seasonId: z.number().nullable(),
+        seasonName: z.string().nullable(),
         applications: z.number(),
         applicants: z.number(),
         assigned: z.number(),
         bonuses: z.number(),
         byClan: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 name: z.string(),
                 league: z.string(),
@@ -32,7 +25,7 @@ export const getAnalyticsCwlSeasonOverview200Schema = z.object({
             }),
         ),
         byTownHall: z.array(
-            z.object({
+            z.strictObject({
                 townHall: z.number(),
                 count: z.number(),
             }),
@@ -40,20 +33,30 @@ export const getAnalyticsCwlSeasonOverview200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAnalyticsCwlSeasonOverview401Schema = z.object({
+export const getAnalyticsCwlSeasonOverviewStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getAnalyticsCwlSeasonOverview500Schema = z.object({
+export const getAnalyticsCwlSeasonOverviewStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAnalyticsCwlSeasonOverviewQueryResponseSchema = z.lazy(() => getAnalyticsCwlSeasonOverview200Schema);
+export const getAnalyticsCwlSeasonOverviewStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getAnalyticsCwlSeasonOverviewResponseSchema = getAnalyticsCwlSeasonOverviewStatus200Schema;
+
+export const getAnalyticsCwlSeasonOverviewErrorSchema = z.union([
+    getAnalyticsCwlSeasonOverviewStatus400Schema,
+    getAnalyticsCwlSeasonOverviewStatus401Schema,
+    getAnalyticsCwlSeasonOverviewStatus500Schema,
+]);
+
+export const getAnalyticsCwlSeasonOverviewQuerySchema = z.object({
+    seasonId: z.int().max(9007199254740991).gt(0).optional(),
+});

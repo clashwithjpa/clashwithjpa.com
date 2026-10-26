@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetRules500, GetRulesQueryResponse } from "../models/GetRules.ts";
-
-function getGetRulesUrl() {
-    const res = { method: "GET", url: `/rules` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetRulesOptions, GetRulesResponses } from "../models/GetRules.ts";
 
 /**
  * @description Fetches the current rules content.
  * {@link /rules}
  */
-export async function getRules(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getRules<ThrowOnError extends boolean = false>(
+    options: Options<GetRulesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetRulesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetRulesQueryResponse, ResponseErrorConfig<GetRules500>, unknown>({
-        method: "GET",
-        url: getGetRulesUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/rules", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetRulesResponses, ThrowOnError>
+        >,
+    );
 }

@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetAdminCocAccounts401,
-    GetAdminCocAccounts500,
-    GetAdminCocAccountsQueryParams,
-    GetAdminCocAccountsQueryResponse,
-} from "../models/GetAdminCocAccounts.ts";
-
-function getGetAdminCocAccountsUrl() {
-    const res = { method: "GET", url: `/admin/coc-accounts` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAdminCocAccountsOptions, GetAdminCocAccountsResponses } from "../models/GetAdminCocAccounts.ts";
 
 /**
  * @description Lists all linked Clash of Clans accounts with their war weights. Search by account tag, Discord id, or owner name.
  * {@link /admin/coc-accounts}
  */
-export async function getAdminCocAccounts(params?: GetAdminCocAccountsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAdminCocAccounts<ThrowOnError extends boolean = false>(
+    options: Options<GetAdminCocAccountsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAdminCocAccountsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAdminCocAccountsQueryResponse, ResponseErrorConfig<GetAdminCocAccounts401 | GetAdminCocAccounts500>, unknown>({
-        method: "GET",
-        url: getGetAdminCocAccountsUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/coc-accounts",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAdminCocAccountsResponses, ThrowOnError>>,
+    );
 }

@@ -3,40 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    AssignCwlApplication400,
-    AssignCwlApplication401,
-    AssignCwlApplication404,
-    AssignCwlApplication500,
-    AssignCwlApplicationMutationRequest,
-    AssignCwlApplicationMutationResponse,
-    AssignCwlApplicationPathParams,
-} from "../models/AssignCwlApplication.ts";
-
-function getAssignCwlApplicationUrl(id: AssignCwlApplicationPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/cwl-applications/${id}/assign` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { AssignCwlApplicationOptions, AssignCwlApplicationResponses } from "../models/AssignCwlApplication.ts";
 
 /**
  * @description Assigns (or unassigns when clanTag is null) a CWL application to a CWL clan.
  * {@link /admin/cwl-applications/:id/assign}
  */
-export async function assignCwlApplication(
-    id: AssignCwlApplicationPathParams["id"],
-    data: AssignCwlApplicationMutationRequest,
-    config: Partial<RequestConfig<AssignCwlApplicationMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function assignCwlApplication<ThrowOnError extends boolean = false>(
+    options: Options<AssignCwlApplicationOptions, ThrowOnError>,
+): Unwrappable<RequestResult<AssignCwlApplicationResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        AssignCwlApplicationMutationResponse,
-        ResponseErrorConfig<AssignCwlApplication400 | AssignCwlApplication401 | AssignCwlApplication404 | AssignCwlApplication500>,
-        AssignCwlApplicationMutationRequest
-    >({ method: "PUT", url: getAssignCwlApplicationUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/cwl-applications/{id}/assign",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<AssignCwlApplicationResponses, ThrowOnError>>,
+    );
 }

@@ -3,38 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    CreateApiKey401,
-    CreateApiKey403,
-    CreateApiKey404,
-    CreateApiKey500,
-    CreateApiKeyMutationRequest,
-    CreateApiKeyMutationResponse,
-} from "../models/CreateApiKey.ts";
-
-function getCreateApiKeyUrl() {
-    const res = { method: "POST", url: `/api-keys` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { CreateApiKeyOptions, CreateApiKeyResponses } from "../models/CreateApiKey.ts";
 
 /**
  * @description Creates an API key owned by the caller. The plaintext key is returned once and never again.
  * {@link /api-keys}
  */
-export async function createApiKey(
-    data: CreateApiKeyMutationRequest,
-    config: Partial<RequestConfig<CreateApiKeyMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function createApiKey<ThrowOnError extends boolean = false>(
+    options: Options<CreateApiKeyOptions, ThrowOnError>,
+): Unwrappable<RequestResult<CreateApiKeyResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        CreateApiKeyMutationResponse,
-        ResponseErrorConfig<CreateApiKey401 | CreateApiKey403 | CreateApiKey404 | CreateApiKey500>,
-        CreateApiKeyMutationRequest
-    >({ method: "POST", url: getCreateApiKeyUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/api-keys",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<CreateApiKeyResponses, ThrowOnError>>,
+    );
 }

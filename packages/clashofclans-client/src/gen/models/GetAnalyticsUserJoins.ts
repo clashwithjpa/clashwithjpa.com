@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsUserJoinsQueryParams = {
+export type GetAnalyticsUserJoinsQuery = {
     /**
      * @minLength 1
      * @maxLength 90
@@ -13,68 +13,55 @@ export type GetAnalyticsUserJoinsQueryParams = {
     days?: number;
 };
 
-/**
- * @description User join trend.
- */
-export type GetAnalyticsUserJoins200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsUserJoinsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             date: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsUserJoins401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsUserJoinsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsUserJoinsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsUserJoins500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsUserJoinsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsUserJoinsQueryResponse = GetAnalyticsUserJoins200;
-
-export type GetAnalyticsUserJoinsQuery = {
-    Response: GetAnalyticsUserJoins200;
-    QueryParams: GetAnalyticsUserJoinsQueryParams;
-    Errors: GetAnalyticsUserJoins401 | GetAnalyticsUserJoins500;
+export type GetAnalyticsUserJoinsOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsUserJoinsQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsUserJoinsResponses = {
+    "200": GetAnalyticsUserJoinsStatus200;
+    "400": GetAnalyticsUserJoinsStatus400;
+    "401": GetAnalyticsUserJoinsStatus401;
+    "500": GetAnalyticsUserJoinsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsUserJoinsResponse = GetAnalyticsUserJoinsStatus200;

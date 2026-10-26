@@ -5,63 +5,74 @@
 
 import * as z from "zod";
 
-export const getCwlApplicationsQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
-        assignedTo: z.optional(z.string()),
-        unassigned: z.optional(z.boolean()),
-        limit: z.optional(z.coerce.number().int().min(1).max(9007199254740991)),
-        offset: z.optional(z.coerce.number().int().min(0).max(9007199254740991)),
-    })
-    .optional();
+export const getCwlApplicationsQuerySeasonIdSchema = z.int().min(-9007199254740991).max(9007199254740991).optional();
 
-/**
- * @description Applications.
- */
-export const getCwlApplications200Schema = z.object({
+export const getCwlApplicationsQueryAssignedToSchema = z.string().optional();
+
+export const getCwlApplicationsQueryUnassignedSchema = z.boolean().optional();
+
+export const getCwlApplicationsQueryLimitSchema = z.int().min(1).max(9007199254740991).optional();
+
+export const getCwlApplicationsQueryOffsetSchema = z.int().min(0).max(9007199254740991).optional();
+
+export const getCwlApplicationsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         applications: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 discordUserId: z.string(),
                 discordUsername: z.string(),
                 cocAccountName: z.string(),
                 cocAccountTag: z.string(),
-                cocAccountClan: z.union([z.string(), z.null()]),
+                cocAccountClan: z.string().nullable(),
                 cocAccountWeight: z.number(),
                 isExternal: z.boolean(),
-                image: z.union([z.string(), z.null()]),
+                image: z.string().nullable(),
                 seasonId: z.number(),
-                seasonName: z.union([z.string(), z.null()]),
-                month: z.union([z.string(), z.null()]),
-                year: z.union([z.number(), z.null()]),
+                seasonName: z.string().nullable(),
+                month: z.string().nullable(),
+                year: z.number().nullable(),
                 preferenceNum: z.number(),
-                appliedAt: z.string().datetime(),
-                assignedTo: z.union([z.string(), z.null()]),
+                appliedAt: z.iso.datetime(),
+                assignedTo: z.string().nullable(),
                 cocAccountId: z.number(),
-                ownerRole: z.union([z.string(), z.null()]),
+                ownerRole: z.string().nullable(),
             }),
         ),
         total: z.number(),
-        seasonId: z.union([z.number(), z.null()]),
+        seasonId: z.number().nullable(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getCwlApplications401Schema = z.object({
+export const getCwlApplicationsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getCwlApplications500Schema = z.object({
+export const getCwlApplicationsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getCwlApplicationsQueryResponseSchema = z.lazy(() => getCwlApplications200Schema);
+export const getCwlApplicationsStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCwlApplicationsResponseSchema = getCwlApplicationsStatus200Schema;
+
+export const getCwlApplicationsErrorSchema = z.union([
+    getCwlApplicationsStatus400Schema,
+    getCwlApplicationsStatus401Schema,
+    getCwlApplicationsStatus500Schema,
+]);
+
+export const getCwlApplicationsQuerySchema = z.object({
+    seasonId: z.int().min(-9007199254740991).max(9007199254740991).optional(),
+    assignedTo: z.string().optional(),
+    unassigned: z.boolean().optional(),
+    limit: z.int().min(1).max(9007199254740991).optional(),
+    offset: z.int().min(0).max(9007199254740991).optional(),
+});

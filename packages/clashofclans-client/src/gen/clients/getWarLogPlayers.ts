@@ -3,37 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetWarLogPlayers404,
-    GetWarLogPlayers500,
-    GetWarLogPlayersPathParams,
-    GetWarLogPlayersQueryParams,
-    GetWarLogPlayersQueryResponse,
-} from "../models/GetWarLogPlayers.ts";
-
-function getGetWarLogPlayersUrl(tag: GetWarLogPlayersPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/war-log/${tag}/players` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetWarLogPlayersOptions, GetWarLogPlayersResponses } from "../models/GetWarLogPlayers.ts";
 
 /**
  * @description Per-player attack, star, missed-attack and mirror totals over the clan's last finished wars that have full detail.
  * {@link /coc/war-log/:tag/players}
  */
-export async function getWarLogPlayers(
-    tag: GetWarLogPlayersPathParams["tag"],
-    params?: GetWarLogPlayersQueryParams,
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getWarLogPlayers<ThrowOnError extends boolean = false>(
+    options: Options<GetWarLogPlayersOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetWarLogPlayersResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetWarLogPlayersQueryResponse, ResponseErrorConfig<GetWarLogPlayers404 | GetWarLogPlayers500>, unknown>({
-        method: "GET",
-        url: getGetWarLogPlayersUrl(tag).url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/war-log/{tag}/players", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetWarLogPlayersResponses, ThrowOnError>
+        >,
+    );
 }

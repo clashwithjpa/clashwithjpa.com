@@ -97,9 +97,11 @@ export function fromArkValue(val: unknown): Date | Date[] | null {
 export function errorMessage(error: unknown): string | undefined {
     if (error instanceof Error) return error.message;
     if (typeof error === "string") return error;
-    if (error && typeof error === "object" && "message" in error) {
-        const { message } = error as { message?: unknown };
+    if (error && typeof error === "object") {
+        const { message, error: apiError } = error as { message?: unknown; error?: unknown };
         if (typeof message === "string") return message;
+        // A failed API call's `.unwrap()` rejects with the `{ success: false, error }` body itself.
+        if (typeof apiError === "string") return apiError;
     }
     return undefined;
 }

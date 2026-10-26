@@ -3,18 +3,14 @@
  * Do not edit manually.
  */
 
-export const getAdminCocAccountsQueryParamsSortDirEnum = {
+export const getAdminCocAccountsSortDir = {
     asc: "asc",
     desc: "desc",
 } as const;
 
-export type GetAdminCocAccountsQueryParamsSortDirEnumKey =
-    (typeof getAdminCocAccountsQueryParamsSortDirEnum)[keyof typeof getAdminCocAccountsQueryParamsSortDirEnum];
+export type GetAdminCocAccountsSortDirKey = (typeof getAdminCocAccountsSortDir)[keyof typeof getAdminCocAccountsSortDir];
 
-export type GetAdminCocAccountsQueryParams = {
-    /**
-     * @type string | undefined
-     */
+export type GetAdminCocAccountsQuery = {
     search?: string;
     /**
      * @minLength 1
@@ -30,127 +26,75 @@ export type GetAdminCocAccountsQueryParams = {
      * @type integer | undefined
      */
     offset?: number;
-    /**
-     * @type string | undefined
-     */
     sortBy?: string;
-    /**
-     * @type string | undefined
-     */
-    sortDir?: GetAdminCocAccountsQueryParamsSortDirEnumKey;
+    sortDir?: GetAdminCocAccountsSortDirKey;
 };
 
-/**
- * @description COC accounts.
- */
-export type GetAdminCocAccounts200 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCocAccountsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         accounts: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
             ownerUserId: string | null;
             ownerName: string | null;
             ownerImage: string | null;
             ownerRole: string | null;
         }[];
-        /**
-         * @type number
-         */
         total: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAdminCocAccounts401 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCocAccountsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAdminCocAccountsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAdminCocAccounts500 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminCocAccountsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAdminCocAccountsQueryResponse = GetAdminCocAccounts200;
-
-export type GetAdminCocAccountsQuery = {
-    Response: GetAdminCocAccounts200;
-    QueryParams: GetAdminCocAccountsQueryParams;
-    Errors: GetAdminCocAccounts401 | GetAdminCocAccounts500;
+export type GetAdminCocAccountsOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAdminCocAccountsQuery;
+    headers?: never;
 };
+
+export type GetAdminCocAccountsResponses = {
+    "200": GetAdminCocAccountsStatus200;
+    "400": GetAdminCocAccountsStatus400;
+    "401": GetAdminCocAccountsStatus401;
+    "500": GetAdminCocAccountsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAdminCocAccountsResponse = GetAdminCocAccountsStatus200;

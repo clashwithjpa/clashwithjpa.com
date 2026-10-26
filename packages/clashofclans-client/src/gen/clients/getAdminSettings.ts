@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminSettings401, GetAdminSettings500, GetAdminSettingsQueryResponse } from "../models/GetAdminSettings.ts";
-
-function getGetAdminSettingsUrl() {
-    const res = { method: "GET", url: `/admin/settings` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAdminSettingsOptions, GetAdminSettingsResponses } from "../models/GetAdminSettings.ts";
 
 /**
  * @description Fetches the current site settings.
  * {@link /admin/settings}
  */
-export async function getAdminSettings(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAdminSettings<ThrowOnError extends boolean = false>(
+    options: Options<GetAdminSettingsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAdminSettingsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAdminSettingsQueryResponse, ResponseErrorConfig<GetAdminSettings401 | GetAdminSettings500>, unknown>({
-        method: "GET",
-        url: getGetAdminSettingsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/settings",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAdminSettingsResponses, ThrowOnError>>,
+    );
 }

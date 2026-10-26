@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetApiKeyUsageStatusQueryParams = {
+export type GetApiKeyUsageStatusQuery = {
     /**
      * @minLength 1
      * @type string
@@ -18,83 +18,65 @@ export type GetApiKeyUsageStatusQueryParams = {
     days?: number;
 };
 
-/**
- * @description Status breakdown.
- */
-export type GetApiKeyUsageStatus200 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageStatusStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             statusClass: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetApiKeyUsageStatus401 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageStatusStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetApiKeyUsageStatusStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API key not found.
- */
-export type GetApiKeyUsageStatus404 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageStatusStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetApiKeyUsageStatus500 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageStatusStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetApiKeyUsageStatusQueryResponse = GetApiKeyUsageStatus200;
-
-export type GetApiKeyUsageStatusQuery = {
-    Response: GetApiKeyUsageStatus200;
-    QueryParams: GetApiKeyUsageStatusQueryParams;
-    Errors: GetApiKeyUsageStatus401 | GetApiKeyUsageStatus404 | GetApiKeyUsageStatus500;
+export type GetApiKeyUsageStatusOptions = {
+    body?: never;
+    path?: never;
+    query: GetApiKeyUsageStatusQuery;
+    headers?: never;
 };
+
+export type GetApiKeyUsageStatusResponses = {
+    "200": GetApiKeyUsageStatusStatus200;
+    "400": GetApiKeyUsageStatusStatus400;
+    "401": GetApiKeyUsageStatusStatus401;
+    "404": GetApiKeyUsageStatusStatus404;
+    "500": GetApiKeyUsageStatusStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetApiKeyUsageStatusResponse = GetApiKeyUsageStatusStatus200;

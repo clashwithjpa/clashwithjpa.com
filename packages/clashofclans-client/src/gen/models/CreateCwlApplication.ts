@@ -3,45 +3,20 @@
  * Do not edit manually.
  */
 
-/**
- * @description Created application.
- */
-export type CreateCwlApplication200 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         application: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type string
-             */
             cocAccountName: string;
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             preferenceNum: number;
-            /**
-             * @type number
-             */
             seasonId: number;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             appliedAt: string;
             assignedTo: string | null;
@@ -49,88 +24,60 @@ export type CreateCwlApplication200 = {
     };
 };
 
-/**
- * @description Bad request.
- */
-export type CreateCwlApplication400 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateCwlApplication401 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type CreateCwlApplication404 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Duplicate application.
- */
-export type CreateCwlApplication409 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateCwlApplication500 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlApplicationStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type CreateCwlApplicationMutationRequest = {
+export type CreateCwlApplicationBody = {
     /**
      * @minLength 1
      * @type string
      */
     userId: string;
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -152,10 +99,23 @@ export type CreateCwlApplicationMutationRequest = {
     seasonId?: number;
 };
 
-export type CreateCwlApplicationMutationResponse = CreateCwlApplication200;
-
-export type CreateCwlApplicationMutation = {
-    Response: CreateCwlApplication200;
-    Request: CreateCwlApplicationMutationRequest;
-    Errors: CreateCwlApplication400 | CreateCwlApplication401 | CreateCwlApplication404 | CreateCwlApplication409 | CreateCwlApplication500;
+export type CreateCwlApplicationOptions = {
+    body: CreateCwlApplicationBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateCwlApplicationResponses = {
+    "200": CreateCwlApplicationStatus200;
+    "400": CreateCwlApplicationStatus400;
+    "401": CreateCwlApplicationStatus401;
+    "404": CreateCwlApplicationStatus404;
+    "409": CreateCwlApplicationStatus409;
+    "500": CreateCwlApplicationStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateCwlApplicationResponse = CreateCwlApplicationStatus200;

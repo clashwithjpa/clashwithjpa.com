@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetFWAClanPointsPathParams = {
+export type GetFWAClanPointsPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,152 +15,89 @@ export type GetFWAClanPointsPathParams = {
     tag: string;
 };
 
-export const matchupWinnerEnum = {
+export const getFWAClanPointsStatus200DataPointsMatchupWinner = {
     clan: "clan",
     opponent: "opponent",
 } as const;
 
-export type MatchupWinnerEnumKey = (typeof matchupWinnerEnum)[keyof typeof matchupWinnerEnum];
+export type GetFWAClanPointsStatus200DataPointsMatchupWinnerKey =
+    (typeof getFWAClanPointsStatus200DataPointsMatchupWinner)[keyof typeof getFWAClanPointsStatus200DataPointsMatchupWinner];
 
-export const historyResultEnum = {
+export const getFWAClanPointsStatus200DataPointsHistoryResult = {
     win: "win",
     lose: "lose",
 } as const;
 
-export type HistoryResultEnumKey = (typeof historyResultEnum)[keyof typeof historyResultEnum];
+export type GetFWAClanPointsStatus200DataPointsHistoryResultKey =
+    (typeof getFWAClanPointsStatus200DataPointsHistoryResult)[keyof typeof getFWAClanPointsStatus200DataPointsHistoryResult];
 
-/**
- * @description Successful response with the clan\'s FWA points.
- */
-export type GetFWAClanPoints200 = {
-    /**
-     * @type boolean
-     */
+export type GetFWAClanPointsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         points: {
-            /**
-             * @type object
-             */
             clan: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type string
-                 */
                 tag: string;
             };
-            /**
-             * @type number,null
-             */
             balance: number | null;
-            /**
-             * @type boolean,null
-             */
             activeFwa: boolean | null;
             matchup: {
-                /**
-                 * @type number,null
-                 */
                 warId: number | null;
-                /**
-                 * @type number,null
-                 */
                 sync: number | null;
-                /**
-                 * @type object
-                 */
                 opponent: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type string
-                     */
                     tag: string;
                 };
-                winner: MatchupWinnerEnumKey | null;
-                /**
-                 * @type string,null
-                 */
+                winner: GetFWAClanPointsStatus200DataPointsMatchupWinnerKey | null;
                 reason: string | null;
-                /**
-                 * @type string,null
-                 */
                 notice: string | null;
             } | null;
-            /**
-             * @type string,null
-             */
             warState: string | null;
-            /**
-             * @type array
-             */
             stars: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type array
-                 */
                 counts: number[];
             }[];
-            /**
-             * @type array
-             */
             history: {
-                /**
-                 * @type string
-                 */
                 at: string;
-                /**
-                 * @type number,null
-                 */
                 sync: number | null;
-                result: HistoryResultEnumKey | null;
-                /**
-                 * @type number
-                 */
+                result: GetFWAClanPointsStatus200DataPointsHistoryResultKey | null;
                 points: number;
-                /**
-                 * @type string,null
-                 */
                 note: string | null;
             }[];
-            /**
-             * @type string
-             */
             sourceUrl: string;
         } | null;
     };
 };
 
-/**
- * @description The FWA points database couldn\'t be reached or read.
- */
-export type GetFWAClanPoints502 = {
-    /**
-     * @type boolean
-     */
+export type GetFWAClanPointsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetFWAClanPointsStatus502 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetFWAClanPointsQueryResponse = GetFWAClanPoints200;
-
-export type GetFWAClanPointsQuery = {
-    Response: GetFWAClanPoints200;
-    PathParams: GetFWAClanPointsPathParams;
-    Errors: GetFWAClanPoints502;
+export type GetFWAClanPointsOptions = {
+    body?: never;
+    path: GetFWAClanPointsPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetFWAClanPointsResponses = {
+    "200": GetFWAClanPointsStatus200;
+    "400": GetFWAClanPointsStatus400;
+    "502": GetFWAClanPointsStatus502;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetFWAClanPointsResponse = GetFWAClanPointsStatus200;

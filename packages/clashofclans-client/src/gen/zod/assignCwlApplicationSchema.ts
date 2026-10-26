@@ -5,71 +5,65 @@
 
 import * as z from "zod";
 
-export const assignCwlApplicationPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const assignCwlApplicationPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Updated application.
- */
-export const assignCwlApplication200Schema = z.object({
+export const assignCwlApplicationStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        application: z.object({
+    data: z.strictObject({
+        application: z.strictObject({
             id: z.number(),
             discordUserId: z.string(),
             discordUsername: z.string(),
             cocAccountName: z.string(),
             cocAccountTag: z.string(),
-            cocAccountClan: z.union([z.string(), z.null()]),
+            cocAccountClan: z.string().nullable(),
             cocAccountWeight: z.number(),
             isExternal: z.boolean(),
-            image: z.union([z.string(), z.null()]),
+            image: z.string().nullable(),
             seasonId: z.number(),
-            seasonName: z.union([z.string(), z.null()]),
-            month: z.union([z.string(), z.null()]),
-            year: z.union([z.number(), z.null()]),
+            seasonName: z.string().nullable(),
+            month: z.string().nullable(),
+            year: z.number().nullable(),
             preferenceNum: z.number(),
-            appliedAt: z.string().datetime(),
-            assignedTo: z.union([z.string(), z.null()]),
+            appliedAt: z.iso.datetime(),
+            assignedTo: z.string().nullable(),
         }),
     }),
 });
 
-/**
- * @description Bad request.
- */
-export const assignCwlApplication400Schema = z.object({
+export const assignCwlApplicationStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const assignCwlApplication401Schema = z.object({
+export const assignCwlApplicationStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Not found.
- */
-export const assignCwlApplication404Schema = z.object({
+export const assignCwlApplicationStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const assignCwlApplication500Schema = z.object({
+export const assignCwlApplicationStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const assignCwlApplicationMutationRequestSchema = z.object({
-    clanTag: z.union([z.string(), z.null()]),
+export const assignCwlApplicationResponseSchema = assignCwlApplicationStatus200Schema;
+
+export const assignCwlApplicationErrorSchema = z.union([
+    assignCwlApplicationStatus400Schema,
+    assignCwlApplicationStatus401Schema,
+    assignCwlApplicationStatus404Schema,
+    assignCwlApplicationStatus500Schema,
+]);
+
+export const assignCwlApplicationBodySchema = z.object({
+    clanTag: z.string().nullable(),
 });
 
-export const assignCwlApplicationMutationResponseSchema = z.lazy(() => assignCwlApplication200Schema);
+export const assignCwlApplicationPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

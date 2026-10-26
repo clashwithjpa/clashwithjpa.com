@@ -5,40 +5,35 @@
 
 import * as z from "zod";
 
-/**
- * @description Test message sent.
- */
-export const testCwlPing200Schema = z.object({
+export const testCwlPingStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({}),
+    data: z.strictObject({}),
 });
 
-/**
- * @description No channel to test.
- */
-export const testCwlPing400Schema = z.object({
+export const testCwlPingStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const testCwlPing401Schema = z.object({
+export const testCwlPingStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Discord rejected the message.
- */
-export const testCwlPing502Schema = z.object({
+export const testCwlPingStatus502Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const testCwlPingMutationRequestSchema = z.object({
-    channelId: z.optional(z.string().regex(/^\d{17,20}$/)),
-});
+export const testCwlPingResponseSchema = testCwlPingStatus200Schema;
 
-export const testCwlPingMutationResponseSchema = z.lazy(() => testCwlPing200Schema);
+export const testCwlPingErrorSchema = z.union([testCwlPingStatus400Schema, testCwlPingStatus401Schema, testCwlPingStatus502Schema]);
+
+export const testCwlPingBodySchema = z
+    .object({
+        channelId: z
+            .string()
+            .regex(/^\d{17,20}$/)
+            .optional(),
+    })
+    .optional();

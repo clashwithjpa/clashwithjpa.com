@@ -3,78 +3,45 @@
  * Do not edit manually.
  */
 
-/**
- * @description Updated bonus.
- */
-export type SetUserSeasonBonus200 = {
-    /**
-     * @type boolean
-     */
+export type SetUserSeasonBonusStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         bonus: {
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type number
-             */
             seasonId: number;
             cocAccountTag: string | null;
         } | null;
     };
 };
 
-/**
- * @description Bad request.
- */
-export type SetUserSeasonBonus400 = {
-    /**
-     * @type boolean
-     */
+export type SetUserSeasonBonusStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SetUserSeasonBonus401 = {
-    /**
-     * @type boolean
-     */
+export type SetUserSeasonBonusStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SetUserSeasonBonus500 = {
-    /**
-     * @type boolean
-     */
+export type SetUserSeasonBonusStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SetUserSeasonBonusMutationRequest = {
+export type SetUserSeasonBonusBody = {
     /**
      * @minLength 1
      * @type string
@@ -87,16 +54,24 @@ export type SetUserSeasonBonusMutationRequest = {
      */
     seasonId: number;
     cocAccountTag: string | null;
-    /**
-     * @type boolean
-     */
     selected: boolean;
 };
 
-export type SetUserSeasonBonusMutationResponse = SetUserSeasonBonus200;
-
-export type SetUserSeasonBonusMutation = {
-    Response: SetUserSeasonBonus200;
-    Request: SetUserSeasonBonusMutationRequest;
-    Errors: SetUserSeasonBonus400 | SetUserSeasonBonus401 | SetUserSeasonBonus500;
+export type SetUserSeasonBonusOptions = {
+    body: SetUserSeasonBonusBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type SetUserSeasonBonusResponses = {
+    "200": SetUserSeasonBonusStatus200;
+    "400": SetUserSeasonBonusStatus400;
+    "401": SetUserSeasonBonusStatus401;
+    "500": SetUserSeasonBonusStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SetUserSeasonBonusResponse = SetUserSeasonBonusStatus200;

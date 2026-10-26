@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetBonusDataQueryParams = {
+export type GetBonusDataQuery = {
     /**
      * @minLength -9007199254740991
      * @maxLength 9007199254740991
@@ -12,164 +12,79 @@ export type GetBonusDataQueryParams = {
     seasonId?: number;
 };
 
-/**
- * @description Bonus rows.
- */
-export type GetBonusData200 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusDataStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         rows: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type number
-             */
             cocAccountId: number;
-            /**
-             * @type number
-             */
             seasonId: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             discordUsername: string;
-            /**
-             * @type string,null
-             */
             image: string | null;
-            /**
-             * @type string
-             */
             cocAccountName: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type string,null
-             */
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             preferenceNum: number;
-            /**
-             * @type string,null
-             */
             assignedTo: string | null;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type string,null
-             */
             currentClan: string | null;
-            /**
-             * @type number
-             */
             townHall: number;
-            /**
-             * @type number
-             */
             totalDonated: number;
-            /**
-             * @type number
-             */
             totalReceived: number;
-            /**
-             * @type number
-             */
             clanGames: number;
-            /**
-             * @type number
-             */
             capitalGoldLooted: number;
-            /**
-             * @type number
-             */
             capitalGoldContributed: number;
-            /**
-             * @type number
-             */
             activityScore: number;
-            /**
-             * @type string,null
-             */
             ownerName: string | null;
-            /**
-             * @type string,null
-             */
             ownerImage: string | null;
-            /**
-             * @type string,null
-             */
             ownerRole: string | null;
         }[];
-        /**
-         * @type number
-         */
         total: number;
-        /**
-         * @type number,null
-         */
         seasonId: number | null;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetBonusData401 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusDataStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetBonusDataStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetBonusData500 = {
-    /**
-     * @type boolean
-     */
+export type GetBonusDataStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetBonusDataQueryResponse = GetBonusData200;
-
-export type GetBonusDataQuery = {
-    Response: GetBonusData200;
-    QueryParams: GetBonusDataQueryParams;
-    Errors: GetBonusData401 | GetBonusData500;
+export type GetBonusDataOptions = {
+    body?: never;
+    path?: never;
+    query?: GetBonusDataQuery;
+    headers?: never;
 };
+
+export type GetBonusDataResponses = {
+    "200": GetBonusDataStatus200;
+    "400": GetBonusDataStatus400;
+    "401": GetBonusDataStatus401;
+    "500": GetBonusDataStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetBonusDataResponse = GetBonusDataStatus200;

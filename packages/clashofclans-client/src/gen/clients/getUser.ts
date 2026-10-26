@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetUser401, GetUser500, GetUserQueryResponse } from "../models/GetUser.ts";
-
-function getGetUserUrl() {
-    const res = { method: "GET", url: `/user` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetUserOptions, GetUserResponses } from "../models/GetUser.ts";
 
 /**
  * @description Fetches the current user's data.
  * {@link /user}
  */
-export async function getUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getUser<ThrowOnError extends boolean = false>(
+    options: Options<GetUserOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetUserResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetUserQueryResponse, ResponseErrorConfig<GetUser401 | GetUser500>, unknown>({
-        method: "GET",
-        url: getGetUserUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/user",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetUserResponses, ThrowOnError>>,
+    );
 }

@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetCOCClanMembersPathParams = {
+export type GetCOCClanMembersPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,152 +15,54 @@ export type GetCOCClanMembersPathParams = {
     tag: string;
 };
 
-export const itemsRoleEnum = {
+export const getCOCClanMembersStatus200DataClanMembersItemsRoleEnum = {
     member: "member",
     admin: "admin",
     coLeader: "coLeader",
     leader: "leader",
 } as const;
 
-export type ItemsRoleEnumKey = (typeof itemsRoleEnum)[keyof typeof itemsRoleEnum];
+export type GetCOCClanMembersStatus200DataClanMembersItemsRoleEnumKey =
+    (typeof getCOCClanMembersStatus200DataClanMembersItemsRoleEnum)[keyof typeof getCOCClanMembersStatus200DataClanMembersItemsRoleEnum];
 
-/**
- * @description Successful response with the clan\'s members.
- */
-export type GetCOCClanMembers200 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanMembersStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clanMembers: {
-            /**
-             * @type array
-             */
             items: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type string
-                 */
                 tag: string;
-                /**
-                 * @type string
-                 */
-                role: ItemsRoleEnumKey;
-                /**
-                 * @type number
-                 */
+                role: GetCOCClanMembersStatus200DataClanMembersItemsRoleEnumKey;
                 expLevel: number;
-                /**
-                 * @type number
-                 */
                 townHallLevel: number;
-                /**
-                 * @type object | undefined
-                 */
                 leagueTier?: {
-                    /**
-                     * @type number
-                     */
                     id: number;
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type object
-                     */
                     iconUrls: {
-                        /**
-                         * @type string
-                         */
                         small: string;
-                        /**
-                         * @type string
-                         */
                         large: string;
                     };
                 };
-                /**
-                 * @type object | undefined
-                 */
                 builderBaseLeague?: {
-                    /**
-                     * @type number
-                     */
                     id: number;
-                    /**
-                     * @type string
-                     */
                     name: string;
                 };
-                /**
-                 * @type number
-                 */
                 trophies: number;
-                /**
-                 * @type number | undefined
-                 */
                 builderBaseTrophies?: number;
-                /**
-                 * @type number
-                 */
                 clanRank: number;
-                /**
-                 * @type number
-                 */
                 previousClanRank: number;
-                /**
-                 * @type number
-                 */
                 donations: number;
-                /**
-                 * @type number
-                 */
                 donationsReceived: number;
-                /**
-                 * @type object | undefined
-                 */
                 playerHouse?: {
-                    /**
-                     * @type array
-                     */
                     elements: {
-                        /**
-                         * @type string
-                         */
                         type: string;
-                        /**
-                         * @type number
-                         */
                         id: number;
                     }[];
                 };
             }[];
-            /**
-             * @type object
-             */
             paging: {
-                /**
-                 * @type object | undefined
-                 */
                 cursors?: {
-                    /**
-                     * @type string | undefined
-                     */
                     after?: string;
-                    /**
-                     * @type string | undefined
-                     */
                     before?: string;
                 };
             };
@@ -166,25 +70,35 @@ export type GetCOCClanMembers200 = {
     };
 };
 
-/**
- * @description Server error response when fetching clan members fails.
- */
-export type GetCOCClanMembers500 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanMembersStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCOCClanMembersStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCOCClanMembersQueryResponse = GetCOCClanMembers200;
-
-export type GetCOCClanMembersQuery = {
-    Response: GetCOCClanMembers200;
-    PathParams: GetCOCClanMembersPathParams;
-    Errors: GetCOCClanMembers500;
+export type GetCOCClanMembersOptions = {
+    body?: never;
+    path: GetCOCClanMembersPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCOCClanMembersResponses = {
+    "200": GetCOCClanMembersStatus200;
+    "400": GetCOCClanMembersStatus400;
+    "500": GetCOCClanMembersStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCOCClanMembersResponse = GetCOCClanMembersStatus200;

@@ -5,52 +5,47 @@
 
 import * as z from "zod";
 
-export const getFWAClanPointsPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getFWAClanPointsPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the clan\'s FWA points.
- */
-export const getFWAClanPoints200Schema = z.object({
+export const getFWAClanPointsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         points: z.union([
-            z.object({
-                clan: z.object({
+            z.strictObject({
+                clan: z.strictObject({
                     name: z.string(),
                     tag: z.string(),
                 }),
-                balance: z.nullable(z.number()),
-                activeFwa: z.nullable(z.boolean()),
+                balance: z.number().nullable(),
+                activeFwa: z.boolean().nullable(),
                 matchup: z.union([
-                    z.object({
-                        warId: z.nullable(z.number()),
-                        sync: z.nullable(z.number()),
-                        opponent: z.object({
+                    z.strictObject({
+                        warId: z.number().nullable(),
+                        sync: z.number().nullable(),
+                        opponent: z.strictObject({
                             name: z.string(),
                             tag: z.string(),
                         }),
                         winner: z.union([z.enum(["clan", "opponent"]), z.null()]),
-                        reason: z.nullable(z.string()),
-                        notice: z.nullable(z.string()),
+                        reason: z.string().nullable(),
+                        notice: z.string().nullable(),
                     }),
                     z.null(),
                 ]),
-                warState: z.nullable(z.string()),
+                warState: z.string().nullable(),
                 stars: z.array(
-                    z.object({
+                    z.strictObject({
                         name: z.string(),
                         counts: z.array(z.number()),
                     }),
                 ),
                 history: z.array(
-                    z.object({
+                    z.strictObject({
                         at: z.string(),
-                        sync: z.nullable(z.number()),
+                        sync: z.number().nullable(),
                         result: z.union([z.enum(["win", "lose"]), z.null()]),
                         points: z.number(),
-                        note: z.nullable(z.string()),
+                        note: z.string().nullable(),
                     }),
                 ),
                 sourceUrl: z.string(),
@@ -60,12 +55,21 @@ export const getFWAClanPoints200Schema = z.object({
     }),
 });
 
-/**
- * @description The FWA points database couldn\'t be reached or read.
- */
-export const getFWAClanPoints502Schema = z.object({
+export const getFWAClanPointsStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getFWAClanPointsQueryResponseSchema = z.lazy(() => getFWAClanPoints200Schema);
+export const getFWAClanPointsStatus502Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getFWAClanPointsResponseSchema = getFWAClanPointsStatus200Schema;
+
+export const getFWAClanPointsErrorSchema = z.union([getFWAClanPointsStatus400Schema, getFWAClanPointsStatus502Schema]);
+
+export const getFWAClanPointsPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

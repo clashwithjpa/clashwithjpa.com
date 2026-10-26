@@ -3,81 +3,57 @@
  * Do not edit manually.
  */
 
-/**
- * @description Backfill result.
- */
-export type RefreshDiscordUsernames200 = {
-    /**
-     * @type boolean
-     */
+export type RefreshDiscordUsernamesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         total: number;
-        /**
-         * @type number
-         */
         matched: number;
-        /**
-         * @type number
-         */
         updated: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type RefreshDiscordUsernames401 = {
-    /**
-     * @type boolean
-     */
+export type RefreshDiscordUsernamesStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type RefreshDiscordUsernames500 = {
-    /**
-     * @type boolean
-     */
+export type RefreshDiscordUsernamesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord unavailable.
- */
-export type RefreshDiscordUsernames503 = {
-    /**
-     * @type boolean
-     */
+export type RefreshDiscordUsernamesStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type RefreshDiscordUsernamesMutationResponse = RefreshDiscordUsernames200;
-
-export type RefreshDiscordUsernamesMutation = {
-    Response: RefreshDiscordUsernames200;
-    Errors: RefreshDiscordUsernames401 | RefreshDiscordUsernames500 | RefreshDiscordUsernames503;
+export type RefreshDiscordUsernamesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type RefreshDiscordUsernamesResponses = {
+    "200": RefreshDiscordUsernamesStatus200;
+    "401": RefreshDiscordUsernamesStatus401;
+    "500": RefreshDiscordUsernamesStatus500;
+    "503": RefreshDiscordUsernamesStatus503;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type RefreshDiscordUsernamesResponse = RefreshDiscordUsernamesStatus200;

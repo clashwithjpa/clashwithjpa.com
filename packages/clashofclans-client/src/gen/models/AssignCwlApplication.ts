@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type AssignCwlApplicationPathParams = {
+export type AssignCwlApplicationPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,65 +12,28 @@ export type AssignCwlApplicationPathParams = {
     id: number;
 };
 
-/**
- * @description Updated application.
- */
-export type AssignCwlApplication200 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         application: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             discordUsername: string;
-            /**
-             * @type string
-             */
             cocAccountName: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             cocAccountClan: string | null;
-            /**
-             * @type number
-             */
             cocAccountWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
             image: string | null;
-            /**
-             * @type number
-             */
             seasonId: number;
             seasonName: string | null;
             month: string | null;
             year: number | null;
-            /**
-             * @type number
-             */
             preferenceNum: number;
             /**
-             * @type string, date-time
+             * @description
+             * Format: `date-time`
+             * @type string
              */
             appliedAt: string;
             assignedTo: string | null;
@@ -78,75 +41,62 @@ export type AssignCwlApplication200 = {
     };
 };
 
-/**
- * @description Bad request.
- */
-export type AssignCwlApplication400 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type AssignCwlApplication401 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type AssignCwlApplication404 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type AssignCwlApplication500 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type AssignCwlApplicationMutationRequest = {
+export type AssignCwlApplicationBody = {
     clanTag: string | null;
 };
 
-export type AssignCwlApplicationMutationResponse = AssignCwlApplication200;
-
-export type AssignCwlApplicationMutation = {
-    Response: AssignCwlApplication200;
-    Request: AssignCwlApplicationMutationRequest;
-    PathParams: AssignCwlApplicationPathParams;
-    Errors: AssignCwlApplication400 | AssignCwlApplication401 | AssignCwlApplication404 | AssignCwlApplication500;
+export type AssignCwlApplicationOptions = {
+    body: AssignCwlApplicationBody;
+    path: AssignCwlApplicationPath;
+    query?: never;
+    headers?: never;
 };
+
+export type AssignCwlApplicationResponses = {
+    "200": AssignCwlApplicationStatus200;
+    "400": AssignCwlApplicationStatus400;
+    "401": AssignCwlApplicationStatus401;
+    "404": AssignCwlApplicationStatus404;
+    "500": AssignCwlApplicationStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type AssignCwlApplicationResponse = AssignCwlApplicationStatus200;

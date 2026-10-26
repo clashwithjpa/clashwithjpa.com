@@ -3,36 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteCocAccountsBulk401,
-    DeleteCocAccountsBulk500,
-    DeleteCocAccountsBulkMutationRequest,
-    DeleteCocAccountsBulkMutationResponse,
-} from "../models/DeleteCocAccountsBulk.ts";
-
-function getDeleteCocAccountsBulkUrl() {
-    const res = { method: "POST", url: `/admin/coc-accounts/delete-bulk` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteCocAccountsBulkOptions, DeleteCocAccountsBulkResponses } from "../models/DeleteCocAccountsBulk.ts";
 
 /**
  * @description Permanently deletes many Clash of Clans accounts in one request. Cascades to each account's CWL applications and cannot be undone.
  * {@link /admin/coc-accounts/delete-bulk}
  */
-export async function deleteCocAccountsBulk(
-    data: DeleteCocAccountsBulkMutationRequest,
-    config: Partial<RequestConfig<DeleteCocAccountsBulkMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteCocAccountsBulk<ThrowOnError extends boolean = false>(
+    options: Options<DeleteCocAccountsBulkOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteCocAccountsBulkResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        DeleteCocAccountsBulkMutationResponse,
-        ResponseErrorConfig<DeleteCocAccountsBulk401 | DeleteCocAccountsBulk500>,
-        DeleteCocAccountsBulkMutationRequest
-    >({ method: "POST", url: getDeleteCocAccountsBulkUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/coc-accounts/delete-bulk",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteCocAccountsBulkResponses, ThrowOnError>>,
+    );
 }

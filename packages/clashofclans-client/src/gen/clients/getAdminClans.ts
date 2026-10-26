@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetAdminClans401, GetAdminClans500, GetAdminClansQueryResponse } from "../models/GetAdminClans.ts";
-
-function getGetAdminClansUrl() {
-    const res = { method: "GET", url: `/admin/clans` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetAdminClansOptions, GetAdminClansResponses } from "../models/GetAdminClans.ts";
 
 /**
  * @description Lists all JPA clans with full details.
  * {@link /admin/clans}
  */
-export async function getAdminClans(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getAdminClans<ThrowOnError extends boolean = false>(
+    options: Options<GetAdminClansOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetAdminClansResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetAdminClansQueryResponse, ResponseErrorConfig<GetAdminClans401 | GetAdminClans500>, unknown>({
-        method: "GET",
-        url: getGetAdminClansUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/clans",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetAdminClansResponses, ThrowOnError>>,
+    );
 }

@@ -22,7 +22,6 @@
     import { loadGuildNicknames } from "#lib/discordNicknames.js";
     import { toast } from "#lib/toast.js";
     import { formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         assignCwlApplication,
         getBonusData,
@@ -33,9 +32,9 @@
         getJPACwlClans,
         setUserSeasonBonus,
         updateCocAccountStats,
-        type GetBonusData200,
-        type GetCwlSeasons200,
-        type GetCwlStats200,
+        type GetBonusDataStatus200,
+        type GetCwlSeasonsStatus200,
+        type GetCwlStatsStatus200,
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type SortingState } from "@tanstack/svelte-table";
     import TablerCircleCheck from "~icons/tabler/circle-check";
@@ -43,10 +42,10 @@
     import TablerDownload from "~icons/tabler/download";
     import TablerShield from "~icons/tabler/shield";
 
-    type BonusRow = GetBonusData200["data"]["rows"][number] & { discordNickname?: string };
-    type Season = GetCwlSeasons200["data"]["seasons"][number];
-    type CwlStat = GetCwlStats200["data"]["stats"][number];
-    type CwlClanRecord = GetCwlStats200["data"]["clans"][number];
+    type BonusRow = GetBonusDataStatus200["data"]["rows"][number] & { discordNickname?: string };
+    type Season = GetCwlSeasonsStatus200["data"]["seasons"][number];
+    type CwlStat = GetCwlStatsStatus200["data"]["stats"][number];
+    type CwlClanRecord = GetCwlStatsStatus200["data"]["clans"][number];
     // A bonus is per Discord user per season; each row carries the set of season
     // ids its owner has been awarded (shared across that user's accounts). CWL
     // attacks/stars are live-fetched when the page loads.
@@ -270,9 +269,11 @@
 
     async function loadClans() {
         try {
-            const resp = await getJPAClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                clanNameByTag = Object.fromEntries(Object.values(resp.data.clans).map((c) => [normalizeTag(c.clanTag), c.clanName ?? c.clanTag]));
+            const resp = await getJPAClans({});
+            if (resp.data) {
+                clanNameByTag = Object.fromEntries(
+                    Object.values(resp.data.data.clans).map((c) => [normalizeTag(c.clanTag), c.clanName ?? c.clanTag]),
+                );
             }
         } catch {
             // Clan cells fall back to showing the raw tag.
@@ -281,9 +282,9 @@
 
     async function loadCwlClans() {
         try {
-            const resp = await getJPACwlClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
-                const clans = Object.values(resp.data.clans);
+            const resp = await getJPACwlClans({});
+            if (resp.data) {
+                const clans = Object.values(resp.data.data.clans);
                 cwlClanOptions = [
                     { label: "Unassigned", value: "" },
                     ...clans.map((c) => ({ label: `${c.clanName} (${c.clanTag})`, value: c.clanTag })),
@@ -298,32 +299,28 @@
     async function load(seasonId?: number) {
         loading = true;
         try {
-            const [bd, bl, ss] = await Promise.all([
-                getBonusData({ seasonId }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-                getBonusLedger({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-                getCwlSeasons({ baseURL: PUBLIC_SERVER_URL, credentials: "include" }),
-            ]);
-            if (!bd.success) {
+            const [bd, bl, ss] = await Promise.all([getBonusData({ query: { seasonId } }), getBonusLedger({}), getCwlSeasons({})]);
+            if (!bd.data) {
                 toast.error("Failed to load bonus data");
                 return;
             }
-            seasons = ss.success ? ss.data.seasons : [];
+            seasons = ss.data ? ss.data.data.seasons : [];
             // Bonus is per Discord user: collect the season ids each user has earned,
             // so all of that user's accounts render the same ticks.
             const seasonsByUser = new Map<string, number[]>();
-            if (bl.success) {
-                for (const b of bl.data.bonuses) {
+            if (bl.data) {
+                for (const b of bl.data.data.bonuses) {
                     const list = seasonsByUser.get(b.discordUserId) ?? [];
                     list.push(b.seasonId);
                     seasonsByUser.set(b.discordUserId, list);
                 }
             }
-            rows = bd.data.rows.map((r) => ({
+            rows = bd.data.data.rows.map((r) => ({
                 ...r,
                 bonusSeasonIds: seasonsByUser.get(r.discordUserId) ?? [],
             }));
-            total = bd.data.total;
-            currentSeasonId = bd.data.seasonId;
+            total = bd.data.data.total;
+            currentSeasonId = bd.data.data.seasonId;
             selectedSeasonValue = currentSeasonId != null ? String(currentSeasonId) : "";
             restoreCwlStats();
             if (cwlFetchedAt == null || Date.now() - cwlFetchedAt > CWL_STALE_MS) fetchCwlStats();
@@ -406,20 +403,23 @@
         const seasonId = currentSeasonId;
         fetchingCwl = true;
         try {
-            const resp = await getCwlStats({ seasonId: seasonId ?? undefined }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (!resp.success) throw new Error();
+            const resp = await getCwlStats({ query: { seasonId: seasonId ?? undefined } });
+            if (!resp.data) throw new Error();
             const fetchedAt = Date.now();
             try {
                 sessionStorage.setItem(
                     CWL_CACHE_KEY,
-                    JSON.stringify({ ...readCwlCache(), [String(seasonId)]: { fetchedAt, stats: resp.data.stats, clans: resp.data.clans } }),
+                    JSON.stringify({
+                        ...readCwlCache(),
+                        [String(seasonId)]: { fetchedAt, stats: resp.data.data.stats, clans: resp.data.data.clans },
+                    }),
                 );
             } catch {
                 // Storage full or blocked; the rows below still get the stats.
             }
             if (id !== cwlLoadId) return;
             cwlFetchedAt = fetchedAt;
-            applyCwlStats(resp.data.stats, resp.data.clans);
+            applyCwlStats(resp.data.data.stats, resp.data.data.clans);
         } catch (error) {
             if (id === cwlLoadId) toast.error("Failed to fetch CWL stats", { description: error instanceof Error ? error.message : undefined });
         } finally {
@@ -434,15 +434,11 @@
             () => ({ assignedTo: clanTag || null }),
         );
         try {
-            const resp = await assignCwlApplication(
-                row.id,
-                { clanTag: clanTag || null },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
+            const resp = await assignCwlApplication({ path: { id: row.id }, body: { clanTag: clanTag || null } });
+            if (!resp.data) throw new Error();
             patchRows(
                 (r) => r.id === row.id,
-                () => ({ assignedTo: resp.data.application.assignedTo ?? null }),
+                () => ({ assignedTo: resp.data.data.application.assignedTo ?? null }),
             );
             toast.success(clanTag ? `Bonus clan set to ${clanLabel(clanTag)}` : "Bonus clan cleared");
         } catch (error) {
@@ -463,13 +459,9 @@
         const sameAccount = (r: Row) => r.cocAccountId === row.cocAccountId;
         patchRows(sameAccount, () => ({ [field]: n }));
         try {
-            const resp = await updateCocAccountStats(
-                row.cocAccountId,
-                { [field]: n },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            patchRows(sameAccount, () => ({ [field]: (resp.data.account as Record<string, unknown>)[field] as number }));
+            const resp = await updateCocAccountStats({ path: { id: row.cocAccountId }, body: { [field]: n } });
+            if (!resp.data) throw new Error();
+            patchRows(sameAccount, () => ({ [field]: (resp.data.data.account as Record<string, unknown>)[field] as number }));
             toast.success(`${label} updated for ${row.cocAccountName}`);
         } catch (error) {
             patchRows(sameAccount, () => ({ [field]: previous }));
@@ -542,11 +534,8 @@
             );
         apply(selected);
         try {
-            const resp = await setUserSeasonBonus(
-                { discordUserId, seasonId, cocAccountTag: data.cocAccountTag, selected },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
+            const resp = await setUserSeasonBonus({ body: { discordUserId, seasonId, cocAccountTag: data.cocAccountTag, selected } });
+            if (!resp.data) throw new Error();
             toast.success(`Bonus ${selected ? "awarded to" : "removed from"} ${data.discordUsername}`);
         } catch (error) {
             apply(!selected);

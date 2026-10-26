@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCwlPingSettings401, GetCwlPingSettings500, GetCwlPingSettingsQueryResponse } from "../models/GetCwlPingSettings.ts";
-
-function getGetCwlPingSettingsUrl() {
-    const res = { method: "GET", url: `/admin/settings/cwl-ping` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCwlPingSettingsOptions, GetCwlPingSettingsResponses } from "../models/GetCwlPingSettings.ts";
 
 /**
  * @description Fetches the CWL ping job's settings (enabled, channel, interval, last run).
  * {@link /admin/settings/cwl-ping}
  */
-export async function getCwlPingSettings(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCwlPingSettings<ThrowOnError extends boolean = false>(
+    options: Options<GetCwlPingSettingsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCwlPingSettingsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCwlPingSettingsQueryResponse, ResponseErrorConfig<GetCwlPingSettings401 | GetCwlPingSettings500>, unknown>({
-        method: "GET",
-        url: getGetCwlPingSettingsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/settings/cwl-ping",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCwlPingSettingsResponses, ThrowOnError>>,
+    );
 }

@@ -9,7 +9,6 @@
     import { townHallUrl } from "#lib/components/ui/TownHall.svelte";
     import { toast } from "#lib/toast.js";
     import { errorMessage } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
 
@@ -54,20 +53,17 @@
     };
 
     async function setOptions() {
-        const accs = await getUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
+        const { accounts } = (await getUserAccounts({}).unwrap()).data;
         const accsInfo = await Promise.all(
-            accs.data.accounts.map(async (acc) => {
+            accounts.map(async (acc) => {
                 try {
-                    const playerData = await getCOCPlayer(encodeURIComponent(acc.cocAccountTag), {
-                        baseURL: PUBLIC_SERVER_URL,
-                        credentials: "include",
-                    });
+                    const { player } = (await getCOCPlayer({ path: { tag: acc.cocAccountTag } }).unwrap()).data;
                     return {
                         tag: acc.cocAccountTag,
-                        name: playerData.data.player.name,
-                        icon: townHallUrl(playerData.data.player.townHallLevel),
+                        name: player.name,
+                        icon: townHallUrl(player.townHallLevel),
                         warWeight: acc.warWeight,
-                        clanTag: playerData.data.player.clan?.tag,
+                        clanTag: player.clan?.tag,
                         isExternal: acc.isExternal,
                     };
                 } catch {
@@ -93,8 +89,8 @@
     }
 
     async function setClanOptions() {
-        const clans = await getJPAClans({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-        Object.values(clans.data.clans).forEach((clan) => {
+        const { clans } = (await getJPAClans({}).unwrap()).data;
+        Object.values(clans).forEach((clan) => {
             clanOptions.push({ label: `${clan.clanTag} - ${clan.clanName}`, value: clan.clanTag });
         });
     }
@@ -114,16 +110,15 @@
 
         isLoading = true;
         try {
-            const data = await applyCwl(
-                {
+            const data = await applyCwl({
+                body: {
                     tag,
                     preferenceNum,
                     accountClan: selectedIsExternal ? null : accountClan,
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
+            });
 
-            if (data.success) {
+            if (data.data) {
                 const selectedOption = options.find((o) => o.value === tag);
                 toast.success(`CWL Application for ${selectedOption?.label || tag} submitted successfully!`);
                 tag = "";

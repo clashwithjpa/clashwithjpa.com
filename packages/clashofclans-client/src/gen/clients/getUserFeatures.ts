@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetUserFeatures401, GetUserFeatures500, GetUserFeaturesQueryResponse } from "../models/GetUserFeatures.ts";
-
-function getGetUserFeaturesUrl() {
-    const res = { method: "GET", url: `/user/features` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetUserFeaturesOptions, GetUserFeaturesResponses } from "../models/GetUserFeatures.ts";
 
 /**
  * @description Fetches the site feature flags relevant to the current user.
  * {@link /user/features}
  */
-export async function getUserFeatures(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getUserFeatures<ThrowOnError extends boolean = false>(
+    options: Options<GetUserFeaturesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetUserFeaturesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetUserFeaturesQueryResponse, ResponseErrorConfig<GetUserFeatures401 | GetUserFeatures500>, unknown>({
-        method: "GET",
-        url: getGetUserFeaturesUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/user/features",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetUserFeaturesResponses, ThrowOnError>>,
+    );
 }

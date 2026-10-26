@@ -3,76 +3,51 @@
  * Do not edit manually.
  */
 
-/**
- * @description Seasons.
- */
-export type GetCwlSeasons200 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlSeasonsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         seasons: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
             createdAt: string | null;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetCwlSeasons401 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlSeasonsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetCwlSeasons500 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlSeasonsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCwlSeasonsQueryResponse = GetCwlSeasons200;
-
-export type GetCwlSeasonsQuery = {
-    Response: GetCwlSeasons200;
-    Errors: GetCwlSeasons401 | GetCwlSeasons500;
+export type GetCwlSeasonsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCwlSeasonsResponses = {
+    "200": GetCwlSeasonsStatus200;
+    "401": GetCwlSeasonsStatus401;
+    "500": GetCwlSeasonsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCwlSeasonsResponse = GetCwlSeasonsStatus200;

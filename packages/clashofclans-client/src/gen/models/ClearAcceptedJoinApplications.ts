@@ -3,58 +3,45 @@
  * Do not edit manually.
  */
 
-/**
- * @description Number of deleted applications.
- */
-export type ClearAcceptedJoinApplications200 = {
-    /**
-     * @type boolean
-     */
+export type ClearAcceptedJoinApplicationsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         deleted: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type ClearAcceptedJoinApplications401 = {
-    /**
-     * @type boolean
-     */
+export type ClearAcceptedJoinApplicationsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type ClearAcceptedJoinApplications500 = {
-    /**
-     * @type boolean
-     */
+export type ClearAcceptedJoinApplicationsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type ClearAcceptedJoinApplicationsMutationResponse = ClearAcceptedJoinApplications200;
-
-export type ClearAcceptedJoinApplicationsMutation = {
-    Response: ClearAcceptedJoinApplications200;
-    Errors: ClearAcceptedJoinApplications401 | ClearAcceptedJoinApplications500;
+export type ClearAcceptedJoinApplicationsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type ClearAcceptedJoinApplicationsResponses = {
+    "200": ClearAcceptedJoinApplicationsStatus200;
+    "401": ClearAcceptedJoinApplicationsStatus401;
+    "500": ClearAcceptedJoinApplicationsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type ClearAcceptedJoinApplicationsResponse = ClearAcceptedJoinApplicationsStatus200;

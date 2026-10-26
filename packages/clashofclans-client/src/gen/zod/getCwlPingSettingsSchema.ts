@@ -5,39 +5,32 @@
 
 import * as z from "zod";
 
-/**
- * @description Settings.
- */
-export const getCwlPingSettings200Schema = z.object({
+export const getCwlPingSettingsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         settings: z.union([
-            z.object({
+            z.strictObject({
                 enabled: z.boolean(),
-                channelId: z.nullable(z.string()),
+                channelId: z.string().nullable(),
                 intervalMinutes: z.number(),
-                lastRunAt: z.union([z.string().datetime(), z.null()]),
-                lastRunSummary: z.nullable(z.string()),
+                lastRunAt: z.union([z.iso.datetime(), z.null()]),
+                lastRunSummary: z.string().nullable(),
             }),
             z.null(),
         ]),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getCwlPingSettings401Schema = z.object({
+export const getCwlPingSettingsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getCwlPingSettings500Schema = z.object({
+export const getCwlPingSettingsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getCwlPingSettingsQueryResponseSchema = z.lazy(() => getCwlPingSettings200Schema);
+export const getCwlPingSettingsResponseSchema = getCwlPingSettingsStatus200Schema;
+
+export const getCwlPingSettingsErrorSchema = z.union([getCwlPingSettingsStatus401Schema, getCwlPingSettingsStatus500Schema]);

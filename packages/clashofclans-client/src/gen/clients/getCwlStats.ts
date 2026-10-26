@@ -3,27 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCwlStats401, GetCwlStats500, GetCwlStatsQueryParams, GetCwlStatsQueryResponse } from "../models/GetCwlStats.ts";
-
-function getGetCwlStatsUrl() {
-    const res = { method: "GET", url: `/admin/cwl-stats` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCwlStatsOptions, GetCwlStatsResponses } from "../models/GetCwlStats.ts";
 
 /**
  * @description Live-fetches the current CWL from the CoC API for the season's assigned clans; returns per-player attacks used (of 7), stars with a per-attack breakdown and the ended rounds they were in the lineup for, plus each clan's war record.
  * {@link /admin/cwl-stats}
  */
-export async function getCwlStats(params?: GetCwlStatsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCwlStats<ThrowOnError extends boolean = false>(
+    options: Options<GetCwlStatsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCwlStatsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCwlStatsQueryResponse, ResponseErrorConfig<GetCwlStats401 | GetCwlStats500>, unknown>({
-        method: "GET",
-        url: getGetCwlStatsUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/cwl-stats",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCwlStatsResponses, ThrowOnError>>,
+    );
 }

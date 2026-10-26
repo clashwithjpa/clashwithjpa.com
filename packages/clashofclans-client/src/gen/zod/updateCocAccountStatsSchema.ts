@@ -5,23 +5,18 @@
 
 import * as z from "zod";
 
-export const updateCocAccountStatsPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const updateCocAccountStatsPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Updated COC account.
- */
-export const updateCocAccountStats200Schema = z.object({
+export const updateCocAccountStatsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        account: z.object({
+    data: z.strictObject({
+        account: z.strictObject({
             id: z.number(),
             discordUserId: z.string(),
             cocAccountTag: z.string(),
             warWeight: z.number(),
             isExternal: z.boolean(),
-            currentClan: z.union([z.string(), z.null()]),
+            currentClan: z.string().nullable(),
             townHall: z.number(),
             totalDonated: z.number(),
             totalReceived: z.number(),
@@ -29,54 +24,55 @@ export const updateCocAccountStats200Schema = z.object({
             capitalGoldLooted: z.number(),
             capitalGoldContributed: z.number(),
             activityScore: z.number(),
-            ownerUserId: z.union([z.string(), z.null()]),
-            ownerName: z.union([z.string(), z.null()]),
-            ownerImage: z.union([z.string(), z.null()]),
-            ownerRole: z.union([z.string(), z.null()]),
+            ownerUserId: z.string().nullable(),
+            ownerName: z.string().nullable(),
+            ownerImage: z.string().nullable(),
+            ownerRole: z.string().nullable(),
         }),
     }),
 });
 
-/**
- * @description Invalid request.
- */
-export const updateCocAccountStats400Schema = z.object({
+export const updateCocAccountStatsStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const updateCocAccountStats401Schema = z.object({
+export const updateCocAccountStatsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Not found.
- */
-export const updateCocAccountStats404Schema = z.object({
+export const updateCocAccountStatsStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const updateCocAccountStats500Schema = z.object({
+export const updateCocAccountStatsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateCocAccountStatsMutationRequestSchema = z.object({
-    currentClan: z.optional(z.union([z.string(), z.null()])),
-    totalDonated: z.optional(z.number().int().min(0).max(9007199254740991)),
-    totalReceived: z.optional(z.number().int().min(0).max(9007199254740991)),
-    clanGames: z.optional(z.number().int().min(0).max(9007199254740991)),
-    capitalGoldLooted: z.optional(z.number().int().min(0).max(9007199254740991)),
-    capitalGoldContributed: z.optional(z.number().int().min(0).max(9007199254740991)),
-    activityScore: z.optional(z.number().int().min(0).max(9007199254740991)),
-});
+export const updateCocAccountStatsResponseSchema = updateCocAccountStatsStatus200Schema;
 
-export const updateCocAccountStatsMutationResponseSchema = z.lazy(() => updateCocAccountStats200Schema);
+export const updateCocAccountStatsErrorSchema = z.union([
+    updateCocAccountStatsStatus400Schema,
+    updateCocAccountStatsStatus401Schema,
+    updateCocAccountStatsStatus404Schema,
+    updateCocAccountStatsStatus500Schema,
+]);
+
+export const updateCocAccountStatsBodySchema = z
+    .object({
+        currentClan: z.string().nullish(),
+        totalDonated: z.int().min(0).max(9007199254740991).optional(),
+        totalReceived: z.int().min(0).max(9007199254740991).optional(),
+        clanGames: z.int().min(0).max(9007199254740991).optional(),
+        capitalGoldLooted: z.int().min(0).max(9007199254740991).optional(),
+        capitalGoldContributed: z.int().min(0).max(9007199254740991).optional(),
+        activityScore: z.int().min(0).max(9007199254740991).optional(),
+    })
+    .optional();
+
+export const updateCocAccountStatsPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

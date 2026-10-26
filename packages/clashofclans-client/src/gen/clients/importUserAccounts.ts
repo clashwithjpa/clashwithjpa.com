@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { ImportUserAccounts401, ImportUserAccounts500, ImportUserAccountsMutationResponse } from "../models/ImportUserAccounts.ts";
-
-function getImportUserAccountsUrl() {
-    const res = { method: "POST", url: `/user/accounts/import` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { ImportUserAccountsOptions, ImportUserAccountsResponses } from "../models/ImportUserAccounts.ts";
 
 /**
  * @description Imports any pre-existing Clash of Clans accounts linked to the user's Discord ID from the migration dataset. Skips accounts already linked. Upgrades the user to 'verified' if at least one account was imported.
  * {@link /user/accounts/import}
  */
-export async function importUserAccounts(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function importUserAccounts<ThrowOnError extends boolean = false>(
+    options: Options<ImportUserAccountsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<ImportUserAccountsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<ImportUserAccountsMutationResponse, ResponseErrorConfig<ImportUserAccounts401 | ImportUserAccounts500>, unknown>({
-        method: "POST",
-        url: getImportUserAccountsUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/user/accounts/import",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<ImportUserAccountsResponses, ThrowOnError>>,
+    );
 }

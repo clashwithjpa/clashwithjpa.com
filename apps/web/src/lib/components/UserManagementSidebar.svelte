@@ -6,7 +6,6 @@
     import { ROLE_LEVELS, roleLevel } from "#lib/config/roles.js";
     import { toast } from "#lib/toast.js";
     import { formatDate, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { goto } from "$app/navigation";
     import {
         deleteCocAccount,
@@ -105,16 +104,12 @@
         const previous = apiAccess;
         apiAccess = next;
         try {
-            const resp = await setUserApiAccess(
-                user.id,
-                { enabled: next },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await setUserApiAccess({ path: { userid: user.id }, body: { enabled: next } });
+            if (resp.data) {
                 toast.success(
                     next
                         ? `API access enabled for ${user.name}`
-                        : `API access revoked for ${user.name}${resp.data.disabledKeys ? `, ${resp.data.disabledKeys} key(s) disabled` : ""}`,
+                        : `API access revoked for ${user.name}${resp.data.data.disabledKeys ? `, ${resp.data.data.disabledKeys} key(s) disabled` : ""}`,
                 );
                 onUserUpdated?.(user.id);
             } else {
@@ -165,12 +160,8 @@
         togglingExternalId = account.id;
         const nextExternal = !account.isExternal;
         try {
-            const resp = await updateCocAccountExternal(
-                account.id,
-                { isExternal: nextExternal },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (resp.success) {
+            const resp = await updateCocAccountExternal({ path: { id: account.id }, body: { isExternal: nextExternal } });
+            if (resp.data) {
                 toast.success(`${account.cocAccountTag} set to ${nextExternal ? "external" : "main"}`);
                 accountsRefreshKey++;
             } else {
@@ -187,8 +178,8 @@
     async function handleDeleteAccount(account: { id: number; cocAccountTag: string }) {
         deletingAccountId = account.id;
         try {
-            const resp = await deleteCocAccount(account.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) {
+            const resp = await deleteCocAccount({ path: { id: account.id } });
+            if (resp.data) {
                 toast.success(`Deleted ${account.cocAccountTag}`);
                 accountsRefreshKey++;
             } else {
@@ -463,7 +454,7 @@
             {/key}
         {:else if activeTab === "accounts"}
             {#key accountsRefreshKey}
-                {#await getUserCocAccountsByUserId(user.id, { baseURL: PUBLIC_SERVER_URL, credentials: "include" })}
+                {#await getUserCocAccountsByUserId({ path: { userid: user.id } })}
                     <div class="space-y-2" aria-busy="true">
                         {#each { length: 3 }, i (i)}
                             <div class="rounded-lg bg-stone-800 px-3 py-2">
@@ -491,7 +482,7 @@
                         {/each}
                     </div>
                 {:then response}
-                    {#if !response.success || response.data.accounts.length === 0}
+                    {#if !response.data || response.data.data.accounts.length === 0}
                         <div class="flex items-center justify-center rounded-lg bg-stone-800 px-2 py-8">
                             <div class="flex items-center gap-2 text-stone-400">
                                 <TablerWorldX class="size-6" />
@@ -500,9 +491,9 @@
                         </div>
                     {:else}
                         <div class="space-y-2">
-                            {#each response.data.accounts as account (account.id)}
+                            {#each response.data.data.accounts as account (account.id)}
                                 <div class="rounded-lg bg-stone-800 px-3 py-2">
-                                    {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
+                                    {#await getCOCPlayer({ path: { tag: account.cocAccountTag } })}
                                         <div class="flex flex-wrap items-center justify-between gap-2">
                                             <div class="flex min-w-28 flex-1 items-center gap-2">
                                                 <div class="size-10 shrink-0 skeleton rounded-lg"></div>
@@ -515,9 +506,9 @@
                                     {:then acc}
                                         <div class="flex flex-wrap items-start justify-between gap-2">
                                             <div class="flex min-w-28 flex-1 items-center gap-2">
-                                                {#if acc.success}
-                                                    <Tooltip title="Town Hall {acc.data.player.townHallLevel}" placement="top">
-                                                        <TownHall level={acc.data.player.townHallLevel} class="size-10 shrink-0" />
+                                                {#if acc.data}
+                                                    <Tooltip title="Town Hall {acc.data.data.player.townHallLevel}" placement="top">
+                                                        <TownHall level={acc.data.data.player.townHallLevel} class="size-10 shrink-0" />
                                                     </Tooltip>
                                                 {:else}
                                                     <div
@@ -527,9 +518,9 @@
                                                     </div>
                                                 {/if}
                                                 <div class="min-w-0">
-                                                    {#if acc.success}
-                                                        <Tooltip title={acc.data.player.name} placement="top" class="block w-full text-left">
-                                                            <p class="truncate text-sm font-medium text-stone-50">{acc.data.player.name}</p>
+                                                    {#if acc.data}
+                                                        <Tooltip title={acc.data.data.player.name} placement="top" class="block w-full text-left">
+                                                            <p class="truncate text-sm font-medium text-stone-50">{acc.data.data.player.name}</p>
                                                         </Tooltip>
                                                     {/if}
                                                     <code class="block truncate font-mono text-xs text-stone-400">{account.cocAccountTag}</code>
@@ -537,16 +528,16 @@
                                             </div>
                                             {@render accountActions(account)}
                                         </div>
-                                        {#if account.isExternal || (acc.success && acc.data.player.clan)}
+                                        {#if account.isExternal || (acc.data && acc.data.data.player.clan)}
                                             <div class="mt-2 flex flex-wrap gap-1">
                                                 {#if account.isExternal}
                                                     <Badge variant="red" content="External" icon={TablerWorld} />
                                                 {/if}
-                                                {#if acc.success && acc.data.player.clan}
+                                                {#if acc.data && acc.data.data.player.clan}
                                                     <Badge
                                                         variant="blue"
-                                                        content={acc.data.player.clan.name}
-                                                        icon={acc.data.player.clan.badgeUrls.small}
+                                                        content={acc.data.data.player.clan.name}
+                                                        icon={acc.data.data.player.clan.badgeUrls.small}
                                                         iconSize="size-4"
                                                     />
                                                 {/if}

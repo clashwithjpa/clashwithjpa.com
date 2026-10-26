@@ -3,36 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    DeleteCwlApplicationsBulk401,
-    DeleteCwlApplicationsBulk500,
-    DeleteCwlApplicationsBulkMutationRequest,
-    DeleteCwlApplicationsBulkMutationResponse,
-} from "../models/DeleteCwlApplicationsBulk.ts";
-
-function getDeleteCwlApplicationsBulkUrl() {
-    const res = { method: "POST", url: `/admin/cwl-applications/delete-bulk` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { DeleteCwlApplicationsBulkOptions, DeleteCwlApplicationsBulkResponses } from "../models/DeleteCwlApplicationsBulk.ts";
 
 /**
  * @description Permanently deletes many CWL applications in one request. Cannot be undone.
  * {@link /admin/cwl-applications/delete-bulk}
  */
-export async function deleteCwlApplicationsBulk(
-    data: DeleteCwlApplicationsBulkMutationRequest,
-    config: Partial<RequestConfig<DeleteCwlApplicationsBulkMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function deleteCwlApplicationsBulk<ThrowOnError extends boolean = false>(
+    options: Options<DeleteCwlApplicationsBulkOptions, ThrowOnError>,
+): Unwrappable<RequestResult<DeleteCwlApplicationsBulkResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        DeleteCwlApplicationsBulkMutationResponse,
-        ResponseErrorConfig<DeleteCwlApplicationsBulk401 | DeleteCwlApplicationsBulk500>,
-        DeleteCwlApplicationsBulkMutationRequest
-    >({ method: "POST", url: getDeleteCwlApplicationsBulkUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/cwl-applications/delete-bulk",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<DeleteCwlApplicationsBulkResponses, ThrowOnError>>,
+    );
 }

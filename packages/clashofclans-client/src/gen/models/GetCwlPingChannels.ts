@@ -3,79 +3,51 @@
  * Do not edit manually.
  */
 
-/**
- * @description Channels.
- */
-export type GetCwlPingChannels200 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingChannelsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type string
-         */
         guildId: string;
-        /**
-         * @type array
-         */
         channels: {
-            /**
-             * @type string
-             */
             id: string;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string,null
-             */
             category: string | null;
-            /**
-             * @type boolean
-             */
             announcement: boolean;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetCwlPingChannels401 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingChannelsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord unavailable.
- */
-export type GetCwlPingChannels503 = {
-    /**
-     * @type boolean
-     */
+export type GetCwlPingChannelsStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCwlPingChannelsQueryResponse = GetCwlPingChannels200;
-
-export type GetCwlPingChannelsQuery = {
-    Response: GetCwlPingChannels200;
-    Errors: GetCwlPingChannels401 | GetCwlPingChannels503;
+export type GetCwlPingChannelsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCwlPingChannelsResponses = {
+    "200": GetCwlPingChannelsStatus200;
+    "401": GetCwlPingChannelsStatus401;
+    "503": GetCwlPingChannelsStatus503;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCwlPingChannelsResponse = GetCwlPingChannelsStatus200;

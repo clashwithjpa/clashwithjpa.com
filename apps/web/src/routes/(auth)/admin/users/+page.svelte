@@ -20,8 +20,7 @@
     import { loadGuildNicknames } from "#lib/discordNicknames.js";
     import { toast } from "#lib/toast.js";
     import { formatDate } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
-    import { getAdminUsers, type GetAdminUsersQueryParams } from "@repo/clashofclans-client";
+    import { getAdminUsers, type GetAdminUsersQuery } from "@repo/clashofclans-client";
     import { renderComponent, type SortingState } from "@tanstack/svelte-table";
     import type { UserWithRole } from "better-auth/plugins";
     import { untrack } from "svelte";
@@ -168,7 +167,7 @@
 
     const list = new InfiniteRows<User>(async (offset, limit) => {
         const sort = sorting[0];
-        const queryParams: GetAdminUsersQueryParams = { limit, offset };
+        const queryParams: GetAdminUsersQuery = { limit, offset };
         if (searchText) queryParams.search = searchText;
         if (roleFilter) queryParams.role = roleFilter;
         if (apiAccessFilter !== null) queryParams.apiAccess = String(apiAccessFilter);
@@ -177,16 +176,16 @@
             queryParams.sortDirection = sort.desc ? "desc" : "asc";
         }
         try {
-            const resp = await getAdminUsers(queryParams, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (!resp.success) throw new Error();
-            if (resp.data.roleCounts) roleCounts = resp.data.roleCounts;
-            if (resp.data.apiAccessCounts) apiAccessCounts = resp.data.apiAccessCounts;
+            const resp = await getAdminUsers({ query: queryParams });
+            if (!resp.data) throw new Error();
+            if (resp.data.data.roleCounts) roleCounts = resp.data.data.roleCounts;
+            if (resp.data.data.apiAccessCounts) apiAccessCounts = resp.data.data.apiAccessCounts;
             return {
-                rows: (resp.data.users as User[]).map((u) => ({
+                rows: (resp.data.data.users as User[]).map((u) => ({
                     ...u,
                     discordNickname: u.discordId ? guildNicknames[u.discordId] : undefined,
                 })),
-                total: resp.data.total,
+                total: resp.data.data.total,
             };
         } catch (error) {
             toast.error("Failed to load users", { description: error instanceof Error ? error.message : "An unknown error occurred" });

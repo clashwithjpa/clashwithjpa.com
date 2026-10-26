@@ -3,108 +3,73 @@
  * Do not edit manually.
  */
 
-/**
- * @description Sync result.
- */
-export type SyncCocAccounts200 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         updated: number;
-        /**
-         * @type number
-         */
         skipped: number;
-        /**
-         * @type array
-         */
         notLinked: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             name: string;
         }[];
-        /**
-         * @type array
-         */
         notInSheet: {
-            /**
-             * @type string
-             */
             cocAccountTag: string;
             ownerName: string | null;
         }[];
     };
 };
 
-/**
- * @description Invalid sheet URL or sheet not publicly viewable.
- */
-export type SyncCocAccounts400 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountsStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SyncCocAccounts401 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SyncCocAccounts500 = {
-    /**
-     * @type boolean
-     */
+export type SyncCocAccountsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SyncCocAccountsMutationRequest = {
+export type SyncCocAccountsBody = {
     /**
-     * @type string, uri
+     * @description
+     * Format: `uri`
+     * @type string
      */
     sheetUrl: string;
 };
 
-export type SyncCocAccountsMutationResponse = SyncCocAccounts200;
-
-export type SyncCocAccountsMutation = {
-    Response: SyncCocAccounts200;
-    Request: SyncCocAccountsMutationRequest;
-    Errors: SyncCocAccounts400 | SyncCocAccounts401 | SyncCocAccounts500;
+export type SyncCocAccountsOptions = {
+    body: SyncCocAccountsBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type SyncCocAccountsResponses = {
+    "200": SyncCocAccountsStatus200;
+    "400": SyncCocAccountsStatus400;
+    "401": SyncCocAccountsStatus401;
+    "500": SyncCocAccountsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SyncCocAccountsResponse = SyncCocAccountsStatus200;

@@ -5,23 +5,18 @@
 
 import * as z from "zod";
 
-export const updateCocAccountWarWeightPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const updateCocAccountWarWeightPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Updated COC account.
- */
-export const updateCocAccountWarWeight200Schema = z.object({
+export const updateCocAccountWarWeightStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        account: z.object({
+    data: z.strictObject({
+        account: z.strictObject({
             id: z.number(),
             discordUserId: z.string(),
             cocAccountTag: z.string(),
             warWeight: z.number(),
             isExternal: z.boolean(),
-            currentClan: z.union([z.string(), z.null()]),
+            currentClan: z.string().nullable(),
             townHall: z.number(),
             totalDonated: z.number(),
             totalReceived: z.number(),
@@ -29,40 +24,48 @@ export const updateCocAccountWarWeight200Schema = z.object({
             capitalGoldLooted: z.number(),
             capitalGoldContributed: z.number(),
             activityScore: z.number(),
-            ownerUserId: z.union([z.string(), z.null()]),
-            ownerName: z.union([z.string(), z.null()]),
-            ownerImage: z.union([z.string(), z.null()]),
-            ownerRole: z.union([z.string(), z.null()]),
+            ownerUserId: z.string().nullable(),
+            ownerName: z.string().nullable(),
+            ownerImage: z.string().nullable(),
+            ownerRole: z.string().nullable(),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const updateCocAccountWarWeight401Schema = z.object({
+export const updateCocAccountWarWeightStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const updateCocAccountWarWeight404Schema = z.object({
+export const updateCocAccountWarWeightStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const updateCocAccountWarWeight500Schema = z.object({
+export const updateCocAccountWarWeightStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateCocAccountWarWeightMutationRequestSchema = z.object({
-    warWeight: z.number().int().min(0).max(9007199254740991),
+export const updateCocAccountWarWeightStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const updateCocAccountWarWeightMutationResponseSchema = z.lazy(() => updateCocAccountWarWeight200Schema);
+export const updateCocAccountWarWeightResponseSchema = updateCocAccountWarWeightStatus200Schema;
+
+export const updateCocAccountWarWeightErrorSchema = z.union([
+    updateCocAccountWarWeightStatus400Schema,
+    updateCocAccountWarWeightStatus401Schema,
+    updateCocAccountWarWeightStatus404Schema,
+    updateCocAccountWarWeightStatus500Schema,
+]);
+
+export const updateCocAccountWarWeightBodySchema = z.object({
+    warWeight: z.int().min(0).max(9007199254740991),
+});
+
+export const updateCocAccountWarWeightPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

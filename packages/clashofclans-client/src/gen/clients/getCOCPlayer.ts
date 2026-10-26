@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCPlayer500, GetCOCPlayerPathParams, GetCOCPlayerQueryResponse } from "../models/GetCOCPlayer.ts";
-
-function getGetCOCPlayerUrl(tag: GetCOCPlayerPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/player/${tag}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCPlayerOptions, GetCOCPlayerResponses } from "../models/GetCOCPlayer.ts";
 
 /**
  * @description Fetches a Clash of Clans player's data by their tag. The tag must start with #.
  * {@link /coc/player/:tag}
  */
-export async function getCOCPlayer(tag: GetCOCPlayerPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCPlayer<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCPlayerOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCPlayerResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCPlayerQueryResponse, ResponseErrorConfig<GetCOCPlayer500>, unknown>({
-        method: "GET",
-        url: getGetCOCPlayerUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/coc/player/{tag}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCOCPlayerResponses, ThrowOnError>>,
+    );
 }

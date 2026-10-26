@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeleteCwlSeasonPathParams = {
+export type DeleteCwlSeasonPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,74 +12,62 @@ export type DeleteCwlSeasonPathParams = {
     id: number;
 };
 
-/**
- * @description Deleted season.
- */
-export type DeleteCwlSeason200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlSeasonStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         id: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteCwlSeason401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlSeasonStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteCwlSeasonStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type DeleteCwlSeason404 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlSeasonStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteCwlSeason500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteCwlSeasonStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteCwlSeasonMutationResponse = DeleteCwlSeason200;
-
-export type DeleteCwlSeasonMutation = {
-    Response: DeleteCwlSeason200;
-    PathParams: DeleteCwlSeasonPathParams;
-    Errors: DeleteCwlSeason401 | DeleteCwlSeason404 | DeleteCwlSeason500;
+export type DeleteCwlSeasonOptions = {
+    body?: never;
+    path: DeleteCwlSeasonPath;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteCwlSeasonResponses = {
+    "200": DeleteCwlSeasonStatus200;
+    "400": DeleteCwlSeasonStatus400;
+    "401": DeleteCwlSeasonStatus401;
+    "404": DeleteCwlSeasonStatus404;
+    "500": DeleteCwlSeasonStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteCwlSeasonResponse = DeleteCwlSeasonStatus200;

@@ -3,30 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    ClearAcceptedJoinApplications401,
-    ClearAcceptedJoinApplications500,
-    ClearAcceptedJoinApplicationsMutationResponse,
-} from "../models/ClearAcceptedJoinApplications.ts";
-
-function getClearAcceptedJoinApplicationsUrl() {
-    const res = { method: "DELETE", url: `/admin/join-applications/accepted` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { ClearAcceptedJoinApplicationsOptions, ClearAcceptedJoinApplicationsResponses } from "../models/ClearAcceptedJoinApplications.ts";
 
 /**
  * @description Deletes every accepted clan join application. Cannot be undone.
  * {@link /admin/join-applications/accepted}
  */
-export async function clearAcceptedJoinApplications(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function clearAcceptedJoinApplications<ThrowOnError extends boolean = false>(
+    options: Options<ClearAcceptedJoinApplicationsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<ClearAcceptedJoinApplicationsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        ClearAcceptedJoinApplicationsMutationResponse,
-        ResponseErrorConfig<ClearAcceptedJoinApplications401 | ClearAcceptedJoinApplications500>,
-        unknown
-    >({ method: "DELETE", url: getClearAcceptedJoinApplicationsUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "DELETE",
+            url: "/admin/join-applications/accepted",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<ClearAcceptedJoinApplicationsResponses, ThrowOnError>>,
+    );
 }

@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetUserCwlApplications401, GetUserCwlApplications500, GetUserCwlApplicationsQueryResponse } from "../models/GetUserCwlApplications.ts";
-
-function getGetUserCwlApplicationsUrl() {
-    const res = { method: "GET", url: `/user/cwl` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetUserCwlApplicationsOptions, GetUserCwlApplicationsResponses } from "../models/GetUserCwlApplications.ts";
 
 /**
  * @description Fetches the current user's CWL applications.
  * {@link /user/cwl}
  */
-export async function getUserCwlApplications(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getUserCwlApplications<ThrowOnError extends boolean = false>(
+    options: Options<GetUserCwlApplicationsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetUserCwlApplicationsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetUserCwlApplicationsQueryResponse,
-        ResponseErrorConfig<GetUserCwlApplications401 | GetUserCwlApplications500>,
-        unknown
-    >({ method: "GET", url: getGetUserCwlApplicationsUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/user/cwl",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetUserCwlApplicationsResponses, ThrowOnError>>,
+    );
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetApiKeyUsageEndpointsQueryParams = {
+export type GetApiKeyUsageEndpointsQuery = {
     /**
      * @minLength 1
      * @type string
@@ -25,91 +25,67 @@ export type GetApiKeyUsageEndpointsQueryParams = {
     limit?: number;
 };
 
-/**
- * @description Endpoint breakdown.
- */
-export type GetApiKeyUsageEndpoints200 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageEndpointsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             method: string;
-            /**
-             * @type string
-             */
             path: string;
-            /**
-             * @type number
-             */
             count: number;
-            /**
-             * @type number
-             */
             avgDurationMs: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetApiKeyUsageEndpoints401 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageEndpointsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetApiKeyUsageEndpointsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API key not found.
- */
-export type GetApiKeyUsageEndpoints404 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageEndpointsStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetApiKeyUsageEndpoints500 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageEndpointsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetApiKeyUsageEndpointsQueryResponse = GetApiKeyUsageEndpoints200;
-
-export type GetApiKeyUsageEndpointsQuery = {
-    Response: GetApiKeyUsageEndpoints200;
-    QueryParams: GetApiKeyUsageEndpointsQueryParams;
-    Errors: GetApiKeyUsageEndpoints401 | GetApiKeyUsageEndpoints404 | GetApiKeyUsageEndpoints500;
+export type GetApiKeyUsageEndpointsOptions = {
+    body?: never;
+    path?: never;
+    query: GetApiKeyUsageEndpointsQuery;
+    headers?: never;
 };
+
+export type GetApiKeyUsageEndpointsResponses = {
+    "200": GetApiKeyUsageEndpointsStatus200;
+    "400": GetApiKeyUsageEndpointsStatus400;
+    "401": GetApiKeyUsageEndpointsStatus401;
+    "404": GetApiKeyUsageEndpointsStatus404;
+    "500": GetApiKeyUsageEndpointsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetApiKeyUsageEndpointsResponse = GetApiKeyUsageEndpointsStatus200;

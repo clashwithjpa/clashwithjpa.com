@@ -5,30 +5,23 @@
 
 import * as z from "zod";
 
-/**
- * @description Nickname map.
- */
-export const getGuildNicknames200Schema = z.object({
+export const getGuildNicknamesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        nicknames: z.object({}).catchall(z.string()),
+    data: z.strictObject({
+        nicknames: z.record(z.string(), z.string()),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getGuildNicknames401Schema = z.object({
+export const getGuildNicknamesStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getGuildNicknames500Schema = z.object({
+export const getGuildNicknamesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getGuildNicknamesQueryResponseSchema = z.lazy(() => getGuildNicknames200Schema);
+export const getGuildNicknamesResponseSchema = getGuildNicknamesStatus200Schema;
+
+export const getGuildNicknamesErrorSchema = z.union([getGuildNicknamesStatus401Schema, getGuildNicknamesStatus500Schema]);

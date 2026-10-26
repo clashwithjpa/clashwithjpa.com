@@ -3,28 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { ApplyCwl400, ApplyCwl401, ApplyCwl409, ApplyCwl500, ApplyCwlMutationRequest, ApplyCwlMutationResponse } from "../models/ApplyCwl.ts";
-
-function getApplyCwlUrl() {
-    const res = { method: "POST", url: `/user/cwl/apply` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { ApplyCwlOptions, ApplyCwlResponses } from "../models/ApplyCwl.ts";
 
 /**
  * @description Submits a CWL application for a Clash of Clans account.
  * {@link /user/cwl/apply}
  */
-export async function applyCwl(data: ApplyCwlMutationRequest, config: Partial<RequestConfig<ApplyCwlMutationRequest>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function applyCwl<ThrowOnError extends boolean = false>(
+    options: Options<ApplyCwlOptions, ThrowOnError>,
+): Unwrappable<RequestResult<ApplyCwlResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        ApplyCwlMutationResponse,
-        ResponseErrorConfig<ApplyCwl400 | ApplyCwl401 | ApplyCwl409 | ApplyCwl500>,
-        ApplyCwlMutationRequest
-    >({ method: "POST", url: getApplyCwlUrl().url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/user/cwl/apply",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<ApplyCwlResponses, ThrowOnError>>,
+    );
 }

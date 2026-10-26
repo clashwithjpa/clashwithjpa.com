@@ -2,9 +2,9 @@
     import Badge from "#lib/components/ui/Badge.svelte";
     import CocCard from "#lib/components/ui/coc/CocCard.svelte";
     import Icon from "#lib/components/ui/Icon.svelte";
-    import type { GetCOCClan200 } from "@repo/clashofclans-client";
+    import type { GetCOCClanStatus200 } from "@repo/clashofclans-client";
 
-    type Clan = GetCOCClan200["data"]["clan"];
+    type Clan = GetCOCClanStatus200["data"]["clan"];
 
     let { clans, loading, failed }: { clans: Clan[]; loading: boolean; failed: boolean } = $props();
 

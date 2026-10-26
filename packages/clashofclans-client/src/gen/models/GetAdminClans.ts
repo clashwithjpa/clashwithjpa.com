@@ -3,113 +3,61 @@
  * Do not edit manually.
  */
 
-/**
- * @description Clans.
- */
-export type GetAdminClans200 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminClansStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocClanCode: string;
             cocClanName: string | null;
             cocClanLevel: number | null;
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             discordClanRoleId: string;
-            /**
-             * @type string
-             */
             discordClanChannelId: string;
-            /**
-             * @type string
-             */
             discordMemberRoleId: string;
-            /**
-             * @type string
-             */
             discordElderRoleId: string;
-            /**
-             * @type string
-             */
             discordColeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderId: string;
-            /**
-             * @type number
-             */
             attacksRequirement: number;
-            /**
-             * @type number
-             */
             donationsRequirement: number;
-            /**
-             * @type number
-             */
             clangamesRequirement: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAdminClans401 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminClansStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAdminClans500 = {
-    /**
-     * @type boolean
-     */
+export type GetAdminClansStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAdminClansQueryResponse = GetAdminClans200;
-
-export type GetAdminClansQuery = {
-    Response: GetAdminClans200;
-    Errors: GetAdminClans401 | GetAdminClans500;
+export type GetAdminClansOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAdminClansResponses = {
+    "200": GetAdminClansStatus200;
+    "401": GetAdminClansStatus401;
+    "500": GetAdminClansStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAdminClansResponse = GetAdminClansStatus200;

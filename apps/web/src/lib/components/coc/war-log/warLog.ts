@@ -1,11 +1,11 @@
-import type { GetWarLogClans200, GetWarLogPlayers200, GetWarLogWar200, GetWarLogWars200 } from "@repo/clashofclans-client";
+import type { GetWarLogClansStatus200, GetWarLogPlayersStatus200, GetWarLogWarsStatus200, GetWarLogWarStatus200 } from "@repo/clashofclans-client";
 
-export type WarDetail = GetWarLogWar200["data"]["war"];
-export type WarSummary = GetWarLogWars200["data"]["wars"][number];
+export type WarDetail = GetWarLogWarStatus200["data"]["war"];
+export type WarSummary = GetWarLogWarsStatus200["data"]["wars"][number];
 export type WarAttack = WarDetail["attacks"][number];
 export type WarMember = WarDetail["clan"]["members"][number];
-export type PlayerStats = GetWarLogPlayers200["data"]["players"][number];
-export type WarLogClan = GetWarLogClans200["data"]["clans"][number];
+export type PlayerStats = GetWarLogPlayersStatus200["data"]["players"][number];
+export type WarLogClan = GetWarLogClansStatus200["data"]["clans"][number];
 export type Side = WarAttack["side"];
 
 // Checked with the dataviz palette validator against the plank surface. A green/red

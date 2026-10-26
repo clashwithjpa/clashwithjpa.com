@@ -5,31 +5,24 @@
 
 import * as z from "zod";
 
-/**
- * @description Feature flags fetched successfully.
- */
-export const getUserFeatures200Schema = z.object({
+export const getUserFeaturesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         applicationsEnabled: z.boolean(),
         cwlEnabled: z.boolean(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getUserFeatures401Schema = z.object({
+export const getUserFeaturesStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const getUserFeatures500Schema = z.object({
+export const getUserFeaturesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getUserFeaturesQueryResponseSchema = z.lazy(() => getUserFeatures200Schema);
+export const getUserFeaturesResponseSchema = getUserFeaturesStatus200Schema;
+
+export const getUserFeaturesErrorSchema = z.union([getUserFeaturesStatus401Schema, getUserFeaturesStatus500Schema]);

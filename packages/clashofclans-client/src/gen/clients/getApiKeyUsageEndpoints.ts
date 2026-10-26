@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetApiKeyUsageEndpoints401,
-    GetApiKeyUsageEndpoints404,
-    GetApiKeyUsageEndpoints500,
-    GetApiKeyUsageEndpointsQueryParams,
-    GetApiKeyUsageEndpointsQueryResponse,
-} from "../models/GetApiKeyUsageEndpoints.ts";
-
-function getGetApiKeyUsageEndpointsUrl() {
-    const res = { method: "GET", url: `/api-keys/usage/endpoints` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetApiKeyUsageEndpointsOptions, GetApiKeyUsageEndpointsResponses } from "../models/GetApiKeyUsageEndpoints.ts";
 
 /**
  * @description Most-called endpoints for one of your own API keys, with average latency.
  * {@link /api-keys/usage/endpoints}
  */
-export async function getApiKeyUsageEndpoints(params: GetApiKeyUsageEndpointsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getApiKeyUsageEndpoints<ThrowOnError extends boolean = false>(
+    options: Options<GetApiKeyUsageEndpointsOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetApiKeyUsageEndpointsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetApiKeyUsageEndpointsQueryResponse,
-        ResponseErrorConfig<GetApiKeyUsageEndpoints401 | GetApiKeyUsageEndpoints404 | GetApiKeyUsageEndpoints500>,
-        unknown
-    >({ method: "GET", url: getGetApiKeyUsageEndpointsUrl().url.toString(), params, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/api-keys/usage/endpoints",
+            security: [{ type: "apiKey", name: "jpa.session_token", in: "cookie" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetApiKeyUsageEndpointsResponses, ThrowOnError>>,
+    );
 }

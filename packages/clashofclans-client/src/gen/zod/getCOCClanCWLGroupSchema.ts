@@ -5,31 +5,26 @@
 
 import * as z from "zod";
 
-export const getCOCClanCWLGroupPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCClanCWLGroupPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the clan\'s CWL league group data.
- */
-export const getCOCClanCWLGroup200Schema = z.object({
+export const getCOCClanCWLGroupStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        leagueGroup: z.object({
+    data: z.strictObject({
+        leagueGroup: z.strictObject({
             state: z.enum(["notInWar", "preparation", "inWar", "ended"]),
             season: z.string(),
             clans: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     tag: z.string(),
                     clanLevel: z.number(),
-                    badgeUrls: z.object({
+                    badgeUrls: z.strictObject({
                         small: z.string(),
                         large: z.string(),
                         medium: z.string(),
                     }),
                     members: z.array(
-                        z.object({
+                        z.strictObject({
                             name: z.string(),
                             tag: z.string(),
                             townHallLevel: z.number(),
@@ -38,7 +33,7 @@ export const getCOCClanCWLGroup200Schema = z.object({
                 }),
             ),
             rounds: z.array(
-                z.object({
+                z.strictObject({
                     warTags: z.array(z.string()),
                 }),
             ),
@@ -46,12 +41,21 @@ export const getCOCClanCWLGroup200Schema = z.object({
     }),
 });
 
-/**
- * @description Server error response when fetching CWL league group data fails.
- */
-export const getCOCClanCWLGroup500Schema = z.object({
+export const getCOCClanCWLGroupStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCClanCWLGroupQueryResponseSchema = z.lazy(() => getCOCClanCWLGroup200Schema);
+export const getCOCClanCWLGroupStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCClanCWLGroupResponseSchema = getCOCClanCWLGroupStatus200Schema;
+
+export const getCOCClanCWLGroupErrorSchema = z.union([getCOCClanCWLGroupStatus400Schema, getCOCClanCWLGroupStatus500Schema]);
+
+export const getCOCClanCWLGroupPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

@@ -3,37 +3,13 @@
  * Do not edit manually.
  */
 
-/**
- * @description Updated settings.
- */
-export type UpdateAdminSettings200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminSettingsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         settings: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type boolean
-             */
             applicationsEnabled: boolean;
-            /**
-             * @type boolean
-             */
             cwlEnabled: boolean;
-            /**
-             * @type boolean
-             */
             siteMaintenanceMode: boolean;
             rulesContent: string | null;
             privacyContent: string | null;
@@ -44,57 +20,55 @@ export type UpdateAdminSettings200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateAdminSettings401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminSettingsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type UpdateAdminSettingsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateAdminSettings500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminSettingsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateAdminSettingsMutationRequest = {
-    /**
-     * @type boolean | undefined
-     */
-    applicationsEnabled?: boolean;
-    /**
-     * @type boolean | undefined
-     */
-    cwlEnabled?: boolean;
-    /**
-     * @type boolean | undefined
-     */
-    siteMaintenanceMode?: boolean;
-    guildId?: string | null;
-    currentCwlSeasonId?: number | null;
+export type UpdateAdminSettingsBody =
+    | {
+          applicationsEnabled?: boolean;
+          cwlEnabled?: boolean;
+          siteMaintenanceMode?: boolean;
+          guildId?: string | null;
+          currentCwlSeasonId?: number | null;
+      }
+    | undefined;
+
+export type UpdateAdminSettingsOptions = {
+    body: UpdateAdminSettingsBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
 
-export type UpdateAdminSettingsMutationResponse = UpdateAdminSettings200;
-
-export type UpdateAdminSettingsMutation = {
-    Response: UpdateAdminSettings200;
-    Request: UpdateAdminSettingsMutationRequest;
-    Errors: UpdateAdminSettings401 | UpdateAdminSettings500;
+export type UpdateAdminSettingsResponses = {
+    "200": UpdateAdminSettingsStatus200;
+    "400": UpdateAdminSettingsStatus400;
+    "401": UpdateAdminSettingsStatus401;
+    "500": UpdateAdminSettingsStatus500;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateAdminSettingsResponse = UpdateAdminSettingsStatus200;

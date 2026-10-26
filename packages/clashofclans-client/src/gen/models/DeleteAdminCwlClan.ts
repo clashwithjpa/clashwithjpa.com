@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeleteAdminCwlClanPathParams = {
+export type DeleteAdminCwlClanPath = {
     /**
      * @minLength 1
      * @type string
@@ -11,91 +11,67 @@ export type DeleteAdminCwlClanPathParams = {
     tag: string;
 };
 
-/**
- * @description Deleted CWL clan.
- */
-export type DeleteAdminCwlClan200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminCwlClanStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clan: {
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             cocClanName: string;
-            /**
-             * @type string
-             */
             cocClanLeague: string;
-            /**
-             * @type string
-             */
             cocClanLeader: string;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteAdminCwlClan401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminCwlClanStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteAdminCwlClanStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type DeleteAdminCwlClan404 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminCwlClanStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteAdminCwlClan500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminCwlClanStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteAdminCwlClanMutationResponse = DeleteAdminCwlClan200;
-
-export type DeleteAdminCwlClanMutation = {
-    Response: DeleteAdminCwlClan200;
-    PathParams: DeleteAdminCwlClanPathParams;
-    Errors: DeleteAdminCwlClan401 | DeleteAdminCwlClan404 | DeleteAdminCwlClan500;
+export type DeleteAdminCwlClanOptions = {
+    body?: never;
+    path: DeleteAdminCwlClanPath;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteAdminCwlClanResponses = {
+    "200": DeleteAdminCwlClanStatus200;
+    "400": DeleteAdminCwlClanStatus400;
+    "401": DeleteAdminCwlClanStatus401;
+    "404": DeleteAdminCwlClanStatus404;
+    "500": DeleteAdminCwlClanStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteAdminCwlClanResponse = DeleteAdminCwlClanStatus200;

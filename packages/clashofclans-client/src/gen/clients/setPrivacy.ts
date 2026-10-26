@@ -3,32 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { SetPrivacy401, SetPrivacy500, SetPrivacyMutationRequest, SetPrivacyMutationResponse } from "../models/SetPrivacy.ts";
-
-function getSetPrivacyUrl() {
-    const res = { method: "PUT", url: `/admin/privacy` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SetPrivacyOptions, SetPrivacyResponses } from "../models/SetPrivacy.ts";
 
 /**
  * @description Updates the privacy policy content.
  * {@link /admin/privacy}
  */
-export async function setPrivacy(
-    data: SetPrivacyMutationRequest,
-    config: Partial<RequestConfig<SetPrivacyMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function setPrivacy<ThrowOnError extends boolean = false>(
+    options: Options<SetPrivacyOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SetPrivacyResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<SetPrivacyMutationResponse, ResponseErrorConfig<SetPrivacy401 | SetPrivacy500>, SetPrivacyMutationRequest>({
-        method: "PUT",
-        url: getSetPrivacyUrl().url.toString(),
-        data: requestData,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/privacy",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SetPrivacyResponses, ThrowOnError>>,
+    );
 }

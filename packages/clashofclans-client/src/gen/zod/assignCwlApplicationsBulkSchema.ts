@@ -5,44 +5,38 @@
 
 import * as z from "zod";
 
-/**
- * @description Number of applications updated.
- */
-export const assignCwlApplicationsBulk200Schema = z.object({
+export const assignCwlApplicationsBulkStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         count: z.number(),
-        assignedTo: z.union([z.string(), z.null()]),
+        assignedTo: z.string().nullable(),
     }),
 });
 
-/**
- * @description Bad request.
- */
-export const assignCwlApplicationsBulk400Schema = z.object({
+export const assignCwlApplicationsBulkStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const assignCwlApplicationsBulk401Schema = z.object({
+export const assignCwlApplicationsBulkStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const assignCwlApplicationsBulk500Schema = z.object({
+export const assignCwlApplicationsBulkStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const assignCwlApplicationsBulkMutationRequestSchema = z.object({
-    ids: z.array(z.number().int().min(1).max(9007199254740991)).min(1).max(10000),
-    clanTag: z.union([z.string(), z.null()]),
-});
+export const assignCwlApplicationsBulkResponseSchema = assignCwlApplicationsBulkStatus200Schema;
 
-export const assignCwlApplicationsBulkMutationResponseSchema = z.lazy(() => assignCwlApplicationsBulk200Schema);
+export const assignCwlApplicationsBulkErrorSchema = z.union([
+    assignCwlApplicationsBulkStatus400Schema,
+    assignCwlApplicationsBulkStatus401Schema,
+    assignCwlApplicationsBulkStatus500Schema,
+]);
+
+export const assignCwlApplicationsBulkBodySchema = z.object({
+    ids: z.array(z.int().min(1).max(9007199254740991)).min(1).max(10000),
+    clanTag: z.string().nullable(),
+});

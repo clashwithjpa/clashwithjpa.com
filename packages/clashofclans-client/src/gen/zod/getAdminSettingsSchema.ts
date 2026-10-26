@@ -5,43 +5,36 @@
 
 import * as z from "zod";
 
-/**
- * @description Settings.
- */
-export const getAdminSettings200Schema = z.object({
+export const getAdminSettingsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         settings: z.union([
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 applicationsEnabled: z.boolean(),
                 cwlEnabled: z.boolean(),
                 siteMaintenanceMode: z.boolean(),
-                rulesContent: z.union([z.string(), z.null()]),
-                privacyContent: z.union([z.string(), z.null()]),
-                guildId: z.union([z.string(), z.null()]),
-                currentCwlSeasonId: z.union([z.number(), z.null()]),
-                updatedAt: z.union([z.string().datetime(), z.null()]),
+                rulesContent: z.string().nullable(),
+                privacyContent: z.string().nullable(),
+                guildId: z.string().nullable(),
+                currentCwlSeasonId: z.number().nullable(),
+                updatedAt: z.union([z.iso.datetime(), z.null()]),
             }),
             z.null(),
         ]),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAdminSettings401Schema = z.object({
+export const getAdminSettingsStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getAdminSettings500Schema = z.object({
+export const getAdminSettingsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAdminSettingsQueryResponseSchema = z.lazy(() => getAdminSettings200Schema);
+export const getAdminSettingsResponseSchema = getAdminSettingsStatus200Schema;
+
+export const getAdminSettingsErrorSchema = z.union([getAdminSettingsStatus401Schema, getAdminSettingsStatus500Schema]);

@@ -21,7 +21,6 @@
     import UserCombobox, { type ComboboxUser } from "#lib/components/ui/UserCombobox.svelte";
     import { loadGuildNicknames } from "#lib/discordNicknames.js";
     import { toast } from "#lib/toast.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         createCocAccount,
         deleteCocAccountsBulk,
@@ -32,7 +31,9 @@
         updateCocAccountExternal,
         updateCocAccountStats,
         updateCocAccountWarWeight,
-        type GetAdminCocAccounts200,
+        type GetAdminCocAccountsStatus200,
+        type SyncCocAccountsStatus200,
+        type SyncCocAccountWarWeightsStatus200,
     } from "@repo/clashofclans-client";
     import { renderComponent, renderSnippet, type RowSelectionState, type SortingState } from "@tanstack/svelte-table";
     import { untrack } from "svelte";
@@ -46,20 +47,9 @@
     import TablerUserPlus from "~icons/tabler/user-plus";
     import TablerX from "~icons/tabler/x";
 
-    type SyncResult = {
-        updated: number;
-        skipped: number;
-        notLinked: { tag: string; name: string }[];
-        notInSheet: { cocAccountTag: string; ownerName: string | null }[];
-    };
-
-    type WarWeightSyncResult = {
-        updated: number;
-        notInFwa: { cocAccountTag: string; ownerName: string | null }[];
-        failedClans: { tag: string; name: string | null }[];
-    };
-
-    type Account = GetAdminCocAccounts200["data"]["accounts"][number] & { discordNickname?: string };
+    type SyncResult = SyncCocAccountsStatus200["data"];
+    type WarWeightSyncResult = SyncCocAccountWarWeightsStatus200["data"];
+    type Account = GetAdminCocAccountsStatus200["data"]["accounts"][number] & { discordNickname?: string };
 
     let { data }: { data: { canDelete: boolean } } = $props();
 
@@ -107,8 +97,8 @@
 
     async function searchUsers(query: string): Promise<ComboboxUser[]> {
         try {
-            const resp = await getAdminUsers({ search: query, limit: 8 }, { baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            if (resp.success) return resp.data.users as ComboboxUser[];
+            const resp = await getAdminUsers({ query: { search: query, limit: 8 } });
+            if (resp.data) return resp.data.data.users as ComboboxUser[];
         } catch {
             // return empty on failure
         }
@@ -135,16 +125,15 @@
         }
         addSubmitting = true;
         try {
-            const resp = (await createCocAccount(
-                { userId: addSelectedUser.id, tag: tag.startsWith("#") ? tag : `#${tag}`, warWeight, isExternal: addExternal },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as { success: true; data: { account: { cocAccountTag: string } } } | { success: false; error: string | Record<string, unknown> };
-            if (resp.success) {
-                toast.success(`Linked ${resp.data.account.cocAccountTag} to ${addSelectedUser.name}`);
+            const resp = await createCocAccount({
+                body: { userId: addSelectedUser.id, tag: tag.startsWith("#") ? tag : `#${tag}`, warWeight, isExternal: addExternal },
+            });
+            if (resp.data) {
+                toast.success(`Linked ${resp.data.data.account.cocAccountTag} to ${addSelectedUser.name}`);
                 // Refresh the loaded rows in place so the new account appears.
                 list.refresh();
             } else {
-                toast.error(typeof resp.error === "string" ? resp.error : "Failed to add account");
+                toast.error(typeof resp.error?.error === "string" ? resp.error.error : "Failed to add account");
                 addOpen = true;
             }
         } catch (error) {
@@ -165,14 +154,13 @@
     const list = new InfiniteRows<Account>(async (offset, limit) => {
         const sort = sorting[0];
         try {
-            const resp = await getAdminCocAccounts(
-                { limit, offset, search: searchText || undefined, sortBy: sort?.id, sortDir: sort ? (sort.desc ? "desc" : "asc") : undefined },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            );
-            if (!resp.success) throw new Error();
+            const resp = await getAdminCocAccounts({
+                query: { limit, offset, search: searchText || undefined, sortBy: sort?.id, sortDir: sort ? (sort.desc ? "desc" : "asc") : undefined },
+            });
+            if (!resp.data) throw new Error();
             return {
-                rows: resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
-                total: resp.data.total,
+                rows: resp.data.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
+                total: resp.data.data.total,
             };
         } catch (error) {
             toast.error("Failed to load COC accounts", { description: error instanceof Error ? error.message : "An unknown error occurred" });
@@ -206,14 +194,11 @@
         }
         const toastId = toast.loading("Syncing from Google Sheet…");
         try {
-            // The fetch client returns the parsed body even on 4xx, so handle the error shape too.
-            const resp = (await syncCocAccounts(
-                { sheetUrl: sheetUrl.trim() },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as { success: true; data: SyncResult } | { success: false; error: string | Record<string, unknown> };
-            if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Sheet could not be read");
-            toast.success(`Synced ${resp.data.updated} account${resp.data.updated === 1 ? "" : "s"}`, { id: toastId });
-            syncResult = resp.data;
+            const resp = await syncCocAccounts({ body: { sheetUrl: sheetUrl.trim() } });
+            if (!resp.data) throw new Error(typeof resp.error?.error === "string" ? resp.error.error : "Sheet could not be read");
+            const result = resp.data.data;
+            toast.success(`Synced ${result.updated} account${result.updated === 1 ? "" : "s"}`, { id: toastId });
+            syncResult = result;
             syncResultOpen = true;
             sheetUrl = "";
             list.reset();
@@ -236,16 +221,14 @@
         warWeightSyncing = true;
         const toastId = toast.loading("Syncing war weights from FWA…");
         try {
-            const resp = (await syncCocAccountWarWeights(
-                {},
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as { success: true; data: WarWeightSyncResult } | { success: false; error: string | Record<string, unknown> };
-            if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Failed to sync war weights");
+            const resp = await syncCocAccountWarWeights({ body: {} });
+            if (!resp.data) throw new Error(typeof resp.error?.error === "string" ? resp.error.error : "Failed to sync war weights");
+            const result = resp.data.data;
 
-            const failed = resp.data.failedClans.length;
+            const failed = result.failedClans.length;
             const suffix = failed ? ` (${failed} clan${failed === 1 ? "" : "s"} need manual paste)` : "";
-            toast.success(`Updated ${resp.data.updated} war weight${resp.data.updated === 1 ? "" : "s"}${suffix}`, { id: toastId });
-            warWeightResult = resp.data;
+            toast.success(`Updated ${result.updated} war weight${result.updated === 1 ? "" : "s"}${suffix}`, { id: toastId });
+            warWeightResult = result;
             pastedFwa = "";
             warWeightResultOpen = true;
             list.reset();
@@ -288,12 +271,10 @@
         applyingPaste = true;
         const toastId = toast.loading("Applying pasted weights…");
         try {
-            const resp = (await syncCocAccountWarWeights(
-                { members: clean },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            )) as { success: true; data: WarWeightSyncResult } | { success: false; error: string | Record<string, unknown> };
-            if (!resp.success) throw new Error(typeof resp.error === "string" ? resp.error : "Failed to apply weights");
-            toast.success(`Updated ${resp.data.updated} war weight${resp.data.updated === 1 ? "" : "s"} from pasted data`, { id: toastId });
+            const resp = await syncCocAccountWarWeights({ body: { members: clean } });
+            if (!resp.data) throw new Error(typeof resp.error?.error === "string" ? resp.error.error : "Failed to apply weights");
+            const { updated } = resp.data.data;
+            toast.success(`Updated ${updated} war weight${updated === 1 ? "" : "s"} from pasted data`, { id: toastId });
             pastedFwa = "";
             list.reset();
         } catch (error) {
@@ -339,12 +320,9 @@
         try {
             let count = 0;
             for (const batch of chunk(ids, BULK_BATCH_SIZE)) {
-                const resp = await deleteCocAccountsBulk(
-                    { ids: batch },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-                );
-                if (!resp.success) throw new Error("Failed to delete accounts");
-                count += resp.data.count;
+                const resp = await deleteCocAccountsBulk({ body: { ids: batch } });
+                if (!resp.data) throw new Error("Failed to delete accounts");
+                count += resp.data.data.count;
             }
             toast.success(`${count} account${count === 1 ? "" : "s"} deleted`);
             clearSelection();
@@ -389,15 +367,12 @@
             const PAGE = 200;
             const rows: Record<string, unknown>[] = [];
             for (let offset = 0; ; offset += PAGE) {
-                const resp = await getAdminCocAccounts(
-                    { limit: PAGE, offset, search: searchText || undefined },
-                    { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-                );
-                if (!resp.success) throw new Error("Failed to load accounts");
+                const resp = await getAdminCocAccounts({ query: { limit: PAGE, offset, search: searchText || undefined } });
+                if (!resp.data) throw new Error("Failed to load accounts");
                 rows.push(
-                    ...resp.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
+                    ...resp.data.data.accounts.map((a) => ({ ...a, discordNickname: a.discordUserId ? guildNicknames[a.discordUserId] : undefined })),
                 );
-                if (rows.length >= resp.data.total || resp.data.accounts.length === 0) break;
+                if (rows.length >= resp.data.data.total || resp.data.data.accounts.length === 0) break;
             }
 
             const lines = [
@@ -435,13 +410,9 @@
         const same = (a: Account) => a.id === account.id;
         list.update(same, () => ({ warWeight }));
         try {
-            const resp = await updateCocAccountWarWeight(
-                account.id,
-                { warWeight },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            list.update(same, () => ({ warWeight: resp.data.account.warWeight }));
+            const resp = await updateCocAccountWarWeight({ path: { id: account.id }, body: { warWeight } });
+            if (!resp.data) throw new Error();
+            list.update(same, () => ({ warWeight: resp.data.data.account.warWeight }));
             toast.success(`War weight updated for ${account.cocAccountTag}`);
         } catch (error) {
             list.update(same, () => ({ warWeight: previous }));
@@ -454,14 +425,10 @@
         const same = (a: Account) => a.id === account.id;
         list.update(same, () => ({ isExternal }));
         try {
-            const resp = await updateCocAccountExternal(
-                account.id,
-                { isExternal },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            list.update(same, () => ({ isExternal: resp.data.account.isExternal }));
-            toast.success(`${account.cocAccountTag} set to ${resp.data.account.isExternal ? "external" : "main"}`);
+            const resp = await updateCocAccountExternal({ path: { id: account.id }, body: { isExternal } });
+            if (!resp.data) throw new Error();
+            list.update(same, () => ({ isExternal: resp.data.data.account.isExternal }));
+            toast.success(`${account.cocAccountTag} set to ${resp.data.data.account.isExternal ? "external" : "main"}`);
         } catch (error) {
             list.update(same, () => ({ isExternal: previous }));
             toast.error("Failed to update external status", { description: error instanceof Error ? error.message : undefined });
@@ -485,13 +452,9 @@
         const same = (a: Account) => a.id === account.id;
         list.update(same, () => ({ [field]: value }));
         try {
-            const resp = await updateCocAccountStats(
-                account.id,
-                { [field]: value },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            if (!resp.success) throw new Error();
-            list.update(same, () => ({ [field]: (resp.data.account as Record<string, unknown>)[field] }));
+            const resp = await updateCocAccountStats({ path: { id: account.id }, body: { [field]: value } });
+            if (!resp.data) throw new Error();
+            list.update(same, () => ({ [field]: (resp.data.data.account as Record<string, unknown>)[field] }));
             toast.success(`${label} updated for ${account.cocAccountTag}`);
         } catch (error) {
             list.update(same, () => ({ [field]: previous }));

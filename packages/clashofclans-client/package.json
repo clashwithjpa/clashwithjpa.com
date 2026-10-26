@@ -12,18 +12,15 @@
         "generate": "kubb generate"
     },
     "dependencies": {
-        "@kubb/plugin-client": "catalog:",
-        "@tanstack/svelte-query": "catalog:",
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@kubb/cli": "catalog:",
-        "@kubb/core": "catalog:",
-        "@kubb/plugin-oas": "catalog:",
-        "@kubb/plugin-svelte-query": "catalog:",
-        "@kubb/plugin-ts": "catalog:",
-        "@kubb/plugin-zod": "catalog:",
+        "@kubb/parser-ts": "^5.14.0",
+        "@kubb/plugin-fetch": "^5.9.2",
+        "@kubb/plugin-ts": "^5.2.0",
+        "@kubb/plugin-zod": "^5.7.2",
         "@types/node": "catalog:",
+        "kubb": "^5.14.0",
         "prettier": "catalog:",
         "typescript": "catalog:"
     },

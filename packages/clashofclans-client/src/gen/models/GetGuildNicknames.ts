@@ -3,60 +3,47 @@
  * Do not edit manually.
  */
 
-/**
- * @description Nickname map.
- */
-export type GetGuildNicknames200 = {
-    /**
-     * @type boolean
-     */
+export type GetGuildNicknamesStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         nicknames: {
             [key: string]: string;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetGuildNicknames401 = {
-    /**
-     * @type boolean
-     */
+export type GetGuildNicknamesStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetGuildNicknames500 = {
-    /**
-     * @type boolean
-     */
+export type GetGuildNicknamesStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetGuildNicknamesQueryResponse = GetGuildNicknames200;
-
-export type GetGuildNicknamesQuery = {
-    Response: GetGuildNicknames200;
-    Errors: GetGuildNicknames401 | GetGuildNicknames500;
+export type GetGuildNicknamesOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetGuildNicknamesResponses = {
+    "200": GetGuildNicknamesStatus200;
+    "401": GetGuildNicknamesStatus401;
+    "500": GetGuildNicknamesStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetGuildNicknamesResponse = GetGuildNicknamesStatus200;

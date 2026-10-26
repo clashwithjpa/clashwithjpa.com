@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetPrivacy500, GetPrivacyQueryResponse } from "../models/GetPrivacy.ts";
-
-function getGetPrivacyUrl() {
-    const res = { method: "GET", url: `/privacy` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetPrivacyOptions, GetPrivacyResponses } from "../models/GetPrivacy.ts";
 
 /**
  * @description Fetches the current privacy policy content.
  * {@link /privacy}
  */
-export async function getPrivacy(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getPrivacy<ThrowOnError extends boolean = false>(
+    options: Options<GetPrivacyOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetPrivacyResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetPrivacyQueryResponse, ResponseErrorConfig<GetPrivacy500>, unknown>({
-        method: "GET",
-        url: getGetPrivacyUrl().url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/privacy", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetPrivacyResponses, ThrowOnError>
+        >,
+    );
 }

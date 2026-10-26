@@ -3,26 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCClanMembers500, GetCOCClanMembersPathParams, GetCOCClanMembersQueryResponse } from "../models/GetCOCClanMembers.ts";
-
-function getGetCOCClanMembersUrl(tag: GetCOCClanMembersPathParams["tag"]) {
-    const res = { method: "GET", url: `/coc/clan/${tag}/members` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCClanMembersOptions, GetCOCClanMembersResponses } from "../models/GetCOCClanMembers.ts";
 
 /**
  * @description Fetches a Clash of Clans clan's members by its tag. The tag must start with #.
  * {@link /coc/clan/:tag/members}
  */
-export async function getCOCClanMembers(tag: GetCOCClanMembersPathParams["tag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCClanMembers<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCClanMembersOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCClanMembersResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCClanMembersQueryResponse, ResponseErrorConfig<GetCOCClanMembers500>, unknown>({
-        method: "GET",
-        url: getGetCOCClanMembersUrl(tag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/clan/{tag}/members", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetCOCClanMembersResponses, ThrowOnError>
+        >,
+    );
 }

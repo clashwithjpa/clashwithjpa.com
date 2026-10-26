@@ -5,54 +5,59 @@
 
 import * as z from "zod";
 
-export const getApiKeyUsageSummaryQueryParamsSchema = z.object({
-    keyId: z.string().min(1),
-    days: z.optional(z.coerce.number().int().min(1).max(90).default(30)),
-});
+export const getApiKeyUsageSummaryQueryKeyIdSchema = z.string().min(1);
 
-/**
- * @description Usage summary.
- */
-export const getApiKeyUsageSummary200Schema = z.object({
+export const getApiKeyUsageSummaryQueryDaysSchema = z.int().min(1).max(90).optional().default(30);
+
+export const getApiKeyUsageSummaryStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         requests: z.number(),
         errors: z.number(),
         errorRate: z.number(),
         p50DurationMs: z.number(),
         p95DurationMs: z.number(),
         windowRequests: z.number(),
-        rateLimitRemaining: z.union([z.number(), z.null()]),
-        rateLimitResetAt: z.union([z.string().datetime(), z.null()]),
-        remaining: z.union([z.number(), z.null()]),
-        rateLimitMax: z.union([z.number(), z.null()]),
-        rateLimitTimeWindow: z.union([z.number(), z.null()]),
-        lastRequest: z.union([z.string().datetime(), z.null()]),
+        rateLimitRemaining: z.number().nullable(),
+        rateLimitResetAt: z.union([z.iso.datetime(), z.null()]),
+        remaining: z.number().nullable(),
+        rateLimitMax: z.number().nullable(),
+        rateLimitTimeWindow: z.number().nullable(),
+        lastRequest: z.union([z.iso.datetime(), z.null()]),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getApiKeyUsageSummary401Schema = z.object({
+export const getApiKeyUsageSummaryStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description API key not found.
- */
-export const getApiKeyUsageSummary404Schema = z.object({
+export const getApiKeyUsageSummaryStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getApiKeyUsageSummary500Schema = z.object({
+export const getApiKeyUsageSummaryStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getApiKeyUsageSummaryQueryResponseSchema = z.lazy(() => getApiKeyUsageSummary200Schema);
+export const getApiKeyUsageSummaryStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getApiKeyUsageSummaryResponseSchema = getApiKeyUsageSummaryStatus200Schema;
+
+export const getApiKeyUsageSummaryErrorSchema = z.union([
+    getApiKeyUsageSummaryStatus400Schema,
+    getApiKeyUsageSummaryStatus401Schema,
+    getApiKeyUsageSummaryStatus404Schema,
+    getApiKeyUsageSummaryStatus500Schema,
+]);
+
+export const getApiKeyUsageSummaryQuerySchema = z.object({
+    keyId: z.string().min(1),
+    days: z.int().min(1).max(90).optional().default(30),
+});

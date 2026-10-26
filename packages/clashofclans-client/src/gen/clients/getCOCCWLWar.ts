@@ -3,26 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetCOCCWLWar500, GetCOCCWLWarPathParams, GetCOCCWLWarQueryResponse } from "../models/GetCOCCWLWar.ts";
-
-function getGetCOCCWLWarUrl(warTag: GetCOCCWLWarPathParams["warTag"]) {
-    const res = { method: "GET", url: `/coc/cwl/wars/${warTag}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetCOCCWLWarOptions, GetCOCCWLWarResponses } from "../models/GetCOCCWLWar.ts";
 
 /**
  * @description Fetches a CWL war's details by its war tag. The tag must start with #.
  * {@link /coc/cwl/wars/:warTag}
  */
-export async function getCOCCWLWar(warTag: GetCOCCWLWarPathParams["warTag"], config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getCOCCWLWar<ThrowOnError extends boolean = false>(
+    options: Options<GetCOCCWLWarOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetCOCCWLWarResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetCOCCWLWarQueryResponse, ResponseErrorConfig<GetCOCCWLWar500>, unknown>({
-        method: "GET",
-        url: getGetCOCCWLWarUrl(warTag).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/coc/cwl/wars/{warTag}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetCOCCWLWarResponses, ThrowOnError>>,
+    );
 }

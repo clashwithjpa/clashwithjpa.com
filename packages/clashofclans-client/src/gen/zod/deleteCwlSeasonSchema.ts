@@ -5,42 +5,45 @@
 
 import * as z from "zod";
 
-export const deleteCwlSeasonPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const deleteCwlSeasonPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Deleted season.
- */
-export const deleteCwlSeason200Schema = z.object({
+export const deleteCwlSeasonStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         id: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteCwlSeason401Schema = z.object({
+export const deleteCwlSeasonStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const deleteCwlSeason404Schema = z.object({
+export const deleteCwlSeasonStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const deleteCwlSeason500Schema = z.object({
+export const deleteCwlSeasonStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteCwlSeasonMutationResponseSchema = z.lazy(() => deleteCwlSeason200Schema);
+export const deleteCwlSeasonStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const deleteCwlSeasonResponseSchema = deleteCwlSeasonStatus200Schema;
+
+export const deleteCwlSeasonErrorSchema = z.union([
+    deleteCwlSeasonStatus400Schema,
+    deleteCwlSeasonStatus401Schema,
+    deleteCwlSeasonStatus404Schema,
+    deleteCwlSeasonStatus500Schema,
+]);
+
+export const deleteCwlSeasonPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

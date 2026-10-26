@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateCocAccountWarWeight401,
-    UpdateCocAccountWarWeight404,
-    UpdateCocAccountWarWeight500,
-    UpdateCocAccountWarWeightMutationRequest,
-    UpdateCocAccountWarWeightMutationResponse,
-    UpdateCocAccountWarWeightPathParams,
-} from "../models/UpdateCocAccountWarWeight.ts";
-
-function getUpdateCocAccountWarWeightUrl(id: UpdateCocAccountWarWeightPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/coc-accounts/${id}/weight` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateCocAccountWarWeightOptions, UpdateCocAccountWarWeightResponses } from "../models/UpdateCocAccountWarWeight.ts";
 
 /**
  * @description Updates the war weight of a linked Clash of Clans account.
  * {@link /admin/coc-accounts/:id/weight}
  */
-export async function updateCocAccountWarWeight(
-    id: UpdateCocAccountWarWeightPathParams["id"],
-    data: UpdateCocAccountWarWeightMutationRequest,
-    config: Partial<RequestConfig<UpdateCocAccountWarWeightMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateCocAccountWarWeight<ThrowOnError extends boolean = false>(
+    options: Options<UpdateCocAccountWarWeightOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateCocAccountWarWeightResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateCocAccountWarWeightMutationResponse,
-        ResponseErrorConfig<UpdateCocAccountWarWeight401 | UpdateCocAccountWarWeight404 | UpdateCocAccountWarWeight500>,
-        UpdateCocAccountWarWeightMutationRequest
-    >({ method: "PUT", url: getUpdateCocAccountWarWeightUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/coc-accounts/{id}/weight",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateCocAccountWarWeightResponses, ThrowOnError>>,
+    );
 }

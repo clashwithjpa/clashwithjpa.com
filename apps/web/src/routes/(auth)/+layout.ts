@@ -1,5 +1,4 @@
 import { authClient, hasPermission } from "#lib/auth.js";
-import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { statement } from "@repo/auth-shared";
 import { getUserFeatures } from "@repo/clashofclans-client";
 import { redirect } from "@sveltejs/kit";
@@ -48,10 +47,10 @@ export const load: LayoutLoad = async ({ url }) => {
 
     const features: Record<FeatureFlag, boolean> = { applicationsEnabled: false, cwlEnabled: false };
     try {
-        const resp = await getUserFeatures({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-        if (resp.success) {
-            features.applicationsEnabled = resp.data.applicationsEnabled;
-            features.cwlEnabled = resp.data.cwlEnabled;
+        const resp = await getUserFeatures({});
+        if (resp.data) {
+            features.applicationsEnabled = resp.data.data.applicationsEnabled;
+            features.cwlEnabled = resp.data.data.cwlEnabled;
         }
     } catch {
         // leave features disabled on failure

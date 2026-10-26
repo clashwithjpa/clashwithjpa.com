@@ -3,27 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetBonusData401, GetBonusData500, GetBonusDataQueryParams, GetBonusDataQueryResponse } from "../models/GetBonusData.ts";
-
-function getGetBonusDataUrl() {
-    const res = { method: "GET", url: `/admin/bonus` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetBonusDataOptions, GetBonusDataResponses } from "../models/GetBonusData.ts";
 
 /**
  * @description Lists a season's CWL applicants joined with their linked account's stats (war weight, town hall, donations, capital gold, clan games, activity). Defaults to the current season.
  * {@link /admin/bonus}
  */
-export async function getBonusData(params?: GetBonusDataQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getBonusData<ThrowOnError extends boolean = false>(
+    options: Options<GetBonusDataOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetBonusDataResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetBonusDataQueryResponse, ResponseErrorConfig<GetBonusData401 | GetBonusData500>, unknown>({
-        method: "GET",
-        url: getGetBonusDataUrl().url.toString(),
-        params,
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/bonus",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetBonusDataResponses, ThrowOnError>>,
+    );
 }

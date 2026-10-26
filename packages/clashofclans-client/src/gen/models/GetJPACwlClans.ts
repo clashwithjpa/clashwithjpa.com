@@ -3,62 +3,42 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the JPA CWL clans.
- */
-export type GetJPACwlClans200 = {
-    /**
-     * @type boolean
-     */
+export type GetJPACwlClansStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clans: {
             [key: string]: {
-                /**
-                 * @type string
-                 */
                 clanTag: string;
-                /**
-                 * @type string
-                 */
                 clanName: string;
-                /**
-                 * @type string
-                 */
                 clanLeague: string;
-                /**
-                 * @type string
-                 */
                 clanLeader: string;
             };
         };
     };
 };
 
-/**
- * @description Server error response when fetching JPA CWL clans fails.
- */
-export type GetJPACwlClans500 = {
-    /**
-     * @type boolean
-     */
+export type GetJPACwlClansStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetJPACwlClansQueryResponse = GetJPACwlClans200;
-
-export type GetJPACwlClansQuery = {
-    Response: GetJPACwlClans200;
-    Errors: GetJPACwlClans500;
+export type GetJPACwlClansOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetJPACwlClansResponses = {
+    "200": GetJPACwlClansStatus200;
+    "500": GetJPACwlClansStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetJPACwlClansResponse = GetJPACwlClansStatus200;

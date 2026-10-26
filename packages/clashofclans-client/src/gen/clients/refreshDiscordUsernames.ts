@@ -3,31 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    RefreshDiscordUsernames401,
-    RefreshDiscordUsernames500,
-    RefreshDiscordUsernames503,
-    RefreshDiscordUsernamesMutationResponse,
-} from "../models/RefreshDiscordUsernames.ts";
-
-function getRefreshDiscordUsernamesUrl() {
-    const res = { method: "POST", url: `/admin/refresh-discord-usernames` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { RefreshDiscordUsernamesOptions, RefreshDiscordUsernamesResponses } from "../models/RefreshDiscordUsernames.ts";
 
 /**
  * @description Re-fetches Discord usernames from the guild member list and updates stored values.
  * {@link /admin/refresh-discord-usernames}
  */
-export async function refreshDiscordUsernames(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function refreshDiscordUsernames<ThrowOnError extends boolean = false>(
+    options: Options<RefreshDiscordUsernamesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<RefreshDiscordUsernamesResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        RefreshDiscordUsernamesMutationResponse,
-        ResponseErrorConfig<RefreshDiscordUsernames401 | RefreshDiscordUsernames500 | RefreshDiscordUsernames503>,
-        unknown
-    >({ method: "POST", url: getRefreshDiscordUsernamesUrl().url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "POST",
+            url: "/admin/refresh-discord-usernames",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<RefreshDiscordUsernamesResponses, ThrowOnError>>,
+    );
 }

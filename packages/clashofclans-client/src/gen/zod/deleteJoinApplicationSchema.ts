@@ -5,52 +5,55 @@
 
 import * as z from "zod";
 
-export const deleteJoinApplicationPathParamsSchema = z.object({
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const deleteJoinApplicationPathIdSchema = z.int().min(1).max(9007199254740991);
 
-/**
- * @description Deleted application.
- */
-export const deleteJoinApplication200Schema = z.object({
+export const deleteJoinApplicationStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        application: z.object({
+    data: z.strictObject({
+        application: z.strictObject({
             id: z.number(),
             cocAccountTag: z.string(),
-            cocAccountData: z.any(),
+            cocAccountData: z.unknown(),
             discordUserId: z.string(),
             status: z.enum(["pending", "accepted", "rejected"]),
-            createdAt: z.string().datetime(),
-            image: z.union([z.string(), z.null()]),
-            discordUsername: z.union([z.string(), z.null()]),
-            discordRole: z.union([z.string(), z.null()]),
+            createdAt: z.iso.datetime(),
+            image: z.string().nullable(),
+            discordUsername: z.string().nullable(),
+            discordRole: z.string().nullable(),
         }),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const deleteJoinApplication401Schema = z.object({
+export const deleteJoinApplicationStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Not found.
- */
-export const deleteJoinApplication404Schema = z.object({
+export const deleteJoinApplicationStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const deleteJoinApplication500Schema = z.object({
+export const deleteJoinApplicationStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const deleteJoinApplicationMutationResponseSchema = z.lazy(() => deleteJoinApplication200Schema);
+export const deleteJoinApplicationStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const deleteJoinApplicationResponseSchema = deleteJoinApplicationStatus200Schema;
+
+export const deleteJoinApplicationErrorSchema = z.union([
+    deleteJoinApplicationStatus400Schema,
+    deleteJoinApplicationStatus401Schema,
+    deleteJoinApplicationStatus404Schema,
+    deleteJoinApplicationStatus500Schema,
+]);
+
+export const deleteJoinApplicationPathSchema = z.object({
+    id: z.int().min(1).max(9007199254740991),
+});

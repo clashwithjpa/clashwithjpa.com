@@ -3,74 +3,44 @@
  * Do not edit manually.
  */
 
-/**
- * @description Created season.
- */
-export type CreateCwlSeason200 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlSeasonStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         season: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
             createdAt: string | null;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateCwlSeason401 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlSeasonStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type CreateCwlSeasonStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateCwlSeason500 = {
-    /**
-     * @type boolean
-     */
+export type CreateCwlSeasonStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type CreateCwlSeasonMutationRequest = {
+export type CreateCwlSeasonBody = {
     /**
      * @minLength 1
      * @type string
@@ -89,10 +59,21 @@ export type CreateCwlSeasonMutationRequest = {
     year: number;
 };
 
-export type CreateCwlSeasonMutationResponse = CreateCwlSeason200;
-
-export type CreateCwlSeasonMutation = {
-    Response: CreateCwlSeason200;
-    Request: CreateCwlSeasonMutationRequest;
-    Errors: CreateCwlSeason401 | CreateCwlSeason500;
+export type CreateCwlSeasonOptions = {
+    body: CreateCwlSeasonBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateCwlSeasonResponses = {
+    "200": CreateCwlSeasonStatus200;
+    "400": CreateCwlSeasonStatus400;
+    "401": CreateCwlSeasonStatus401;
+    "500": CreateCwlSeasonStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateCwlSeasonResponse = CreateCwlSeasonStatus200;

@@ -3,40 +3,35 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the privacy policy content.
- */
-export type GetPrivacy200 = {
-    /**
-     * @type boolean
-     */
+export type GetPrivacyStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
         privacy: string | null;
     };
 };
 
-/**
- * @description Server error response when fetching the privacy policy fails.
- */
-export type GetPrivacy500 = {
-    /**
-     * @type boolean
-     */
+export type GetPrivacyStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetPrivacyQueryResponse = GetPrivacy200;
-
-export type GetPrivacyQuery = {
-    Response: GetPrivacy200;
-    Errors: GetPrivacy500;
+export type GetPrivacyOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetPrivacyResponses = {
+    "200": GetPrivacyStatus200;
+    "500": GetPrivacyStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetPrivacyResponse = GetPrivacyStatus200;

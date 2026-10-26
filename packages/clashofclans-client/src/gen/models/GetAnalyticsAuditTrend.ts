@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetAnalyticsAuditTrendQueryParams = {
+export type GetAnalyticsAuditTrendQuery = {
     /**
      * @minLength 1
      * @maxLength 90
@@ -13,68 +13,55 @@ export type GetAnalyticsAuditTrendQueryParams = {
     days?: number;
 };
 
-/**
- * @description Audit trend.
- */
-export type GetAnalyticsAuditTrend200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditTrendStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         data: {
-            /**
-             * @type string
-             */
             date: string;
-            /**
-             * @type number
-             */
             count: number;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsAuditTrend401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditTrendStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetAnalyticsAuditTrendStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsAuditTrend500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsAuditTrendStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsAuditTrendQueryResponse = GetAnalyticsAuditTrend200;
-
-export type GetAnalyticsAuditTrendQuery = {
-    Response: GetAnalyticsAuditTrend200;
-    QueryParams: GetAnalyticsAuditTrendQueryParams;
-    Errors: GetAnalyticsAuditTrend401 | GetAnalyticsAuditTrend500;
+export type GetAnalyticsAuditTrendOptions = {
+    body?: never;
+    path?: never;
+    query?: GetAnalyticsAuditTrendQuery;
+    headers?: never;
 };
+
+export type GetAnalyticsAuditTrendResponses = {
+    "200": GetAnalyticsAuditTrendStatus200;
+    "400": GetAnalyticsAuditTrendStatus400;
+    "401": GetAnalyticsAuditTrendStatus401;
+    "500": GetAnalyticsAuditTrendStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsAuditTrendResponse = GetAnalyticsAuditTrendStatus200;

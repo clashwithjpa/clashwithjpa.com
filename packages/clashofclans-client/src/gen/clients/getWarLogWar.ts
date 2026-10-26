@@ -3,30 +3,22 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type { GetWarLogWar404, GetWarLogWar500, GetWarLogWarPathParams, GetWarLogWarQueryResponse } from "../models/GetWarLogWar.ts";
-
-function getGetWarLogWarUrl(tag: GetWarLogWarPathParams["tag"], id: GetWarLogWarPathParams["id"]) {
-    const res = { method: "GET", url: `/coc/war-log/${tag}/wars/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetWarLogWarOptions, GetWarLogWarResponses } from "../models/GetWarLogWar.ts";
 
 /**
  * @description Fetches one stored war with both lineups ranked, every attack replayed in order, and each hit's seen time where the tracker caught it.
  * {@link /coc/war-log/:tag/wars/:id}
  */
-export async function getWarLogWar(
-    tag: GetWarLogWarPathParams["tag"],
-    id: GetWarLogWarPathParams["id"],
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getWarLogWar<ThrowOnError extends boolean = false>(
+    options: Options<GetWarLogWarOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetWarLogWarResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<GetWarLogWarQueryResponse, ResponseErrorConfig<GetWarLogWar404 | GetWarLogWar500>, unknown>({
-        method: "GET",
-        url: getGetWarLogWarUrl(tag, id).url.toString(),
-        ...requestConfig,
-    });
-    return res.data;
+    return withUnwrap(
+        request({ method: "GET", url: "/coc/war-log/{tag}/wars/{id}", ...config, throwOnError: config.throwOnError ?? false }) as Promise<
+            RequestResult<GetWarLogWarResponses, ThrowOnError>
+        >,
+    );
 }

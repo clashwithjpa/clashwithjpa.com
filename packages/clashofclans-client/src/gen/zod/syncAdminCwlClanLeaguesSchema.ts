@@ -5,17 +5,14 @@
 
 import * as z from "zod";
 
-/**
- * @description Sync summary and the refreshed CWL clan list.
- */
-export const syncAdminCwlClanLeagues200Schema = z.object({
+export const syncAdminCwlClanLeaguesStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         updated: z.number(),
         unchanged: z.number(),
         failed: z.number(),
         clans: z.array(
-            z.object({
+            z.strictObject({
                 cocClanTag: z.string(),
                 cocClanName: z.string(),
                 cocClanLeague: z.string(),
@@ -25,20 +22,16 @@ export const syncAdminCwlClanLeagues200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const syncAdminCwlClanLeagues401Schema = z.object({
+export const syncAdminCwlClanLeaguesStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const syncAdminCwlClanLeagues500Schema = z.object({
+export const syncAdminCwlClanLeaguesStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const syncAdminCwlClanLeaguesMutationResponseSchema = z.lazy(() => syncAdminCwlClanLeagues200Schema);
+export const syncAdminCwlClanLeaguesResponseSchema = syncAdminCwlClanLeaguesStatus200Schema;
+
+export const syncAdminCwlClanLeaguesErrorSchema = z.union([syncAdminCwlClanLeaguesStatus401Schema, syncAdminCwlClanLeaguesStatus500Schema]);

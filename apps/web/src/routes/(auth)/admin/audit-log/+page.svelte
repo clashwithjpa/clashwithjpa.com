@@ -23,13 +23,7 @@
     } from "#lib/config/auditLog.js";
     import { toast } from "#lib/toast.js";
     import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
-    import {
-        getAuditLog,
-        type GetAuditLogQueryParamsActionEnumKey,
-        type GetAuditLogQueryParamsSourceEnumKey,
-        type GetAuditLogQueryParamsTargetTypeEnumKey,
-    } from "@repo/clashofclans-client";
+    import { getAuditLog, type GetAuditLogActionKey, type GetAuditLogSourceKey, type GetAuditLogTargetTypeKey } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
     import { PreRendered } from "carta-md";
     import { slide } from "svelte/transition";
@@ -71,20 +65,19 @@
     async function load() {
         loading = true;
         try {
-            const resp = await getAuditLog(
-                {
+            const resp = await getAuditLog({
+                query: {
                     limit: PAGE_SIZE,
                     offset: page * PAGE_SIZE,
-                    action: (actionFilter || undefined) as GetAuditLogQueryParamsActionEnumKey | undefined,
-                    targetType: (targetTypeFilter || undefined) as GetAuditLogQueryParamsTargetTypeEnumKey | undefined,
-                    source: (sourceFilter || undefined) as GetAuditLogQueryParamsSourceEnumKey | undefined,
+                    action: (actionFilter || undefined) as GetAuditLogActionKey | undefined,
+                    targetType: (targetTypeFilter || undefined) as GetAuditLogTargetTypeKey | undefined,
+                    source: (sourceFilter || undefined) as GetAuditLogSourceKey | undefined,
                     actorId: actorIdFilter.trim() || undefined,
                 },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include" },
-            );
-            if (resp.success) {
-                entries = resp.data.entries;
-                total = resp.data.total;
+            });
+            if (resp.data) {
+                entries = resp.data.data.entries;
+                total = resp.data.data.total;
             } else {
                 toast.error("Failed to load audit log");
             }

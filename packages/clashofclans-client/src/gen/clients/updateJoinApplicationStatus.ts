@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateJoinApplicationStatus401,
-    UpdateJoinApplicationStatus404,
-    UpdateJoinApplicationStatus500,
-    UpdateJoinApplicationStatusMutationRequest,
-    UpdateJoinApplicationStatusMutationResponse,
-    UpdateJoinApplicationStatusPathParams,
-} from "../models/UpdateJoinApplicationStatus.ts";
-
-function getUpdateJoinApplicationStatusUrl(id: UpdateJoinApplicationStatusPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/join-applications/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateJoinApplicationStatusOptions, UpdateJoinApplicationStatusResponses } from "../models/UpdateJoinApplicationStatus.ts";
 
 /**
  * @description Updates the status of a clan join application (accept/reject/pending).
  * {@link /admin/join-applications/:id}
  */
-export async function updateJoinApplicationStatus(
-    id: UpdateJoinApplicationStatusPathParams["id"],
-    data: UpdateJoinApplicationStatusMutationRequest,
-    config: Partial<RequestConfig<UpdateJoinApplicationStatusMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateJoinApplicationStatus<ThrowOnError extends boolean = false>(
+    options: Options<UpdateJoinApplicationStatusOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateJoinApplicationStatusResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateJoinApplicationStatusMutationResponse,
-        ResponseErrorConfig<UpdateJoinApplicationStatus401 | UpdateJoinApplicationStatus404 | UpdateJoinApplicationStatus500>,
-        UpdateJoinApplicationStatusMutationRequest
-    >({ method: "PUT", url: getUpdateJoinApplicationStatusUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/join-applications/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateJoinApplicationStatusResponses, ThrowOnError>>,
+    );
 }

@@ -3,83 +3,61 @@
  * Do not edit manually.
  */
 
-/**
- * @description Number of applications updated.
- */
-export type AssignCwlApplicationsBulk200 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationsBulkStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         count: number;
         assignedTo: string | null;
     };
 };
 
-/**
- * @description Bad request.
- */
-export type AssignCwlApplicationsBulk400 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationsBulkStatus400 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Unauthorized.
- */
-export type AssignCwlApplicationsBulk401 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationsBulkStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type AssignCwlApplicationsBulk500 = {
-    /**
-     * @type boolean
-     */
+export type AssignCwlApplicationsBulkStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type AssignCwlApplicationsBulkMutationRequest = {
-    /**
-     * @type array
-     */
+export type AssignCwlApplicationsBulkBody = {
     ids: number[];
     clanTag: string | null;
 };
 
-export type AssignCwlApplicationsBulkMutationResponse = AssignCwlApplicationsBulk200;
-
-export type AssignCwlApplicationsBulkMutation = {
-    Response: AssignCwlApplicationsBulk200;
-    Request: AssignCwlApplicationsBulkMutationRequest;
-    Errors: AssignCwlApplicationsBulk400 | AssignCwlApplicationsBulk401 | AssignCwlApplicationsBulk500;
+export type AssignCwlApplicationsBulkOptions = {
+    body: AssignCwlApplicationsBulkBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type AssignCwlApplicationsBulkResponses = {
+    "200": AssignCwlApplicationsBulkStatus200;
+    "400": AssignCwlApplicationsBulkStatus400;
+    "401": AssignCwlApplicationsBulkStatus401;
+    "500": AssignCwlApplicationsBulkStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type AssignCwlApplicationsBulkResponse = AssignCwlApplicationsBulkStatus200;

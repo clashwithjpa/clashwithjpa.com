@@ -5,7 +5,6 @@
     import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
     import Icon from "#lib/components/ui/Icon.svelte";
     import Seo from "#lib/components/ui/Seo.svelte";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
     import { getCOCClan, getCOCClanCurrentWar } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
@@ -15,7 +14,7 @@
 
     let { data }: PageProps = $props();
 
-    const tags = $derived(data.clans?.success ? Object.keys(data.clans.data.clans) : []);
+    const tags = $derived(data.clans?.data ? Object.keys(data.clans.data.data.clans) : []);
 
     let entries = $state<WarEntry[]>([]);
     let loading = $state(true);
@@ -23,16 +22,14 @@
     let now = $state(Date.now());
 
     async function load(tag: string): Promise<WarEntry | null> {
-        const opts = { baseURL: PUBLIC_SERVER_URL };
-        const encoded = encodeURIComponent(tag);
-        const war = await getCOCClanCurrentWar(encoded, opts)
-            .then((r) => (r.success ? r.data.currentWar : null))
+        const war = await getCOCClanCurrentWar({ path: { tag } })
+            .then((r) => (r.data ? r.data.data.currentWar : null))
             .catch(() => null);
         if (war?.clan?.name) return { tag, name: war.clan.name, badge: war.clan.badgeUrls.large, war };
 
         // Outside a war the response carries no clan details, so the name and badge come from the clan itself.
-        const clan = await getCOCClan(encoded, opts)
-            .then((r) => (r.success ? r.data.clan : null))
+        const clan = await getCOCClan({ path: { tag } })
+            .then((r) => (r.data ? r.data.data.clan : null))
             .catch(() => null);
         return clan ? { tag, name: clan.name, badge: clan.badgeUrls.large, war } : null;
     }

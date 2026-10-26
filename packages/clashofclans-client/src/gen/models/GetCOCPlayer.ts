@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetCOCPlayerPathParams = {
+export type GetCOCPlayerPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,585 +15,235 @@ export type GetCOCPlayerPathParams = {
     tag: string;
 };
 
-export const playerWarPreferenceEnum = {
+export const getCOCPlayerStatus200DataPlayerWarPreferenceEnum = {
     in: "in",
     out: "out",
 } as const;
 
-export type PlayerWarPreferenceEnumKey = (typeof playerWarPreferenceEnum)[keyof typeof playerWarPreferenceEnum];
+export type GetCOCPlayerStatus200DataPlayerWarPreferenceEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerWarPreferenceEnum)[keyof typeof getCOCPlayerStatus200DataPlayerWarPreferenceEnum];
 
-export const achievementsVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerAchievementsVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type AchievementsVillageEnumKey = (typeof achievementsVillageEnum)[keyof typeof achievementsVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerAchievementsVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerAchievementsVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerAchievementsVillageEnum];
 
-export const equipmentVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type EquipmentVillageEnumKey = (typeof equipmentVillageEnum)[keyof typeof equipmentVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnum];
 
-export const troopsVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerTroopsVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type TroopsVillageEnumKey = (typeof troopsVillageEnum)[keyof typeof troopsVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerTroopsVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerTroopsVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerTroopsVillageEnum];
 
-export const heroesVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type HeroesVillageEnumKey = (typeof heroesVillageEnum)[keyof typeof heroesVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnum];
 
-export const spellsVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerHeroesVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type SpellsVillageEnumKey = (typeof spellsVillageEnum)[keyof typeof spellsVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerHeroesVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerHeroesVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerHeroesVillageEnum];
 
-export const heroEquipmentVillageEnum = {
+export const getCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnum = {
     home: "home",
     builderBase: "builderBase",
 } as const;
 
-export type HeroEquipmentVillageEnumKey = (typeof heroEquipmentVillageEnum)[keyof typeof heroEquipmentVillageEnum];
+export type GetCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnum];
 
-/**
- * @description Successful response with the player\'s data.
- */
-export type GetCOCPlayer200 = {
-    /**
-     * @type boolean
-     */
+export const getCOCPlayerStatus200DataPlayerSpellsVillageEnum = {
+    home: "home",
+    builderBase: "builderBase",
+} as const;
+
+export type GetCOCPlayerStatus200DataPlayerSpellsVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerSpellsVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerSpellsVillageEnum];
+
+export const getCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnum = {
+    home: "home",
+    builderBase: "builderBase",
+} as const;
+
+export type GetCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnum];
+
+export const getCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnum = {
+    home: "home",
+    builderBase: "builderBase",
+} as const;
+
+export type GetCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnumKey =
+    (typeof getCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnum)[keyof typeof getCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnum];
+
+export type GetCOCPlayerStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         player: {
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type number
-             */
             townHallLevel: number;
-            /**
-             * @type number | undefined
-             */
             townHallWeaponLevel?: number;
-            /**
-             * @type number
-             */
             expLevel: number;
-            /**
-             * @type number
-             */
             trophies: number;
-            /**
-             * @type number
-             */
             bestTrophies: number;
-            /**
-             * @type number
-             */
             warStars: number;
-            /**
-             * @type number
-             */
             attackWins: number;
-            /**
-             * @type number
-             */
             defenseWins: number;
-            /**
-             * @type number | undefined
-             */
             builderHallLevel?: number;
-            /**
-             * @type number | undefined
-             */
             builderBaseTrophies?: number;
-            /**
-             * @type number | undefined
-             */
             bestBuilderBaseTrophies?: number;
-            /**
-             * @type number
-             */
             donations: number;
-            /**
-             * @type number
-             */
             donationsReceived: number;
-            /**
-             * @type number
-             */
             clanCapitalContributions: number;
-            /**
-             * @type string | undefined
-             */
             role?: string;
-            /**
-             * @type string | undefined
-             */
-            warPreference?: PlayerWarPreferenceEnumKey;
-            /**
-             * @type object | undefined
-             */
+            warPreference?: GetCOCPlayerStatus200DataPlayerWarPreferenceEnumKey;
             clan?: {
-                /**
-                 * @type string
-                 */
                 tag: string;
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 clanLevel: number;
-                /**
-                 * @type object
-                 */
                 badgeUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string
-                     */
                     large: string;
-                    /**
-                     * @type string
-                     */
                     medium: string;
                 };
             };
-            /**
-             * @type object | undefined
-             */
             leagueTier?: {
-                /**
-                 * @type number
-                 */
                 id: number;
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type object
-                 */
                 iconUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string
-                     */
                     large: string;
                 };
             };
-            /**
-             * @type object | undefined
-             */
             builderBaseLeague?: {
-                /**
-                 * @type number
-                 */
                 id: number;
-                /**
-                 * @type string
-                 */
                 name: string;
             };
-            /**
-             * @type object | undefined
-             */
             legendStatistics?: {
-                /**
-                 * @type object | undefined
-                 */
                 previousSeason?: {
-                    /**
-                     * @type string
-                     */
                     id: string;
-                    /**
-                     * @type number
-                     */
                     rank: number;
-                    /**
-                     * @type number
-                     */
                     trophies: number;
                 };
-                /**
-                 * @type object | undefined
-                 */
                 previousBuilderBaseSeason?: {
-                    /**
-                     * @type string
-                     */
                     id: string;
-                    /**
-                     * @type number
-                     */
                     rank: number;
-                    /**
-                     * @type number
-                     */
                     trophies: number;
                 };
-                /**
-                 * @type object | undefined
-                 */
                 bestBuilderBaseSeason?: {
-                    /**
-                     * @type string
-                     */
                     id: string;
-                    /**
-                     * @type number
-                     */
                     rank: number;
-                    /**
-                     * @type number
-                     */
                     trophies: number;
                 };
-                /**
-                 * @type object | undefined
-                 */
                 currentSeason?: {
-                    /**
-                     * @type string
-                     */
                     id: string;
-                    /**
-                     * @type number
-                     */
                     rank: number;
-                    /**
-                     * @type number
-                     */
                     trophies: number;
                 };
-                /**
-                 * @type object | undefined
-                 */
                 bestSeason?: {
-                    /**
-                     * @type string
-                     */
                     id: string;
-                    /**
-                     * @type number
-                     */
                     rank: number;
-                    /**
-                     * @type number
-                     */
                     trophies: number;
                 };
-                /**
-                 * @type number
-                 */
                 legendTrophies: number;
             };
-            /**
-             * @type array
-             */
             achievements: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 value: number;
-                /**
-                 * @type number
-                 */
                 target: number;
-                /**
-                 * @type string
-                 */
                 info: string;
                 completionInfo: string | null;
-                /**
-                 * @type string
-                 */
-                village: AchievementsVillageEnumKey;
+                village: GetCOCPlayerStatus200DataPlayerAchievementsVillageEnumKey;
             }[];
-            /**
-             * @type array
-             */
             troops: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 level: number;
-                /**
-                 * @type number
-                 */
                 maxLevel: number;
-                /**
-                 * @type boolean | undefined
-                 */
                 superTroopIsActive?: boolean;
-                /**
-                 * @type array | undefined
-                 */
                 equipment?: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     level: number;
-                    /**
-                     * @type number
-                     */
                     maxLevel: number;
-                    /**
-                     * @type boolean | undefined
-                     */
                     superTroopIsActive?: boolean;
-                    /**
-                     * @type string
-                     */
-                    village: EquipmentVillageEnumKey;
+                    village: GetCOCPlayerStatus200DataPlayerTroopsEquipmentVillageEnumKey;
                 }[];
-                /**
-                 * @type string
-                 */
-                village: TroopsVillageEnumKey;
+                village: GetCOCPlayerStatus200DataPlayerTroopsVillageEnumKey;
             }[];
-            /**
-             * @type array
-             */
             heroes: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 level: number;
-                /**
-                 * @type number
-                 */
                 maxLevel: number;
-                /**
-                 * @type boolean | undefined
-                 */
                 superTroopIsActive?: boolean;
-                /**
-                 * @type array | undefined
-                 */
                 equipment?: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     level: number;
-                    /**
-                     * @type number
-                     */
                     maxLevel: number;
-                    /**
-                     * @type boolean | undefined
-                     */
                     superTroopIsActive?: boolean;
-                    /**
-                     * @type string
-                     */
-                    village: EquipmentVillageEnumKey;
+                    village: GetCOCPlayerStatus200DataPlayerHeroesEquipmentVillageEnumKey;
                 }[];
-                /**
-                 * @type string
-                 */
-                village: HeroesVillageEnumKey;
+                village: GetCOCPlayerStatus200DataPlayerHeroesVillageEnumKey;
             }[];
-            /**
-             * @type array
-             */
             spells: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 level: number;
-                /**
-                 * @type number
-                 */
                 maxLevel: number;
-                /**
-                 * @type boolean | undefined
-                 */
                 superTroopIsActive?: boolean;
-                /**
-                 * @type array | undefined
-                 */
                 equipment?: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     level: number;
-                    /**
-                     * @type number
-                     */
                     maxLevel: number;
-                    /**
-                     * @type boolean | undefined
-                     */
                     superTroopIsActive?: boolean;
-                    /**
-                     * @type string
-                     */
-                    village: EquipmentVillageEnumKey;
+                    village: GetCOCPlayerStatus200DataPlayerSpellsEquipmentVillageEnumKey;
                 }[];
-                /**
-                 * @type string
-                 */
-                village: SpellsVillageEnumKey;
+                village: GetCOCPlayerStatus200DataPlayerSpellsVillageEnumKey;
             }[];
-            /**
-             * @type array
-             */
             heroEquipment: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type number
-                 */
                 level: number;
-                /**
-                 * @type number
-                 */
                 maxLevel: number;
-                /**
-                 * @type boolean | undefined
-                 */
                 superTroopIsActive?: boolean;
-                /**
-                 * @type array | undefined
-                 */
                 equipment?: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     level: number;
-                    /**
-                     * @type number
-                     */
                     maxLevel: number;
-                    /**
-                     * @type boolean | undefined
-                     */
                     superTroopIsActive?: boolean;
-                    /**
-                     * @type string
-                     */
-                    village: EquipmentVillageEnumKey;
+                    village: GetCOCPlayerStatus200DataPlayerHeroEquipmentEquipmentVillageEnumKey;
                 }[];
-                /**
-                 * @type string
-                 */
-                village: HeroEquipmentVillageEnumKey;
+                village: GetCOCPlayerStatus200DataPlayerHeroEquipmentVillageEnumKey;
             }[];
-            /**
-             * @type array
-             */
             labels: {
-                /**
-                 * @type number
-                 */
                 id: number;
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type object
-                 */
                 iconUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string | undefined
-                     */
                     tiny?: string;
-                    /**
-                     * @type string | undefined
-                     */
                     medium?: string;
                 };
             }[];
-            /**
-             * @type object | undefined
-             */
             playerHouse?: {
-                /**
-                 * @type array
-                 */
                 elements: {
-                    /**
-                     * @type string
-                     */
                     type: string;
-                    /**
-                     * @type number
-                     */
                     id: number;
                 }[];
             };
@@ -599,25 +251,35 @@ export type GetCOCPlayer200 = {
     };
 };
 
-/**
- * @description Server error response when fetching player data fails.
- */
-export type GetCOCPlayer500 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCPlayerStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCOCPlayerStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCOCPlayerQueryResponse = GetCOCPlayer200;
-
-export type GetCOCPlayerQuery = {
-    Response: GetCOCPlayer200;
-    PathParams: GetCOCPlayerPathParams;
-    Errors: GetCOCPlayer500;
+export type GetCOCPlayerOptions = {
+    body?: never;
+    path: GetCOCPlayerPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCOCPlayerResponses = {
+    "200": GetCOCPlayerStatus200;
+    "400": GetCOCPlayerStatus400;
+    "500": GetCOCPlayerStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCOCPlayerResponse = GetCOCPlayerStatus200;

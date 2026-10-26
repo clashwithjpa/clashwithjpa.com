@@ -5,48 +5,51 @@
 
 import * as z from "zod";
 
-export const setUserApiAccessPathParamsSchema = z.object({
-    userid: z.string().min(1),
-});
+export const setUserApiAccessPathUseridSchema = z.string().min(1);
 
-/**
- * @description API access updated.
- */
-export const setUserApiAccess200Schema = z.object({
+export const setUserApiAccessStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         userId: z.string(),
         apiAccess: z.boolean(),
         disabledKeys: z.number(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const setUserApiAccess401Schema = z.object({
+export const setUserApiAccessStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description User not found.
- */
-export const setUserApiAccess404Schema = z.object({
+export const setUserApiAccessStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const setUserApiAccess500Schema = z.object({
+export const setUserApiAccessStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const setUserApiAccessMutationRequestSchema = z.object({
+export const setUserApiAccessStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const setUserApiAccessResponseSchema = setUserApiAccessStatus200Schema;
+
+export const setUserApiAccessErrorSchema = z.union([
+    setUserApiAccessStatus400Schema,
+    setUserApiAccessStatus401Schema,
+    setUserApiAccessStatus404Schema,
+    setUserApiAccessStatus500Schema,
+]);
+
+export const setUserApiAccessBodySchema = z.object({
     enabled: z.boolean(),
 });
 
-export const setUserApiAccessMutationResponseSchema = z.lazy(() => setUserApiAccess200Schema);
+export const setUserApiAccessPathSchema = z.object({
+    userid: z.string().min(1),
+});

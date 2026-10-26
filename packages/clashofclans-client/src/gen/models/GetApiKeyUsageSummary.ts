@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type GetApiKeyUsageSummaryQueryParams = {
+export type GetApiKeyUsageSummaryQuery = {
     /**
      * @minLength 1
      * @type string
@@ -18,41 +18,14 @@ export type GetApiKeyUsageSummaryQueryParams = {
     days?: number;
 };
 
-/**
- * @description Usage summary.
- */
-export type GetApiKeyUsageSummary200 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageSummaryStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type number
-         */
         requests: number;
-        /**
-         * @type number
-         */
         errors: number;
-        /**
-         * @type number
-         */
         errorRate: number;
-        /**
-         * @type number
-         */
         p50DurationMs: number;
-        /**
-         * @type number
-         */
         p95DurationMs: number;
-        /**
-         * @type number
-         */
         windowRequests: number;
         rateLimitRemaining: number | null;
         rateLimitResetAt: string | null;
@@ -63,55 +36,55 @@ export type GetApiKeyUsageSummary200 = {
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetApiKeyUsageSummary401 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageSummaryStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetApiKeyUsageSummaryStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description API key not found.
- */
-export type GetApiKeyUsageSummary404 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageSummaryStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetApiKeyUsageSummary500 = {
-    /**
-     * @type boolean
-     */
+export type GetApiKeyUsageSummaryStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetApiKeyUsageSummaryQueryResponse = GetApiKeyUsageSummary200;
-
-export type GetApiKeyUsageSummaryQuery = {
-    Response: GetApiKeyUsageSummary200;
-    QueryParams: GetApiKeyUsageSummaryQueryParams;
-    Errors: GetApiKeyUsageSummary401 | GetApiKeyUsageSummary404 | GetApiKeyUsageSummary500;
+export type GetApiKeyUsageSummaryOptions = {
+    body?: never;
+    path?: never;
+    query: GetApiKeyUsageSummaryQuery;
+    headers?: never;
 };
+
+export type GetApiKeyUsageSummaryResponses = {
+    "200": GetApiKeyUsageSummaryStatus200;
+    "400": GetApiKeyUsageSummaryStatus400;
+    "401": GetApiKeyUsageSummaryStatus401;
+    "404": GetApiKeyUsageSummaryStatus404;
+    "500": GetApiKeyUsageSummaryStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetApiKeyUsageSummaryResponse = GetApiKeyUsageSummaryStatus200;

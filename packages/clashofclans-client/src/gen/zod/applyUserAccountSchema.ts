@@ -5,79 +5,69 @@
 
 import * as z from "zod";
 
-/**
- * @description Application submitted successfully.
- */
-export const applyUserAccount200Schema = z.object({
+export const applyUserAccountStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        application: z.optional(
-            z.object({
+    data: z.strictObject({
+        application: z
+            .strictObject({
                 id: z.number(),
                 cocAccountTag: z.string(),
-                cocAccountData: z.any(),
+                cocAccountData: z.unknown(),
                 discordUserId: z.string(),
                 status: z.string(),
-                createdAt: z.string().datetime(),
-            }),
-        ),
-        account: z.optional(
-            z.object({
+                createdAt: z.iso.datetime(),
+            })
+            .optional(),
+        account: z
+            .strictObject({
                 id: z.number(),
                 cocAccountTag: z.string(),
                 warWeight: z.number(),
                 isExternal: z.boolean(),
-            }),
-        ),
+            })
+            .optional(),
     }),
 });
 
-/**
- * @description Bad request (captcha failed or token verification failed).
- */
-export const applyUserAccount400Schema = z.object({
+export const applyUserAccountStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const applyUserAccount401Schema = z.object({
+export const applyUserAccountStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Applications closed, or external account add requires a verified member.
- */
-export const applyUserAccount403Schema = z.object({
+export const applyUserAccountStatus403Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Application already exists for this account.
- */
-export const applyUserAccount409Schema = z.object({
+export const applyUserAccountStatus409Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Internal server error.
- */
-export const applyUserAccount500Schema = z.object({
+export const applyUserAccountStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const applyUserAccountMutationRequestSchema = z.object({
+export const applyUserAccountResponseSchema = applyUserAccountStatus200Schema;
+
+export const applyUserAccountErrorSchema = z.union([
+    applyUserAccountStatus400Schema,
+    applyUserAccountStatus401Schema,
+    applyUserAccountStatus403Schema,
+    applyUserAccountStatus409Schema,
+    applyUserAccountStatus500Schema,
+]);
+
+export const applyUserAccountBodySchema = z.object({
     cocAccountTag: z.string().min(1).max(20).regex(/^#.*/),
     apiToken: z.string().min(1).max(500),
-    captchaToken: z.optional(z.union([z.string(), z.null()])),
-    isExternal: z.optional(z.boolean().default(false)),
-    warWeight: z.optional(z.number().int().min(1).max(9999999)),
+    captchaToken: z.union([z.string().max(2048), z.null()]).optional(),
+    isExternal: z.boolean().optional().default(false),
+    warWeight: z.int().min(1).max(9999999).optional(),
 });
-
-export const applyUserAccountMutationResponseSchema = z.lazy(() => applyUserAccount200Schema);

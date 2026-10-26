@@ -5,22 +5,18 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the privacy policy content.
- */
-export const getPrivacy200Schema = z.object({
+export const getPrivacyStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        privacy: z.union([z.string(), z.null()]),
+    data: z.strictObject({
+        privacy: z.string().nullable(),
     }),
 });
 
-/**
- * @description Server error response when fetching the privacy policy fails.
- */
-export const getPrivacy500Schema = z.object({
+export const getPrivacyStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getPrivacyQueryResponseSchema = z.lazy(() => getPrivacy200Schema);
+export const getPrivacyResponseSchema = getPrivacyStatus200Schema;
+
+export const getPrivacyErrorSchema = getPrivacyStatus500Schema;

@@ -1,5 +1,4 @@
 import { authClient, hasPermission } from "#lib/auth.js";
-import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { getRules } from "@repo/clashofclans-client";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
@@ -12,6 +11,6 @@ export const load: PageLoad = async () => {
         throw error(401, "Unauthorized");
     }
 
-    const rules = await getRules({ baseURL: PUBLIC_SERVER_URL });
+    const rules = await getRules({}).unwrap();
     return { session, rules };
 };

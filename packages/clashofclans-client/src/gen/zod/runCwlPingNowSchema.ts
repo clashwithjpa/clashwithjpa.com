@@ -5,33 +5,29 @@
 
 import * as z from "zod";
 
-/**
- * @description Run summary.
- */
-export const runCwlPingNow200Schema = z.object({
+export const runCwlPingNowStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        seasonId: z.nullable(z.number()),
+    data: z.strictObject({
+        seasonId: z.number().nullable(),
         clansChecked: z.number(),
         clansPinged: z.number(),
         usersPinged: z.number(),
         clans: z.array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 name: z.string(),
                 pending: z.number(),
             }),
         ),
-        skippedReason: z.optional(z.string()),
+        skippedReason: z.string().optional(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const runCwlPingNow401Schema = z.object({
+export const runCwlPingNowStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const runCwlPingNowMutationResponseSchema = z.lazy(() => runCwlPingNow200Schema);
+export const runCwlPingNowResponseSchema = runCwlPingNowStatus200Schema;
+
+export const runCwlPingNowErrorSchema = runCwlPingNowStatus401Schema;

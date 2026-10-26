@@ -3,76 +3,51 @@
  * Do not edit manually.
  */
 
-/**
- * @description Seasons.
- */
-export type GetAnalyticsCwlSeasons200 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         seasons: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             name: string;
-            /**
-             * @type string
-             */
             month: string;
-            /**
-             * @type number
-             */
             year: number;
             createdAt: string | null;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetAnalyticsCwlSeasons401 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetAnalyticsCwlSeasons500 = {
-    /**
-     * @type boolean
-     */
+export type GetAnalyticsCwlSeasonsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetAnalyticsCwlSeasonsQueryResponse = GetAnalyticsCwlSeasons200;
-
-export type GetAnalyticsCwlSeasonsQuery = {
-    Response: GetAnalyticsCwlSeasons200;
-    Errors: GetAnalyticsCwlSeasons401 | GetAnalyticsCwlSeasons500;
+export type GetAnalyticsCwlSeasonsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetAnalyticsCwlSeasonsResponses = {
+    "200": GetAnalyticsCwlSeasonsStatus200;
+    "401": GetAnalyticsCwlSeasonsStatus401;
+    "500": GetAnalyticsCwlSeasonsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetAnalyticsCwlSeasonsResponse = GetAnalyticsCwlSeasonsStatus200;

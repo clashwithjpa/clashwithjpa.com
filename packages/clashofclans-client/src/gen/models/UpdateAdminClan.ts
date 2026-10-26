@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type UpdateAdminClanPathParams = {
+export type UpdateAdminClanPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,229 +12,171 @@ export type UpdateAdminClanPathParams = {
     id: number;
 };
 
-/**
- * @description Updated clan.
- */
-export type UpdateAdminClan200 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clan: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocClanCode: string;
             cocClanName: string | null;
             cocClanLevel: number | null;
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             discordClanRoleId: string;
-            /**
-             * @type string
-             */
             discordClanChannelId: string;
-            /**
-             * @type string
-             */
             discordMemberRoleId: string;
-            /**
-             * @type string
-             */
             discordElderRoleId: string;
-            /**
-             * @type string
-             */
             discordColeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderId: string;
-            /**
-             * @type number
-             */
             attacksRequirement: number;
-            /**
-             * @type number
-             */
             donationsRequirement: number;
-            /**
-             * @type number
-             */
             clangamesRequirement: number;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type UpdateAdminClan401 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type UpdateAdminClanStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type UpdateAdminClan404 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Invalid Discord IDs.
- */
-export type UpdateAdminClan422 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus422 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type UpdateAdminClan500 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord verification unavailable.
- */
-export type UpdateAdminClan503 = {
-    /**
-     * @type boolean
-     */
+export type UpdateAdminClanStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type UpdateAdminClanMutationRequest = {
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    cocClanCode?: string;
-    cocClanName?: string | null;
-    cocClanLevel?: number | null;
-    /**
-     * @minLength 1
-     * @pattern ^#.*
-     * @type string | undefined
-     */
-    cocClanTag?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordClanRoleId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordClanChannelId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordMemberRoleId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordElderRoleId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordColeaderRoleId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordLeaderRoleId?: string;
-    /**
-     * @minLength 1
-     * @type string | undefined
-     */
-    discordLeaderId?: string;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    attacksRequirement?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    donationsRequirement?: number;
-    /**
-     * @minLength 0
-     * @maxLength 9007199254740991
-     * @type integer | undefined
-     */
-    clangamesRequirement?: number;
+export type UpdateAdminClanBody =
+    | {
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          cocClanCode?: string;
+          cocClanName?: string | null;
+          cocClanLevel?: number | null;
+          /**
+           * @description
+           * Format: `starts_with`
+           * @minLength 1
+           * @pattern ^#.*
+           * @type string | undefined
+           */
+          cocClanTag?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordClanRoleId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordClanChannelId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordMemberRoleId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordElderRoleId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordColeaderRoleId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordLeaderRoleId?: string;
+          /**
+           * @minLength 1
+           * @type string | undefined
+           */
+          discordLeaderId?: string;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          attacksRequirement?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          donationsRequirement?: number;
+          /**
+           * @minLength 0
+           * @maxLength 9007199254740991
+           * @type integer | undefined
+           */
+          clangamesRequirement?: number;
+      }
+    | undefined;
+
+export type UpdateAdminClanOptions = {
+    body: UpdateAdminClanBody;
+    path: UpdateAdminClanPath;
+    query?: never;
+    headers?: never;
 };
 
-export type UpdateAdminClanMutationResponse = UpdateAdminClan200;
-
-export type UpdateAdminClanMutation = {
-    Response: UpdateAdminClan200;
-    Request: UpdateAdminClanMutationRequest;
-    PathParams: UpdateAdminClanPathParams;
-    Errors: UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503;
+export type UpdateAdminClanResponses = {
+    "200": UpdateAdminClanStatus200;
+    "400": UpdateAdminClanStatus400;
+    "401": UpdateAdminClanStatus401;
+    "404": UpdateAdminClanStatus404;
+    "422": UpdateAdminClanStatus422;
+    "500": UpdateAdminClanStatus500;
+    "503": UpdateAdminClanStatus503;
 };
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateAdminClanResponse = UpdateAdminClanStatus200;

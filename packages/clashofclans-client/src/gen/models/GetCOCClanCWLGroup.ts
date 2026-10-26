@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetCOCClanCWLGroupPathParams = {
+export type GetCOCClanCWLGroupPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,122 +15,73 @@ export type GetCOCClanCWLGroupPathParams = {
     tag: string;
 };
 
-export const leagueGroupStateEnum = {
+export const getCOCClanCWLGroupStatus200DataLeagueGroupStateEnum = {
     notInWar: "notInWar",
     preparation: "preparation",
     inWar: "inWar",
     ended: "ended",
 } as const;
 
-export type LeagueGroupStateEnumKey = (typeof leagueGroupStateEnum)[keyof typeof leagueGroupStateEnum];
+export type GetCOCClanCWLGroupStatus200DataLeagueGroupStateEnumKey =
+    (typeof getCOCClanCWLGroupStatus200DataLeagueGroupStateEnum)[keyof typeof getCOCClanCWLGroupStatus200DataLeagueGroupStateEnum];
 
-/**
- * @description Successful response with the clan\'s CWL league group data.
- */
-export type GetCOCClanCWLGroup200 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanCWLGroupStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         leagueGroup: {
-            /**
-             * @type string
-             */
-            state: LeagueGroupStateEnumKey;
-            /**
-             * @type string
-             */
+            state: GetCOCClanCWLGroupStatus200DataLeagueGroupStateEnumKey;
             season: string;
-            /**
-             * @type array
-             */
             clans: {
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type string
-                 */
                 tag: string;
-                /**
-                 * @type number
-                 */
                 clanLevel: number;
-                /**
-                 * @type object
-                 */
                 badgeUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string
-                     */
                     large: string;
-                    /**
-                     * @type string
-                     */
                     medium: string;
                 };
-                /**
-                 * @type array
-                 */
                 members: {
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type string
-                     */
                     tag: string;
-                    /**
-                     * @type number
-                     */
                     townHallLevel: number;
                 }[];
             }[];
-            /**
-             * @type array
-             */
             rounds: {
-                /**
-                 * @type array
-                 */
                 warTags: string[];
             }[];
         };
     };
 };
 
-/**
- * @description Server error response when fetching CWL league group data fails.
- */
-export type GetCOCClanCWLGroup500 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanCWLGroupStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCOCClanCWLGroupStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCOCClanCWLGroupQueryResponse = GetCOCClanCWLGroup200;
-
-export type GetCOCClanCWLGroupQuery = {
-    Response: GetCOCClanCWLGroup200;
-    PathParams: GetCOCClanCWLGroupPathParams;
-    Errors: GetCOCClanCWLGroup500;
+export type GetCOCClanCWLGroupOptions = {
+    body?: never;
+    path: GetCOCClanCWLGroupPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCOCClanCWLGroupResponses = {
+    "200": GetCOCClanCWLGroupStatus200;
+    "400": GetCOCClanCWLGroupStatus400;
+    "500": GetCOCClanCWLGroupStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCOCClanCWLGroupResponse = GetCOCClanCWLGroupStatus200;

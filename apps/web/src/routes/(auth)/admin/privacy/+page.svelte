@@ -4,7 +4,6 @@
     import { toast } from "#lib/toast.js";
     import { errorMessage } from "#lib/utils.js";
     import { createMobileMediaQuery } from "#lib/utils/mobile.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { setPrivacy } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -22,11 +21,8 @@
 
     async function handleSave() {
         try {
-            const newPrivacyResp = await setPrivacy(
-                { privacy: privacyContent },
-                { baseURL: PUBLIC_SERVER_URL, credentials: "include", headers: { "Content-Type": "application/json" } },
-            );
-            privacyContent = newPrivacyResp.data.privacy;
+            const saved = await setPrivacy({ body: { privacy: privacyContent } }).unwrap();
+            privacyContent = saved.data.privacy;
             toast.success("Privacy policy updated successfully");
         } catch (e) {
             toast.error("Failed to update privacy policy", { description: errorMessage(e) || "An error occurred" });

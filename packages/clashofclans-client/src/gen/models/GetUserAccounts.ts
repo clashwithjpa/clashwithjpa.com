@@ -3,79 +3,51 @@
  * Do not edit manually.
  */
 
-/**
- * @description User accounts fetched successfully.
- */
-export type GetUserAccounts200 = {
-    /**
-     * @type boolean
-     */
+export type GetUserAccountsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         accounts: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             discordUserId: string;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            /**
-             * @type number
-             */
             warWeight: number;
-            /**
-             * @type boolean
-             */
             isExternal: boolean;
         }[];
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetUserAccounts401 = {
-    /**
-     * @type boolean
-     */
+export type GetUserAccountsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Internal server error.
- */
-export type GetUserAccounts500 = {
-    /**
-     * @type boolean
-     */
+export type GetUserAccountsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetUserAccountsQueryResponse = GetUserAccounts200;
-
-export type GetUserAccountsQuery = {
-    Response: GetUserAccounts200;
-    Errors: GetUserAccounts401 | GetUserAccounts500;
+export type GetUserAccountsOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetUserAccountsResponses = {
+    "200": GetUserAccountsStatus200;
+    "401": GetUserAccountsStatus401;
+    "500": GetUserAccountsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserAccountsResponse = GetUserAccountsStatus200;

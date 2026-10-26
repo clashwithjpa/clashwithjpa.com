@@ -5,225 +5,229 @@
 
 import * as z from "zod";
 
-export const getCOCPlayerPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-});
+export const getCOCPlayerPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description Successful response with the player\'s data.
- */
-export const getCOCPlayer200Schema = z.object({
+export const getCOCPlayerStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        player: z.object({
+    data: z.strictObject({
+        player: z.strictObject({
             name: z.string(),
             tag: z.string(),
             townHallLevel: z.number(),
-            townHallWeaponLevel: z.optional(z.number()),
+            townHallWeaponLevel: z.number().optional(),
             expLevel: z.number(),
             trophies: z.number(),
             bestTrophies: z.number(),
             warStars: z.number(),
             attackWins: z.number(),
             defenseWins: z.number(),
-            builderHallLevel: z.optional(z.number()),
-            builderBaseTrophies: z.optional(z.number()),
-            bestBuilderBaseTrophies: z.optional(z.number()),
+            builderHallLevel: z.number().optional(),
+            builderBaseTrophies: z.number().optional(),
+            bestBuilderBaseTrophies: z.number().optional(),
             donations: z.number(),
             donationsReceived: z.number(),
             clanCapitalContributions: z.number(),
-            role: z.optional(z.string()),
-            warPreference: z.optional(z.enum(["in", "out"])),
-            clan: z.optional(
-                z.object({
+            role: z.string().optional(),
+            warPreference: z.enum(["in", "out"]).optional(),
+            clan: z
+                .strictObject({
                     tag: z.string(),
                     name: z.string(),
                     clanLevel: z.number(),
-                    badgeUrls: z.object({
+                    badgeUrls: z.strictObject({
                         small: z.string(),
                         large: z.string(),
                         medium: z.string(),
                     }),
-                }),
-            ),
-            leagueTier: z.optional(
-                z.object({
+                })
+                .optional(),
+            leagueTier: z
+                .strictObject({
                     id: z.number(),
                     name: z.string(),
-                    iconUrls: z.object({
+                    iconUrls: z.strictObject({
                         small: z.string(),
                         large: z.string(),
                     }),
-                }),
-            ),
-            builderBaseLeague: z.optional(
-                z.object({
+                })
+                .optional(),
+            builderBaseLeague: z
+                .strictObject({
                     id: z.number(),
                     name: z.string(),
-                }),
-            ),
-            legendStatistics: z.optional(
-                z.object({
-                    previousSeason: z.optional(
-                        z.object({
+                })
+                .optional(),
+            legendStatistics: z
+                .strictObject({
+                    previousSeason: z
+                        .strictObject({
                             id: z.string(),
                             rank: z.number(),
                             trophies: z.number(),
-                        }),
-                    ),
-                    previousBuilderBaseSeason: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    previousBuilderBaseSeason: z
+                        .strictObject({
                             id: z.string(),
                             rank: z.number(),
                             trophies: z.number(),
-                        }),
-                    ),
-                    bestBuilderBaseSeason: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    bestBuilderBaseSeason: z
+                        .strictObject({
                             id: z.string(),
                             rank: z.number(),
                             trophies: z.number(),
-                        }),
-                    ),
-                    currentSeason: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    currentSeason: z
+                        .strictObject({
                             id: z.string(),
                             rank: z.number(),
                             trophies: z.number(),
-                        }),
-                    ),
-                    bestSeason: z.optional(
-                        z.object({
+                        })
+                        .optional(),
+                    bestSeason: z
+                        .strictObject({
                             id: z.string(),
                             rank: z.number(),
                             trophies: z.number(),
-                        }),
-                    ),
+                        })
+                        .optional(),
                     legendTrophies: z.number(),
-                }),
-            ),
+                })
+                .optional(),
             achievements: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     stars: z.number(),
                     value: z.number(),
                     target: z.number(),
                     info: z.string(),
-                    completionInfo: z.union([z.string(), z.null()]),
+                    completionInfo: z.string().nullable(),
                     village: z.enum(["home", "builderBase"]),
                 }),
             ),
             troops: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     level: z.number(),
                     maxLevel: z.number(),
-                    superTroopIsActive: z.optional(z.boolean()),
-                    equipment: z.optional(
-                        z.array(
-                            z.object({
+                    superTroopIsActive: z.boolean().optional(),
+                    equipment: z
+                        .array(
+                            z.strictObject({
                                 name: z.string(),
                                 level: z.number(),
                                 maxLevel: z.number(),
-                                superTroopIsActive: z.optional(z.boolean()),
+                                superTroopIsActive: z.boolean().optional(),
                                 village: z.enum(["home", "builderBase"]),
                             }),
-                        ),
-                    ),
+                        )
+                        .optional(),
                     village: z.enum(["home", "builderBase"]),
                 }),
             ),
             heroes: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     level: z.number(),
                     maxLevel: z.number(),
-                    superTroopIsActive: z.optional(z.boolean()),
-                    equipment: z.optional(
-                        z.array(
-                            z.object({
+                    superTroopIsActive: z.boolean().optional(),
+                    equipment: z
+                        .array(
+                            z.strictObject({
                                 name: z.string(),
                                 level: z.number(),
                                 maxLevel: z.number(),
-                                superTroopIsActive: z.optional(z.boolean()),
+                                superTroopIsActive: z.boolean().optional(),
                                 village: z.enum(["home", "builderBase"]),
                             }),
-                        ),
-                    ),
+                        )
+                        .optional(),
                     village: z.enum(["home", "builderBase"]),
                 }),
             ),
             spells: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     level: z.number(),
                     maxLevel: z.number(),
-                    superTroopIsActive: z.optional(z.boolean()),
-                    equipment: z.optional(
-                        z.array(
-                            z.object({
+                    superTroopIsActive: z.boolean().optional(),
+                    equipment: z
+                        .array(
+                            z.strictObject({
                                 name: z.string(),
                                 level: z.number(),
                                 maxLevel: z.number(),
-                                superTroopIsActive: z.optional(z.boolean()),
+                                superTroopIsActive: z.boolean().optional(),
                                 village: z.enum(["home", "builderBase"]),
                             }),
-                        ),
-                    ),
+                        )
+                        .optional(),
                     village: z.enum(["home", "builderBase"]),
                 }),
             ),
             heroEquipment: z.array(
-                z.object({
+                z.strictObject({
                     name: z.string(),
                     level: z.number(),
                     maxLevel: z.number(),
-                    superTroopIsActive: z.optional(z.boolean()),
-                    equipment: z.optional(
-                        z.array(
-                            z.object({
+                    superTroopIsActive: z.boolean().optional(),
+                    equipment: z
+                        .array(
+                            z.strictObject({
                                 name: z.string(),
                                 level: z.number(),
                                 maxLevel: z.number(),
-                                superTroopIsActive: z.optional(z.boolean()),
+                                superTroopIsActive: z.boolean().optional(),
                                 village: z.enum(["home", "builderBase"]),
                             }),
-                        ),
-                    ),
+                        )
+                        .optional(),
                     village: z.enum(["home", "builderBase"]),
                 }),
             ),
             labels: z.array(
-                z.object({
+                z.strictObject({
                     id: z.number(),
                     name: z.string(),
-                    iconUrls: z.object({
+                    iconUrls: z.strictObject({
                         small: z.string(),
-                        tiny: z.optional(z.string()),
-                        medium: z.optional(z.string()),
+                        tiny: z.string().optional(),
+                        medium: z.string().optional(),
                     }),
                 }),
             ),
-            playerHouse: z.optional(
-                z.object({
+            playerHouse: z
+                .strictObject({
                     elements: z.array(
-                        z.object({
+                        z.strictObject({
                             type: z.string(),
                             id: z.number(),
                         }),
                     ),
-                }),
-            ),
+                })
+                .optional(),
         }),
     }),
 });
 
-/**
- * @description Server error response when fetching player data fails.
- */
-export const getCOCPlayer500Schema = z.object({
+export const getCOCPlayerStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-export const getCOCPlayerQueryResponseSchema = z.lazy(() => getCOCPlayer200Schema);
+export const getCOCPlayerStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getCOCPlayerResponseSchema = getCOCPlayerStatus200Schema;
+
+export const getCOCPlayerErrorSchema = z.union([getCOCPlayerStatus400Schema, getCOCPlayerStatus500Schema]);
+
+export const getCOCPlayerPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+});

@@ -5,28 +5,25 @@
 
 import * as z from "zod";
 
-/**
- * @description Successful response with the JPA clans.
- */
-export const getJPAClanRequirements200Schema = z.object({
+export const getJPAClanRequirementsStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        clans: z.object({}).catchall(
-            z.object({
-                requiredAttacks: z.union([z.number(), z.null()]),
-                requiredClangames: z.union([z.number(), z.null()]),
-                requiredDonations: z.union([z.number(), z.null()]),
+    data: z.strictObject({
+        clans: z.record(
+            z.string(),
+            z.strictObject({
+                requiredAttacks: z.number().nullable(),
+                requiredClangames: z.number().nullable(),
+                requiredDonations: z.number().nullable(),
             }),
         ),
     }),
 });
 
-/**
- * @description Server error response when fetching JPA clans fails.
- */
-export const getJPAClanRequirements500Schema = z.object({
+export const getJPAClanRequirementsStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getJPAClanRequirementsQueryResponseSchema = z.lazy(() => getJPAClanRequirements200Schema);
+export const getJPAClanRequirementsResponseSchema = getJPAClanRequirementsStatus200Schema;
+
+export const getJPAClanRequirementsErrorSchema = getJPAClanRequirementsStatus500Schema;

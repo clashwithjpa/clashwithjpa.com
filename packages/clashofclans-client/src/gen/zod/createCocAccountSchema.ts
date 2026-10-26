@@ -5,19 +5,16 @@
 
 import * as z from "zod";
 
-/**
- * @description Linked COC account.
- */
-export const createCocAccount200Schema = z.object({
+export const createCocAccountStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        account: z.object({
+    data: z.strictObject({
+        account: z.strictObject({
             id: z.number(),
             discordUserId: z.string(),
             cocAccountTag: z.string(),
             warWeight: z.number(),
             isExternal: z.boolean(),
-            currentClan: z.union([z.string(), z.null()]),
+            currentClan: z.string().nullable(),
             townHall: z.number(),
             totalDonated: z.number(),
             totalReceived: z.number(),
@@ -25,59 +22,52 @@ export const createCocAccount200Schema = z.object({
             capitalGoldLooted: z.number(),
             capitalGoldContributed: z.number(),
             activityScore: z.number(),
-            ownerUserId: z.union([z.string(), z.null()]),
-            ownerName: z.union([z.string(), z.null()]),
-            ownerImage: z.union([z.string(), z.null()]),
-            ownerRole: z.union([z.string(), z.null()]),
+            ownerUserId: z.string().nullable(),
+            ownerName: z.string().nullable(),
+            ownerImage: z.string().nullable(),
+            ownerRole: z.string().nullable(),
         }),
     }),
 });
 
-/**
- * @description Bad request.
- */
-export const createCocAccount400Schema = z.object({
+export const createCocAccountStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const createCocAccount401Schema = z.object({
+export const createCocAccountStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Member not found.
- */
-export const createCocAccount404Schema = z.object({
+export const createCocAccountStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Account already linked.
- */
-export const createCocAccount409Schema = z.object({
+export const createCocAccountStatus409Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const createCocAccount500Schema = z.object({
+export const createCocAccountStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const createCocAccountMutationRequestSchema = z.object({
+export const createCocAccountResponseSchema = createCocAccountStatus200Schema;
+
+export const createCocAccountErrorSchema = z.union([
+    createCocAccountStatus400Schema,
+    createCocAccountStatus401Schema,
+    createCocAccountStatus404Schema,
+    createCocAccountStatus409Schema,
+    createCocAccountStatus500Schema,
+]);
+
+export const createCocAccountBodySchema = z.object({
     userId: z.string().min(1),
     tag: z.string().min(1).max(20).regex(/^#.*/),
-    warWeight: z.optional(z.number().int().min(0).max(9007199254740991).default(0)),
-    isExternal: z.optional(z.boolean().default(false)),
+    warWeight: z.int().min(0).max(9007199254740991).optional().default(0),
+    isExternal: z.boolean().optional().default(false),
 });
-
-export const createCocAccountMutationResponseSchema = z.lazy(() => createCocAccount200Schema);

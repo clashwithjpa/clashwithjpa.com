@@ -3,156 +3,81 @@
  * Do not edit manually.
  */
 
-/**
- * @description Created clan.
- */
-export type CreateAdminClan200 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clan: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocClanCode: string;
             cocClanName: string | null;
             cocClanLevel: number | null;
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             discordClanRoleId: string;
-            /**
-             * @type string
-             */
             discordClanChannelId: string;
-            /**
-             * @type string
-             */
             discordMemberRoleId: string;
-            /**
-             * @type string
-             */
             discordElderRoleId: string;
-            /**
-             * @type string
-             */
             discordColeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderId: string;
-            /**
-             * @type number
-             */
             attacksRequirement: number;
-            /**
-             * @type number
-             */
             donationsRequirement: number;
-            /**
-             * @type number
-             */
             clangamesRequirement: number;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type CreateAdminClan401 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type CreateAdminClanStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Duplicate.
- */
-export type CreateAdminClan409 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus409 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Invalid Discord IDs.
- */
-export type CreateAdminClan422 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus422 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type CreateAdminClan500 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Discord verification unavailable.
- */
-export type CreateAdminClan503 = {
-    /**
-     * @type boolean
-     */
+export type CreateAdminClanStatus503 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type CreateAdminClanMutationRequest = {
+export type CreateAdminClanBody = {
     /**
      * @minLength 1
      * @type string
@@ -161,6 +86,8 @@ export type CreateAdminClanMutationRequest = {
     cocClanName?: string | null;
     cocClanLevel?: number | null;
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @pattern ^#.*
      * @type string
@@ -221,10 +148,24 @@ export type CreateAdminClanMutationRequest = {
     clangamesRequirement: number;
 };
 
-export type CreateAdminClanMutationResponse = CreateAdminClan200;
-
-export type CreateAdminClanMutation = {
-    Response: CreateAdminClan200;
-    Request: CreateAdminClanMutationRequest;
-    Errors: CreateAdminClan401 | CreateAdminClan409 | CreateAdminClan422 | CreateAdminClan500 | CreateAdminClan503;
+export type CreateAdminClanOptions = {
+    body: CreateAdminClanBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type CreateAdminClanResponses = {
+    "200": CreateAdminClanStatus200;
+    "400": CreateAdminClanStatus400;
+    "401": CreateAdminClanStatus401;
+    "409": CreateAdminClanStatus409;
+    "422": CreateAdminClanStatus422;
+    "500": CreateAdminClanStatus500;
+    "503": CreateAdminClanStatus503;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateAdminClanResponse = CreateAdminClanStatus200;

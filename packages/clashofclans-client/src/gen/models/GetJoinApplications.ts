@@ -3,20 +3,16 @@
  * Do not edit manually.
  */
 
-export const getJoinApplicationsQueryParamsStatusEnum = {
+export const getJoinApplicationsStatus = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type GetJoinApplicationsQueryParamsStatusEnumKey =
-    (typeof getJoinApplicationsQueryParamsStatusEnum)[keyof typeof getJoinApplicationsQueryParamsStatusEnum];
+export type GetJoinApplicationsStatusKey = (typeof getJoinApplicationsStatus)[keyof typeof getJoinApplicationsStatus];
 
-export type GetJoinApplicationsQueryParams = {
-    /**
-     * @type string | undefined
-     */
-    status?: GetJoinApplicationsQueryParamsStatusEnumKey;
+export type GetJoinApplicationsQuery = {
+    status?: GetJoinApplicationsStatusKey;
     /**
      * @minLength 1
      * @maxLength 200
@@ -33,96 +29,77 @@ export type GetJoinApplicationsQueryParams = {
     offset?: number;
 };
 
-export const applicationsStatusEnum = {
+export const getJoinApplicationsStatus200DataApplicationsStatusEnum = {
     pending: "pending",
     accepted: "accepted",
     rejected: "rejected",
 } as const;
 
-export type ApplicationsStatusEnumKey = (typeof applicationsStatusEnum)[keyof typeof applicationsStatusEnum];
+export type GetJoinApplicationsStatus200DataApplicationsStatusEnumKey =
+    (typeof getJoinApplicationsStatus200DataApplicationsStatusEnum)[keyof typeof getJoinApplicationsStatus200DataApplicationsStatusEnum];
 
-/**
- * @description Applications.
- */
-export type GetJoinApplications200 = {
-    /**
-     * @type boolean
-     */
+export type GetJoinApplicationsStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         applications: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocAccountTag: string;
-            cocAccountData: any;
-            /**
-             * @type string
-             */
+            cocAccountData: unknown;
             discordUserId: string;
+            status: GetJoinApplicationsStatus200DataApplicationsStatusEnumKey;
             /**
+             * @description
+             * Format: `date-time`
              * @type string
-             */
-            status: ApplicationsStatusEnumKey;
-            /**
-             * @type string, date-time
              */
             createdAt: string;
             image: string | null;
             discordUsername: string | null;
             discordRole: string | null;
         }[];
-        /**
-         * @type number
-         */
         total: number;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type GetJoinApplications401 = {
-    /**
-     * @type boolean
-     */
+export type GetJoinApplicationsStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetJoinApplicationsStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetJoinApplications500 = {
-    /**
-     * @type boolean
-     */
+export type GetJoinApplicationsStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetJoinApplicationsQueryResponse = GetJoinApplications200;
-
-export type GetJoinApplicationsQuery = {
-    Response: GetJoinApplications200;
-    QueryParams: GetJoinApplicationsQueryParams;
-    Errors: GetJoinApplications401 | GetJoinApplications500;
+export type GetJoinApplicationsOptions = {
+    body?: never;
+    path?: never;
+    query?: GetJoinApplicationsQuery;
+    headers?: never;
 };
+
+export type GetJoinApplicationsResponses = {
+    "200": GetJoinApplicationsStatus200;
+    "400": GetJoinApplicationsStatus400;
+    "401": GetJoinApplicationsStatus401;
+    "500": GetJoinApplicationsStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetJoinApplicationsResponse = GetJoinApplicationsStatus200;

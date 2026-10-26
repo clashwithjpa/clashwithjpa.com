@@ -5,18 +5,15 @@
 
 import * as z from "zod";
 
-/**
- * @description Clans.
- */
-export const getAdminClans200Schema = z.object({
+export const getAdminClansStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         clans: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 cocClanCode: z.string(),
-                cocClanName: z.union([z.string(), z.null()]),
-                cocClanLevel: z.union([z.number(), z.null()]),
+                cocClanName: z.string().nullable(),
+                cocClanLevel: z.number().nullable(),
                 cocClanTag: z.string(),
                 discordClanRoleId: z.string(),
                 discordClanChannelId: z.string(),
@@ -33,20 +30,16 @@ export const getAdminClans200Schema = z.object({
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getAdminClans401Schema = z.object({
+export const getAdminClansStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const getAdminClans500Schema = z.object({
+export const getAdminClansStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getAdminClansQueryResponseSchema = z.lazy(() => getAdminClans200Schema);
+export const getAdminClansResponseSchema = getAdminClansStatus200Schema;
+
+export const getAdminClansErrorSchema = z.union([getAdminClansStatus401Schema, getAdminClansStatus500Schema]);

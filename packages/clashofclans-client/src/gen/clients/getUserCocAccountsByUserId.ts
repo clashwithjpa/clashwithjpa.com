@@ -3,34 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    GetUserCocAccountsByUserId401,
-    GetUserCocAccountsByUserId500,
-    GetUserCocAccountsByUserIdPathParams,
-    GetUserCocAccountsByUserIdQueryResponse,
-} from "../models/GetUserCocAccountsByUserId.ts";
-
-function getGetUserCocAccountsByUserIdUrl(userid: GetUserCocAccountsByUserIdPathParams["userid"]) {
-    const res = { method: "GET", url: `/admin/users/${userid}/coc-accounts` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { GetUserCocAccountsByUserIdOptions, GetUserCocAccountsByUserIdResponses } from "../models/GetUserCocAccountsByUserId.ts";
 
 /**
  * @description Fetches the linked Clash of Clans accounts for a user by Better Auth userId.
  * {@link /admin/users/:userid/coc-accounts}
  */
-export async function getUserCocAccountsByUserId(
-    userid: GetUserCocAccountsByUserIdPathParams["userid"],
-    config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function getUserCocAccountsByUserId<ThrowOnError extends boolean = false>(
+    options: Options<GetUserCocAccountsByUserIdOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetUserCocAccountsByUserIdResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const res = await request<
-        GetUserCocAccountsByUserIdQueryResponse,
-        ResponseErrorConfig<GetUserCocAccountsByUserId401 | GetUserCocAccountsByUserId500>,
-        unknown
-    >({ method: "GET", url: getGetUserCocAccountsByUserIdUrl(userid).url.toString(), ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "GET",
+            url: "/admin/users/{userid}/coc-accounts",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<GetUserCocAccountsByUserIdResponses, ThrowOnError>>,
+    );
 }

@@ -3,161 +3,73 @@
  * Do not edit manually.
  */
 
-/**
- * @description Family clans and their latest war.
- */
-export type GetWarLogClans200 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogClansStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type array
-         */
         clans: {
-            /**
-             * @type string
-             */
             tag: string;
-            /**
-             * @type string
-             */
             code: string;
-            /**
-             * @type string,null
-             */
             name: string | null;
-            /**
-             * @type string,null
-             */
             badge: string | null;
             war: {
-                /**
-                 * @type number
-                 */
                 id: number;
-                /**
-                 * @type string
-                 */
                 clanTag: string;
-                /**
-                 * @type string
-                 */
                 state: string;
-                /**
-                 * @type string,null
-                 */
                 result: string | null;
-                /**
-                 * @type string
-                 */
                 source: string;
-                /**
-                 * @type number
-                 */
                 teamSize: number;
-                /**
-                 * @type number
-                 */
                 attacksPerMember: number;
-                /**
-                 * @type string,null
-                 */
                 preparationStartTime: string | null;
-                /**
-                 * @type string,null
-                 */
                 startTime: string | null;
-                /**
-                 * @type string
-                 */
                 endTime: string;
-                /**
-                 * @type string,null
-                 */
                 opponentTag: string | null;
-                /**
-                 * @type string,null
-                 */
                 opponentName: string | null;
-                /**
-                 * @type string,null
-                 */
                 opponentBadge: string | null;
-                /**
-                 * @type number
-                 */
                 clanStars: number;
-                /**
-                 * @type number
-                 */
                 clanDestruction: number;
-                /**
-                 * @type number
-                 */
                 clanAttacks: number;
-                /**
-                 * @type number
-                 */
                 opponentStars: number;
-                /**
-                 * @type number
-                 */
                 opponentDestruction: number;
-                /**
-                 * @type number
-                 */
                 opponentAttacks: number;
-                /**
-                 * @type boolean
-                 */
                 hasDetail: boolean;
-                /**
-                 * @type boolean
-                 */
                 tracked: boolean;
             } | null;
         }[];
     };
 };
 
-/**
- * @description Not a family clan, or no such war.
- */
-export type GetWarLogClans404 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogClansStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type GetWarLogClans500 = {
-    /**
-     * @type boolean
-     */
+export type GetWarLogClansStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetWarLogClansQueryResponse = GetWarLogClans200;
-
-export type GetWarLogClansQuery = {
-    Response: GetWarLogClans200;
-    Errors: GetWarLogClans404 | GetWarLogClans500;
+export type GetWarLogClansOptions = {
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type GetWarLogClansResponses = {
+    "200": GetWarLogClansStatus200;
+    "404": GetWarLogClansStatus404;
+    "500": GetWarLogClansStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetWarLogClansResponse = GetWarLogClansStatus200;

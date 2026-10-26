@@ -5,41 +5,37 @@
 
 import * as z from "zod";
 
-export const getWarLogWarPathParamsSchema = z.object({
-    tag: z.string().min(1).max(20).regex(/^#.*/),
-    id: z.coerce.number().int().min(1).max(9007199254740991),
-});
+export const getWarLogWarPathTagSchema = z.string().min(1).max(20).regex(/^#.*/);
 
-/**
- * @description The war.
- */
-export const getWarLogWar200Schema = z.object({
+export const getWarLogWarPathIdSchema = z.int().min(1).max(9007199254740991);
+
+export const getWarLogWarStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
-        war: z.object({
+    data: z.strictObject({
+        war: z.strictObject({
             id: z.number(),
             clanTag: z.string(),
             state: z.string(),
-            result: z.nullable(z.string()),
+            result: z.string().nullable(),
             source: z.string(),
             teamSize: z.number(),
             attacksPerMember: z.number(),
-            battleModifier: z.nullable(z.string()),
-            preparationStartTime: z.nullable(z.string()),
-            startTime: z.nullable(z.string()),
+            battleModifier: z.string().nullable(),
+            preparationStartTime: z.string().nullable(),
+            startTime: z.string().nullable(),
             endTime: z.string(),
-            trackedSince: z.nullable(z.string()),
+            trackedSince: z.string().nullable(),
             updatedAt: z.string(),
             hasDetail: z.boolean(),
-            clan: z.object({
-                tag: z.nullable(z.string()),
-                name: z.nullable(z.string()),
-                badge: z.nullable(z.string()),
+            clan: z.strictObject({
+                tag: z.string().nullable(),
+                name: z.string().nullable(),
+                badge: z.string().nullable(),
                 stars: z.number(),
                 destruction: z.number(),
                 attacks: z.number(),
                 members: z.array(
-                    z.object({
+                    z.strictObject({
                         tag: z.string(),
                         name: z.string(),
                         th: z.number(),
@@ -50,7 +46,7 @@ export const getWarLogWar200Schema = z.object({
                         destruction: z.number(),
                         defenses: z.number(),
                         bestDefense: z.union([
-                            z.object({
+                            z.strictObject({
                                 stars: z.number(),
                                 destruction: z.number(),
                             }),
@@ -59,15 +55,15 @@ export const getWarLogWar200Schema = z.object({
                     }),
                 ),
             }),
-            opponent: z.object({
-                tag: z.nullable(z.string()),
-                name: z.nullable(z.string()),
-                badge: z.nullable(z.string()),
+            opponent: z.strictObject({
+                tag: z.string().nullable(),
+                name: z.string().nullable(),
+                badge: z.string().nullable(),
                 stars: z.number(),
                 destruction: z.number(),
                 attacks: z.number(),
                 members: z.array(
-                    z.object({
+                    z.strictObject({
                         tag: z.string(),
                         name: z.string(),
                         th: z.number(),
@@ -78,7 +74,7 @@ export const getWarLogWar200Schema = z.object({
                         destruction: z.number(),
                         defenses: z.number(),
                         bestDefense: z.union([
-                            z.object({
+                            z.strictObject({
                                 stars: z.number(),
                                 destruction: z.number(),
                             }),
@@ -88,7 +84,7 @@ export const getWarLogWar200Schema = z.object({
                 ),
             }),
             attacks: z.array(
-                z.object({
+                z.strictObject({
                     order: z.number(),
                     side: z.enum(["clan", "opponent"]),
                     attackerTag: z.string(),
@@ -103,27 +99,34 @@ export const getWarLogWar200Schema = z.object({
                     destruction: z.number(),
                     duration: z.number(),
                     fresh: z.boolean(),
-                    seenAt: z.nullable(z.string()),
+                    seenAt: z.string().nullable(),
                 }),
             ),
         }),
     }),
 });
 
-/**
- * @description Not a family clan, or no such war.
- */
-export const getWarLogWar404Schema = z.object({
+export const getWarLogWarStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getWarLogWar500Schema = z.object({
+export const getWarLogWarStatus404Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getWarLogWarQueryResponseSchema = z.lazy(() => getWarLogWar200Schema);
+export const getWarLogWarStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getWarLogWarResponseSchema = getWarLogWarStatus200Schema;
+
+export const getWarLogWarErrorSchema = z.union([getWarLogWarStatus400Schema, getWarLogWarStatus404Schema, getWarLogWarStatus500Schema]);
+
+export const getWarLogWarPathSchema = z.object({
+    tag: z.string().min(1).max(20).regex(/^#.*/),
+    id: z.int().min(1).max(9007199254740991),
+});

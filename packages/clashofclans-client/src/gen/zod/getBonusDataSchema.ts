@@ -5,34 +5,27 @@
 
 import * as z from "zod";
 
-export const getBonusDataQueryParamsSchema = z
-    .object({
-        seasonId: z.optional(z.coerce.number().int().min(-9007199254740991).max(9007199254740991)),
-    })
-    .optional();
+export const getBonusDataQuerySeasonIdSchema = z.int().min(-9007199254740991).max(9007199254740991).optional();
 
-/**
- * @description Bonus rows.
- */
-export const getBonusData200Schema = z.object({
+export const getBonusDataStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         rows: z.array(
-            z.object({
+            z.strictObject({
                 id: z.number(),
                 cocAccountId: z.number(),
                 seasonId: z.number(),
                 discordUserId: z.string(),
                 discordUsername: z.string(),
-                image: z.nullable(z.string()),
+                image: z.string().nullable(),
                 cocAccountName: z.string(),
                 cocAccountTag: z.string(),
-                cocAccountClan: z.nullable(z.string()),
+                cocAccountClan: z.string().nullable(),
                 preferenceNum: z.number(),
-                assignedTo: z.nullable(z.string()),
+                assignedTo: z.string().nullable(),
                 isExternal: z.boolean(),
                 warWeight: z.number(),
-                currentClan: z.nullable(z.string()),
+                currentClan: z.string().nullable(),
                 townHall: z.number(),
                 totalDonated: z.number(),
                 totalReceived: z.number(),
@@ -40,30 +33,36 @@ export const getBonusData200Schema = z.object({
                 capitalGoldLooted: z.number(),
                 capitalGoldContributed: z.number(),
                 activityScore: z.number(),
-                ownerName: z.nullable(z.string()),
-                ownerImage: z.nullable(z.string()),
-                ownerRole: z.nullable(z.string()),
+                ownerName: z.string().nullable(),
+                ownerImage: z.string().nullable(),
+                ownerRole: z.string().nullable(),
             }),
         ),
         total: z.number(),
-        seasonId: z.nullable(z.number()),
+        seasonId: z.number().nullable(),
     }),
 });
 
-/**
- * @description Unauthorized.
- */
-export const getBonusData401Schema = z.object({
+export const getBonusDataStatus400Schema = z.object({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.array(z.unknown()),
+    data: z.unknown(),
 });
 
-/**
- * @description Server error.
- */
-export const getBonusData500Schema = z.object({
+export const getBonusDataStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const getBonusDataQueryResponseSchema = z.lazy(() => getBonusData200Schema);
+export const getBonusDataStatus500Schema = z.strictObject({
+    success: z.literal(false),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
+});
+
+export const getBonusDataResponseSchema = getBonusDataStatus200Schema;
+
+export const getBonusDataErrorSchema = z.union([getBonusDataStatus400Schema, getBonusDataStatus401Schema, getBonusDataStatus500Schema]);
+
+export const getBonusDataQuerySchema = z.object({
+    seasonId: z.int().min(-9007199254740991).max(9007199254740991).optional(),
+});

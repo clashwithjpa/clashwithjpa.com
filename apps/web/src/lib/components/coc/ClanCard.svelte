@@ -5,9 +5,9 @@
     import Icon from "#lib/components/ui/Icon.svelte";
     import TownHall from "#lib/components/ui/TownHall.svelte";
     import { cn } from "#lib/utils.js";
-    import type { GetCOCClan200, GetJPAClanRequirements200 } from "@repo/clashofclans-client";
+    import type { GetCOCClanStatus200, GetJPAClanRequirementsStatus200 } from "@repo/clashofclans-client";
 
-    type Clan = GetCOCClan200["data"]["clan"];
+    type Clan = GetCOCClanStatus200["data"]["clan"];
 
     let {
         clan,
@@ -15,7 +15,7 @@
         class: className = "",
     }: {
         clan: Clan;
-        requirements: GetJPAClanRequirements200["data"]["clans"][string];
+        requirements: GetJPAClanRequirementsStatus200["data"]["clans"][string];
         class?: string;
     } = $props();
 

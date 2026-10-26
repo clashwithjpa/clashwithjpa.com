@@ -9,8 +9,7 @@
     import type { Role } from "#lib/config/roles.js";
     import { toast } from "#lib/toast.js";
     import { num, str } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
-    import { getCOCPlayer } from "@repo/clashofclans-client";
+    import { getCOCPlayer, type GetCOCPlayerStatus200 } from "@repo/clashofclans-client";
     import type { Component } from "svelte";
     import TablerActivity from "~icons/tabler/activity";
     import TablerBuildingBank from "~icons/tabler/building-bank";
@@ -58,10 +57,10 @@
     let copied = $state(false);
 
     // Fetched once per account; switching tabs re-awaits the same resolved promise (no refetch).
-    let playerRequest = $derived(getCOCPlayer(encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" }));
+    let playerRequest = $derived(getCOCPlayer({ path: { tag: account.cocAccountTag } }));
 
     // Resolved live player, used to backfill any CoC field the caller didn't pass.
-    type PlayerData = Extract<Awaited<ReturnType<typeof getCOCPlayer>>, { success: true }>["data"]["player"];
+    type PlayerData = GetCOCPlayerStatus200["data"]["player"];
     let player = $state<PlayerData | null>(null);
     let playerLoading = $state(false);
     $effect(() => {
@@ -70,7 +69,7 @@
         playerLoading = true;
         playerRequest
             .then((res) => {
-                if (active && res.success) player = res.data.player;
+                if (active && res.data) player = res.data.data.player;
             })
             .catch(() => {})
             .finally(() => {
@@ -213,7 +212,7 @@
                     {#await playerRequest}
                         <span class="font-mono">{account.cocAccountTag}</span>
                     {:then res}
-                        {res.success ? res.data.player.name : account.cocAccountTag}
+                        {res.data ? res.data.data.player.name : account.cocAccountTag}
                     {:catch}
                         <span class="font-mono">{account.cocAccountTag}</span>
                     {/await}
@@ -332,8 +331,8 @@
             {#await playerRequest}
                 {@render profileSkeleton()}
             {:then res}
-                {#if res.success}
-                    {@const player = res.data.player}
+                {#if res.data}
+                    {@const player = res.data.data.player}
                     <div class="space-y-4">
                         <!-- Profile -->
                         <div class="space-y-2">
@@ -451,8 +450,8 @@
                     {/each}
                 </div>
             {:then res}
-                {#if res.success && res.data.player.heroes?.filter((h) => h.village === "home").length}
-                    {@const heroes = res.data.player.heroes.filter((h) => h.village === "home")}
+                {#if res.data && res.data.data.player.heroes?.filter((h) => h.village === "home").length}
+                    {@const heroes = res.data.data.player.heroes.filter((h) => h.village === "home")}
                     <div class="space-y-2">
                         {@render sectionTitle(TablerSparkles, "Heroes")}
                         {#each heroes as hero (hero.name)}
@@ -471,7 +470,7 @@
                             </div>
                         {/each}
                     </div>
-                {:else if res.success}
+                {:else if res.data}
                     {@render stateBox(TablerSwords, "No heroes yet")}
                 {:else}
                     {@render stateBox(TablerWorldX, "Couldn't load live data")}

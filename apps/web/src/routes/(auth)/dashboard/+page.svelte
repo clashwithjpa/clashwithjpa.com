@@ -13,7 +13,6 @@
     import { jobs } from "#lib/jobs.svelte.js";
     import { toast } from "#lib/toast.js";
     import { formatDate, formatDateTime } from "#lib/utils.js";
-    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
     import {
         getCOCPlayer,
@@ -23,8 +22,7 @@
         getUserCwlApplications,
         importUserAccounts,
         setUserAccountExternal,
-        type GetCOCPlayer500,
-        type SetUserAccountExternal500,
+        type GetUserCwlApplicationsStatus200,
     } from "@repo/clashofclans-client";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
     import TablerCalendarClock from "~icons/tabler/calendar-clock";
@@ -61,8 +59,8 @@
 
     async function loadAccounts() {
         try {
-            const resp = await getUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-            accounts = resp.success ? resp.data.accounts : [];
+            const resp = await getUserAccounts({});
+            accounts = resp.data ? resp.data.data.accounts : [];
         } catch (err) {
             console.error("Failed to load accounts:", err);
             accounts = [];
@@ -78,17 +76,13 @@
     async function markExternal(account: LinkedAccount) {
         markingId = account.id;
         try {
-            const resp = await setUserAccountExternal(account.id, {
-                baseURL: PUBLIC_SERVER_URL,
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
+            const resp = await setUserAccountExternal({ path: { id: account.id } });
 
-            if (resp.success) {
-                account.isExternal = resp.data.account.isExternal;
+            if (resp.data) {
+                account.isExternal = resp.data.data.account.isExternal;
                 toast.success(`${account.cocAccountTag} marked as external`);
             } else {
-                const error = (resp as unknown as SetUserAccountExternal500).error;
+                const error = resp.error?.error;
                 toast.error(typeof error === "string" ? error : "Failed to convert account to external");
             }
         } catch (err) {
@@ -107,13 +101,13 @@
     function importAccounts() {
         jobs.start("dashboard:import", "Importing accounts", async () => {
             try {
-                const resp = await importUserAccounts({ baseURL: PUBLIC_SERVER_URL, credentials: "include" });
-                if (!resp.success) {
+                const resp = await importUserAccounts({});
+                if (!resp.data) {
                     toast.error("Failed to import accounts");
                     return;
                 }
 
-                const { imported, available } = resp.data;
+                const { imported, available } = resp.data.data;
                 if (available === 0) {
                     toast.info("No pre-existing accounts found for your Discord ID. Please apply manually.");
                     return "dismiss";
@@ -131,7 +125,7 @@
         });
     }
 
-    type CwlApplication = Awaited<ReturnType<typeof getUserCwlApplications>>["data"]["applications"][number];
+    type CwlApplication = GetUserCwlApplicationsStatus200["data"]["applications"][number];
 </script>
 
 <Seo title="Dashboard" />
@@ -282,31 +276,31 @@
                             style="--i:{i}"
                         >
                             <div class="flex w-full grow items-center justify-center">
-                                {#await getCOCPlayer( encodeURIComponent(account.cocAccountTag), { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )}
+                                {#await getCOCPlayer({ path: { tag: account.cocAccountTag } })}
                                     {@render playerSkeleton()}
                                 {:then acc}
-                                    {#if !acc.success}
+                                    {#if !acc.data}
                                         <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <TablerX class="size-16 text-stone-400" />
                                             <div class="flex flex-col items-start justify-center gap-1">
                                                 <span class="text-lg font-semibold">Error fetching player</span>
-                                                <span class="font-mono text-sm text-stone-400">{(acc as unknown as GetCOCPlayer500).error}</span>
+                                                <span class="font-mono text-sm text-stone-400">{acc.error?.error}</span>
                                             </div>
                                         </div>
                                     {:else}
                                         <div class="flex size-full min-w-0 flex-col items-start justify-start gap-2">
                                             <div class="flex w-full min-w-0 flex-col items-start justify-center gap-2">
-                                                <Tooltip title="Townhall {acc.data.player.townHallLevel}" placement="right">
-                                                    <TownHall level={acc.data.player.townHallLevel} class="size-16 shrink-0" />
+                                                <Tooltip title="Townhall {acc.data.data.player.townHallLevel}" placement="right">
+                                                    <TownHall level={acc.data.data.player.townHallLevel} class="size-16 shrink-0" />
                                                 </Tooltip>
                                                 <div class="w-full min-w-0">
-                                                    <Tooltip title={acc.data.player.name} placement="top" class="w-full text-left">
+                                                    <Tooltip title={acc.data.data.player.name} placement="top" class="w-full text-left">
                                                         <span class="block w-full truncate text-lg font-semibold">
-                                                            {acc.data.player.name}
+                                                            {acc.data.data.player.name}
                                                         </span>
                                                     </Tooltip>
                                                     <span class="block w-full truncate font-mono text-sm text-stone-400">
-                                                        {acc.data.player.tag}
+                                                        {acc.data.data.player.tag}
                                                     </span>
                                                 </div>
                                             </div>
@@ -314,15 +308,15 @@
                                                 {#if account.isExternal}
                                                     <Badge variant="red" content="External" icon={TablerWorld} />
                                                 {/if}
-                                                {#if acc.data.player.clan}
+                                                {#if acc.data.data.player.clan}
                                                     <Badge
                                                         variant="blue"
-                                                        content={acc.data.player.clan?.name}
-                                                        icon={acc.data.player.clan?.badgeUrls.small}
+                                                        content={acc.data.data.player.clan?.name}
+                                                        icon={acc.data.data.player.clan?.badgeUrls.small}
                                                         iconSize="size-4"
                                                     />
                                                 {/if}
-                                                <Badge variant="yellow" content="BH {acc.data.player.builderHallLevel}" icon={TablerHammer} />
+                                                <Badge variant="yellow" content="BH {acc.data.data.player.builderHallLevel}" icon={TablerHammer} />
                                             </div>
                                         </div>
                                     {/if}
@@ -358,7 +352,7 @@
 
 {#await hasPermission($session.data?.user.id, "cwl") then canApplyCWL}
     {#if canApplyCWL}
-        {#await Promise.all( [getUserCwlApplications( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPAClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } ), getJPACwlClans( { baseURL: PUBLIC_SERVER_URL, credentials: "include" } )] )}
+        {#await Promise.all([getUserCwlApplications({}).unwrap(), getJPAClans({}).unwrap(), getJPACwlClans({}).unwrap()])}
             <!-- With CWL closed the section usually stays hidden, so a placeholder would only flash and vanish. -->
             <div aria-busy="true" class={cwlEnabled ? "" : "hidden"}>
                 <h1 class="pb-4 text-2xl font-bold">CWL Applications</h1>
@@ -517,6 +511,8 @@
                     {/if}
                 </div>
             {/if}
+        {:catch}
+            <!-- The CWL section is secondary, so a failed load hides it rather than breaking the dashboard. -->
         {/await}
     {/if}
 {/await}

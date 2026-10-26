@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeleteAdminClanPathParams = {
+export type DeleteAdminClanPath = {
     /**
      * @minLength 1
      * @maxLength 9007199254740991
@@ -12,129 +12,78 @@ export type DeleteAdminClanPathParams = {
     id: number;
 };
 
-/**
- * @description Deleted clan.
- */
-export type DeleteAdminClan200 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminClanStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         clan: {
-            /**
-             * @type number
-             */
             id: number;
-            /**
-             * @type string
-             */
             cocClanCode: string;
             cocClanName: string | null;
             cocClanLevel: number | null;
-            /**
-             * @type string
-             */
             cocClanTag: string;
-            /**
-             * @type string
-             */
             discordClanRoleId: string;
-            /**
-             * @type string
-             */
             discordClanChannelId: string;
-            /**
-             * @type string
-             */
             discordMemberRoleId: string;
-            /**
-             * @type string
-             */
             discordElderRoleId: string;
-            /**
-             * @type string
-             */
             discordColeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderRoleId: string;
-            /**
-             * @type string
-             */
             discordLeaderId: string;
-            /**
-             * @type number
-             */
             attacksRequirement: number;
-            /**
-             * @type number
-             */
             donationsRequirement: number;
-            /**
-             * @type number
-             */
             clangamesRequirement: number;
         };
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type DeleteAdminClan401 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminClanStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type DeleteAdminClanStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Not found.
- */
-export type DeleteAdminClan404 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminClanStatus404 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type DeleteAdminClan500 = {
-    /**
-     * @type boolean
-     */
+export type DeleteAdminClanStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type DeleteAdminClanMutationResponse = DeleteAdminClan200;
-
-export type DeleteAdminClanMutation = {
-    Response: DeleteAdminClan200;
-    PathParams: DeleteAdminClanPathParams;
-    Errors: DeleteAdminClan401 | DeleteAdminClan404 | DeleteAdminClan500;
+export type DeleteAdminClanOptions = {
+    body?: never;
+    path: DeleteAdminClanPath;
+    query?: never;
+    headers?: never;
 };
+
+export type DeleteAdminClanResponses = {
+    "200": DeleteAdminClanStatus200;
+    "400": DeleteAdminClanStatus400;
+    "401": DeleteAdminClanStatus401;
+    "404": DeleteAdminClanStatus404;
+    "500": DeleteAdminClanStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteAdminClanResponse = DeleteAdminClanStatus200;

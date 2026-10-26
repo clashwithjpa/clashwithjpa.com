@@ -3,39 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    SetUserApiAccess401,
-    SetUserApiAccess404,
-    SetUserApiAccess500,
-    SetUserApiAccessMutationRequest,
-    SetUserApiAccessMutationResponse,
-    SetUserApiAccessPathParams,
-} from "../models/SetUserApiAccess.ts";
-
-function getSetUserApiAccessUrl(userid: SetUserApiAccessPathParams["userid"]) {
-    const res = { method: "PUT", url: `/admin/users/${userid}/api-access` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { SetUserApiAccessOptions, SetUserApiAccessResponses } from "../models/SetUserApiAccess.ts";
 
 /**
  * @description Grants or revokes a user's ability to create API keys. Revoking also disables all of their existing keys.
  * {@link /admin/users/:userid/api-access}
  */
-export async function setUserApiAccess(
-    userid: SetUserApiAccessPathParams["userid"],
-    data: SetUserApiAccessMutationRequest,
-    config: Partial<RequestConfig<SetUserApiAccessMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function setUserApiAccess<ThrowOnError extends boolean = false>(
+    options: Options<SetUserApiAccessOptions, ThrowOnError>,
+): Unwrappable<RequestResult<SetUserApiAccessResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        SetUserApiAccessMutationResponse,
-        ResponseErrorConfig<SetUserApiAccess401 | SetUserApiAccess404 | SetUserApiAccess500>,
-        SetUserApiAccessMutationRequest
-    >({ method: "PUT", url: getSetUserApiAccessUrl(userid).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/users/{userid}/api-access",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<SetUserApiAccessResponses, ThrowOnError>>,
+    );
 }

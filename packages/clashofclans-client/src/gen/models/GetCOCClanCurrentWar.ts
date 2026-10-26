@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-export type GetCOCClanCurrentWarPathParams = {
+export type GetCOCClanCurrentWarPath = {
     /**
+     * @description
+     * Format: `starts_with`
      * @minLength 1
      * @maxLength 20
      * @pattern ^#.*
@@ -13,347 +15,140 @@ export type GetCOCClanCurrentWarPathParams = {
     tag: string;
 };
 
-export const currentWarStateEnum = {
+export const getCOCClanCurrentWarStatus200DataCurrentWarStateEnum = {
     notInWar: "notInWar",
     preparation: "preparation",
     inWar: "inWar",
     warEnded: "warEnded",
 } as const;
 
-export type CurrentWarStateEnumKey = (typeof currentWarStateEnum)[keyof typeof currentWarStateEnum];
+export type GetCOCClanCurrentWarStatus200DataCurrentWarStateEnumKey =
+    (typeof getCOCClanCurrentWarStatus200DataCurrentWarStateEnum)[keyof typeof getCOCClanCurrentWarStatus200DataCurrentWarStateEnum];
 
-export const currentWarBattleModifierEnum = {
+export const getCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnum = {
     none: "none",
     hardMode: "hardMode",
 } as const;
 
-export type CurrentWarBattleModifierEnumKey = (typeof currentWarBattleModifierEnum)[keyof typeof currentWarBattleModifierEnum];
+export type GetCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnumKey =
+    (typeof getCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnum)[keyof typeof getCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnum];
 
-/**
- * @description Successful response with the clan\'s current war data.
- */
-export type GetCOCClanCurrentWar200 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanCurrentWarStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type object
-         */
         currentWar: {
-            /**
-             * @type string
-             */
-            state: CurrentWarStateEnumKey;
-            /**
-             * @type number
-             */
+            state: GetCOCClanCurrentWarStatus200DataCurrentWarStateEnumKey;
             teamSize: number;
-            /**
-             * @type string
-             */
             startTime: string;
-            /**
-             * @type string
-             */
             preparationStartTime: string;
-            /**
-             * @type string | undefined
-             */
-            battleModifier?: CurrentWarBattleModifierEnumKey;
-            /**
-             * @type string
-             */
+            battleModifier?: GetCOCClanCurrentWarStatus200DataCurrentWarBattleModifierEnumKey;
             endTime: string;
-            /**
-             * @type object
-             */
             clan: {
-                /**
-                 * @type string
-                 */
                 tag: string;
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type object
-                 */
                 badgeUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string
-                     */
                     large: string;
-                    /**
-                     * @type string
-                     */
                     medium: string;
                 };
-                /**
-                 * @type number
-                 */
                 clanLevel: number;
-                /**
-                 * @type number
-                 */
                 attacks: number;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destructionPercentage: number;
-                /**
-                 * @type array
-                 */
                 members: {
-                    /**
-                     * @type string
-                     */
                     tag: string;
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     mapPosition: number;
-                    /**
-                     * @type number
-                     */
                     townhallLevel: number;
-                    /**
-                     * @type number
-                     */
                     opponentAttacks: number;
-                    /**
-                     * @type object | undefined
-                     */
                     bestOpponentAttack?: {
-                        /**
-                         * @type number
-                         */
                         order: number;
-                        /**
-                         * @type string
-                         */
                         attackerTag: string;
-                        /**
-                         * @type string
-                         */
                         defenderTag: string;
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         duration: number;
-                        /**
-                         * @type number
-                         */
                         destructionPercentage: number;
                     };
-                    /**
-                     * @type array | undefined
-                     */
                     attacks?: {
-                        /**
-                         * @type number
-                         */
                         order: number;
-                        /**
-                         * @type string
-                         */
                         attackerTag: string;
-                        /**
-                         * @type string
-                         */
                         defenderTag: string;
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         duration: number;
-                        /**
-                         * @type number
-                         */
                         destructionPercentage: number;
                     }[];
                 }[];
             };
-            /**
-             * @type object
-             */
             opponent: {
-                /**
-                 * @type string
-                 */
                 tag: string;
-                /**
-                 * @type string
-                 */
                 name: string;
-                /**
-                 * @type object
-                 */
                 badgeUrls: {
-                    /**
-                     * @type string
-                     */
                     small: string;
-                    /**
-                     * @type string
-                     */
                     large: string;
-                    /**
-                     * @type string
-                     */
                     medium: string;
                 };
-                /**
-                 * @type number
-                 */
                 clanLevel: number;
-                /**
-                 * @type number
-                 */
                 attacks: number;
-                /**
-                 * @type number
-                 */
                 stars: number;
-                /**
-                 * @type number
-                 */
                 destructionPercentage: number;
-                /**
-                 * @type array
-                 */
                 members: {
-                    /**
-                     * @type string
-                     */
                     tag: string;
-                    /**
-                     * @type string
-                     */
                     name: string;
-                    /**
-                     * @type number
-                     */
                     mapPosition: number;
-                    /**
-                     * @type number
-                     */
                     townhallLevel: number;
-                    /**
-                     * @type number
-                     */
                     opponentAttacks: number;
-                    /**
-                     * @type object | undefined
-                     */
                     bestOpponentAttack?: {
-                        /**
-                         * @type number
-                         */
                         order: number;
-                        /**
-                         * @type string
-                         */
                         attackerTag: string;
-                        /**
-                         * @type string
-                         */
                         defenderTag: string;
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         duration: number;
-                        /**
-                         * @type number
-                         */
                         destructionPercentage: number;
                     };
-                    /**
-                     * @type array | undefined
-                     */
                     attacks?: {
-                        /**
-                         * @type number
-                         */
                         order: number;
-                        /**
-                         * @type string
-                         */
                         attackerTag: string;
-                        /**
-                         * @type string
-                         */
                         defenderTag: string;
-                        /**
-                         * @type number
-                         */
                         stars: number;
-                        /**
-                         * @type number
-                         */
                         duration: number;
-                        /**
-                         * @type number
-                         */
                         destructionPercentage: number;
                     }[];
                 }[];
             };
-            /**
-             * @type number | undefined
-             */
             attacksPerMember?: number;
         };
     };
 };
 
-/**
- * @description Server error response when fetching current war data fails.
- */
-export type GetCOCClanCurrentWar500 = {
-    /**
-     * @type boolean
-     */
+export type GetCOCClanCurrentWarStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type GetCOCClanCurrentWarStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type GetCOCClanCurrentWarQueryResponse = GetCOCClanCurrentWar200;
-
-export type GetCOCClanCurrentWarQuery = {
-    Response: GetCOCClanCurrentWar200;
-    PathParams: GetCOCClanCurrentWarPathParams;
-    Errors: GetCOCClanCurrentWar500;
+export type GetCOCClanCurrentWarOptions = {
+    body?: never;
+    path: GetCOCClanCurrentWarPath;
+    query?: never;
+    headers?: never;
 };
+
+export type GetCOCClanCurrentWarResponses = {
+    "200": GetCOCClanCurrentWarStatus200;
+    "400": GetCOCClanCurrentWarStatus400;
+    "500": GetCOCClanCurrentWarStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetCOCClanCurrentWarResponse = GetCOCClanCurrentWarStatus200;

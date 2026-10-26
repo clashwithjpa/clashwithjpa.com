@@ -3,56 +3,38 @@
  * Do not edit manually.
  */
 
-/**
- * @description Successful response with the updated privacy policy content.
- */
-export type SetPrivacy200 = {
-    /**
-     * @type boolean
-     */
+export type SetPrivacyStatus200 = {
     success: true;
-    /**
-     * @type object
-     */
     data: {
-        /**
-         * @type string
-         */
         privacy: string;
     };
 };
 
-/**
- * @description Unauthorized.
- */
-export type SetPrivacy401 = {
-    /**
-     * @type boolean
-     */
+export type SetPrivacyStatus400 = {
+    success: false;
+    error: unknown[];
+    data: unknown;
+};
+
+export type SetPrivacyStatus401 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-/**
- * @description Server error.
- */
-export type SetPrivacy500 = {
-    /**
-     * @type boolean
-     */
+export type SetPrivacyStatus500 = {
     success: false;
     error:
         | string
         | {
-              [key: string]: any;
+              [key: string]: unknown;
           };
 };
 
-export type SetPrivacyMutationRequest = {
+export type SetPrivacyBody = {
     /**
      * @minLength 1
      * @maxLength 100000
@@ -61,10 +43,21 @@ export type SetPrivacyMutationRequest = {
     privacy: string;
 };
 
-export type SetPrivacyMutationResponse = SetPrivacy200;
-
-export type SetPrivacyMutation = {
-    Response: SetPrivacy200;
-    Request: SetPrivacyMutationRequest;
-    Errors: SetPrivacy401 | SetPrivacy500;
+export type SetPrivacyOptions = {
+    body: SetPrivacyBody;
+    path?: never;
+    query?: never;
+    headers?: never;
 };
+
+export type SetPrivacyResponses = {
+    "200": SetPrivacyStatus200;
+    "400": SetPrivacyStatus400;
+    "401": SetPrivacyStatus401;
+    "500": SetPrivacyStatus500;
+};
+
+/**
+ * @description Union of all possible responses
+ */
+export type SetPrivacyResponse = SetPrivacyStatus200;

@@ -5,52 +5,46 @@
 
 import * as z from "zod";
 
-/**
- * @description Updated bonus.
- */
-export const setUserSeasonBonus200Schema = z.object({
+export const setUserSeasonBonusStatus200Schema = z.strictObject({
     success: z.literal(true),
-    data: z.object({
+    data: z.strictObject({
         bonus: z.union([
-            z.object({
+            z.strictObject({
                 discordUserId: z.string(),
                 seasonId: z.number(),
-                cocAccountTag: z.union([z.string(), z.null()]),
+                cocAccountTag: z.string().nullable(),
             }),
             z.null(),
         ]),
     }),
 });
 
-/**
- * @description Bad request.
- */
-export const setUserSeasonBonus400Schema = z.object({
+export const setUserSeasonBonusStatus400Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Unauthorized.
- */
-export const setUserSeasonBonus401Schema = z.object({
+export const setUserSeasonBonusStatus401Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-/**
- * @description Server error.
- */
-export const setUserSeasonBonus500Schema = z.object({
+export const setUserSeasonBonusStatus500Schema = z.strictObject({
     success: z.literal(false),
-    error: z.union([z.string(), z.object({}).catchall(z.any())]),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]),
 });
 
-export const setUserSeasonBonusMutationRequestSchema = z.object({
+export const setUserSeasonBonusResponseSchema = setUserSeasonBonusStatus200Schema;
+
+export const setUserSeasonBonusErrorSchema = z.union([
+    setUserSeasonBonusStatus400Schema,
+    setUserSeasonBonusStatus401Schema,
+    setUserSeasonBonusStatus500Schema,
+]);
+
+export const setUserSeasonBonusBodySchema = z.object({
     discordUserId: z.string().min(1),
-    seasonId: z.number().int().min(-9007199254740991).max(9007199254740991),
-    cocAccountTag: z.union([z.string(), z.null()]),
+    seasonId: z.int().min(-9007199254740991).max(9007199254740991),
+    cocAccountTag: z.union([z.string().min(1), z.null()]),
     selected: z.boolean(),
 });
-
-export const setUserSeasonBonusMutationResponseSchema = z.lazy(() => setUserSeasonBonus200Schema);

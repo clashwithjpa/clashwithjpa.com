@@ -3,41 +3,26 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
-import type {
-    UpdateAdminClan401,
-    UpdateAdminClan404,
-    UpdateAdminClan422,
-    UpdateAdminClan500,
-    UpdateAdminClan503,
-    UpdateAdminClanMutationRequest,
-    UpdateAdminClanMutationResponse,
-    UpdateAdminClanPathParams,
-} from "../models/UpdateAdminClan.ts";
-
-function getUpdateAdminClanUrl(id: UpdateAdminClanPathParams["id"]) {
-    const res = { method: "PUT", url: `/admin/clans/${id}` as const };
-    return res;
-}
+import type { Options, RequestResult, Unwrappable } from "../.kubb/client.ts";
+import { client, withUnwrap } from "../.kubb/client.ts";
+import type { UpdateAdminClanOptions, UpdateAdminClanResponses } from "../models/UpdateAdminClan.ts";
 
 /**
  * @description Updates a JPA clan.
  * {@link /admin/clans/:id}
  */
-export async function updateAdminClan(
-    id: UpdateAdminClanPathParams["id"],
-    data: UpdateAdminClanMutationRequest,
-    config: Partial<RequestConfig<UpdateAdminClanMutationRequest>> & { client?: Client } = {},
-) {
-    const { client: request = fetch, ...requestConfig } = config;
+export function updateAdminClan<ThrowOnError extends boolean = false>(
+    options: Options<UpdateAdminClanOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdateAdminClanResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = options;
 
-    const requestData = data;
-
-    const res = await request<
-        UpdateAdminClanMutationResponse,
-        ResponseErrorConfig<UpdateAdminClan401 | UpdateAdminClan404 | UpdateAdminClan422 | UpdateAdminClan500 | UpdateAdminClan503>,
-        UpdateAdminClanMutationRequest
-    >({ method: "PUT", url: getUpdateAdminClanUrl(id).url.toString(), data: requestData, ...requestConfig });
-    return res.data;
+    return withUnwrap(
+        request({
+            method: "PUT",
+            url: "/admin/clans/{id}",
+            security: [{ type: "apiKey", name: "x-api-key", in: "header" }],
+            ...config,
+            throwOnError: config.throwOnError ?? false,
+        }) as Promise<RequestResult<UpdateAdminClanResponses, ThrowOnError>>,
+    );
 }
