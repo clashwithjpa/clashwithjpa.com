@@ -183,7 +183,7 @@
         </div>
     </div>
 {:else if type === "checkbox"}
-    <div class={cn("relative flex size-5 shrink-0 items-center justify-center", className)}>
+    <div class={cn("relative isolate flex size-5 shrink-0 items-center justify-center", className)}>
         <input
             bind:this={ref}
             type="checkbox"
@@ -200,7 +200,7 @@
         />
     </div>
 {:else if type === "radio"}
-    <div class={cn("relative flex size-5 shrink-0 items-center justify-center", className)}>
+    <div class={cn("relative isolate flex size-5 shrink-0 items-center justify-center", className)}>
         <input
             bind:this={ref}
             type="radio"
