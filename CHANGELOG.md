@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.6.1] - 2026-10-26
+
+### Refactor
+
+- **server:** Replace MinIO with RustFS ([4e99a96](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/4e99a9683e77df6d6d34bd2c1c4f57b7ef0ff139))
 ## [2.6.0] - 2026-10-26
 
 ### Features
