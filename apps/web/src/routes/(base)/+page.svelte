@@ -1,14 +1,14 @@
 <script lang="ts">
+    import ClanRoster from "#lib/components/coc/ClanRoster.svelte";
+    import FamilyChart, { type FamilyClan } from "#lib/components/coc/FamilyChart.svelte";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import H1 from "#lib/components/ui/coc/H1.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { LINKS } from "#lib/utils/links.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import ClanRoster from "$lib/components/coc/ClanRoster.svelte";
-    import FamilyChart, { type FamilyClan } from "$lib/components/coc/FamilyChart.svelte";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import H1 from "$lib/components/ui/coc/H1.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { LINKS } from "$lib/utils/links";
     import { getCOCClan, type GetCOCClan200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";

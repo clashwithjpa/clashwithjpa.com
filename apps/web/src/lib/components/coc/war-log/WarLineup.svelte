@@ -1,9 +1,9 @@
 <script lang="ts">
-    import CocDataTable from "$lib/components/ui/coc/CocDataTable.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import type { TableColumn } from "$lib/components/ui/table/features";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import { cn } from "$lib/utils";
+    import CocDataTable from "#lib/components/ui/coc/CocDataTable.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import type { TableColumn } from "#lib/components/ui/table/features.js";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import { cn } from "#lib/utils.js";
     import { renderSnippet, type SortingState } from "@tanstack/svelte-table";
     import Stars from "./Stars.svelte";
     import { SIDE_COLOR, type Side, type WarDetail, type WarMember } from "./warLog";

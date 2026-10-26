@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { authClient } from "$lib/auth";
-    import SessionCard from "$lib/components/SessionCard.svelte";
-    import CardSkeleton from "$lib/components/ui/CardSkeleton.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
+    import { authClient } from "#lib/auth.js";
+    import SessionCard from "#lib/components/SessionCard.svelte";
+    import CardSkeleton from "#lib/components/ui/CardSkeleton.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
     import TablerServer from "~icons/tabler/server";
 
     let session = authClient.useSession();

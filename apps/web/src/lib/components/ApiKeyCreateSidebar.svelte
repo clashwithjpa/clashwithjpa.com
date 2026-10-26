@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import LevelSlider from "$lib/components/ui/LevelSlider.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import { SCOPE_LABELS, scopesUpTo } from "$lib/config/apiKeys";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import LevelSlider from "#lib/components/ui/LevelSlider.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import { SCOPE_LABELS, scopesUpTo } from "#lib/config/apiKeys.js";
     import type { JpaPermission } from "@repo/auth-shared";
     import { slide } from "svelte/transition";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";

@@ -25,8 +25,8 @@
 
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import type { Role } from "$lib/config/roles";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import type { Role } from "#lib/config/roles.js";
 
     let { role, class: className = "" }: { role: Role | string; class?: string } = $props();
 

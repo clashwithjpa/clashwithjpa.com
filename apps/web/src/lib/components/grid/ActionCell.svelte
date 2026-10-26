@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Button from "$lib/components/ui/Button.svelte";
-    import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
+    import Button from "#lib/components/ui/Button.svelte";
+    import { ROLE_LEVELS, roleLevel } from "#lib/config/roles.js";
     import type { UserWithRole } from "better-auth/plugins";
     import TablerBan from "~icons/tabler/ban";
     import TablerCheck from "~icons/tabler/check";

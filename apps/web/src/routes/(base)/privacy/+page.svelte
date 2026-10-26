@@ -1,11 +1,11 @@
 <script lang="ts">
+    import CocBand from "#lib/components/ui/coc/CocBand.svelte";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { cn } from "#lib/utils.js";
+    import { createSectionSpy } from "#lib/utils/section-spy.svelte.js";
     import { page } from "$app/state";
-    import CocBand from "$lib/components/ui/coc/CocBand.svelte";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { cn } from "$lib/utils";
-    import { createSectionSpy } from "$lib/utils/section-spy.svelte";
     import { PreRendered } from "carta-md";
     import TablerMailFilled from "~icons/tabler/mail-filled";
     import type { PageProps } from "./$types";

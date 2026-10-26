@@ -1,10 +1,10 @@
 <script lang="ts">
+    import { signInWithDiscord } from "#lib/auth.js";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { LINKS } from "#lib/utils/links.js";
     import { page } from "$app/state";
-    import { signInWithDiscord } from "$lib/auth";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { LINKS } from "$lib/utils/links";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
 
     type Scene = { art: "goblin-sign" | "goblin-facepalm" | "fallen-king"; title: string; quips: string[] };

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Button from "$lib/components/ui/Button.svelte";
-    import MobileDrawer from "$lib/components/ui/mobile/Drawer.svelte";
-    import { cn } from "$lib/utils";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import Button from "#lib/components/ui/Button.svelte";
+    import MobileDrawer from "#lib/components/ui/mobile/Drawer.svelte";
+    import { cn } from "#lib/utils.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
     import { Dialog } from "@ark-ui/svelte/dialog";
     import { Portal } from "@ark-ui/svelte/portal";
     import { onMount, setContext, type Snippet } from "svelte";

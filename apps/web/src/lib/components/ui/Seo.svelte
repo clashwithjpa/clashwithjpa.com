@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { page } from "$app/state";
     import {
         actionRow,
         container,
@@ -11,8 +10,9 @@
         type ComponentEmbedPayload,
         type Container,
         type LinkButton,
-    } from "$lib/discord/component-embed";
-    import { LINKS } from "$lib/utils/links";
+    } from "#lib/discord/component-embed.js";
+    import { LINKS } from "#lib/utils/links.js";
+    import { page } from "$app/state";
 
     interface Props {
         title?: string;

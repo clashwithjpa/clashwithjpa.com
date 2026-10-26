@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
     import TablerCircleCheck from "~icons/tabler/circle-check";
     import TablerEye from "~icons/tabler/eye";
     import TablerWorld from "~icons/tabler/world";

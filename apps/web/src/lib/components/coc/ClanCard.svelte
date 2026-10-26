@@ -1,10 +1,10 @@
 <script lang="ts">
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocMeter from "$lib/components/ui/coc/CocMeter.svelte";
-    import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import { cn } from "$lib/utils";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocMeter from "#lib/components/ui/coc/CocMeter.svelte";
+    import CocPopup from "#lib/components/ui/coc/CocPopup.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import { cn } from "#lib/utils.js";
     import type { GetCOCClan200, GetJPAClanRequirements200 } from "@repo/clashofclans-client";
 
     type Clan = GetCOCClan200["data"]["clan"];

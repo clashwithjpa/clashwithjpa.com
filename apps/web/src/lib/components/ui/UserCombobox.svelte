@@ -1,9 +1,9 @@
 <script lang="ts">
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import type { Role } from "$lib/config/roles";
-    import { cn } from "$lib/utils";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import type { Role } from "#lib/config/roles.js";
+    import { cn } from "#lib/utils.js";
     import TablerX from "~icons/tabler/x";
     import Button from "./Button.svelte";
     import RawPopup from "./RawPopup.svelte";

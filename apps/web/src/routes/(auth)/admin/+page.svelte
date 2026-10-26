@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient } from "$lib/auth";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import Panel from "$lib/components/ui/Panel.svelte";
-    import Select, { type Option } from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { actionConfig, actorLabel, describeAction, type AuditEntry } from "$lib/config/auditLog";
-    import type { Role } from "$lib/config/roles";
-    import { cn, formatDateTime, formatRelativeTime } from "$lib/utils";
+    import { authClient } from "#lib/auth.js";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import Panel from "#lib/components/ui/Panel.svelte";
+    import Select, { type Option } from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { actionConfig, actorLabel, describeAction, type AuditEntry } from "#lib/config/auditLog.js";
+    import type { Role } from "#lib/config/roles.js";
+    import { cn, formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         getAnalyticsAdminActivity,
         getAnalyticsAuditTrend,

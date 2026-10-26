@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
 
     // Mirrors SessionCard and ApiKeyCard row for row, so the swap to real content doesn't shift.
     let { variant, class: className = "" }: { variant: "session" | "apiKey"; class?: string } = $props();

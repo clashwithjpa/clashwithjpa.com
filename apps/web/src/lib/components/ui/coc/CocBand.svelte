@@ -1,7 +1,7 @@
 <script lang="ts">
-    import H1 from "$lib/components/ui/coc/H1.svelte";
-    import Ribbon from "$lib/components/ui/coc/Ribbon.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
+    import H1 from "#lib/components/ui/coc/H1.svelte";
+    import Ribbon from "#lib/components/ui/coc/Ribbon.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
 
     let {
         ribbon,

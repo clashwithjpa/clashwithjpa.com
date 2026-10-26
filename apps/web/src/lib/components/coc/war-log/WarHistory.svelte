@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import { cn } from "$lib/utils";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import { cn } from "#lib/utils.js";
     import { formatShortDate, isActive, missedAttacks, RESULT_TEXT, STATE_LABEL, type WarSummary } from "./warLog";
 
     let {

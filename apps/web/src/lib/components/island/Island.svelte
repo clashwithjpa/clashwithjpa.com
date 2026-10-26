@@ -1,11 +1,11 @@
 <script lang="ts">
+    import ProgressBorder from "#lib/components/ui/ProgressBorder.svelte";
+    import { sidebarStore } from "#lib/components/ui/sidebar/index.js";
+    import { cn } from "#lib/utils.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
+    import { storage } from "#lib/utils/storage.svelte.js";
     import { afterNavigate } from "$app/navigation";
     import { page } from "$app/state";
-    import ProgressBorder from "$lib/components/ui/ProgressBorder.svelte";
-    import { sidebarStore } from "$lib/components/ui/sidebar";
-    import { cn } from "$lib/utils";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
-    import { storage } from "$lib/utils/storage.svelte";
     import { onMount, tick } from "svelte";
     import { fade, fly } from "svelte/transition";
     import TablerBuildingCastle from "~icons/tabler/building-castle";
@@ -62,7 +62,7 @@
     let lifted = $derived(isMobile && /^\/(admin|dashboard)(\/|$)/.test(page.url.pathname));
     let left = $derived(storage.islandSide === "left");
 
-    afterNavigate(() => (island.expanded = false));
+    afterNavigate(({ shallow }) => !shallow && (island.expanded = false));
 
     // On wide screens the admin details panel takes the right edge, so the island
     // moves to just left of it instead of covering its footer.

@@ -17,16 +17,16 @@
     },
     "prettier": "./packages/prettier-config",
     "devDependencies": {
-        "@commitlint/cli": "^21.2.2",
-        "@commitlint/config-conventional": "^21.2.2",
+        "@commitlint/cli": "^21.2.4",
+        "@commitlint/config-conventional": "^21.2.4",
         "@ianvs/prettier-plugin-sort-imports": "catalog:",
         "@types/node": "catalog:",
         "husky": "^9.1.7",
-        "lint-staged": "^17.4.1",
+        "lint-staged": "^17.6.0",
         "prettier": "catalog:",
         "prettier-plugin-svelte": "catalog:",
         "prettier-plugin-tailwindcss": "catalog:",
-        "turbo": "^2.11.4",
+        "turbo": "^2.11.10",
         "typescript": "catalog:"
     },
     "packageManager": "pnpm@12.6.0"

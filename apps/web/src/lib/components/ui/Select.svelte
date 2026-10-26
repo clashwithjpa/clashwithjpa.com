@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils.js";
+    import { cn } from "#lib/utils.js";
     import type { Component } from "svelte";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import Icon from "./Icon.svelte";

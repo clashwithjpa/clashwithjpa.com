@@ -1,5 +1,5 @@
-import type Badge from "$lib/components/ui/Badge.svelte";
-import { ROLE_DETAILS } from "$lib/components/ui/RoleBadge.svelte";
+import type Badge from "#lib/components/ui/Badge.svelte";
+import { ROLE_DETAILS } from "#lib/components/ui/RoleBadge.svelte";
 import { maxPermLevel, statement, type JpaPermission } from "@repo/auth-shared";
 import type { Component, ComponentProps } from "svelte";
 import TablerWorld from "~icons/tabler/world";

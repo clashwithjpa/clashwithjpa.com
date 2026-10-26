@@ -1,7 +1,7 @@
 <script lang="ts">
-    import CocMeter from "$lib/components/ui/coc/CocMeter.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import { cn } from "$lib/utils";
+    import CocMeter from "#lib/components/ui/coc/CocMeter.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import { cn } from "#lib/utils.js";
     import Momentum from "./Momentum.svelte";
     import { formatCountdown, formatDateTime, isActive, pct, RESULT_LABEL, RESULT_TEXT, STATE_LABEL, type Side, type WarDetail } from "./warLog";
 

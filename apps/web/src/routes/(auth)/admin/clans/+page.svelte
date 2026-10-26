@@ -1,19 +1,19 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import ClanFormSidebar, { type ClanForm } from "$lib/components/ClanFormSidebar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar, sidebarStore } from "$lib/components/ui/sidebar";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import DataTable from "$lib/components/ui/table/DataTable.svelte";
-    import type { TableColumn } from "$lib/components/ui/table/features";
-    import { toast } from "$lib/toast";
-    import { errorMessage } from "$lib/utils";
+    import ClanFormSidebar, { type ClanForm } from "#lib/components/ClanFormSidebar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { Sidebar, sidebarStore } from "#lib/components/ui/sidebar/index.js";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import DataTable from "#lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "#lib/components/ui/table/features.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         createAdminClan,
         deleteAdminClan,

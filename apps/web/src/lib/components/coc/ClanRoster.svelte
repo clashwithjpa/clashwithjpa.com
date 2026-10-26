@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
     import type { GetCOCClan200 } from "@repo/clashofclans-client";
 
     type Clan = GetCOCClan200["data"]["clan"];

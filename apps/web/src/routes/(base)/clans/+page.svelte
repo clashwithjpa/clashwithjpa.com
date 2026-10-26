@@ -1,14 +1,14 @@
 <script lang="ts">
+    import ClanCard from "#lib/components/coc/ClanCard.svelte";
+    import CocBand from "#lib/components/ui/coc/CocBand.svelte";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocInput from "#lib/components/ui/coc/CocInput.svelte";
+    import CocPanel from "#lib/components/ui/coc/CocPanel.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import ClanCard from "$lib/components/coc/ClanCard.svelte";
-    import CocBand from "$lib/components/ui/coc/CocBand.svelte";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocInput from "$lib/components/ui/coc/CocInput.svelte";
-    import CocPanel from "$lib/components/ui/coc/CocPanel.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
     import { getCOCClan, type GetCOCClan200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import TablerSearch from "~icons/tabler/search";

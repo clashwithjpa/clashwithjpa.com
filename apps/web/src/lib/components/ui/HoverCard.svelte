@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
     import { HoverCard } from "@ark-ui/svelte/hover-card";
     import { Portal } from "@ark-ui/svelte/portal";
     import { getContext, type Snippet } from "svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils.js";
+    import { cn } from "#lib/utils.js";
     import { ToggleGroup } from "@ark-ui/svelte/toggle-group";
     import type { Component } from "svelte";
     import Tooltip from "./Tooltip.svelte";

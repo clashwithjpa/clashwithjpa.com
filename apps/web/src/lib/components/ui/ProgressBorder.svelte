@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
 
     // A rounded-rect outline that fills clockwise from the top centre. Place it in
     // a positioned parent and pass that box's live size, since the stroke sits

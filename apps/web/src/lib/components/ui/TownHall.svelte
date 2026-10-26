@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
 
     let { level, class: className = "" }: { level: number | null | undefined; class?: string } = $props();
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import ReadmeEditor from "$lib/components/ui/ReadmeEditor.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { toast } from "$lib/toast";
-    import { errorMessage } from "$lib/utils";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import ReadmeEditor from "#lib/components/ui/ReadmeEditor.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage } from "#lib/utils.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { setRules } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";

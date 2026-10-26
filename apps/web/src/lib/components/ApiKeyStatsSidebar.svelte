@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ChartPanel from "$lib/components/ui/chart/ChartPanel.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, STATUS_CLASS_COLORS, type ApiKeyRow } from "$lib/config/apiKeys";
-    import { formatDateTime, formatRelativeTime } from "$lib/utils";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ChartPanel from "#lib/components/ui/chart/ChartPanel.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, STATUS_CLASS_COLORS, type ApiKeyRow } from "#lib/config/apiKeys.js";
+    import { formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { getApiKeyUsageDaily, getApiKeyUsageEndpoints, getApiKeyUsageStatus, getApiKeyUsageSummary } from "@repo/clashofclans-client";
     import { curveMonotoneX } from "d3-shape";
     import { AreaChart, BarChart, PieChart } from "layerchart";

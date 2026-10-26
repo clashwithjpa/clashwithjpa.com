@@ -1,8 +1,8 @@
 <script lang="ts">
-    import CocInput from "$lib/components/ui/coc/CocInput.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import { cn } from "$lib/utils";
+    import CocInput from "#lib/components/ui/coc/CocInput.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import { cn } from "#lib/utils.js";
     import TablerArrowRight from "~icons/tabler/arrow-right";
     import TablerSearch from "~icons/tabler/search";
     import TablerSortAscending from "~icons/tabler/sort-ascending";

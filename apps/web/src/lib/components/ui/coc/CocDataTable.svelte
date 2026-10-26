@@ -1,7 +1,7 @@
 <script lang="ts" generics="T extends RowData">
-    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
-    import { features, type TableColumn } from "$lib/components/ui/table/features";
-    import { cn } from "$lib/utils";
+    import OverlayScrollbar from "#lib/components/ui/OverlayScrollbar.svelte";
+    import { features, type TableColumn } from "#lib/components/ui/table/features.js";
+    import { cn } from "#lib/utils.js";
     import { createTable, FlexRender, type RowData, type SortingState, type Updater } from "@tanstack/svelte-table";
     import TablerChevronDown from "~icons/tabler/chevron-down";
     import TablerChevronUp from "~icons/tabler/chevron-up";

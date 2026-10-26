@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
     import type { Component } from "svelte";
     import TablerArmchair from "~icons/tabler/armchair";
     import TablerCoins from "~icons/tabler/coins";

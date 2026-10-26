@@ -1,12 +1,12 @@
 <script lang="ts">
+    import CocBand from "#lib/components/ui/coc/CocBand.svelte";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { cn } from "#lib/utils.js";
+    import { LINKS } from "#lib/utils/links.js";
+    import { createSectionSpy } from "#lib/utils/section-spy.svelte.js";
     import { page } from "$app/state";
-    import CocBand from "$lib/components/ui/coc/CocBand.svelte";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { cn } from "$lib/utils";
-    import { LINKS } from "$lib/utils/links";
-    import { createSectionSpy } from "$lib/utils/section-spy.svelte";
     import { PreRendered } from "carta-md";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import type { PageProps } from "./$types";

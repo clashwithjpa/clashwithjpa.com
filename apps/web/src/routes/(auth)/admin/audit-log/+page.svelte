@@ -1,18 +1,17 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient } from "$lib/auth";
-    import { carta } from "$lib/carta";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar } from "$lib/components/ui/sidebar";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import UserManagementSidebar from "$lib/components/UserManagementSidebar.svelte";
+    import { authClient } from "#lib/auth.js";
+    import { carta } from "#lib/carta.js";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Dialog from "#lib/components/ui/Dialog.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { Sidebar } from "#lib/components/ui/sidebar/index.js";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import UserManagementSidebar from "#lib/components/UserManagementSidebar.svelte";
     import {
         actionConfig,
         actorLabel,
@@ -21,9 +20,10 @@
         auditTargetOptions,
         describeAction,
         type AuditEntry,
-    } from "$lib/config/auditLog";
-    import { toast } from "$lib/toast";
-    import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
+    } from "#lib/config/auditLog.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         getAuditLog,
         type GetAuditLogQueryParamsActionEnumKey,

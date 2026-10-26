@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
     import Pill from "./Pill.svelte";
 
     // Without a value it spins. With one (0 to 1) it fills a ring.

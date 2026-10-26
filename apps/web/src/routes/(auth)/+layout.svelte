@@ -1,16 +1,16 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
+    import { authClient } from "#lib/auth.js";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Drawer from "#lib/components/ui/mobile/Drawer.svelte";
+    import OverlayScrollbar from "#lib/components/ui/OverlayScrollbar.svelte";
+    import ScrollArea from "#lib/components/ui/ScrollArea.svelte";
+    import { sidebarStore } from "#lib/components/ui/sidebar/index.js";
+    import type { Role } from "#lib/config/roles.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
+    import { storage } from "#lib/utils/storage.svelte.js";
     import { page } from "$app/state";
-    import { authClient } from "$lib/auth";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Drawer from "$lib/components/ui/mobile/Drawer.svelte";
-    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
-    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
-    import { sidebarStore } from "$lib/components/ui/sidebar";
-    import type { Role } from "$lib/config/roles";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
-    import { storage } from "$lib/utils/storage.svelte";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { onMount } from "svelte";
     import TablerX from "~icons/tabler/x";

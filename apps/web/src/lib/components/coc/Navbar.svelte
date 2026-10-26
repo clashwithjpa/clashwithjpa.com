@@ -1,11 +1,11 @@
 <script lang="ts">
+    import { clearIdentifiedUser } from "#lib/analytics.js";
+    import { authClient, hasPermission, signInWithDiscord } from "#lib/auth.js";
+    import { ROLE_CONFIG, type Role } from "#lib/config/roles.js";
+    import { cn } from "#lib/utils.js";
+    import { NAV_LINKS as links } from "#lib/utils/links.js";
     import { afterNavigate } from "$app/navigation";
     import { page } from "$app/state";
-    import { clearIdentifiedUser } from "$lib/analytics";
-    import { authClient, hasPermission, signInWithDiscord } from "$lib/auth";
-    import { ROLE_CONFIG, type Role } from "$lib/config/roles";
-    import { cn } from "$lib/utils";
-    import { NAV_LINKS as links } from "$lib/utils/links";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import Avatar from "../ui/Avatar.svelte";
     import CocBtn from "../ui/coc/CocBtn.svelte";
@@ -30,7 +30,8 @@
         if (id) hasPermission(id, "review").then((ok) => (canAdmin = ok));
     });
 
-    afterNavigate(() => {
+    afterNavigate(({ shallow }) => {
+        if (shallow) return;
         menuOpen = false;
         accountOpen = false;
     });

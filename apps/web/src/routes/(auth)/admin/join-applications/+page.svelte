@@ -1,21 +1,21 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
-    import type { Option } from "$lib/components/ui/Select.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import type { Role } from "$lib/config/roles";
-    import { toast } from "$lib/toast";
-    import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import RoleBadge from "#lib/components/ui/RoleBadge.svelte";
+    import type { Option } from "#lib/components/ui/Select.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import type { Role } from "#lib/config/roles.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage, formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         clearAcceptedJoinApplications,
         deleteJoinApplication,

@@ -33,16 +33,16 @@
 
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
+    import { carta } from "#lib/carta.js";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import OverlayScrollbar from "#lib/components/ui/OverlayScrollbar.svelte";
+    import ScrollArea from "#lib/components/ui/ScrollArea.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import { toast } from "#lib/toast.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { beforeNavigate, goto } from "$app/navigation";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { carta } from "$lib/carta";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
-    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import { toast } from "$lib/toast";
     import { Splitter } from "@ark-ui/svelte/splitter";
     import { Tabs } from "@ark-ui/svelte/tabs";
     import { acceptCompletion, type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
@@ -91,7 +91,7 @@
     let showConfirmDialog = $state(false);
 
     beforeNavigate((navigation) => {
-        if (hasChanges && !allowNavigation) {
+        if (hasChanges && !allowNavigation && !navigation.shallow) {
             navigation.cancel();
             pendingNavigation = navigation.to?.url.href || null;
             if (pendingNavigation) {

@@ -1,5 +1,5 @@
-import { toast } from "$lib/toast";
-import { storage } from "$lib/utils/storage.svelte";
+import { toast } from "#lib/toast.js";
+import { storage } from "#lib/utils/storage.svelte.js";
 import { island } from "../island.svelte";
 import { TRACKS, type Track } from "./tracks";
 

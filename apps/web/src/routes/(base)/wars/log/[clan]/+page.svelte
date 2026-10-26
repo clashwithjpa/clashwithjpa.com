@@ -1,10 +1,7 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import { page } from "$app/state";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import WarFeed from "$lib/components/coc/war-log/WarFeed.svelte";
-    import WarHistory from "$lib/components/coc/war-log/WarHistory.svelte";
-    import WarLineup from "$lib/components/coc/war-log/WarLineup.svelte";
+    import WarFeed from "#lib/components/coc/war-log/WarFeed.svelte";
+    import WarHistory from "#lib/components/coc/war-log/WarHistory.svelte";
+    import WarLineup from "#lib/components/coc/war-log/WarLineup.svelte";
     import {
         formatAgo,
         formatShortDate,
@@ -14,19 +11,22 @@
         type WarDetail,
         type WarLogClan,
         type WarSummary,
-    } from "$lib/components/coc/war-log/warLog";
-    import WarMissed from "$lib/components/coc/war-log/WarMissed.svelte";
-    import WarPlayers from "$lib/components/coc/war-log/WarPlayers.svelte";
-    import WarScoreboard from "$lib/components/coc/war-log/WarScoreboard.svelte";
-    import CocBand from "$lib/components/ui/coc/CocBand.svelte";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocPanel from "$lib/components/ui/coc/CocPanel.svelte";
-    import CocPopup from "$lib/components/ui/coc/CocPopup.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { toast } from "$lib/toast";
-    import { cn } from "$lib/utils";
+    } from "#lib/components/coc/war-log/warLog.js";
+    import WarMissed from "#lib/components/coc/war-log/WarMissed.svelte";
+    import WarPlayers from "#lib/components/coc/war-log/WarPlayers.svelte";
+    import WarScoreboard from "#lib/components/coc/war-log/WarScoreboard.svelte";
+    import CocBand from "#lib/components/ui/coc/CocBand.svelte";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocPanel from "#lib/components/ui/coc/CocPanel.svelte";
+    import CocPopup from "#lib/components/ui/coc/CocPopup.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { toast } from "#lib/toast.js";
+    import { cn } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
+    import { goto } from "$app/navigation";
+    import { page } from "$app/state";
     import { getFWAClanPoints, getWarLogClans, getWarLogWar, getWarLogWars } from "@repo/clashofclans-client";
     import { onMount, tick, untrack } from "svelte";
     import type { PageProps } from "./$types";
@@ -184,11 +184,11 @@
     });
 
     function openWar(id: number | null, replace = false) {
-        const url = new URL(page.url);
+        const url = new URL(page.url.href);
         if (id) url.searchParams.set("war", String(id));
         else url.searchParams.delete("war");
         scrollOnChange = !replace;
-        return goto(url, { noScroll: true, keepFocus: true, replaceState: replace });
+        return goto(url, { reset: false, replace });
     }
 
     async function reveal() {

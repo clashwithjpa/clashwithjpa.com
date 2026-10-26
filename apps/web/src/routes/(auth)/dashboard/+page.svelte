@@ -1,20 +1,20 @@
 <script lang="ts">
+    import { authClient, hasPermission } from "#lib/auth.js";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import RoleBadge from "#lib/components/ui/RoleBadge.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import type { Role } from "#lib/config/roles.js";
+    import { jobs } from "#lib/jobs.svelte.js";
+    import { toast } from "#lib/toast.js";
+    import { formatDate, formatDateTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient, hasPermission } from "$lib/auth";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import type { Role } from "$lib/config/roles";
-    import { jobs } from "$lib/jobs.svelte";
-    import { toast } from "$lib/toast";
-    import { formatDate, formatDateTime } from "$lib/utils";
     import {
         getCOCPlayer,
         getJPAClans,

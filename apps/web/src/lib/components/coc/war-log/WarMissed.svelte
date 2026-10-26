@@ -1,7 +1,7 @@
 <script lang="ts">
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import { toast } from "$lib/toast";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import { toast } from "#lib/toast.js";
     import { formatCountdown, isActive, missedAttacks, type WarDetail } from "./warLog";
 
     let { war, now }: { war: WarDetail; now: number } = $props();

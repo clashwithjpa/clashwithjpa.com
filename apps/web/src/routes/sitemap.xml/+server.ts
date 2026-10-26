@@ -1,6 +1,6 @@
 import type { RequestHandler } from "./$types";
 
-// Built once at prerender, so `url.origin` is the configured site origin (kit.prerender.origin).
+// Built once at prerender, so `url.origin` is the configured site origin (`paths.origin` in vite.config.ts).
 export const prerender = true;
 
 const PAGES = [

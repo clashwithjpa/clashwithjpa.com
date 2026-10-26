@@ -1,4 +1,4 @@
-import { slugToTag } from "$lib/components/coc/war-log/warLog";
+import { slugToTag } from "#lib/components/coc/war-log/warLog.js";
 import type { PageLoad } from "./$types";
 
 // Any clan tag can follow /wars/log, so this page can't be prerendered. The SPA fallback serves it.

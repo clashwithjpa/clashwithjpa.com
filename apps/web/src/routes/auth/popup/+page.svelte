@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { AUTH_POPUP_CHANNEL, type AuthPopupMessage } from "#lib/auth.js";
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
     import { page } from "$app/state";
-    import { AUTH_POPUP_CHANNEL, type AuthPopupMessage } from "$lib/auth";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
     import { onMount } from "svelte";
 
     // Discord lands here in the sign-in popup. Tell the tab that opened it, then close.

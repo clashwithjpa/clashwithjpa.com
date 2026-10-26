@@ -1,6 +1,6 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import { cn, fromArkValue, type WithElementRef } from "$lib/utils";
+    import { cn, fromArkValue, type WithElementRef } from "#lib/utils.js";
     import { DateInput, useDateInput } from "@ark-ui/svelte/date-input";
     import { DatePicker, parseDate, useDatePicker } from "@ark-ui/svelte/date-picker";
     import { Portal } from "@ark-ui/svelte/portal";

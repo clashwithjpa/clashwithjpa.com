@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import { cn } from "$lib/utils";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import { cn } from "#lib/utils.js";
 
     // `newStars` of `stars` were new on that base; the rest were already taken by an earlier hit.
     let { stars, newStars = stars, class: className = "size-4" }: { stars: number; newStars?: number; class?: string } = $props();

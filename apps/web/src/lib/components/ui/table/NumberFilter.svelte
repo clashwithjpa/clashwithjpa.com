@@ -1,10 +1,10 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import RawPopup from "$lib/components/ui/RawPopup.svelte";
-    import Select, { type Option } from "$lib/components/ui/Select.svelte";
-    import { cn } from "$lib/utils";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import RawPopup from "#lib/components/ui/RawPopup.svelte";
+    import Select, { type Option } from "#lib/components/ui/Select.svelte";
+    import { cn } from "#lib/utils.js";
     import type { Column } from "@tanstack/svelte-table";
     import TablerFilter from "~icons/tabler/filter";
     import TablerFilterFilled from "~icons/tabler/filter-filled";

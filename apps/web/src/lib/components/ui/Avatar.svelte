@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { ROLE_CONFIG, type Role } from "$lib/config/roles";
-    import { cn } from "$lib/utils";
+    import { ROLE_CONFIG, type Role } from "#lib/config/roles.js";
+    import { cn } from "#lib/utils.js";
 
     let {
         src,

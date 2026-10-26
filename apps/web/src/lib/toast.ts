@@ -1,4 +1,4 @@
-import { island } from "$lib/components/island/island.svelte";
+import { island } from "#lib/components/island/island.svelte.js";
 
 type Id = string | number;
 type Tone = "success" | "info" | "neutral" | "warning" | "error";

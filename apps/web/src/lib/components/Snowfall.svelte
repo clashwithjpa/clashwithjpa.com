@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { storage } from "$lib/utils/storage.svelte";
+    import { storage } from "#lib/utils/storage.svelte.js";
 
     const GLYPHS = ["❄", "❅", "❆"];
 

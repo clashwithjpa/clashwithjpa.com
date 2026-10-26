@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Ribbon from "$lib/components/ui/coc/Ribbon.svelte";
-    import { cn } from "$lib/utils";
+    import Ribbon from "#lib/components/ui/coc/Ribbon.svelte";
+    import { cn } from "#lib/utils.js";
     import type { Snippet } from "svelte";
 
     let { label, children, class: className = "" }: { label: string; children: Snippet; class?: string } = $props();

@@ -1,4 +1,4 @@
-import { replaceState } from "$app/navigation";
+import { goto } from "$app/navigation";
 
 /**
  * Tracks which section of a long page is on screen, for a sidebar table of contents.
@@ -11,7 +11,7 @@ export function createSectionSpy(getIds: () => string[]) {
     let locked = false;
     let release: (() => void) | undefined;
 
-    const setHash = (id: string) => replaceState(`#${id}`, {});
+    const setHash = (id: string) => goto(`#${id}`, { shallow: true, replace: true });
 
     function lockUntilScrollEnds() {
         release?.();

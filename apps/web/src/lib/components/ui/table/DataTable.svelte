@@ -1,9 +1,9 @@
 <script lang="ts" generics="T extends RowData">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import Input from "$lib/components/ui/Input.svelte";
-    import OverlayScrollbar from "$lib/components/ui/OverlayScrollbar.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import { cn } from "$lib/utils";
+    import Input from "#lib/components/ui/Input.svelte";
+    import OverlayScrollbar from "#lib/components/ui/OverlayScrollbar.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import { cn } from "#lib/utils.js";
     import {
         createTable,
         FlexRender,

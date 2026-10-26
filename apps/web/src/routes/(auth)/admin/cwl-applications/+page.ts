@@ -1,4 +1,4 @@
-import { authClient, hasPermission } from "$lib/auth";
+import { authClient, hasPermission } from "#lib/auth.js";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 

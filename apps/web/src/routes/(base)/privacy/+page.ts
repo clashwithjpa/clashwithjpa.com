@@ -1,5 +1,5 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
-import { extractMarkdownVar, renderSections } from "$lib/utils/markdown-sections";
+import { extractMarkdownVar, renderSections } from "#lib/utils/markdown-sections.js";
+import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { getPrivacy } from "@repo/clashofclans-client";
 import type { PageLoad } from "./$types";
 

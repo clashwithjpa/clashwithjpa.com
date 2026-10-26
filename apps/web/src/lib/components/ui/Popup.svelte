@@ -1,7 +1,7 @@
 <script lang="ts">
-    import MobileDrawer from "$lib/components/ui/mobile/Drawer.svelte";
-    import { cn } from "$lib/utils";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import MobileDrawer from "#lib/components/ui/mobile/Drawer.svelte";
+    import { cn } from "#lib/utils.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
     import type { Drawer } from "@ark-ui/svelte/drawer";
     import type { Popover } from "@ark-ui/svelte/popover";
     import { onMount, type Snippet } from "svelte";

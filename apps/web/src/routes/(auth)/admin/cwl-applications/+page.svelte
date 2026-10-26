@@ -1,31 +1,31 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import CocAccountSidebar from "$lib/components/CocAccountSidebar.svelte";
-    import ClanCell from "$lib/components/grid/ClanCell.svelte";
-    import CwlAccountCell from "$lib/components/grid/CwlAccountCell.svelte";
-    import CwlDiscordCell from "$lib/components/grid/CwlDiscordCell.svelte";
-    import CwlNicknameCell from "$lib/components/grid/CwlNicknameCell.svelte";
-    import CwlStatusCell from "$lib/components/grid/CwlStatusCell.svelte";
-    import Toolbar from "$lib/components/Toolbar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import type { Option } from "$lib/components/ui/Select.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar } from "$lib/components/ui/sidebar";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import DataTable from "$lib/components/ui/table/DataTable.svelte";
-    import type { TableColumn } from "$lib/components/ui/table/features";
-    import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
-    import UserCombobox, { type ComboboxUser } from "$lib/components/ui/UserCombobox.svelte";
-    import { loadGuildNicknames } from "$lib/discordNicknames";
-    import { toast } from "$lib/toast";
-    import { errorMessage, formatDate, formatDateTime } from "$lib/utils";
+    import CocAccountSidebar from "#lib/components/CocAccountSidebar.svelte";
+    import ClanCell from "#lib/components/grid/ClanCell.svelte";
+    import CwlAccountCell from "#lib/components/grid/CwlAccountCell.svelte";
+    import CwlDiscordCell from "#lib/components/grid/CwlDiscordCell.svelte";
+    import CwlNicknameCell from "#lib/components/grid/CwlNicknameCell.svelte";
+    import CwlStatusCell from "#lib/components/grid/CwlStatusCell.svelte";
+    import Toolbar from "#lib/components/Toolbar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Dialog from "#lib/components/ui/Dialog.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import type { Option } from "#lib/components/ui/Select.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { Sidebar } from "#lib/components/ui/sidebar/index.js";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import DataTable from "#lib/components/ui/table/DataTable.svelte";
+    import type { TableColumn } from "#lib/components/ui/table/features.js";
+    import { townHallUrl } from "#lib/components/ui/TownHall.svelte";
+    import UserCombobox, { type ComboboxUser } from "#lib/components/ui/UserCombobox.svelte";
+    import { loadGuildNicknames } from "#lib/discordNicknames.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage, formatDate, formatDateTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         assignCwlApplication,
         assignCwlApplicationsBulk,

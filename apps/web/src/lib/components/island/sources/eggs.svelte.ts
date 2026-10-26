@@ -1,4 +1,4 @@
-import { storage } from "$lib/utils/storage.svelte";
+import { storage } from "#lib/utils/storage.svelte.js";
 import { island } from "../island.svelte";
 
 const EGGS = [

@@ -1,4 +1,4 @@
-import { carta } from "$lib/carta";
+import { carta } from "#lib/carta.js";
 
 export interface MarkdownSection {
     id: string;

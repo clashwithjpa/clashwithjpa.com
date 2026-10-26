@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
     import { Slider } from "@ark-ui/svelte/slider";
     import { onMount } from "svelte";
     import TablerArrowsShuffle from "~icons/tabler/arrows-shuffle";

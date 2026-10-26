@@ -1,4 +1,4 @@
-import { authClient } from "$lib/auth";
+import { authClient } from "#lib/auth.js";
 import { ROLE_LEVELS, roleLevel } from "@repo/auth-shared";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";

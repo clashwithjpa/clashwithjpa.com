@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
     import { Drawer } from "@ark-ui/svelte/drawer";
     import { Portal } from "@ark-ui/svelte/portal";
     import type { Snippet } from "svelte";

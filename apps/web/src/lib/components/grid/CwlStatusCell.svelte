@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";
     import TablerArrowsExchange from "~icons/tabler/arrows-exchange";
     import TablerCheck from "~icons/tabler/check";

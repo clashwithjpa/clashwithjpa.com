@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
+    import { cn } from "#lib/utils.js";
     import { Popover } from "@ark-ui/svelte/popover";
     import { Portal } from "@ark-ui/svelte/portal";
     import { getContext, type Snippet } from "svelte";

@@ -1,4 +1,4 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
+import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { apiKeyClient } from "@better-auth/api-key/client";
 import { ac, admin, manager, reviewer, statement, superadmin, unverified, verified } from "@repo/auth-shared";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";

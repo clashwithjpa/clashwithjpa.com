@@ -1,5 +1,5 @@
 <script lang="ts">
-    import RawPopup from "$lib/components/ui/RawPopup.svelte";
+    import RawPopup from "#lib/components/ui/RawPopup.svelte";
     import TablerArrowRight from "~icons/tabler/arrow-right";
     import TablerStar from "~icons/tabler/star";
 

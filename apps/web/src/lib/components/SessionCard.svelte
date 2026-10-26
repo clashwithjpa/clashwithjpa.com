@@ -1,10 +1,10 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import { formatDateTime, formatRelativeTime } from "$lib/utils";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import { formatDateTime, formatRelativeTime } from "#lib/utils.js";
     import { UAParser } from "ua-parser-js";
     import LogosChrome from "~icons/logos/chrome";
     import LogosFirefox from "~icons/logos/firefox";

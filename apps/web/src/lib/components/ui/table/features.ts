@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Option } from "$lib/components/ui/Select.svelte";
+import type { Option } from "#lib/components/ui/Select.svelte";
 import {
     columnFilteringFeature,
     columnResizingFeature,

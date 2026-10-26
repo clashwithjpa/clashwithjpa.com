@@ -1,5 +1,5 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
-import { authClient, hasPermission } from "$lib/auth";
+import { authClient, hasPermission } from "#lib/auth.js";
+import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { getPrivacy } from "@repo/clashofclans-client";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";

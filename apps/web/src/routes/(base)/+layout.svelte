@@ -1,9 +1,9 @@
 <script lang="ts">
+    import Footer from "#lib/components/coc/Footer.svelte";
+    import Navbar from "#lib/components/coc/Navbar.svelte";
+    import PageScrollbar from "#lib/components/coc/PageScrollbar.svelte";
+    import { cn } from "#lib/utils.js";
     import { page } from "$app/state";
-    import Footer from "$lib/components/coc/Footer.svelte";
-    import Navbar from "$lib/components/coc/Navbar.svelte";
-    import PageScrollbar from "$lib/components/coc/PageScrollbar.svelte";
-    import { cn } from "$lib/utils";
 
     let { children } = $props();
 

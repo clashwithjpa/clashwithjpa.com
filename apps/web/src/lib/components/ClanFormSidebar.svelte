@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
     import type { Component } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
     import TablerAlertTriangle from "~icons/tabler/alert-triangle";

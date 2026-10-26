@@ -23,7 +23,7 @@
         return sidebarStore.isOpen && sidebarStore.contentKey === key;
     }
 
-    onNavigate(() => {
-        sidebarStore.close();
+    onNavigate(({ shallow }) => {
+        if (!shallow) sidebarStore.close();
     });
 </script>

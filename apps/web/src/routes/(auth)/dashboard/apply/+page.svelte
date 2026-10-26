@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL, PUBLIC_TURNSTILE_SITE_KEY } from "$env/static/public";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import { toast } from "$lib/toast";
-    import { errorMessage } from "$lib/utils";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL, PUBLIC_TURNSTILE_SITE_KEY } from "$app/env/public";
     import { Field } from "@ark-ui/svelte/field";
     import { applyUserAccount, type ApplyUserAccount500 } from "@repo/clashofclans-client";
     import { Turnstile } from "svelte-turnstile";

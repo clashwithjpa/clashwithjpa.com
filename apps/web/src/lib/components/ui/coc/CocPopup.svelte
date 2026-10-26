@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { cn } from "$lib/utils";
-    import { createMobileMediaQuery } from "$lib/utils/mobile";
+    import { cn } from "#lib/utils.js";
+    import { createMobileMediaQuery } from "#lib/utils/mobile.js";
     import { Drawer } from "@ark-ui/svelte/drawer";
     import { Popover } from "@ark-ui/svelte/popover";
     import { Portal } from "@ark-ui/svelte/portal";

@@ -1,15 +1,15 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import type { Option } from "$lib/components/ui/Select.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import { townHallUrl } from "$lib/components/ui/TownHall.svelte";
-    import { toast } from "$lib/toast";
-    import { errorMessage } from "$lib/utils";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import type { Option } from "#lib/components/ui/Select.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import { townHallUrl } from "#lib/components/ui/TownHall.svelte";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { Field } from "@ark-ui/svelte/field";
     import { applyCwl, getCOCPlayer, getJPAClans, getUserAccounts } from "@repo/clashofclans-client";
 

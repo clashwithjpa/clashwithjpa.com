@@ -1,6 +1,6 @@
+import { authClient } from "#lib/auth.js";
+import { toast } from "#lib/toast.js";
 import { goto } from "$app/navigation";
-import { authClient } from "$lib/auth";
-import { toast } from "$lib/toast";
 import { fromStore } from "svelte/store";
 import { island } from "../island.svelte";
 
@@ -15,7 +15,7 @@ export function watchImpersonation() {
         }
         await session.current.refetch?.();
         toast.success("Stopped impersonating");
-        await goto("/admin/users", { invalidateAll: true });
+        await goto("/admin/users", { refreshAll: true });
     }
 
     $effect(() => {

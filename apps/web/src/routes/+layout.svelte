@@ -1,8 +1,10 @@
 <script lang="ts">
-    import { clearIdentifiedUser, identifyUser } from "$lib/analytics";
-    import { authClient } from "$lib/auth";
-    import Island from "$lib/components/island/Island.svelte";
-    import Snowfall from "$lib/components/Snowfall.svelte";
+    import { clearIdentifiedUser, identifyUser } from "#lib/analytics.js";
+    import { authClient } from "#lib/auth.js";
+    import Island from "#lib/components/island/Island.svelte";
+    import Snowfall from "#lib/components/Snowfall.svelte";
+    import { beforeNavigate } from "$app/navigation";
+    import { updated } from "$app/state";
     import "@cartamd/plugin-anchor/default.css";
     import "@cartamd/plugin-code/default.css";
     import "@cartamd/plugin-emoji/default.css";
@@ -17,6 +19,12 @@
     let { children } = $props();
 
     const session = authClient.useSession();
+
+    // A deploy swaps out the old build's chunks, so once SvelteKit spots a newer version,
+    // the next in-app navigation loads the page fresh instead of from the stale manifest.
+    beforeNavigate(({ willUnload, shallow, to }) => {
+        if (updated.current && !willUnload && !shallow && to?.url) location.href = to.url.href;
+    });
 
     $effect(() => {
         const user = $session.data?.user;

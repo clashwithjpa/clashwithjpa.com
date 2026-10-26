@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import CocDataTable from "$lib/components/ui/coc/CocDataTable.svelte";
-    import CocInput from "$lib/components/ui/coc/CocInput.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import type { TableColumn } from "$lib/components/ui/table/features";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import { cn } from "$lib/utils";
+    import CocDataTable from "#lib/components/ui/coc/CocDataTable.svelte";
+    import CocInput from "#lib/components/ui/coc/CocInput.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import type { TableColumn } from "#lib/components/ui/table/features.js";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import { cn } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { getWarLogPlayers } from "@repo/clashofclans-client";
     import { renderSnippet, type SortingState } from "@tanstack/svelte-table";
     import TablerSearch from "~icons/tabler/search";

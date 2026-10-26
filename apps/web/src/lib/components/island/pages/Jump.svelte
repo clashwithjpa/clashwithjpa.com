@@ -1,10 +1,10 @@
 <script lang="ts">
+    import { authClient } from "#lib/auth.js";
+    import Input from "#lib/components/ui/Input.svelte";
+    import { cn } from "#lib/utils.js";
+    import { NAV_LINKS } from "#lib/utils/links.js";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { authClient } from "$lib/auth";
-    import Input from "$lib/components/ui/Input.svelte";
-    import { cn } from "$lib/utils";
-    import { NAV_LINKS } from "$lib/utils/links";
     import { island } from "../island.svelte";
 
     type Target = { name: string; group: string; href: string; external?: boolean };

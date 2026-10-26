@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import CwlClanFormSidebar from "$lib/components/CwlClanFormSidebar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import { Sidebar } from "$lib/components/ui/sidebar";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import { jobs } from "$lib/jobs.svelte";
-    import { toast } from "$lib/toast";
-    import { errorMessage } from "$lib/utils";
+    import CwlClanFormSidebar from "#lib/components/CwlClanFormSidebar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { Sidebar } from "#lib/components/ui/sidebar/index.js";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import { jobs } from "#lib/jobs.svelte.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import {
         createAdminCwlClan,
         deleteAdminCwlClan,

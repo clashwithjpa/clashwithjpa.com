@@ -1,11 +1,11 @@
-import { dev } from "$app/environment";
-import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_SPOTLIGHT } from "$env/static/public";
+import { dev } from "$app/env";
+import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_SPOTLIGHT } from "$app/env/public";
 import * as Sentry from "@sentry/sveltekit";
-import type { HandleClientError } from "@sveltejs/kit";
+import type { HandleClientError } from "@sveltejs/kit/hooks";
 
 Sentry.init({
-    dsn: PUBLIC_SENTRY_SPOTLIGHT === "1" ? undefined : PUBLIC_SENTRY_DSN,
-    spotlight: PUBLIC_SENTRY_SPOTLIGHT === "1",
+    dsn: PUBLIC_SENTRY_SPOTLIGHT ? undefined : PUBLIC_SENTRY_DSN,
+    spotlight: PUBLIC_SENTRY_SPOTLIGHT,
     sampleRate: 1,
     tracesSampleRate: 1,
     enableLogs: true,
@@ -13,15 +13,14 @@ Sentry.init({
     debug: false,
 });
 
-export const handleError: HandleClientError = async ({ error, event, status }) => {
-    const errorId = crypto.randomUUID();
+export const handleError: HandleClientError = ({ kind, error, event }) => {
+    // `error(...)` calls and framework errors (404s and the like) are expected and safe to show as-is.
+    if (kind === "app" || kind === "framework") return error;
 
+    const errorId = crypto.randomUUID();
     Sentry.captureException(error, {
-        extra: { errorId, status, route: event.route?.id ?? null, path: event.url?.pathname ?? null },
+        extra: { errorId, route: event.route?.id ?? null, path: event.url?.pathname ?? null },
     });
 
-    return {
-        message: "Whoops!",
-        errorId,
-    };
+    return { message: "Whoops!", errorId };
 };

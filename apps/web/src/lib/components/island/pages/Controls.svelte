@@ -1,8 +1,8 @@
 <script lang="ts">
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import { clearSiteCache } from "#lib/utils/cache.js";
     import { page } from "$app/state";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import { clearSiteCache } from "$lib/utils/cache";
     import { onMount, tick } from "svelte";
     import TablerMaximize from "~icons/tabler/maximize";
     import TablerMinimize from "~icons/tabler/minimize";

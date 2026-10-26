@@ -1,22 +1,22 @@
 <script lang="ts">
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Dialog from "#lib/components/ui/Dialog.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import PageHeader from "#lib/components/ui/PageHeader.svelte";
+    import ScrollArea from "#lib/components/ui/ScrollArea.svelte";
+    import type { Option } from "#lib/components/ui/Select.svelte";
+    import Select from "#lib/components/ui/Select.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import Toggle from "#lib/components/ui/Toggle.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import { jobs } from "#lib/jobs.svelte.js";
+    import { toast } from "#lib/toast.js";
+    import { errorMessage, formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { beforeNavigate, goto } from "$app/navigation";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Dialog from "$lib/components/ui/Dialog.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import PageHeader from "$lib/components/ui/PageHeader.svelte";
-    import ScrollArea from "$lib/components/ui/ScrollArea.svelte";
-    import type { Option } from "$lib/components/ui/Select.svelte";
-    import Select from "$lib/components/ui/Select.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import Toggle from "$lib/components/ui/Toggle.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import { jobs } from "$lib/jobs.svelte";
-    import { toast } from "$lib/toast";
-    import { errorMessage, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         createCwlSeason,
         deleteCwlSeason,
@@ -417,7 +417,7 @@
     let showUnsavedDialog = $state(false);
 
     beforeNavigate((navigation) => {
-        if (isDirty && !allowNavigation) {
+        if (isDirty && !allowNavigation && !navigation.shallow) {
             navigation.cancel();
             pendingNavigation = navigation.to?.url.href || null;
             if (pendingNavigation) showUnsavedDialog = true;

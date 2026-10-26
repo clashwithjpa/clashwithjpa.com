@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import { cn } from "$lib/utils";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import { cn } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { getFWAClanPoints, type GetFWAClanPoints200 } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
 

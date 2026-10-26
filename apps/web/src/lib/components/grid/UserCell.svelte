@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import type { Role } from "$lib/config/roles";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import type { Role } from "#lib/config/roles.js";
 
     let { user }: { user: { name?: string | null; image?: string | null; role?: string | null; discordId?: string | null } } = $props();
 </script>

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CocCard from "$lib/components/ui/coc/CocCard.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
+    import CocCard from "#lib/components/ui/coc/CocCard.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
     import { BarChart, Bars, LinearGradient } from "layerchart";
 
     export type FamilyClan = {

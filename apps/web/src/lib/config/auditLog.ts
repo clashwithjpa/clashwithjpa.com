@@ -1,4 +1,4 @@
-import type { Option } from "$lib/components/ui/Select.svelte";
+import type { Option } from "#lib/components/ui/Select.svelte";
 import type { GetAuditLog200 } from "@repo/clashofclans-client";
 import type { Component } from "svelte";
 import TablerArrowBackUp from "~icons/tabler/arrow-back-up";

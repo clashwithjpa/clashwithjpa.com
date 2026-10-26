@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import ConfirmationDialog from "$lib/components/ui/ConfirmationDialog.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, type ApiKeyRow } from "$lib/config/apiKeys";
-    import { formatDateTime, formatRelativeTime } from "$lib/utils";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import ConfirmationDialog from "#lib/components/ui/ConfirmationDialog.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import { keyLevel, maskedKey, SCOPE_LABELS, scopesUpTo, type ApiKeyRow } from "#lib/config/apiKeys.js";
+    import { formatDateTime, formatRelativeTime } from "#lib/utils.js";
     import TablerActivity from "~icons/tabler/activity";
     import TablerCalendarPlus from "~icons/tabler/calendar-plus";
     import TablerCalendarX from "~icons/tabler/calendar-x";

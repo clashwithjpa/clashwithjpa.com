@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import RawPopup from "$lib/components/ui/RawPopup.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import RawPopup from "#lib/components/ui/RawPopup.svelte";
 
     type Season = { id: number; name: string };
 

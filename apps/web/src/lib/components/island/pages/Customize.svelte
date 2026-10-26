@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Toggle from "$lib/components/ui/Toggle.svelte";
-    import { storage } from "$lib/utils/storage.svelte";
+    import Toggle from "#lib/components/ui/Toggle.svelte";
+    import { storage } from "#lib/utils/storage.svelte.js";
     import { onDestroy } from "svelte";
     import { fade } from "svelte/transition";
     import TablerMoodWink from "~icons/tabler/mood-wink";

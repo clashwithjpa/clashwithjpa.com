@@ -1,12 +1,12 @@
 <script lang="ts">
+    import WarCard, { parseCoCDate, type WarEntry } from "#lib/components/coc/WarCard.svelte";
+    import CocBand from "#lib/components/ui/coc/CocBand.svelte";
+    import CocPanel from "#lib/components/ui/coc/CocPanel.svelte";
+    import CocTabs from "#lib/components/ui/coc/CocTabs.svelte";
+    import Icon from "#lib/components/ui/Icon.svelte";
+    import Seo from "#lib/components/ui/Seo.svelte";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { page } from "$app/state";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import WarCard, { parseCoCDate, type WarEntry } from "$lib/components/coc/WarCard.svelte";
-    import CocBand from "$lib/components/ui/coc/CocBand.svelte";
-    import CocPanel from "$lib/components/ui/coc/CocPanel.svelte";
-    import CocTabs from "$lib/components/ui/coc/CocTabs.svelte";
-    import Icon from "$lib/components/ui/Icon.svelte";
-    import Seo from "$lib/components/ui/Seo.svelte";
     import { getCOCClan, getCOCClanCurrentWar } from "@repo/clashofclans-client";
     import { onMount } from "svelte";
     import type { PageProps } from "./$types";

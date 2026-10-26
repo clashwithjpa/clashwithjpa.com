@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import Avatar from "$lib/components/ui/Avatar.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import RoleBadge from "$lib/components/ui/RoleBadge.svelte";
-    import Tabs from "$lib/components/ui/Tabs.svelte";
-    import Tooltip from "$lib/components/ui/Tooltip.svelte";
-    import TownHall from "$lib/components/ui/TownHall.svelte";
-    import type { Role } from "$lib/config/roles";
-    import { toast } from "$lib/toast";
-    import { num, str } from "$lib/utils";
+    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import Badge from "#lib/components/ui/Badge.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import RoleBadge from "#lib/components/ui/RoleBadge.svelte";
+    import Tabs from "#lib/components/ui/Tabs.svelte";
+    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import TownHall from "#lib/components/ui/TownHall.svelte";
+    import type { Role } from "#lib/config/roles.js";
+    import { toast } from "#lib/toast.js";
+    import { num, str } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { getCOCPlayer } from "@repo/clashofclans-client";
     import type { Component } from "svelte";
     import TablerActivity from "~icons/tabler/activity";

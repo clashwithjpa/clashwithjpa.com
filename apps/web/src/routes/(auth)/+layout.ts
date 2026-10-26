@@ -1,5 +1,5 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
-import { authClient, hasPermission } from "$lib/auth";
+import { authClient, hasPermission } from "#lib/auth.js";
+import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { statement } from "@repo/auth-shared";
 import { getUserFeatures } from "@repo/clashofclans-client";
 import { redirect } from "@sveltejs/kit";
@@ -39,7 +39,7 @@ export const load: LayoutLoad = async ({ url }) => {
     if (!user) {
         const signInResult = await authClient.signIn.social({ provider: "discord", callbackURL: url.href });
         const target = signInResult.data?.url ?? "/";
-        throw redirect(303, target);
+        throw redirect(303, target, { external: ["https://discord.com"] });
     }
 
     const permsToCheck = statement.jpa;

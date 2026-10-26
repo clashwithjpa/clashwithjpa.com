@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Button from "$lib/components/ui/Button.svelte";
-    import Input from "$lib/components/ui/Input.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import Button from "#lib/components/ui/Button.svelte";
+    import Input from "#lib/components/ui/Input.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
     import TablerPlus from "~icons/tabler/plus";
 
     interface ClanForm {

@@ -1,4 +1,4 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
+import { PUBLIC_SERVER_URL } from "$app/env/public";
 import { getGuildNicknames } from "@repo/clashofclans-client";
 
 export async function loadGuildNicknames(): Promise<Record<string, string>> {

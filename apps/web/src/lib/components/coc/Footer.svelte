@@ -1,8 +1,8 @@
 <script lang="ts">
+    import CocBtn from "#lib/components/ui/coc/CocBtn.svelte";
+    import { cn } from "#lib/utils.js";
+    import { LINKS, NAV_LINKS } from "#lib/utils/links.js";
     import { page } from "$app/state";
-    import CocBtn from "$lib/components/ui/coc/CocBtn.svelte";
-    import { cn } from "$lib/utils";
-    import { LINKS, NAV_LINKS } from "$lib/utils/links";
     import { onMount } from "svelte";
     import SimpleIconsDiscord from "~icons/simple-icons/discord";
 

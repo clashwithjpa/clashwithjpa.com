@@ -1,4 +1,4 @@
-import { island } from "$lib/components/island/island.svelte";
+import { island } from "#lib/components/island/island.svelte.js";
 import { onDestroy, untrack } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 

@@ -1,13 +1,13 @@
 <script lang="ts">
+    import { authClient } from "#lib/auth.js";
+    import CardSkeleton from "#lib/components/ui/CardSkeleton.svelte";
+    import Spinner from "#lib/components/ui/Spinner.svelte";
+    import type { Role } from "#lib/config/roles.js";
+    import { ROLE_LEVELS, roleLevel } from "#lib/config/roles.js";
+    import { toast } from "#lib/toast.js";
+    import { formatDate, formatDateTime, formatRelativeTime } from "#lib/utils.js";
+    import { PUBLIC_SERVER_URL } from "$app/env/public";
     import { goto } from "$app/navigation";
-    import { PUBLIC_SERVER_URL } from "$env/static/public";
-    import { authClient } from "$lib/auth";
-    import CardSkeleton from "$lib/components/ui/CardSkeleton.svelte";
-    import Spinner from "$lib/components/ui/Spinner.svelte";
-    import type { Role } from "$lib/config/roles";
-    import { ROLE_LEVELS, roleLevel } from "$lib/config/roles";
-    import { toast } from "$lib/toast";
-    import { formatDate, formatDateTime, formatRelativeTime } from "$lib/utils";
     import {
         deleteCocAccount,
         getCOCPlayer,
@@ -139,7 +139,7 @@
         } else {
             await $currentSession.refetch?.();
             toast.success(`Now impersonating ${user.name}`);
-            await goto("/dashboard", { invalidateAll: true });
+            await goto("/dashboard", { refreshAll: true });
         }
     }
 
