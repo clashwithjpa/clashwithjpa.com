@@ -531,6 +531,7 @@
 {#snippet externalCell(account: Account)}
     <Input
         type="checkbox"
+        class="mx-auto"
         checked={account.isExternal}
         onchange={(e) => saveExternal(account, e.currentTarget.checked)}
         aria-label="External account"

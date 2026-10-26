@@ -412,6 +412,7 @@
 {#snippet selectAllCheckbox(t: Table<Features, any>)}
     <Input
         type="checkbox"
+        class="mx-auto"
         checked={t.getIsAllRowsSelected()}
         indeterminate={!t.getIsAllRowsSelected() && t.getIsSomeRowsSelected()}
         onclick={t.getToggleAllRowsSelectedHandler()}
@@ -420,7 +421,7 @@
 {/snippet}
 
 {#snippet selectRowCheckbox(row: Row<Features, any>)}
-    <Input type="checkbox" checked={row.getIsSelected()} onclick={row.getToggleSelectedHandler()} aria-label="Select row" />
+    <Input type="checkbox" class="mx-auto" checked={row.getIsSelected()} onclick={row.getToggleSelectedHandler()} aria-label="Select row" />
 {/snippet}
 
 <div class={cn("relative size-full", className)}>
