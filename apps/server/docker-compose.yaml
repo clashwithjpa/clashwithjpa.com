@@ -29,19 +29,20 @@ services:
       timeout: 5s
       retries: 5
 
-  jpa-minio:
-    image: minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
-    container_name: jpa-minio
+  jpa-rustfs:
+    image: rustfs/rustfs:1.0.4@sha256:ed9210d6411d77ffceb70d94b964a3cb7d225983368bc25bebe01e995293dcc2
+    container_name: jpa-rustfs
     restart: unless-stopped
     env_file: .env.server-db
+    environment:
+      RUSTFS_REGION: ap-mumbai-1
     ports:
       - 7105:9000
       - 7106:9001
     volumes:
-      - jpa-minio-data:/data
-    command: server /data --console-address ":9001"
+      - jpa-rustfs-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -49,4 +50,4 @@ services:
 volumes:
   jpa-pg-data:
   jpa-redis-data:
-  jpa-minio-data:
+  jpa-rustfs-data:

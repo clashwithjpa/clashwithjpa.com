@@ -18,10 +18,10 @@ services:
       - services
       - prod
 
-  jpa-minio:
+  jpa-rustfs:
     extends:
       file: ./apps/server/docker-compose.yaml
-      service: jpa-minio
+      service: jpa-rustfs
     profiles:
       - all
       - services
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
       jpa-redis:
         condition: service_healthy
-      jpa-minio:
+      jpa-rustfs:
         condition: service_healthy
     profiles:
       - prod
@@ -105,7 +105,7 @@ services:
 volumes:
   jpa-pg-data:
   jpa-redis-data:
-  jpa-minio-data:
+  jpa-rustfs-data:
   drizzle-gateway-data:
   redis-insight-data:
 

@@ -42,11 +42,6 @@
             "description": "Capacitor owns the native projects. cap sync rewrites these files, and their Gradle and Swift versions move with Capacitor upgrades.",
             "matchFileNames": ["apps/web/android/**", "apps/web/ios/**"],
             "enabled": false
-        },
-        {
-            "description": "MinIO stopped publishing images, so there is no new digest to find and the lookup fails on every run.",
-            "matchPackageNames": ["minio/minio"],
-            "enabled": false
         }
     ],
     "customManagers": [

@@ -1,5 +1,5 @@
 services:
-  jpa-minio:
+  jpa-rustfs:
     networks:
       - default
       - pangolin

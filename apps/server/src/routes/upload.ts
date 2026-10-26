@@ -19,11 +19,11 @@ const MIME_TO_EXT: Record<string, string> = {
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const s3 = new S3Client({
-    endpoint: config.MINIO_ENDPOINT,
-    region: "us-east-1",
+    endpoint: config.S3_ENDPOINT,
+    region: "ap-mumbai-1",
     credentials: {
-        accessKeyId: config.MINIO_ROOT_USER,
-        secretAccessKey: config.MINIO_ROOT_PASSWORD,
+        accessKeyId: config.RUSTFS_ACCESS_KEY,
+        secretAccessKey: config.RUSTFS_SECRET_KEY,
     },
     forcePathStyle: true,
 });
@@ -102,7 +102,7 @@ upload.post(
                 }),
             );
 
-            const fileUrl = `${config.MINIO_PUBLIC_URL}/${BUCKET_NAME}/${uniqueFilename}`;
+            const fileUrl = `${config.S3_PUBLIC_URL}/${BUCKET_NAME}/${uniqueFilename}`;
 
             return c.json({ success: true, data: { url: fileUrl } });
         } catch (error) {
