@@ -64,7 +64,7 @@ services:
 
   drizzle-gateway:
     container_name: drizzle-gateway
-    image: ghcr.io/drizzle-team/gateway:latest@sha256:db9c50c7aa7553af27e1ee735ea3f41510f25e21fb4e6cdf90669e3d9c6bef01
+    image: ghcr.io/drizzle-team/gateway:latest@sha256:3f09490584ad97cb5fa6d2a7335b405b8ac96e3b17a427830930f4ff70fe3993
     restart: unless-stopped
     ports:
       - 7103:4983
@@ -92,7 +92,7 @@ services:
 
   spotlight:
     container_name: spotlight
-    image: ghcr.io/getsentry/spotlight:latest@sha256:daba2de5136fc8db0a0cde45280aa4d369b5ea0a394fe762c86aa42294a11d4d
+    image: ghcr.io/getsentry/spotlight:latest@sha256:8c0db1d8ce11db8587b70bc1971cd731d0a71b37214de3ad322e28183f2e5a2c
     restart: unless-stopped
     ports:
       - 8969:8969
