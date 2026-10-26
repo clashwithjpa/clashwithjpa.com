@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.6.0] - 2026-10-26
+
+### Features
+
+- **web:** Migrate to SvelteKit 3 ([e5f3d8d](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/e5f3d8dfe87d991ff810f50e40f2914ebca6b99f))
+
+### Bug Fixes
+
+- **web:** Center checkboxes in table cells ([0370b20](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/0370b20518c1993619fa7f3a4890d20946280659))
+
+### Refactor
+
+- Move to kubb 5 and self-hosted GlitchTip ([898786a](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/898786a861858d9f3d30175b7f482017ed197d34))
+
+### Dependencies
+
+- **deps:** Update dependency vite to v8.2.4 [security] ([eb120f0](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/eb120f055906412707864dc4bc3024ed9377a24b))
+- **deps:** Update dependency hono to v4.13.11 [security] ([0b91109](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/0b911092084b04af5e1969a17e0345c824b88de9))
+- **deps:** Update digests ([ffdf84b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/ffdf84b1cefd2e078a1fccfd76641a1c5e414900))
+- **deps:** Update dependency zod to v4.6.6 [security] ([d477436](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/d477436ba2b9b63a317ff29991202714d776d32a))
 ## [2.5.2] - 2026-10-24
 
 ### Features
