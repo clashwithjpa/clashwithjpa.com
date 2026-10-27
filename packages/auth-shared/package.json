@@ -26,6 +26,6 @@
         "typescript": "catalog:"
     },
     "peerDependencies": {
-        "better-auth": "^1.7.5"
+        "better-auth": "^1.7.12"
     }
 }
