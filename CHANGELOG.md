@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.7.0] - 2026-10-31
+
+### Features
+
+- **audit:** Rebuild audit log with real before/after changes ([1c3dad3](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/1c3dad30e59a9bc56b42b606a3826b9b141095df))
+
+### Bug Fixes
+
+- **web:** Keep checkboxes from covering sticky table headers ([211b7ca](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/211b7cac7c685897b699da525212bb1593b03812))
+
+### Documentation
+
+- Update README ([7ffda1b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/7ffda1b25e04cbac78c9618074f411a325455d76))
+
+### Dependencies
+
+- **deps:** Update dependency better-auth to ^1.7.12 [security] ([c95809b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/c95809bf967471e3a150e2dcd50bb3e8854ba916))
 ## [2.6.1] - 2026-10-26
 
 ### Refactor
