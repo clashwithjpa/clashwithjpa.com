@@ -180,17 +180,25 @@ export const cocAccountRelations = relations(cocAccountTable, ({ one, many }) =>
     cwlApplications: many(cwlApplicationTable),
 }));
 
-// No FK on actorId so deletes don't cascade (audit must survive user removal).
-// actorName is a snapshot taken at log time as a display fallback.
+// No FK on actorId or anything referenced in subjects, so deletes don't cascade:
+// audit must survive user removal. Users are stored by id only and joined live
+// on read (name, avatar, role); one that no longer exists renders as a ghost.
 export const auditLogTable = pgTable(
     "audit_log_table",
     {
         id: serial("id").primaryKey(),
         actorId: text("actor_id"),
-        actorName: text("actor_name"),
         action: text("action").notNull(),
         targetType: text("target_type"),
         targetId: text("target_id"),
+        // Other entities the action touched (applicant, account owner, clan...). See AuditEntity in lib/audit.ts.
+        subjects: jsonb("subjects").$type<unknown[]>(),
+        // Field-level before/after pairs for the target. See AuditChange in lib/audit.ts.
+        changes: jsonb("changes").$type<unknown[]>(),
+        // Per-row before/after for bulk actions, capped (metadata.itemsTotal holds the real count).
+        items: jsonb("items").$type<unknown[]>(),
+        // Request context: ip, user agent, request id, method/path, impersonator.
+        context: jsonb("context").$type<Record<string, unknown>>(),
         metadata: jsonb("metadata"),
         // "web" | "api" — which surface the action came through. Same actions and
         // target types either way; source is an extra dimension, not a category.
@@ -205,6 +213,8 @@ export const auditLogTable = pgTable(
         index("audit_log_target_idx").on(t.targetType, t.targetId, t.createdAt.desc()),
         index("audit_log_action_idx").on(t.action, t.createdAt.desc()),
         index("audit_log_source_idx").on(t.source, t.createdAt.desc()),
+        // Backs the `subjects @> [...]` lookup for "every event involving this user/account".
+        index("audit_log_subjects_idx").using("gin", t.subjects.op("jsonb_path_ops")),
     ],
 );
 

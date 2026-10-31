@@ -1,4 +1,4 @@
-import { logAction } from "@/lib/audit";
+import { diffFields, entity, logAction, userEntity } from "@/lib/audit";
 import { isAuthenticated, isVerified } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { config } from "@/lib/config";
@@ -279,6 +279,11 @@ app.post(
                 logAction(c, {
                     action: "coc_account.import",
                     targetType: "coc_account",
+                    subjects: [userEntity({ id: user.id }, "owner")],
+                    items: inserted.map((row) => ({
+                        entity: entity("coc_account", row.cocAccountTag),
+                        changes: diffFields(null, row, ["warWeight"]),
+                    })),
                     metadata: { count: inserted.length },
                 });
             }
@@ -452,7 +457,8 @@ app.post(
                     action: "coc_account.create",
                     targetType: "coc_account",
                     targetId: account!.id,
-                    metadata: { cocAccountTag, warWeight, isExternal: true },
+                    subjects: [entity("coc_account", account!.cocAccountTag, "target"), userEntity({ id: user.id }, "owner")],
+                    changes: diffFields(null, account, ["warWeight", "isExternal"]),
                 });
                 return c.json({
                     success: true,
@@ -475,7 +481,8 @@ app.post(
                 action: "clan_application.create",
                 targetType: "clan_application",
                 targetId: application.id,
-                metadata: { cocAccountTag },
+                subjects: [userEntity({ id: user.id }, "applicant"), entity("coc_account", application.cocAccountTag, "account")],
+                changes: diffFields(null, application, ["cocAccountTag", "status"]),
             });
             return c.json({
                 success: true,
@@ -565,15 +572,18 @@ app.put(
         }
 
         try {
-            const account = await setUserCocAccountExternal(id, discordId);
-            if (!account) {
+            const result = await setUserCocAccountExternal(id, discordId);
+            if (!result) {
                 return c.json({ success: false, error: "Account not found or not linked to your profile." }, 404);
             }
+            const { account, before } = result;
             logAction(c, {
                 action: "coc_account.mark_external",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, isExternal: true },
+                subjects: [entity("coc_account", account.cocAccountTag, "target"), userEntity({ id: user.id }, "owner")],
+                changes: diffFields(before, account, ["isExternal"]),
+                onlyIfChanged: true,
             });
             return c.json({
                 success: true,
@@ -795,12 +805,13 @@ app.post(
                 action: "cwl_application.create",
                 targetType: "cwl_application",
                 targetId: application.id,
-                metadata: {
-                    cocAccountTag: tag,
-                    seasonId: application.seasonId,
-                    preferenceNum,
-                    isExternal,
-                },
+                subjects: [
+                    userEntity({ id: user.id }, "applicant"),
+                    entity("coc_account", tag, "account"),
+                    entity("cwl_season", application.seasonId, "season"),
+                ],
+                changes: diffFields(null, application, ["preferenceNum", "cocAccountClan"]),
+                metadata: { isExternal },
             });
             return c.json({
                 success: true,

@@ -246,6 +246,13 @@
             "when": 1792817452783,
             "tag": "0034_clan_war_log",
             "breakpoints": true
+        },
+        {
+            "idx": 35,
+            "version": "7",
+            "when": 1793460543502,
+            "tag": "0035_audit_log_revamp",
+            "breakpoints": true
         }
     ]
 }

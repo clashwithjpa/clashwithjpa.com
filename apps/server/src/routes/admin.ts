@@ -1,4 +1,16 @@
-import { AUDIT_ACTIONS, AUDIT_SOURCES, AUDIT_TARGET_TYPES, logAction } from "@/lib/audit";
+import {
+    AUDIT_ACTIONS,
+    AUDIT_ENTITY_TYPES,
+    AUDIT_SOURCES,
+    AUDIT_TARGET_TYPES,
+    diffFields,
+    entity,
+    logAction,
+    ref,
+    textDiff,
+    userEntity,
+    type AuditChange,
+} from "@/lib/audit";
 import { isAdmin, isManager, isReviewer, isSuperadmin } from "@/lib/auth/functions";
 import { cocClient } from "@/lib/coc";
 import { runCwlPingCheck, sendTestPing } from "@/lib/cwl-ping";
@@ -27,6 +39,7 @@ import {
     getAllCwlApplications,
     getAllCwlClans,
     getAuditLog,
+    getAuditLogEntry,
     getBonusData,
     getBonusLedger,
     getClanApplications,
@@ -45,6 +58,7 @@ import {
     setUserApiAccess,
     setUserDiscordUsername,
     setUserSeasonBonus,
+    SHEET_STAT_FIELDS,
     syncCocAccountStats,
     syncCocAccountWarWeights,
     updateClan,
@@ -55,6 +69,7 @@ import {
     updateCwlClan,
     updateCwlPingSettings,
     updateSettings,
+    type AuditLookup,
 } from "@/lib/db/functions";
 import {
     assertClanDiscordIds,
@@ -192,7 +207,10 @@ app.put(
                 action: enabled ? "user.api_access_granted" : "user.api_access_revoked",
                 targetType: "user",
                 targetId: userid,
-                metadata: { targetName: updated.name, ...(enabled ? {} : { disabledKeys }) },
+                subjects: [userEntity({ id: userid }, "target")],
+                changes: diffFields({ apiAccess: updated.previousApiAccess }, { apiAccess: enabled }, ["apiAccess"]),
+                metadata: disabledKeys ? { disabledKeys } : undefined,
+                onlyIfChanged: true,
             });
 
             return c.json({ success: true, data: { userId: userid, apiAccess: enabled, disabledKeys } });
@@ -334,13 +352,24 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const { status } = c.req.valid("json");
-            const application = await updateClanApplicationStatus(id, status);
-            if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            const result = await updateClanApplicationStatus(id, status);
+            if (!result) return c.json({ success: false, error: "Application not found" }, 404);
+            const { application, previousStatus, effects } = result;
+            const changes: AuditChange[] = [{ field: "status", before: previousStatus, after: status }];
+            // The transition's side effects are what a reviewer most needs to see later.
+            if (effects.accountLinked) changes.push({ field: "linkedAccount", before: null, after: application.cocAccountTag });
+            if (effects.accountUnlinked) changes.push({ field: "linkedAccount", before: application.cocAccountTag, after: null });
+            if (effects.roleChange) changes.push({ field: "applicantRole", before: effects.roleChange.from, after: effects.roleChange.to });
             logAction(c, {
                 action: `clan_application.${status}` as const,
                 targetType: "clan_application",
                 targetId: application.id,
-                metadata: { cocAccountTag: application.cocAccountTag },
+                subjects: [
+                    userEntity({ id: effects.userId, discordId: application.discordUserId }, "applicant"),
+                    entity("coc_account", application.cocAccountTag, "account"),
+                ],
+                changes: previousStatus === status ? [] : changes,
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { application } });
         } catch (error) {
@@ -373,11 +402,14 @@ app.delete(
     }),
     async (c) => {
         try {
-            const deleted = await deleteAcceptedClanApplications();
+            const rows = await deleteAcceptedClanApplications();
+            const deleted = rows.length;
             logAction(c, {
                 action: "clan_application.clear_accepted",
                 targetType: "clan_application",
+                items: rows.map((r) => ({ entity: entity("coc_account", r.cocAccountTag), owner: userEntity({ discordId: r.discordUserId }) })),
                 metadata: { deleted },
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { deleted } });
         } catch (error) {
@@ -416,7 +448,11 @@ app.delete(
                 action: "clan_application.delete",
                 targetType: "clan_application",
                 targetId: application.id,
-                metadata: { cocAccountTag: application.cocAccountTag },
+                subjects: [
+                    userEntity({ discordId: application.discordUserId }, "applicant"),
+                    entity("coc_account", application.cocAccountTag, "account"),
+                ],
+                changes: diffFields(application, null, ["cocAccountTag", "status", "createdAt"]),
             });
             return c.json({ success: true, data: { application } });
         } catch (error) {
@@ -579,7 +615,9 @@ app.post(
                 action: "cwl_application.create",
                 targetType: "cwl_application",
                 targetId: application.id,
-                metadata: { cocAccountTag: tag, seasonId, preferenceNum, manual: true },
+                subjects: [userEntity({ id: userId }, "applicant"), entity("coc_account", tag, "account"), entity("cwl_season", seasonId, "season")],
+                changes: diffFields(null, application, ["preferenceNum", "cocAccountClan"], { cocAccountClan: (v) => ref("clan", v as string) }),
+                metadata: { manual: true },
             });
             return c.json({ success: true, data: { application } });
         } catch (error) {
@@ -631,15 +669,22 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const { clanTag } = c.req.valid("json");
-            const application = await assignCwlApplication(id, clanTag);
-            if (!application) return c.json({ success: false, error: "Application not found" }, 404);
+            const result = await assignCwlApplication(id, clanTag);
+            if (!result) return c.json({ success: false, error: "Application not found" }, 404);
+            const { application, previousAssignedTo } = result;
             logAction(c, {
                 action: clanTag ? "cwl_application.assign" : "cwl_application.unassign",
                 targetType: "cwl_application",
                 targetId: application.id,
-                metadata: clanTag
-                    ? { cocAccountTag: application.cocAccountTag, assignedClanTag: clanTag }
-                    : { cocAccountTag: application.cocAccountTag },
+                subjects: [
+                    userEntity({ discordId: application.discordUserId }, "applicant"),
+                    entity("coc_account", application.cocAccountTag, "account"),
+                    entity("cwl_season", application.seasonId, "season"),
+                ],
+                changes: diffFields({ assignedTo: previousAssignedTo }, application, ["assignedTo"], {
+                    assignedTo: (v) => ref("cwl_clan", v as string),
+                }),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { application } });
         } catch (error) {
@@ -682,10 +727,21 @@ app.post(
         try {
             const { ids, clanTag } = c.req.valid("json");
             const result = await assignCwlApplicationsBulk(ids, clanTag);
+            const toClan = (v: unknown) => ref("cwl_clan", v as string);
             logAction(c, {
                 action: clanTag ? "cwl_application.bulk_assign" : "cwl_application.bulk_unassign",
                 targetType: "cwl_application",
-                metadata: { count: result.count, assignedClanTag: clanTag, ids: result.ids },
+                subjects: clanTag ? [entity("cwl_clan", clanTag, "assigned clan")] : [],
+                // Rows already in that clan are counted but not listed: nothing changed for them.
+                items: result.rows
+                    .filter((r) => r.assignedTo !== clanTag)
+                    .map((r) => ({
+                        entity: entity("coc_account", r.cocAccountTag),
+                        owner: userEntity({ discordId: r.discordUserId }),
+                        changes: diffFields(r, { assignedTo: clanTag }, ["assignedTo"], { assignedTo: toClan }),
+                    })),
+                metadata: { count: result.count },
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { count: result.count, assignedTo: clanTag } });
         } catch (error) {
@@ -725,10 +781,18 @@ app.post(
         try {
             const { ids } = c.req.valid("json");
             const result = await deleteCwlApplicationsBulk(ids);
+            const seasonIds = [...new Set(result.rows.map((r) => r.seasonId))];
             logAction(c, {
                 action: "cwl_application.bulk_delete",
                 targetType: "cwl_application",
-                metadata: { count: result.count, ids: result.ids },
+                subjects: seasonIds.map((sid) => entity("cwl_season", sid, "season")),
+                items: result.rows.map((r) => ({
+                    entity: entity("coc_account", r.cocAccountTag),
+                    owner: userEntity({ discordId: r.discordUserId }),
+                    changes: diffFields(r, null, ["preferenceNum", "assignedTo"], { assignedTo: (v) => ref("cwl_clan", v as string) }),
+                })),
+                metadata: { count: result.count },
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { count: result.count } });
         } catch (error) {
@@ -867,7 +931,13 @@ app.post(
     async (c) => {
         try {
             const season = await createCwlSeason(c.req.valid("json"));
-            logAction(c, { action: "cwl_season.create", targetType: "cwl_season", targetId: season.id, metadata: { name: season.name } });
+            logAction(c, {
+                action: "cwl_season.create",
+                targetType: "cwl_season",
+                targetId: season.id,
+                subjects: [entity("cwl_season", season.id, "target")],
+                changes: diffFields(null, season, ["name", "month", "year"]),
+            });
             return c.json({ success: true, data: { season } });
         } catch (error) {
             if (error instanceof DuplicateSeasonNameError) return c.json({ success: false, error: error.message }, 409);
@@ -902,7 +972,13 @@ app.delete(
             const { id } = c.req.valid("param");
             const season = await deleteCwlSeason(id);
             if (!season) return c.json({ success: false, error: "Season not found." }, 404);
-            logAction(c, { action: "cwl_season.delete", targetType: "cwl_season", targetId: id, metadata: { name: season.name } });
+            logAction(c, {
+                action: "cwl_season.delete",
+                targetType: "cwl_season",
+                targetId: id,
+                subjects: [entity("cwl_season", id, "target")],
+                changes: diffFields(season, null, ["name", "month", "year"]),
+            });
             return c.json({ success: true, data: { id } });
         } catch (error) {
             Sentry.captureException(error);
@@ -940,7 +1016,14 @@ app.patch(
             const updated = await renameCwlSeason(id, name);
             if (!updated) return c.json({ success: false, error: "Season not found." }, 404);
             const { season, previousName } = updated;
-            logAction(c, { action: "cwl_season.rename", targetType: "cwl_season", targetId: id, metadata: { name, previousName } });
+            logAction(c, {
+                action: "cwl_season.rename",
+                targetType: "cwl_season",
+                targetId: id,
+                subjects: [entity("cwl_season", id, "target")],
+                changes: diffFields({ name: previousName }, { name }, ["name"]),
+                onlyIfChanged: true,
+            });
             return c.json({ success: true, data: { season } });
         } catch (error) {
             if (error instanceof DuplicateSeasonNameError) return c.json({ success: false, error: error.message }, 409);
@@ -1011,12 +1094,22 @@ app.put(
     async (c) => {
         try {
             const { discordUserId, seasonId, cocAccountTag, selected } = c.req.valid("json");
-            const bonus = await setUserSeasonBonus({ discordUserId, seasonId, cocAccountTag, selected });
+            const { bonus, previous } = await setUserSeasonBonus({ discordUserId, seasonId, cocAccountTag, selected });
             logAction(c, {
                 action: selected ? "cwl_bonus.tick" : "cwl_bonus.untick",
                 targetType: "cwl_bonus",
                 targetId: discordUserId,
-                metadata: { seasonId, cocAccountTag },
+                subjects: [
+                    userEntity({ discordId: discordUserId }, "member"),
+                    ...(cocAccountTag ? [entity("coc_account", cocAccountTag, "account")] : []),
+                    entity("cwl_season", seasonId, "season"),
+                ],
+                changes: diffFields(
+                    { awarded: !!previous, cocAccountTag: previous?.cocAccountTag ?? null },
+                    { awarded: selected, cocAccountTag: selected ? cocAccountTag : null },
+                    ["awarded", "cocAccountTag"],
+                ),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { bonus } });
         } catch (error) {
@@ -1168,24 +1261,16 @@ app.put(
     async (c) => {
         try {
             const body = c.req.valid("json");
-            const settings = await updateSettings(body);
+            const { settings, previous } = await updateSettings(body);
             await invalidateSettingsCache();
 
-            const booleans: Record<string, boolean> = {};
-            const fields: string[] = [];
-            for (const [key, value] of Object.entries(body)) {
-                if (value === undefined) continue;
-                if (typeof value === "boolean") booleans[key] = value;
-                else fields.push(key);
-            }
-            const metadata: Record<string, unknown> = {};
-            if (Object.keys(booleans).length) metadata.booleans = booleans;
-            if (fields.length) metadata.fields = fields;
+            const fields = (Object.keys(body) as (keyof typeof body)[]).filter((k) => body[k] !== undefined);
             logAction(c, {
                 action: "settings.update",
                 targetType: "settings",
                 targetId: settings.id,
-                metadata: Object.keys(metadata).length ? metadata : undefined,
+                changes: diffFields(previous, settings, fields, { currentCwlSeasonId: (v) => ref("cwl_season", v as number) }),
+                onlyIfChanged: true,
             });
 
             return c.json({ success: true, data: { settings } });
@@ -1225,9 +1310,9 @@ app.put(
     async (c) => {
         try {
             const { privacy } = c.req.valid("json");
-            const updated = await setPrivacy(privacy);
+            const { privacy: updated, previous } = await setPrivacy(privacy);
             await invalidateSettingsCache();
-            logAction(c, { action: "privacy.update", targetType: "privacy" });
+            if (previous !== updated) logAction(c, { action: "privacy.update", targetType: "privacy", ...textDiff(previous, updated) });
             return c.json({ success: true, data: { privacy: updated } });
         } catch (error) {
             Sentry.captureException(error);
@@ -1339,12 +1424,15 @@ app.put(
                     return c.json({ success: false, error: "That channel isn't a text channel in this server." }, 400);
                 }
             }
-            const settings = await updateCwlPingSettings(body);
+            const { settings, previous } = await updateCwlPingSettings(body);
             logAction(c, {
                 action: "cwl_ping.settings_update",
                 targetType: "settings",
                 targetId: settings.id,
-                metadata: { fields: Object.keys(body) },
+                changes: diffFields(previous, settings, ["enabled", "channelId", "intervalMinutes"], {
+                    channelId: (v) => ref("discord_channel", v as string),
+                }),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { settings } });
         } catch (error) {
@@ -1433,7 +1521,16 @@ app.post(
         logAction(c, {
             action: "cwl_ping.manual_run",
             targetType: "settings",
-            metadata: { clansChecked: result.clansChecked, clansPinged: result.clansPinged, usersPinged: result.usersPinged },
+            items: result.clans.map((clan) => ({
+                entity: entity("cwl_clan", clan.tag),
+                changes: [{ field: "pendingMembers", after: clan.pending }],
+            })),
+            metadata: {
+                clansChecked: result.clansChecked,
+                clansPinged: result.clansPinged,
+                usersPinged: result.usersPinged,
+                ...(result.skippedReason ? { skippedReason: result.skippedReason } : {}),
+            },
         });
         return c.json({ success: true, data: result });
     },
@@ -1542,7 +1639,8 @@ app.post(
                 action: "clan.create",
                 targetType: "clan",
                 targetId: clan.id,
-                metadata: { cocClanCode: clan.cocClanCode, cocClanTag: clan.cocClanTag },
+                subjects: [entity("clan", clan.cocClanTag, "target"), userEntity({ discordId: clan.discordLeaderId }, "leader")],
+                changes: diffFields(null, clan, CLAN_AUDIT_FIELDS),
             });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
@@ -1553,6 +1651,23 @@ app.post(
         }
     },
 );
+
+const CLAN_AUDIT_FIELDS = [
+    "cocClanCode",
+    "cocClanName",
+    "cocClanTag",
+    "cocClanLevel",
+    "discordClanRoleId",
+    "discordClanChannelId",
+    "discordMemberRoleId",
+    "discordElderRoleId",
+    "discordColeaderRoleId",
+    "discordLeaderRoleId",
+    "discordLeaderId",
+    "attacksRequirement",
+    "donationsRequirement",
+    "clangamesRequirement",
+] as const;
 
 const clanIdPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
 app.put(
@@ -1588,14 +1703,16 @@ app.put(
                 }
                 throw error;
             }
-            const clan = await updateClan(id, body);
-            if (!clan) return c.json({ success: false, error: "Clan not found" }, 404);
-            const fields = Object.keys(body).filter((k) => (body as Record<string, unknown>)[k] !== undefined);
+            const result = await updateClan(id, body);
+            if (!result) return c.json({ success: false, error: "Clan not found" }, 404);
+            const { clan, before } = result;
             logAction(c, {
                 action: "clan.update",
                 targetType: "clan",
                 targetId: clan.id,
-                metadata: { cocClanCode: clan.cocClanCode, ...(fields.length ? { fields } : {}) },
+                subjects: [entity("clan", clan.cocClanTag, "target")],
+                changes: diffFields(before, clan, CLAN_AUDIT_FIELDS),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
@@ -1630,7 +1747,8 @@ app.delete(
                 action: "clan.delete",
                 targetType: "clan",
                 targetId: clan.id,
-                metadata: { cocClanCode: clan.cocClanCode, cocClanTag: clan.cocClanTag },
+                subjects: [entity("clan", clan.cocClanTag, "target")],
+                changes: diffFields(clan, null, CLAN_AUDIT_FIELDS),
             });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
@@ -1778,7 +1896,8 @@ app.post(
                 action: "cwl_clan.create",
                 targetType: "cwl_clan",
                 targetId: clan.cocClanTag,
-                metadata: { cocClanTag: clan.cocClanTag, cocClanName: clan.cocClanName },
+                subjects: [entity("cwl_clan", clan.cocClanTag, "target")],
+                changes: diffFields(null, clan, CWL_CLAN_AUDIT_FIELDS),
             });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
@@ -1789,6 +1908,8 @@ app.post(
         }
     },
 );
+
+const CWL_CLAN_AUDIT_FIELDS = ["cocClanName", "cocClanLeague", "cocClanLeader"] as const;
 
 const cwlClanPathSchema = z4.object({ tag: z4.string().min(1) });
 app.delete(
@@ -1819,7 +1940,8 @@ app.delete(
                 action: "cwl_clan.delete",
                 targetType: "cwl_clan",
                 targetId: clan.cocClanTag,
-                metadata: { cocClanTag: clan.cocClanTag, cocClanName: clan.cocClanName },
+                subjects: [entity("cwl_clan", clan.cocClanTag, "target")],
+                changes: diffFields(clan, null, CWL_CLAN_AUDIT_FIELDS),
             });
             return c.json({ success: true, data: { clan } });
         } catch (error) {
@@ -1861,6 +1983,7 @@ app.post(
             let updated = 0;
             let unchanged = 0;
             let failed = 0;
+            const items: { entity: ReturnType<typeof entity>; changes: AuditChange[] }[] = [];
 
             for (let i = 0; i < clans.length; i += SYNC_CWL_LEAGUES_CONCURRENCY) {
                 const batch = clans.slice(i, i + SYNC_CWL_LEAGUES_CONCURRENCY);
@@ -1883,6 +2006,10 @@ app.post(
                             }
                             await updateCwlClan(clan.cocClanTag, changes);
                             updated++;
+                            items.push({
+                                entity: entity("cwl_clan", clan.cocClanTag),
+                                changes: diffFields(clan, { ...clan, ...changes }, CWL_CLAN_AUDIT_FIELDS),
+                            });
                         } catch (error) {
                             failed++;
                             Sentry.captureException(error);
@@ -1895,6 +2022,7 @@ app.post(
                 logAction(c, {
                     action: "cwl_clan.sync_leagues",
                     targetType: "cwl_clan",
+                    items,
                     metadata: { updated, unchanged, failed },
                 });
             }
@@ -1910,30 +2038,95 @@ app.post(
 
 // Audit log - manager+
 
+const auditEntitySchema = z4.object({
+    type: z4.enum(AUDIT_ENTITY_TYPES),
+    id: z4.string().nullable(),
+    discordId: z4.string().nullable().optional(),
+    relation: z4.string().optional(),
+});
+const auditValueSchema = z4.union([
+    z4.string(),
+    z4.number(),
+    z4.boolean(),
+    z4.null(),
+    z4.array(z4.string()),
+    z4.object({ ref: z4.enum(AUDIT_ENTITY_TYPES), id: z4.string() }),
+]);
+const auditChangeSchema = z4.object({ field: z4.string(), before: auditValueSchema.optional(), after: auditValueSchema.optional() });
 const auditLogEntrySchema = z4.object({
     id: z4.number(),
     actorId: z4.string().nullable(),
-    actorName: z4.string().nullable(),
-    actorCurrentName: z4.string().nullable(),
-    actorCurrentImage: z4.string().nullable(),
-    actorCurrentRole: z4.enum(ROLES).nullable(),
-    actorDiscordId: z4.string().nullable(),
     action: z4.enum(AUDIT_ACTIONS),
     targetType: z4.enum(AUDIT_TARGET_TYPES).nullable(),
     targetId: z4.string().nullable(),
-    metadata: z4.unknown().nullable(),
+    subjects: z4.array(auditEntitySchema).nullable(),
+    changes: z4.array(auditChangeSchema).nullable(),
+    items: z4
+        .array(z4.object({ entity: auditEntitySchema, owner: auditEntitySchema.optional(), changes: z4.array(auditChangeSchema).optional() }))
+        .nullable(),
+    context: z4
+        .object({
+            userAgent: z4.string().nullable(),
+            requestId: z4.string().nullable(),
+            method: z4.string().nullable(),
+            path: z4.string().nullable(),
+            impersonatorId: z4.string().nullable().optional(),
+        })
+        .nullable(),
+    metadata: z4.record(z4.string(), z4.unknown()).nullable(),
     source: z4.enum(AUDIT_SOURCES),
     apiKeyId: z4.string().nullable(),
     apiKeyName: z4.string().nullable(),
     createdAt: z4.date(),
 });
+// Live data for everything the entries reference. Entries hold ids only, so a
+// reader joins on these; anything missing no longer exists.
+const auditLookupSchema = z4.object({
+    users: z4.array(
+        z4.object({
+            id: z4.string(),
+            name: z4.string(),
+            image: z4.string().nullable(),
+            role: z4.enum(ROLES).nullable(),
+            discordId: z4.string().nullable(),
+        }),
+    ),
+    accounts: z4.array(
+        z4.object({
+            tag: z4.string(),
+            name: z4.string().nullable(),
+            townHall: z4.number().nullable(),
+            ownerDiscordId: z4.string().nullable(),
+            linked: z4.boolean(),
+        }),
+    ),
+    clans: z4.array(z4.object({ tag: z4.string(), name: z4.string().nullable(), code: z4.string() })),
+    cwlClans: z4.array(z4.object({ tag: z4.string(), name: z4.string(), league: z4.string() })),
+    seasons: z4.array(z4.object({ id: z4.number(), name: z4.string() })),
+    apiKeys: z4.array(z4.object({ id: z4.string(), name: z4.string().nullable() })),
+    channels: z4.array(z4.object({ id: z4.string(), name: z4.string() })),
+});
+
+async function withChannelNames({ channelIds, ...lookup }: AuditLookup) {
+    if (channelIds.length === 0) return { ...lookup, channels: [] };
+    try {
+        const { channels } = await getGuildTextChannels();
+        const wanted = new Set(channelIds);
+        return { ...lookup, channels: channels.filter((ch) => wanted.has(ch.id)).map(({ id, name }) => ({ id, name })) };
+    } catch {
+        // Discord being down shouldn't break the log; channels just show their ids.
+        return { ...lookup, channels: [] };
+    }
+}
 
 const getAuditLogQuerySchema = z4.object({
     actorId: z4.string().optional(),
+    involvingUserId: z4.string().optional(),
     action: z4.enum(AUDIT_ACTIONS).optional(),
     targetType: z4.enum(AUDIT_TARGET_TYPES).optional(),
     targetId: z4.string().optional(),
     source: z4.enum(AUDIT_SOURCES).optional(),
+    q: z4.string().trim().min(1).max(100).optional(),
     before: z4.coerce.date().optional(),
     after: z4.coerce.date().optional(),
     limit: z4.coerce.number().int().min(1).max(200).default(50),
@@ -1941,6 +2134,7 @@ const getAuditLogQuerySchema = z4.object({
 });
 const getAuditLogData = z4.object({
     entries: z4.array(auditLogEntrySchema),
+    lookup: auditLookupSchema,
     total: z4.number(),
 });
 app.get(
@@ -1949,7 +2143,8 @@ app.get(
     describeRoute({
         operationId: "getAuditLog",
         role: "Manager",
-        description: "Lists audit log entries with optional filters (actorId, action, targetType, targetId, source, date range) and pagination.",
+        description:
+            "Lists audit log entries, newest first. Filter by actor, by any user involved (actor, target or subject), action, target, source, date range or a free-text search over names, tags and ids. Entries reference users, accounts, clans and seasons by id; `lookup` carries their live details.",
         tags: ["admin"],
         responses: {
             200: {
@@ -1963,11 +2158,44 @@ app.get(
     zValidator("query", getAuditLogQuerySchema),
     async (c) => {
         try {
-            const result = await getAuditLog(c.req.valid("query"));
-            return c.json({ success: true, data: result });
+            const { entries, lookup, total } = await getAuditLog(c.req.valid("query"));
+            return c.json({ success: true, data: { entries, lookup: await withChannelNames(lookup), total } });
         } catch (error) {
             Sentry.captureException(error);
             return c.json({ success: false, error: "Failed to fetch audit log" }, 500);
+        }
+    },
+);
+
+const auditLogEntryPathSchema = z4.object({ id: z4.coerce.number().int().min(1) });
+const getAuditLogEntryData = z4.object({ entry: auditLogEntrySchema, lookup: auditLookupSchema });
+app.get(
+    "/audit-log/:id",
+    hasAccessAuthMiddleware(isManager),
+    describeRoute({
+        operationId: "getAuditLogEntry",
+        role: "Manager",
+        description: "Fetches a single audit log entry with live details for everything it references.",
+        tags: ["admin"],
+        responses: {
+            200: {
+                description: "Audit log entry.",
+                content: { "application/json": { schema: resolver(SuccessResponseSchema(getAuditLogEntryData)) } },
+            },
+            401: { description: "Unauthorized.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            404: { description: "Not found.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+            500: { description: "Server error.", content: { "application/json": { schema: resolver(ErrorResponseSchema) } } },
+        },
+    }),
+    zValidator("param", auditLogEntryPathSchema),
+    async (c) => {
+        try {
+            const result = await getAuditLogEntry(c.req.valid("param").id);
+            if (!result) return c.json({ success: false, error: "Audit log entry not found" }, 404);
+            return c.json({ success: true, data: { entry: result.entry, lookup: await withChannelNames(result.lookup) } });
+        } catch (error) {
+            Sentry.captureException(error);
+            return c.json({ success: false, error: "Failed to fetch audit log entry" }, 500);
         }
     },
 );
@@ -2087,7 +2315,9 @@ app.post(
                 action: "coc_account.create",
                 targetType: "coc_account",
                 targetId: account!.id,
-                metadata: { cocAccountTag: account!.cocAccountTag, warWeight, isExternal, manual: true },
+                subjects: [entity("coc_account", account!.cocAccountTag, "target"), userEntity({ id: userId }, "owner")],
+                changes: diffFields(null, account, ["warWeight", "isExternal"]),
+                metadata: { manual: true },
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -2192,14 +2422,19 @@ app.post(
                 }));
 
             const skipped = records.length - rows.length;
-            const { updated, notFound, notInSheet } = await syncCocAccountStats(rows);
+            const { updated, changed, notFound, notInSheet } = await syncCocAccountStats(rows);
             const nameByTag = new Map(rows.map((r) => [r.cocAccountTag, r.name]));
             const notLinked = notFound.map((tag) => ({ tag, name: nameByTag.get(tag) ?? "" }));
 
             logAction(c, {
                 action: "coc_account.sync",
                 targetType: "coc_account",
-                metadata: { sheetId, gid, updated, skipped, notLinked: notLinked.length, notInSheet: notInSheet.length },
+                items: changed.map(({ before, row }) => ({
+                    entity: entity("coc_account", before.cocAccountTag),
+                    owner: userEntity({ discordId: before.discordUserId }),
+                    changes: diffFields(before, row, SHEET_STAT_FIELDS),
+                })),
+                metadata: { sheetId, gid, updated, changed: changed.length, skipped, notLinked: notLinked.length, notInSheet: notInSheet.length },
             });
 
             return c.json({ success: true, data: { updated, skipped, notLinked, notInSheet } });
@@ -2296,11 +2531,22 @@ app.post(
             }
 
             const rows = Array.from(weightByTag, ([cocAccountTag, warWeight]) => ({ cocAccountTag, warWeight }));
-            const { updated, notInFwa } = await syncCocAccountWarWeights(rows);
+            const { updated, changed, notInFwa } = await syncCocAccountWarWeights(rows);
             logAction(c, {
                 action: "coc_account.sync_war_weights",
                 targetType: "coc_account",
-                metadata: { updated, notInFwa: notInFwa.length, failedClans: failedClans.length, manual: !!(members && members.length) },
+                items: changed.map(({ before, warWeight }) => ({
+                    entity: entity("coc_account", before.cocAccountTag),
+                    owner: userEntity({ discordId: before.discordUserId }),
+                    changes: diffFields(before, { warWeight }, ["warWeight"]),
+                })),
+                metadata: {
+                    updated,
+                    changed: changed.length,
+                    notInFwa: notInFwa.length,
+                    failedClans: failedClans.length,
+                    manual: !!(members && members.length),
+                },
             });
             return c.json({ success: true, data: { updated, notInFwa, failedClans } });
         } catch (error) {
@@ -2341,13 +2587,16 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const { warWeight } = c.req.valid("json");
-            const account = await updateCocAccountWarWeight(id, warWeight);
-            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            const result = await updateCocAccountWarWeight(id, warWeight);
+            if (!result) return c.json({ success: false, error: "COC account not found" }, 404);
+            const { account, before } = result;
             logAction(c, {
-                action: "coc_account.stats_update",
+                action: "coc_account.weight_update",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, fields: ["warWeight"], warWeight: account.warWeight },
+                subjects: [entity("coc_account", account.cocAccountTag, "target"), userEntity({ discordId: account.discordUserId }, "owner")],
+                changes: diffFields(before, account, ["warWeight"]),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -2388,13 +2637,16 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const { isExternal } = c.req.valid("json");
-            const account = await updateCocAccountExternal(id, isExternal);
-            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            const result = await updateCocAccountExternal(id, isExternal);
+            if (!result) return c.json({ success: false, error: "COC account not found" }, 404);
+            const { account, before } = result;
             logAction(c, {
                 action: account.isExternal ? "coc_account.mark_external" : "coc_account.mark_main",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, isExternal: account.isExternal },
+                subjects: [entity("coc_account", account.cocAccountTag, "target"), userEntity({ discordId: account.discordUserId }, "owner")],
+                changes: diffFields(before, account, ["isExternal"]),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -2446,13 +2698,16 @@ app.put(
         try {
             const { id } = c.req.valid("param");
             const values = c.req.valid("json");
-            const account = await updateCocAccountStats(id, values);
-            if (!account) return c.json({ success: false, error: "COC account not found" }, 404);
+            const result = await updateCocAccountStats(id, values);
+            if (!result) return c.json({ success: false, error: "COC account not found" }, 404);
+            const { account, before } = result;
             logAction(c, {
                 action: "coc_account.stats_update",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, fields: Object.keys(values) },
+                subjects: [entity("coc_account", account.cocAccountTag, "target"), userEntity({ discordId: account.discordUserId }, "owner")],
+                changes: diffFields(before, account, Object.keys(values) as (keyof typeof values)[]),
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -2493,7 +2748,8 @@ app.delete(
                 action: "coc_account.delete",
                 targetType: "coc_account",
                 targetId: account.id,
-                metadata: { cocAccountTag: account.cocAccountTag, discordUserId: account.discordUserId },
+                subjects: [entity("coc_account", account.cocAccountTag, "target"), userEntity({ discordId: account.discordUserId }, "owner")],
+                changes: diffFields(account, null, ["cocAccountTag", "warWeight", "isExternal", "townHall", "currentClan"]),
             });
             return c.json({ success: true, data: { account } });
         } catch (error) {
@@ -2535,7 +2791,13 @@ app.post(
             logAction(c, {
                 action: "coc_account.bulk_delete",
                 targetType: "coc_account",
-                metadata: { count: result.count, cocAccountTags: result.accounts.map((a) => a.cocAccountTag) },
+                items: result.accounts.map((a) => ({
+                    entity: entity("coc_account", a.cocAccountTag),
+                    owner: userEntity({ discordId: a.discordUserId }),
+                    changes: diffFields(a, null, ["warWeight", "isExternal", "townHall"]),
+                })),
+                metadata: { count: result.count },
+                onlyIfChanged: true,
             });
             return c.json({ success: true, data: { count: result.count } });
         } catch (error) {
@@ -2607,6 +2869,7 @@ app.post(
             const [usernames, users] = await Promise.all([getGuildUsernames(), getUsersWithDiscordAccounts()]);
             let matched = 0;
             let updated = 0;
+            const items = [];
             for (const u of users) {
                 const username = usernames.get(u.discordId);
                 if (!username) continue;
@@ -2614,8 +2877,16 @@ app.post(
                 if (username !== u.discordUsername) {
                     await setUserDiscordUsername(u.userId, username);
                     updated++;
+                    items.push({ entity: userEntity({ id: u.userId }), changes: diffFields(u, { discordUsername: username }, ["discordUsername"]) });
                 }
             }
+            logAction(c, {
+                action: "user.usernames_refreshed",
+                targetType: "user",
+                items,
+                metadata: { total: users.length, matched, updated },
+                onlyIfChanged: true,
+            });
             return c.json({ success: true, data: { total: users.length, matched, updated } });
         } catch (error) {
             if (error instanceof DiscordRateLimitError || error instanceof DiscordUnavailableError) {

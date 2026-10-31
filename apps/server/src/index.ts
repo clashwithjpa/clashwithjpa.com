@@ -18,6 +18,7 @@ import { openAPIRouteHandler, resolver } from "hono-openapi";
 import { rateLimiter, type Store } from "hono-rate-limiter";
 import { every } from "hono/combine";
 import { compress } from "hono/compress";
+import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 import { createMiddleware } from "hono/factory";
@@ -70,6 +71,10 @@ app.use(
         // Use cloudflare ray id in production - https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/
         // https://hono.dev/docs/middleware/builtin/request-id#headername-string
         requestId(),
+
+        // Lets code with no Hono context in scope (the better-auth hooks) reach the
+        // current request, so their audit entries carry the same request context.
+        contextStorage(),
 
         betterAuthMiddleware,
 

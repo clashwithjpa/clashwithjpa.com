@@ -1,131 +1,289 @@
 <script lang="ts">
     import { authClient } from "#lib/auth.js";
-    import { carta } from "#lib/carta.js";
-    import Avatar from "#lib/components/ui/Avatar.svelte";
+    import AuditActorAvatar from "#lib/components/audit/AuditActorAvatar.svelte";
+    import AuditEventSidebar, { type AuditFilterRequest } from "#lib/components/audit/AuditEventSidebar.svelte";
+    import AuditMention from "#lib/components/audit/AuditMention.svelte";
+    import AuditSentence from "#lib/components/audit/AuditSentence.svelte";
     import Button from "#lib/components/ui/Button.svelte";
     import Dialog from "#lib/components/ui/Dialog.svelte";
     import Input from "#lib/components/ui/Input.svelte";
     import PageHeader from "#lib/components/ui/PageHeader.svelte";
     import Select from "#lib/components/ui/Select.svelte";
     import Seo from "#lib/components/ui/Seo.svelte";
-    import { Sidebar } from "#lib/components/ui/sidebar/index.js";
-    import Spinner from "#lib/components/ui/Spinner.svelte";
-    import Tooltip from "#lib/components/ui/Tooltip.svelte";
+    import { Sidebar, sidebarStore } from "#lib/components/ui/sidebar/index.js";
+    import UserCombobox, { type ComboboxUser } from "#lib/components/ui/UserCombobox.svelte";
     import UserManagementSidebar from "#lib/components/UserManagementSidebar.svelte";
     import {
-        actionConfig,
-        actorLabel,
         auditActionOptions,
+        auditRangeOptions,
         auditSourceOptions,
         auditTargetOptions,
-        describeAction,
+        createResolver,
+        describe,
+        EMPTY_LOOKUP,
+        mergeLookups,
         type AuditEntry,
+        type AuditLookup,
     } from "#lib/config/auditLog.js";
     import { toast } from "#lib/toast.js";
-    import { errorMessage, formatDate, formatDateTime, formatRelativeTime } from "#lib/utils.js";
-    import { getAuditLog, type GetAuditLogActionKey, type GetAuditLogSourceKey, type GetAuditLogTargetTypeKey } from "@repo/clashofclans-client";
+    import { cn, errorMessage, formatDate, formatDateTime } from "#lib/utils.js";
+    import { replaceState } from "$app/navigation";
+    import { page } from "$app/state";
+    import {
+        getAdminUsers,
+        getAuditLog,
+        getAuditLogEntry,
+        type GetAuditLogActionKey,
+        type GetAuditLogSourceKey,
+        type GetAuditLogTargetTypeKey,
+    } from "@repo/clashofclans-client";
     import type { UserWithRole } from "better-auth/plugins";
-    import { PreRendered } from "carta-md";
-    import { slide } from "svelte/transition";
-    import TablerChevronDown from "~icons/tabler/chevron-down";
-    import TablerChevronLeft from "~icons/tabler/chevron-left";
-    import TablerChevronRight from "~icons/tabler/chevron-right";
+    import { onMount, untrack } from "svelte";
+    import TablerCheck from "~icons/tabler/check";
     import TablerHistory from "~icons/tabler/history";
-    import TablerKey from "~icons/tabler/key";
+    import TablerLink from "~icons/tabler/link";
+    import TablerRefresh from "~icons/tabler/refresh";
+    import TablerSearch from "~icons/tabler/search";
+    import TablerX from "~icons/tabler/x";
 
     const PAGE_SIZE = 50;
 
-    const ICON_ACCENT: Record<string, string> = {
-        blue: "text-blue-400",
-        green: "text-green-400",
-        red: "text-red-400",
-        yellow: "text-yellow-400",
-        ghost: "text-stone-400",
-    };
-
     let entries = $state<AuditEntry[]>([]);
+    let lookup = $state<AuditLookup>(EMPTY_LOOKUP);
     let total = $state(0);
     let loading = $state(true);
-    let actionFilter = $state<string>("");
-    let targetTypeFilter = $state<string>("");
-    let sourceFilter = $state<string>("");
-    let actorIdFilter = $state<string>("");
-    let page = $state(0);
-    let expanded = $state<Record<number, boolean>>({});
+    let loadingMore = $state(false);
 
-    // User sidebar (mirrors the admin/users page).
-    const session = authClient.useSession();
-    let userSidebar: Sidebar | null = $state(null);
-    let selectedSidebarUser = $state<(UserWithRole & { discordId?: string }) | null>(null);
-    let openingEntryId = $state<number | null>(null);
-    let isProcessing = $state<string | null>(null);
-    let banUserDialogOpen = $state(false);
-    let banTarget = $state<{ userId: string; reason: string; duration: Date[] }>({ userId: "", reason: "", duration: [] });
+    let actionFilter = $state("");
+    let targetTypeFilter = $state("");
+    let sourceFilter = $state("");
+    let rangeFilter = $state("");
+    let search = $state("");
+    let debouncedSearch = $state("");
+    // Events the user did or was involved in (actor, target, subject or bulk row).
+    let userFilter = $state<ComboboxUser | null>(null);
+    // Set from the event sidebar ("events for this target/account"); shown as a removable chip.
+    let scope = $state<{ filter: AuditFilterRequest; label: string } | null>(null);
 
-    async function load() {
-        loading = true;
+    const resolver = $derived(createResolver(lookup));
+
+    // Ignores responses from superseded requests, so fast filter changes can't land out of order.
+    let requestSeq = 0;
+
+    function query(offset: number) {
+        const days = Number(rangeFilter);
+        return {
+            limit: PAGE_SIZE,
+            offset,
+            action: (actionFilter || undefined) as GetAuditLogActionKey | undefined,
+            targetType: ((scope?.filter.targetType ?? targetTypeFilter) || undefined) as GetAuditLogTargetTypeKey | undefined,
+            targetId: scope?.filter.targetId,
+            source: (sourceFilter || undefined) as GetAuditLogSourceKey | undefined,
+            involvingUserId: userFilter?.id,
+            q: (scope?.filter.q ?? debouncedSearch.trim()) || undefined,
+            after: days ? new Date(Date.now() - days * 86_400_000).toISOString() : undefined,
+        };
+    }
+
+    async function load(append = false) {
+        const seq = ++requestSeq;
+        if (append) loadingMore = true;
+        else loading = true;
         try {
-            const resp = await getAuditLog({
-                query: {
-                    limit: PAGE_SIZE,
-                    offset: page * PAGE_SIZE,
-                    action: (actionFilter || undefined) as GetAuditLogActionKey | undefined,
-                    targetType: (targetTypeFilter || undefined) as GetAuditLogTargetTypeKey | undefined,
-                    source: (sourceFilter || undefined) as GetAuditLogSourceKey | undefined,
-                    actorId: actorIdFilter.trim() || undefined,
-                },
-            });
-            if (resp.data) {
-                entries = resp.data.data.entries;
-                total = resp.data.data.total;
-            } else {
+            const resp = await getAuditLog({ query: query(append ? entries.length : 0) });
+            if (seq !== requestSeq) return;
+            if (!resp.data) {
                 toast.error("Failed to load audit log");
+                return;
             }
+            const data = resp.data.data;
+            entries = append ? [...entries, ...data.entries] : data.entries;
+            // Always merged, never replaced: the event open in the sidebar may reference people who
+            // aren't on the new page, and dropping them would show those people as ghosts.
+            lookup = mergeLookups(lookup, data.lookup);
+            total = data.total;
         } catch (e) {
-            toast.error("Failed to load audit log", { description: errorMessage(e) });
+            if (seq === requestSeq) toast.error("Failed to load audit log", { description: errorMessage(e) });
         } finally {
-            loading = false;
+            if (seq === requestSeq) {
+                loading = false;
+                loadingMore = false;
+            }
         }
     }
+
+    $effect(() => {
+        const value = search;
+        const handle = setTimeout(() => (debouncedSearch = value), 300);
+        return () => clearTimeout(handle);
+    });
 
     $effect(() => {
         actionFilter;
         targetTypeFilter;
         sourceFilter;
-        page;
-        load();
+        rangeFilter;
+        debouncedSearch;
+        userFilter;
+        scope;
+        untrack(() => load());
     });
 
     function resetFilters() {
         actionFilter = "";
         targetTypeFilter = "";
         sourceFilter = "";
-        actorIdFilter = "";
-        page = 0;
+        rangeFilter = "";
+        search = "";
+        debouncedSearch = "";
+        userFilter = null;
+        scope = null;
     }
 
-    // Fetch the full user behind an actor id and open the management sidebar.
-    async function openActor(entry: AuditEntry) {
-        if (!entry.actorId || openingEntryId !== null) return;
-        openingEntryId = entry.id;
+    let sentinel = $state<HTMLDivElement | null>(null);
+
+    function scrollParent(el: HTMLElement): HTMLElement | null {
+        for (let p = el.parentElement; p; p = p.parentElement) {
+            if (/(auto|scroll)/.test(getComputedStyle(p).overflowY)) return p;
+        }
+        return null;
+    }
+
+    // Starts the next page a screen before the end, so scrolling rarely has to wait. Re-armed after
+    // every load: if the sentinel is still on screen then, the fresh observer fires again right away.
+    $effect(() => {
+        entries.length;
+        if (!sentinel) return;
+        const observer = new IntersectionObserver(
+            (seen) => {
+                if (seen[0]?.isIntersecting && !loading && !loadingMore && entries.length < total) load(true);
+            },
+            { root: scrollParent(sentinel), rootMargin: "600px 0px" },
+        );
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    });
+
+    const hasFilters = $derived(!!(actionFilter || targetTypeFilter || sourceFilter || rangeFilter || search || userFilter || scope));
+
+    async function searchUsers(q: string): Promise<ComboboxUser[]> {
         try {
-            const { data, error } = await authClient.admin.getUser({ query: { id: entry.actorId } });
-            if (error || !data) {
-                toast.error("Failed to load user", { description: error?.message ?? "User no longer exists" });
-                return;
-            }
-            selectedSidebarUser = { ...(data as UserWithRole), discordId: entry.actorDiscordId ?? undefined };
-            userSidebar?.open(entry.actorId);
-        } catch (e) {
-            toast.error("Failed to load user", { description: errorMessage(e) });
-        } finally {
-            openingEntryId = null;
+            const resp = await getAdminUsers({ query: { search: q, limit: 8 } });
+            if (resp.data) return resp.data.data.users as ComboboxUser[];
+        } catch {
+            // return empty on failure
+        }
+        return [];
+    }
+
+    // ── Day grouping ──
+    const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "short", day: "numeric" });
+    const timeFmt = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
+    function dayLabel(d: Date) {
+        const today = new Date();
+        const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+        const diff = Math.round((startOf(today) - startOf(d)) / 86_400_000);
+        if (diff === 0) return "Today";
+        if (diff === 1) return "Yesterday";
+        if (d.getFullYear() !== today.getFullYear()) return formatDate(d);
+        return dayFmt.format(d);
+    }
+    const groups = $derived.by(() => {
+        const out: { label: string; entries: AuditEntry[] }[] = [];
+        for (const e of entries) {
+            const label = dayLabel(new Date(e.createdAt));
+            const last = out.at(-1);
+            if (last?.label === label) last.entries.push(e);
+            else out.push({ label, entries: [e] });
+        }
+        return out;
+    });
+
+    // ── Event sidebar ──
+    let eventSidebar: Sidebar | null = $state(null);
+    let selected = $state<AuditEntry | null>(null);
+
+    function setEventParam(id: number | null) {
+        const url = new URL(page.url.href);
+        if (id === null) url.searchParams.delete("event");
+        else url.searchParams.set("event", String(id));
+        if (url.href !== page.url.href) replaceState(url, page.state);
+    }
+
+    let copiedId = $state<number | null>(null);
+
+    async function copyEventLink(id: number) {
+        const url = new URL(page.url.href);
+        url.search = "";
+        url.searchParams.set("event", String(id));
+        try {
+            await navigator.clipboard.writeText(url.href);
+            copiedId = id;
+            setTimeout(() => (copiedId = copiedId === id ? null : copiedId), 1500);
+        } catch {
+            toast.error("Couldn't copy to clipboard");
         }
     }
 
-    function closeUserSidebar() {
-        userSidebar?.close();
-        selectedSidebarUser = null;
+    function openEvent(entry: AuditEntry) {
+        selected = entry;
+        eventSidebar?.open(`event-${entry.id}`);
+        setEventParam(entry.id);
+    }
+
+    // The layout's close button clears the store directly, so the URL follows the store.
+    $effect(() => {
+        if (!sidebarStore.isOpen && selected) {
+            untrack(() => {
+                selected = null;
+                setEventParam(null);
+            });
+        }
+    });
+
+    onMount(async () => {
+        const id = Number(page.url.searchParams.get("event"));
+        if (!Number.isInteger(id) || id <= 0) return;
+        const resp = await getAuditLogEntry({ path: { id } });
+        if (!resp.data) {
+            toast.error("That audit event doesn't exist");
+            setEventParam(null);
+            return;
+        }
+        lookup = mergeLookups(lookup, resp.data.data.lookup);
+        openEvent(resp.data.data.entry);
+    });
+
+    function applyScope(filter: AuditFilterRequest, label: string) {
+        if (filter.involvingUserId) {
+            const u = resolver.user(filter.involvingUserId);
+            userFilter = { id: filter.involvingUserId, name: u.name, image: u.image, role: u.role, discordId: u.discordId };
+            scope = null;
+            return;
+        }
+        scope = { filter, label };
+        actionFilter = "";
+        targetTypeFilter = "";
+        search = "";
+        debouncedSearch = "";
+    }
+
+    // ── User management (same flow as the users page) ──
+    const session = authClient.useSession();
+    let userSidebar: Sidebar | null = $state(null);
+    let selectedSidebarUser = $state<(UserWithRole & { discordId?: string }) | null>(null);
+    let isProcessing = $state<string | null>(null);
+    let banUserDialogOpen = $state(false);
+    let banTarget = $state<{ userId: string; reason: string; duration: Date[] }>({ userId: "", reason: "", duration: [] });
+
+    async function manageUser(userId: string) {
+        const { data, error } = await authClient.admin.getUser({ query: { id: userId } });
+        if (error || !data) {
+            toast.error("Failed to load user", { description: error?.message ?? "User no longer exists" });
+            return;
+        }
+        selectedSidebarUser = { ...(data as UserWithRole), discordId: resolver.user(userId).discordId ?? undefined };
+        userSidebar?.open(userId);
     }
 
     async function syncSidebarUser(userId: string) {
@@ -177,7 +335,10 @@
             toast.error("Failed to remove user", { description: error.message });
         } else {
             toast.success("User removed successfully");
-            if (selectedSidebarUser?.id === userId) closeUserSidebar();
+            if (selectedSidebarUser?.id === userId) {
+                userSidebar?.close();
+                selectedSidebarUser = null;
+            }
             load();
         }
         isProcessing = null;
@@ -188,185 +349,182 @@
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow.toISOString().split("T")[0];
     }
-
-    const totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
-
-    let renderedMetadata = $state<Record<number, string>>({});
-
-    async function toggleDetails(entry: AuditEntry) {
-        const id = entry.id;
-        if (expanded[id]) {
-            expanded[id] = false;
-            return;
-        }
-        if (!renderedMetadata[id] && entry.metadata) {
-            renderedMetadata[id] = await carta.render(`\`\`\`json\n${JSON.stringify(entry.metadata, null, 2)}\n\`\`\``);
-        }
-        expanded[id] = true;
-    }
 </script>
+
+{#snippet dayHeading(label: string | null)}
+    <div class="flex items-center gap-3 pb-1">
+        {#if label}
+            <h2 class="shrink-0 text-xs font-medium tracking-wide text-stone-500 uppercase">{label}</h2>
+        {:else}
+            <div class="flex h-4 items-center"><div class="h-3 w-20 skeleton"></div></div>
+        {/if}
+        <div class="h-px flex-1 bg-stone-800"></div>
+    </div>
+{/snippet}
+
+<!-- Same box as a real row: avatar with its action badge, a 24px sentence line, a 16px time line. -->
+{#snippet rowSkeleton(i: number)}
+    <div class="-mx-2 flex items-start gap-3 px-2 py-2.5">
+        <div class="relative size-10 shrink-0">
+            <div class="size-10 skeleton rounded-full"></div>
+            <div class="absolute -right-1 -bottom-1 size-5 skeleton rounded-full ring-2 ring-stone-950"></div>
+        </div>
+        <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex h-6 items-center gap-1.5">
+                <div class="h-3.5 w-16 skeleton"></div>
+                <div class="h-3.5 skeleton" style:width="{30 + ((i * 17) % 5) * 9}%"></div>
+            </div>
+            <div class="flex h-4 items-center"><div class="h-3 w-14 skeleton"></div></div>
+        </div>
+    </div>
+{/snippet}
 
 <Seo title="Audit Log" description="View server actions audit log" />
 
 <div class="flex size-full flex-col gap-4">
-    <PageHeader title="Audit Log" subtitleLoading={loading} subtitle="{total} entr{total === 1 ? 'y' : 'ies'} recorded">
+    <PageHeader
+        title="Audit Log"
+        subtitleLoading={loading && entries.length === 0}
+        subtitle="{total.toLocaleString()} event{total === 1 ? '' : 's'}{hasFilters ? ' match' : ' recorded'}"
+    >
         {#snippet actions()}
-            <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Filter action" class="w-full @md:w-52 @md:shrink-0" />
-            <Select bind:value={targetTypeFilter} options={auditTargetOptions} placeholder="Filter target" class="w-full @md:w-44 @md:shrink-0" />
-            <Select bind:value={sourceFilter} options={auditSourceOptions} placeholder="Filter source" class="w-full @md:w-40 @md:shrink-0" />
-            <Input
-                bind:value={actorIdFilter}
-                placeholder="Filter by actor ID"
-                class="min-w-36 flex-1 @4xl:max-w-56"
-                onkeydown={(e: KeyboardEvent) => e.key === "Enter" && load()}
+            <div class="relative min-w-48 flex-1 @4xl:max-w-64">
+                <TablerSearch class="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-stone-500" />
+                <Input bind:value={search} placeholder="Search names, tags, ids…" class="pl-9" disabled={!!scope} />
+            </div>
+            <UserCombobox bind:value={userFilter} search={searchUsers} placeholder="Filter by user…" class="w-full @md:w-56 @md:shrink-0" />
+            <Select bind:value={actionFilter} options={auditActionOptions} placeholder="Action" class="w-full @md:w-52 @md:shrink-0" />
+            <Select
+                bind:value={targetTypeFilter}
+                options={auditTargetOptions}
+                placeholder="Target"
+                class="w-full @md:w-44 @md:shrink-0"
+                disabled={!!scope?.filter.targetType}
             />
-            <Button variant="ghost" class="shrink-0" onclick={resetFilters}>Reset</Button>
+            <Select bind:value={sourceFilter} options={auditSourceOptions} placeholder="Source" class="w-full @md:w-36 @md:shrink-0" />
+            <Select bind:value={rangeFilter} options={auditRangeOptions} placeholder="Time" class="w-full @md:w-40 @md:shrink-0" />
+            <Button variant="base" class="shrink-0" tooltip="Refresh" tooltipPlacement="bottom" onclick={() => load()}>
+                <TablerRefresh class="size-5" />
+            </Button>
+            {#if hasFilters}
+                <Button variant="ghost" class="shrink-0" onclick={resetFilters}>Reset</Button>
+            {/if}
         {/snippet}
     </PageHeader>
 
+    {#if scope}
+        <div class="flex flex-wrap items-center gap-2 text-sm">
+            <span class="text-stone-400">Showing events for</span>
+            <button
+                type="button"
+                class="press inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-700/50 bg-blue-900 px-2 py-1 text-blue-200 transition-colors duration-200 hover:bg-blue-700 hover:text-blue-50"
+                onclick={() => (scope = null)}
+            >
+                {scope.label}
+                <TablerX class="size-3.5" />
+            </button>
+        </div>
+    {/if}
+
     <div class="flex-1">
-        {#if loading}
-            <div class="flex flex-col gap-2" aria-busy="true">
-                {#each { length: 8 }, i (i)}
-                    <div class="flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3">
-                        <div class="flex h-10 items-center justify-between gap-2">
-                            <div class="flex items-center gap-2">
-                                <div class="size-8 skeleton rounded-full"></div>
-                                <div class="h-3.5 w-28 skeleton"></div>
-                            </div>
-                            <div class="h-3 w-14 skeleton"></div>
-                        </div>
-                        <div class="flex h-5 items-center">
-                            <div class="h-3.5 skeleton" style:width="{35 + ((i * 17) % 4) * 10}%"></div>
-                        </div>
-                        <div class="flex h-5 items-center gap-2">
-                            <div class="h-5 w-28 skeleton rounded"></div>
-                            <div class="h-5 w-20 skeleton rounded"></div>
-                        </div>
-                    </div>
+        {#if loading && entries.length === 0}
+            <div class="flex flex-col gap-5" aria-busy="true">
+                {#each [6, 4] as rows, g (g)}
+                    <section class="flex flex-col gap-1">
+                        {@render dayHeading(null)}
+                        {#each { length: rows }, i (i)}
+                            {@render rowSkeleton(i + g * 7)}
+                        {/each}
+                    </section>
                 {/each}
             </div>
         {:else if entries.length === 0}
             <div class="flex size-full flex-col items-center justify-center gap-2 pt-10 text-stone-400">
                 <TablerHistory class="size-12 lg:size-16" />
-                <span>No audit entries found</span>
+                <span>{hasFilters ? "No events match these filters" : "No audit events yet"}</span>
+                {#if hasFilters}
+                    <Button variant="ghost" onclick={resetFilters}>Clear filters</Button>
+                {/if}
             </div>
         {:else}
-            <div class="flex flex-col gap-2">
-                {#each entries as entry, i (entry.id)}
-                    {@const cfg = actionConfig(entry.action)}
-                    {@const ActionIcon = cfg.icon}
-                    {@const hasMeta = !!entry.metadata && Object.keys(entry.metadata).length > 0}
-                    <div
-                        class="stagger-card flex flex-col gap-1.5 rounded-lg border-2 border-stone-700/50 bg-stone-900 p-3 transition-colors duration-200 hover:border-stone-700"
-                        style="--i:{i}"
-                    >
-                        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-                        <div
-                            class="flex flex-col gap-1.5 {hasMeta ? 'cursor-pointer' : ''}"
-                            role={hasMeta ? "button" : undefined}
-                            tabindex={hasMeta ? 0 : undefined}
-                            aria-expanded={hasMeta ? expanded[entry.id] : undefined}
-                            onclick={hasMeta ? () => toggleDetails(entry) : undefined}
-                            onkeydown={hasMeta
-                                ? (e: KeyboardEvent) => {
-                                      if (e.key === "Enter" || e.key === " ") {
-                                          e.preventDefault();
-                                          toggleDetails(entry);
-                                      }
-                                  }
-                                : undefined}
-                        >
-                            <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class={cn("flex flex-col gap-5 transition-opacity duration-200", loading && "opacity-60")}>
+                {#each groups as group (group.label)}
+                    <section class="flex flex-col gap-1">
+                        {@render dayHeading(group.label)}
+                        {#each group.entries as entry (entry.id)}
+                            <div
+                                role="button"
+                                tabindex="0"
+                                class={cn(
+                                    "group -mx-2 flex cursor-pointer items-start gap-3 rounded-lg px-2 py-2.5 transition-colors duration-200 hover:bg-stone-800/50",
+                                    selected?.id === entry.id && "bg-stone-800/70 hover:bg-stone-800/70",
+                                )}
+                                onclick={() => openEvent(entry)}
+                                onkeydown={(e: KeyboardEvent) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        openEvent(entry);
+                                    }
+                                }}
+                            >
+                                <AuditActorAvatar {entry} {resolver} />
+                                <div class="flex min-w-0 flex-1 flex-col">
+                                    <p class="text-sm leading-6 wrap-break-word text-stone-300">
+                                        {#if entry.actorId}
+                                            <AuditMention entity={{ type: "user", id: entry.actorId }} {resolver} />
+                                        {:else}
+                                            <span class="font-semibold text-stone-50">System</span>
+                                        {/if}
+                                        <AuditSentence segments={describe(entry)} {resolver} />
+                                    </p>
+                                    <span class="text-xs leading-4 text-stone-500" title={formatDateTime(entry.createdAt)}>
+                                        {timeFmt.format(new Date(entry.createdAt))}{entry.source === "api"
+                                            ? ` · via API key ${entry.apiKeyName ?? ""}`
+                                            : ""}{entry.context?.impersonatorId && entry.context.impersonatorId !== entry.actorId
+                                            ? " · while impersonating"
+                                            : ""}
+                                    </span>
+                                </div>
+                                <!-- Stops its own events so copying never opens the row behind it. -->
                                 <button
                                     type="button"
+                                    title={copiedId === entry.id ? "Link copied" : "Copy link to this event"}
+                                    aria-label="Copy link to this event"
+                                    class={cn(
+                                        "grid size-8 shrink-0 cursor-pointer place-items-center self-center rounded-lg text-stone-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-stone-700 hover:text-stone-50 focus-visible:opacity-100",
+                                        copiedId === entry.id && "text-green-400 opacity-100 hover:text-green-400",
+                                    )}
                                     onclick={(e) => {
                                         e.stopPropagation();
-                                        openActor(entry);
+                                        copyEventLink(entry.id);
                                     }}
-                                    disabled={!entry.actorId || openingEntryId === entry.id}
-                                    class="group -mx-1 flex min-w-0 items-center gap-2 rounded-lg p-1 transition-colors duration-200 enabled:cursor-pointer enabled:hover:bg-stone-800 disabled:cursor-default"
+                                    onkeydown={(e) => e.stopPropagation()}
                                 >
-                                    <Avatar src={entry.actorCurrentImage} name={actorLabel(entry)} role={entry.actorCurrentRole} size="xs" />
-                                    <span class="truncate text-sm font-medium text-stone-100 group-enabled:group-hover:text-stone-50"
-                                        >{actorLabel(entry)}</span
-                                    >
-                                    {#if openingEntryId === entry.id}
-                                        <Spinner class="size-4 shrink-0 text-stone-400" />
-                                    {/if}
+                                    {#if copiedId === entry.id}<TablerCheck class="size-4" />{:else}<TablerLink class="size-4" />{/if}
                                 </button>
-                                <div class="flex shrink-0 items-center gap-2">
-                                    <Tooltip title={formatDateTime(entry.createdAt)} placement="left">
-                                        <span class="font-mono text-xs whitespace-nowrap text-stone-500">{formatRelativeTime(entry.createdAt)}</span>
-                                    </Tooltip>
-                                    {#if hasMeta}
-                                        <TablerChevronDown
-                                            class="size-4 shrink-0 text-stone-400 transition-transform duration-200 {expanded[entry.id]
-                                                ? 'rotate-180'
-                                                : ''}"
-                                        />
-                                    {/if}
-                                </div>
                             </div>
-
-                            <p class="text-sm wrap-break-word text-stone-200">{describeAction(entry)}</p>
-
-                            <div class="flex flex-wrap items-center gap-2 text-xs text-stone-400">
-                                <span class="inline-flex items-center gap-1.5 rounded bg-stone-800 px-2 py-0.5 font-mono">
-                                    <ActionIcon class="size-3.5 shrink-0 {ICON_ACCENT[cfg.variant] ?? ICON_ACCENT.ghost}" />
-                                    {entry.action}
-                                </span>
-                                {#if entry.targetType}
-                                    <span class="rounded bg-stone-800 px-2 py-0.5 font-mono">
-                                        {entry.targetType}{entry.targetId ? `#${entry.targetId}` : ""}
-                                    </span>
-                                {/if}
-                                <!--
-                                    Source is a separate axis from the action, so it gets a colour
-                                    the action variants never use. Web entries stay unmarked — the
-                                    badge is there to make the rarer, machine-driven ones stand out.
-                                -->
-                                {#if entry.source === "api"}
-                                    <Tooltip
-                                        title={entry.apiKeyName ? `Performed with the API key "${entry.apiKeyName}"` : "Performed with an API key"}
-                                        placement="top"
-                                    >
-                                        <span
-                                            class="inline-flex cursor-help items-center gap-1.5 rounded border border-purple-700/50 bg-purple-900 px-2 py-0.5 font-mono text-purple-200"
-                                        >
-                                            <TablerKey class="size-3.5 shrink-0" />
-                                            API{entry.apiKeyName ? ` · ${entry.apiKeyName}` : ""}
-                                        </span>
-                                    </Tooltip>
-                                {/if}
-                            </div>
-                        </div>
-
-                        {#if expanded[entry.id]}
-                            <div transition:slide={{ duration: 200 }}>
-                                <div class="typography max-w-none! text-sm! **:mb-0!">
-                                    <PreRendered html={renderedMetadata[entry.id]} />
-                                </div>
-                            </div>
-                        {/if}
-                    </div>
+                        {/each}
+                    </section>
                 {/each}
+
+                {#if entries.length < total}
+                    <!-- Scrolling near this pulls the next page in; the rows below stand in until it lands. -->
+                    <div bind:this={sentinel} class="flex flex-col gap-1" aria-busy="true">
+                        {#each { length: 3 }, i (i)}
+                            {@render rowSkeleton(i)}
+                        {/each}
+                    </div>
+                {/if}
             </div>
         {/if}
     </div>
-
-    {#if !loading && total > PAGE_SIZE}
-        <div class="flex items-center justify-center gap-2">
-            <Button variant="ghost" disabled={page === 0} onclick={() => (page = Math.max(0, page - 1))}>
-                <TablerChevronLeft class="size-4" /> Prev
-            </Button>
-            <span class="text-sm text-stone-400">Page {page + 1} / {totalPages}</span>
-            <Button variant="ghost" disabled={page + 1 >= totalPages} onclick={() => (page = page + 1)}>
-                Next <TablerChevronRight class="size-4" />
-            </Button>
-        </div>
-    {/if}
 </div>
+
+<Sidebar bind:this={eventSidebar}>
+    {#if selected}
+        <AuditEventSidebar entry={selected} {resolver} onFilter={applyScope} onManageUser={manageUser} />
+    {/if}
+</Sidebar>
 
 <Sidebar bind:this={userSidebar}>
     {#if selectedSidebarUser}

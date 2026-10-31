@@ -38,9 +38,7 @@
 <HoverCard.Root openDelay={150} closeDelay={100} positioning={{ placement, gutter: 12 }}>
     <HoverCard.Trigger class={cn("cursor-pointer border-none bg-transparent outline-none", className)}>
         {@render trigger()}
-    </HoverCard.Trigger>
-
-    <Portal disabled={renderInline}>
+    </HoverCard.Trigger><Portal disabled={renderInline}>
         <HoverCard.Positioner class={cn(renderInline ? "z-9999" : "z-60")}>
             <HoverCard.Content
                 style="--arrow-background: var(--color-stone-900); --arrow-size: 12px;"

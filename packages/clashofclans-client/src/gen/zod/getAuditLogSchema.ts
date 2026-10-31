@@ -7,6 +7,8 @@ import * as z from "zod";
 
 export const getAuditLogQueryActorIdSchema = z.string().optional();
 
+export const getAuditLogQueryInvolvingUserIdSchema = z.string().optional();
+
 export const getAuditLogQueryActionSchema = z
     .enum([
         "clan_application.create",
@@ -42,6 +44,7 @@ export const getAuditLogQueryActionSchema = z
         "coc_account.create",
         "coc_account.import",
         "coc_account.stats_update",
+        "coc_account.weight_update",
         "coc_account.mark_main",
         "coc_account.mark_external",
         "coc_account.sync",
@@ -57,8 +60,11 @@ export const getAuditLogQueryActionSchema = z
         "user.password_set",
         "user.session_revoked",
         "user.sessions_revoked",
+        "user.impersonate",
+        "user.impersonate_stop",
         "user.api_access_granted",
         "user.api_access_revoked",
+        "user.usernames_refreshed",
         "api_key.create",
         "api_key.update",
         "api_key.delete",
@@ -86,6 +92,8 @@ export const getAuditLogQueryTargetIdSchema = z.string().optional();
 
 export const getAuditLogQuerySourceSchema = z.enum(["web", "api"]).optional();
 
+export const getAuditLogQueryQSchema = z.string().min(1).max(100).optional();
+
 export const getAuditLogQueryBeforeSchema = z.iso.datetime().optional();
 
 export const getAuditLogQueryAfterSchema = z.iso.datetime().optional();
@@ -101,11 +109,6 @@ export const getAuditLogStatus200Schema = z.strictObject({
             z.strictObject({
                 id: z.number(),
                 actorId: z.string().nullable(),
-                actorName: z.string().nullable(),
-                actorCurrentName: z.string().nullable(),
-                actorCurrentImage: z.string().nullable(),
-                actorCurrentRole: z.union([z.enum(["unverified", "verified", "reviewer", "manager", "admin", "superadmin"]), z.null()]),
-                actorDiscordId: z.string().nullable(),
                 action: z.enum([
                     "clan_application.create",
                     "clan_application.accepted",
@@ -140,6 +143,7 @@ export const getAuditLogStatus200Schema = z.strictObject({
                     "coc_account.create",
                     "coc_account.import",
                     "coc_account.stats_update",
+                    "coc_account.weight_update",
                     "coc_account.mark_main",
                     "coc_account.mark_external",
                     "coc_account.sync",
@@ -155,8 +159,11 @@ export const getAuditLogStatus200Schema = z.strictObject({
                     "user.password_set",
                     "user.session_revoked",
                     "user.sessions_revoked",
+                    "user.impersonate",
+                    "user.impersonate_stop",
                     "user.api_access_granted",
                     "user.api_access_revoked",
+                    "user.usernames_refreshed",
                     "api_key.create",
                     "api_key.update",
                     "api_key.delete",
@@ -179,13 +186,190 @@ export const getAuditLogStatus200Schema = z.strictObject({
                     z.null(),
                 ]),
                 targetId: z.string().nullable(),
-                metadata: z.union([z.unknown(), z.null()]),
+                subjects: z.union([
+                    z.array(
+                        z.strictObject({
+                            type: z.enum(["user", "coc_account", "clan", "cwl_clan", "cwl_season", "api_key", "discord_channel"]),
+                            id: z.string().nullable(),
+                            discordId: z.string().nullish(),
+                            relation: z.string().optional(),
+                        }),
+                    ),
+                    z.null(),
+                ]),
+                changes: z.union([
+                    z.array(
+                        z.strictObject({
+                            field: z.string(),
+                            before: z
+                                .union([
+                                    z.string(),
+                                    z.number(),
+                                    z.boolean(),
+                                    z.null(),
+                                    z.array(z.string()),
+                                    z.strictObject({
+                                        ref: z.enum(["user", "coc_account", "clan", "cwl_clan", "cwl_season", "api_key", "discord_channel"]),
+                                        id: z.string(),
+                                    }),
+                                ])
+                                .optional(),
+                            after: z
+                                .union([
+                                    z.string(),
+                                    z.number(),
+                                    z.boolean(),
+                                    z.null(),
+                                    z.array(z.string()),
+                                    z.strictObject({
+                                        ref: z.enum(["user", "coc_account", "clan", "cwl_clan", "cwl_season", "api_key", "discord_channel"]),
+                                        id: z.string(),
+                                    }),
+                                ])
+                                .optional(),
+                        }),
+                    ),
+                    z.null(),
+                ]),
+                items: z.union([
+                    z.array(
+                        z.strictObject({
+                            entity: z.strictObject({
+                                type: z.enum(["user", "coc_account", "clan", "cwl_clan", "cwl_season", "api_key", "discord_channel"]),
+                                id: z.string().nullable(),
+                                discordId: z.string().nullish(),
+                                relation: z.string().optional(),
+                            }),
+                            owner: z
+                                .strictObject({
+                                    type: z.enum(["user", "coc_account", "clan", "cwl_clan", "cwl_season", "api_key", "discord_channel"]),
+                                    id: z.string().nullable(),
+                                    discordId: z.string().nullish(),
+                                    relation: z.string().optional(),
+                                })
+                                .optional(),
+                            changes: z
+                                .array(
+                                    z.strictObject({
+                                        field: z.string(),
+                                        before: z
+                                            .union([
+                                                z.string(),
+                                                z.number(),
+                                                z.boolean(),
+                                                z.null(),
+                                                z.array(z.string()),
+                                                z.strictObject({
+                                                    ref: z.enum([
+                                                        "user",
+                                                        "coc_account",
+                                                        "clan",
+                                                        "cwl_clan",
+                                                        "cwl_season",
+                                                        "api_key",
+                                                        "discord_channel",
+                                                    ]),
+                                                    id: z.string(),
+                                                }),
+                                            ])
+                                            .optional(),
+                                        after: z
+                                            .union([
+                                                z.string(),
+                                                z.number(),
+                                                z.boolean(),
+                                                z.null(),
+                                                z.array(z.string()),
+                                                z.strictObject({
+                                                    ref: z.enum([
+                                                        "user",
+                                                        "coc_account",
+                                                        "clan",
+                                                        "cwl_clan",
+                                                        "cwl_season",
+                                                        "api_key",
+                                                        "discord_channel",
+                                                    ]),
+                                                    id: z.string(),
+                                                }),
+                                            ])
+                                            .optional(),
+                                    }),
+                                )
+                                .optional(),
+                        }),
+                    ),
+                    z.null(),
+                ]),
+                context: z.union([
+                    z.strictObject({
+                        userAgent: z.string().nullable(),
+                        requestId: z.string().nullable(),
+                        method: z.string().nullable(),
+                        path: z.string().nullable(),
+                        impersonatorId: z.string().nullish(),
+                    }),
+                    z.null(),
+                ]),
+                metadata: z.union([z.record(z.string(), z.unknown()), z.null()]),
                 source: z.enum(["web", "api"]),
                 apiKeyId: z.string().nullable(),
                 apiKeyName: z.string().nullable(),
                 createdAt: z.iso.datetime(),
             }),
         ),
+        lookup: z.strictObject({
+            users: z.array(
+                z.strictObject({
+                    id: z.string(),
+                    name: z.string(),
+                    image: z.string().nullable(),
+                    role: z.union([z.enum(["unverified", "verified", "reviewer", "manager", "admin", "superadmin"]), z.null()]),
+                    discordId: z.string().nullable(),
+                }),
+            ),
+            accounts: z.array(
+                z.strictObject({
+                    tag: z.string(),
+                    name: z.string().nullable(),
+                    townHall: z.number().nullable(),
+                    ownerDiscordId: z.string().nullable(),
+                    linked: z.boolean(),
+                }),
+            ),
+            clans: z.array(
+                z.strictObject({
+                    tag: z.string(),
+                    name: z.string().nullable(),
+                    code: z.string(),
+                }),
+            ),
+            cwlClans: z.array(
+                z.strictObject({
+                    tag: z.string(),
+                    name: z.string(),
+                    league: z.string(),
+                }),
+            ),
+            seasons: z.array(
+                z.strictObject({
+                    id: z.number(),
+                    name: z.string(),
+                }),
+            ),
+            apiKeys: z.array(
+                z.strictObject({
+                    id: z.string(),
+                    name: z.string().nullable(),
+                }),
+            ),
+            channels: z.array(
+                z.strictObject({
+                    id: z.string(),
+                    name: z.string(),
+                }),
+            ),
+        }),
         total: z.number(),
     }),
 });
@@ -212,6 +396,7 @@ export const getAuditLogErrorSchema = z.union([getAuditLogStatus400Schema, getAu
 
 export const getAuditLogQuerySchema = z.object({
     actorId: z.string().optional(),
+    involvingUserId: z.string().optional(),
     action: z
         .enum([
             "clan_application.create",
@@ -247,6 +432,7 @@ export const getAuditLogQuerySchema = z.object({
             "coc_account.create",
             "coc_account.import",
             "coc_account.stats_update",
+            "coc_account.weight_update",
             "coc_account.mark_main",
             "coc_account.mark_external",
             "coc_account.sync",
@@ -262,8 +448,11 @@ export const getAuditLogQuerySchema = z.object({
             "user.password_set",
             "user.session_revoked",
             "user.sessions_revoked",
+            "user.impersonate",
+            "user.impersonate_stop",
             "user.api_access_granted",
             "user.api_access_revoked",
+            "user.usernames_refreshed",
             "api_key.create",
             "api_key.update",
             "api_key.delete",
@@ -287,6 +476,7 @@ export const getAuditLogQuerySchema = z.object({
         .optional(),
     targetId: z.string().optional(),
     source: z.enum(["web", "api"]).optional(),
+    q: z.string().min(1).max(100).optional(),
     before: z.iso.datetime().optional(),
     after: z.iso.datetime().optional(),
     limit: z.int().min(1).max(200).optional().default(50),

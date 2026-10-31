@@ -5,7 +5,6 @@
     import type { Role } from "#lib/config/roles.js";
     import { cn } from "#lib/utils.js";
     import TablerX from "~icons/tabler/x";
-    import Button from "./Button.svelte";
     import RawPopup from "./RawPopup.svelte";
 
     export type ComboboxUser = {
@@ -129,17 +128,24 @@
         {#if value && !open}
             <div
                 class={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 px-3 py-2 shadow-xs transition-colors duration-200 ease-in-out",
+                    // Same box as Input (border-2, py-2, one line of text-sm), so picking a user doesn't change the height.
+                    "flex w-full items-center justify-between gap-2 rounded-lg border-2 border-stone-700/50 bg-stone-900 py-2 pr-2 pl-3 shadow-xs transition-colors duration-200 ease-in-out",
                     disabled && "cursor-not-allowed opacity-50!",
                 )}
             >
                 <div class="flex min-w-0 flex-1 items-center gap-2">
-                    <Avatar src={value.image ?? null} name={value.name} role={value.role ?? null} size="sm" />
-                    <span class="truncate text-sm text-stone-50">{value.name}</span>
+                    <Avatar src={value.image ?? null} name={value.name} role={value.role ?? null} size="2xs" />
+                    <span class="truncate text-sm leading-5 text-stone-50">{value.name}</span>
                 </div>
-                <Button onclick={clearValue} variant="ghost" size="icon" {disabled} class="border-none">
-                    <TablerX />
-                </Button>
+                <button
+                    type="button"
+                    onclick={clearValue}
+                    {disabled}
+                    aria-label="Clear"
+                    class="grid size-5 shrink-0 cursor-pointer place-items-center rounded text-stone-400 transition-colors duration-200 hover:bg-stone-700 hover:text-stone-50"
+                >
+                    <TablerX class="size-4" />
+                </button>
             </div>
         {:else}
             <Input

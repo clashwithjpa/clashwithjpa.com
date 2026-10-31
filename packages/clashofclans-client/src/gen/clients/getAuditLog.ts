@@ -8,7 +8,7 @@ import { client, withUnwrap } from "../.kubb/client.ts";
 import type { GetAuditLogOptions, GetAuditLogResponses } from "../models/GetAuditLog.ts";
 
 /**
- * @description Lists audit log entries with optional filters (actorId, action, targetType, targetId, source, date range) and pagination.
+ * @description Lists audit log entries, newest first. Filter by actor, by any user involved (actor, target or subject), action, target, source, date range or a free-text search over names, tags and ids. Entries reference users, accounts, clans and seasons by id; `lookup` carries their live details.
  * {@link /admin/audit-log}
  */
 export function getAuditLog<ThrowOnError extends boolean = false>(

@@ -37,6 +37,7 @@ export const getAuditLogAction = {
     "coc_account.create": "coc_account.create",
     "coc_account.import": "coc_account.import",
     "coc_account.stats_update": "coc_account.stats_update",
+    "coc_account.weight_update": "coc_account.weight_update",
     "coc_account.mark_main": "coc_account.mark_main",
     "coc_account.mark_external": "coc_account.mark_external",
     "coc_account.sync": "coc_account.sync",
@@ -52,8 +53,11 @@ export const getAuditLogAction = {
     "user.password_set": "user.password_set",
     "user.session_revoked": "user.session_revoked",
     "user.sessions_revoked": "user.sessions_revoked",
+    "user.impersonate": "user.impersonate",
+    "user.impersonate_stop": "user.impersonate_stop",
     "user.api_access_granted": "user.api_access_granted",
     "user.api_access_revoked": "user.api_access_revoked",
+    "user.usernames_refreshed": "user.usernames_refreshed",
     "api_key.create": "api_key.create",
     "api_key.update": "api_key.update",
     "api_key.delete": "api_key.delete",
@@ -87,10 +91,17 @@ export type GetAuditLogSourceKey = (typeof getAuditLogSource)[keyof typeof getAu
 
 export type GetAuditLogQuery = {
     actorId?: string;
+    involvingUserId?: string;
     action?: GetAuditLogActionKey;
     targetType?: GetAuditLogTargetTypeKey;
     targetId?: string;
     source?: GetAuditLogSourceKey;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @type string | undefined
+     */
+    q?: string;
     /**
      * @description
      * Format: `date-time`
@@ -118,18 +129,6 @@ export type GetAuditLogQuery = {
      */
     offset?: number;
 };
-
-export const getAuditLogStatus200DataEntriesActorCurrentRole = {
-    unverified: "unverified",
-    verified: "verified",
-    reviewer: "reviewer",
-    manager: "manager",
-    admin: "admin",
-    superadmin: "superadmin",
-} as const;
-
-export type GetAuditLogStatus200DataEntriesActorCurrentRoleKey =
-    (typeof getAuditLogStatus200DataEntriesActorCurrentRole)[keyof typeof getAuditLogStatus200DataEntriesActorCurrentRole];
 
 export const getAuditLogStatus200DataEntriesActionEnum = {
     "clan_application.create": "clan_application.create",
@@ -165,6 +164,7 @@ export const getAuditLogStatus200DataEntriesActionEnum = {
     "coc_account.create": "coc_account.create",
     "coc_account.import": "coc_account.import",
     "coc_account.stats_update": "coc_account.stats_update",
+    "coc_account.weight_update": "coc_account.weight_update",
     "coc_account.mark_main": "coc_account.mark_main",
     "coc_account.mark_external": "coc_account.mark_external",
     "coc_account.sync": "coc_account.sync",
@@ -180,8 +180,11 @@ export const getAuditLogStatus200DataEntriesActionEnum = {
     "user.password_set": "user.password_set",
     "user.session_revoked": "user.session_revoked",
     "user.sessions_revoked": "user.sessions_revoked",
+    "user.impersonate": "user.impersonate",
+    "user.impersonate_stop": "user.impersonate_stop",
     "user.api_access_granted": "user.api_access_granted",
     "user.api_access_revoked": "user.api_access_revoked",
+    "user.usernames_refreshed": "user.usernames_refreshed",
     "api_key.create": "api_key.create",
     "api_key.update": "api_key.update",
     "api_key.delete": "api_key.delete",
@@ -208,6 +211,97 @@ export const getAuditLogStatus200DataEntriesTargetType = {
 export type GetAuditLogStatus200DataEntriesTargetTypeKey =
     (typeof getAuditLogStatus200DataEntriesTargetType)[keyof typeof getAuditLogStatus200DataEntriesTargetType];
 
+export const getAuditLogStatus200DataEntriesSubjectsTypeEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesSubjectsTypeEnumKey =
+    (typeof getAuditLogStatus200DataEntriesSubjectsTypeEnum)[keyof typeof getAuditLogStatus200DataEntriesSubjectsTypeEnum];
+
+export const getAuditLogStatus200DataEntriesChangesBeforeRefEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesChangesBeforeRefEnumKey =
+    (typeof getAuditLogStatus200DataEntriesChangesBeforeRefEnum)[keyof typeof getAuditLogStatus200DataEntriesChangesBeforeRefEnum];
+
+export const getAuditLogStatus200DataEntriesChangesAfterRefEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesChangesAfterRefEnumKey =
+    (typeof getAuditLogStatus200DataEntriesChangesAfterRefEnum)[keyof typeof getAuditLogStatus200DataEntriesChangesAfterRefEnum];
+
+export const getAuditLogStatus200DataEntriesItemsEntityTypeEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesItemsEntityTypeEnumKey =
+    (typeof getAuditLogStatus200DataEntriesItemsEntityTypeEnum)[keyof typeof getAuditLogStatus200DataEntriesItemsEntityTypeEnum];
+
+export const getAuditLogStatus200DataEntriesItemsOwnerTypeEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesItemsOwnerTypeEnumKey =
+    (typeof getAuditLogStatus200DataEntriesItemsOwnerTypeEnum)[keyof typeof getAuditLogStatus200DataEntriesItemsOwnerTypeEnum];
+
+export const getAuditLogStatus200DataEntriesItemsChangesBeforeRefEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesItemsChangesBeforeRefEnumKey =
+    (typeof getAuditLogStatus200DataEntriesItemsChangesBeforeRefEnum)[keyof typeof getAuditLogStatus200DataEntriesItemsChangesBeforeRefEnum];
+
+export const getAuditLogStatus200DataEntriesItemsChangesAfterRefEnum = {
+    user: "user",
+    coc_account: "coc_account",
+    clan: "clan",
+    cwl_clan: "cwl_clan",
+    cwl_season: "cwl_season",
+    api_key: "api_key",
+    discord_channel: "discord_channel",
+} as const;
+
+export type GetAuditLogStatus200DataEntriesItemsChangesAfterRefEnumKey =
+    (typeof getAuditLogStatus200DataEntriesItemsChangesAfterRefEnum)[keyof typeof getAuditLogStatus200DataEntriesItemsChangesAfterRefEnum];
+
 export const getAuditLogStatus200DataEntriesSourceEnum = {
     web: "web",
     api: "api",
@@ -216,21 +310,109 @@ export const getAuditLogStatus200DataEntriesSourceEnum = {
 export type GetAuditLogStatus200DataEntriesSourceEnumKey =
     (typeof getAuditLogStatus200DataEntriesSourceEnum)[keyof typeof getAuditLogStatus200DataEntriesSourceEnum];
 
+export const getAuditLogStatus200DataLookupUsersRole = {
+    unverified: "unverified",
+    verified: "verified",
+    reviewer: "reviewer",
+    manager: "manager",
+    admin: "admin",
+    superadmin: "superadmin",
+} as const;
+
+export type GetAuditLogStatus200DataLookupUsersRoleKey =
+    (typeof getAuditLogStatus200DataLookupUsersRole)[keyof typeof getAuditLogStatus200DataLookupUsersRole];
+
 export type GetAuditLogStatus200 = {
     success: true;
     data: {
         entries: {
             id: number;
             actorId: string | null;
-            actorName: string | null;
-            actorCurrentName: string | null;
-            actorCurrentImage: string | null;
-            actorCurrentRole: GetAuditLogStatus200DataEntriesActorCurrentRoleKey | null;
-            actorDiscordId: string | null;
             action: GetAuditLogStatus200DataEntriesActionEnumKey;
             targetType: GetAuditLogStatus200DataEntriesTargetTypeKey | null;
             targetId: string | null;
-            metadata: unknown | null;
+            subjects:
+                | {
+                      type: GetAuditLogStatus200DataEntriesSubjectsTypeEnumKey;
+                      id: string | null;
+                      discordId?: string | null;
+                      relation?: string;
+                  }[]
+                | null;
+            changes:
+                | {
+                      field: string;
+                      before?:
+                          | string
+                          | number
+                          | boolean
+                          | null
+                          | string[]
+                          | {
+                                ref: GetAuditLogStatus200DataEntriesChangesBeforeRefEnumKey;
+                                id: string;
+                            };
+                      after?:
+                          | string
+                          | number
+                          | boolean
+                          | null
+                          | string[]
+                          | {
+                                ref: GetAuditLogStatus200DataEntriesChangesAfterRefEnumKey;
+                                id: string;
+                            };
+                  }[]
+                | null;
+            items:
+                | {
+                      entity: {
+                          type: GetAuditLogStatus200DataEntriesItemsEntityTypeEnumKey;
+                          id: string | null;
+                          discordId?: string | null;
+                          relation?: string;
+                      };
+                      owner?: {
+                          type: GetAuditLogStatus200DataEntriesItemsOwnerTypeEnumKey;
+                          id: string | null;
+                          discordId?: string | null;
+                          relation?: string;
+                      };
+                      changes?: {
+                          field: string;
+                          before?:
+                              | string
+                              | number
+                              | boolean
+                              | null
+                              | string[]
+                              | {
+                                    ref: GetAuditLogStatus200DataEntriesItemsChangesBeforeRefEnumKey;
+                                    id: string;
+                                };
+                          after?:
+                              | string
+                              | number
+                              | boolean
+                              | null
+                              | string[]
+                              | {
+                                    ref: GetAuditLogStatus200DataEntriesItemsChangesAfterRefEnumKey;
+                                    id: string;
+                                };
+                      }[];
+                  }[]
+                | null;
+            context: {
+                userAgent: string | null;
+                requestId: string | null;
+                method: string | null;
+                path: string | null;
+                impersonatorId?: string | null;
+            } | null;
+            metadata: {
+                [key: string]: unknown;
+            } | null;
             source: GetAuditLogStatus200DataEntriesSourceEnumKey;
             apiKeyId: string | null;
             apiKeyName: string | null;
@@ -241,6 +423,44 @@ export type GetAuditLogStatus200 = {
              */
             createdAt: string;
         }[];
+        lookup: {
+            users: {
+                id: string;
+                name: string;
+                image: string | null;
+                role: GetAuditLogStatus200DataLookupUsersRoleKey | null;
+                discordId: string | null;
+            }[];
+            accounts: {
+                tag: string;
+                name: string | null;
+                townHall: number | null;
+                ownerDiscordId: string | null;
+                linked: boolean;
+            }[];
+            clans: {
+                tag: string;
+                name: string | null;
+                code: string;
+            }[];
+            cwlClans: {
+                tag: string;
+                name: string;
+                league: string;
+            }[];
+            seasons: {
+                id: number;
+                name: string;
+            }[];
+            apiKeys: {
+                id: string;
+                name: string | null;
+            }[];
+            channels: {
+                id: string;
+                name: string;
+            }[];
+        };
         total: number;
     };
 };

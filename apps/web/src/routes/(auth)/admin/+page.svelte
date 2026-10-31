@@ -6,7 +6,7 @@
     import Panel from "#lib/components/ui/Panel.svelte";
     import Select, { type Option } from "#lib/components/ui/Select.svelte";
     import Seo from "#lib/components/ui/Seo.svelte";
-    import { actionConfig, actorLabel, describeAction, type AuditEntry } from "#lib/config/auditLog.js";
+    import { actionConfig, actorOf, createResolver, describeText, type AuditEntry, type AuditResolver } from "#lib/config/auditLog.js";
     import type { Role } from "#lib/config/roles.js";
     import { cn, formatDateTime, formatRelativeTime } from "#lib/utils.js";
     import {
@@ -53,6 +53,7 @@
     let auditTrend = $state<DailyPoint[] | null>(null);
     let actors = $state<Actor[] | null>(null);
     let recent = $state<AuditEntry[] | null>(null);
+    let recentResolver = $state<AuditResolver | null>(null);
     const AREA_SKELETON_SHAPE =
         "polygon(0 72%, 8% 60%, 17% 66%, 26% 48%, 35% 55%, 45% 38%, 55% 46%, 64% 30%, 74% 42%, 84% 26%, 92% 34%, 100% 22%, 100% 100%, 0 100%)";
     // Until the first round of requests settles, nulls mean "loading", not "nothing there".
@@ -84,7 +85,10 @@
         if (j.status === "fulfilled" && j.value.data) joins = daily(j.value.data.data.data);
         if (a.status === "fulfilled" && a.value.data) auditTrend = daily(a.value.data.data.data);
         if (act.status === "fulfilled" && act.value.data) actors = act.value.data.data.data;
-        if (log.status === "fulfilled" && log.value.data) recent = log.value.data.data.entries;
+        if (log.status === "fulfilled" && log.value.data) {
+            recent = log.value.data.data.entries;
+            recentResolver = createResolver(log.value.data.data.lookup);
+        }
         loaded = true;
     });
 
@@ -517,12 +521,13 @@
                     <ul class="flex flex-col divide-y divide-stone-800">
                         {#each recent as entry (entry.id)}
                             {@const cfg = actionConfig(entry.action)}
+                            {@const text = recentResolver ? describeText(entry, recentResolver) : cfg.label}
                             <li class="flex items-start gap-2.5 py-2 first:pt-0 last:pb-0">
                                 <cfg.icon class={cn("mt-0.5 size-4 shrink-0", ICON_ACCENT[cfg.variant] ?? ICON_ACCENT.ghost)} />
                                 <div class="flex min-w-0 flex-1 flex-col">
-                                    <span class="truncate text-sm text-stone-200" title={describeAction(entry)}>{describeAction(entry)}</span>
+                                    <span class="truncate text-sm text-stone-200" title={text}>{text.charAt(0).toUpperCase() + text.slice(1)}</span>
                                     <span class="truncate text-xs text-stone-500" title={formatDateTime(entry.createdAt)}>
-                                        {actorLabel(entry)} · {formatRelativeTime(entry.createdAt)}
+                                        {(recentResolver && actorOf(entry, recentResolver)?.name) ?? "System"} · {formatRelativeTime(entry.createdAt)}
                                     </span>
                                 </div>
                             </li>

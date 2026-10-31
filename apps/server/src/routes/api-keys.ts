@@ -1,4 +1,4 @@
-import { logAction } from "@/lib/audit";
+import { diffFields, entity, logAction } from "@/lib/audit";
 import { auth, MAX_API_KEYS_PER_USER } from "@/lib/auth";
 import { isVerified } from "@/lib/auth/functions";
 import {
@@ -140,7 +140,9 @@ app.post(
                 action: "api_key.create",
                 targetType: "api_key",
                 targetId: created.id,
-                metadata: { name: created.name ?? name, scope, scopes },
+                subjects: [entity("api_key", created.id, "target")],
+                changes: diffFields(null, { name: created.name ?? name, scopes, expiresAt: created.expiresAt }, ["name", "scopes", "expiresAt"]),
+                metadata: { scope },
             });
 
             return c.json({ success: true, data: { id: created.id, name: created.name, key: created.key } });

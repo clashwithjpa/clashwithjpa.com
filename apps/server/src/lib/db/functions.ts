@@ -73,8 +73,12 @@ export async function setUserDiscordUsername(userId: string, discordUsername: st
 // Returns null when no such user exists, so the route can answer 404 instead of
 // silently reporting success on a typo'd id.
 export async function setUserApiAccess(userId: string, apiAccess: boolean) {
-    const rows = await db.update(user).set({ apiAccess }).where(eq(user.id, userId)).returning({ id: user.id, name: user.name });
-    return rows[0] ?? null;
+    return db.transaction(async (tx) => {
+        const [before] = await tx.select({ apiAccess: user.apiAccess }).from(user).where(eq(user.id, userId)).for("update");
+        if (!before) return null;
+        const [updated] = await tx.update(user).set({ apiAccess }).where(eq(user.id, userId)).returning({ id: user.id, name: user.name });
+        return { ...updated!, previousApiAccess: before.apiAccess ?? false };
+    });
 }
 
 export async function addCocAccount(discordUserId: string, cocAccountTag: string, opts: { warWeight?: number; isExternal?: boolean } = {}) {
@@ -160,7 +164,8 @@ export async function getRules(): Promise<string | null> {
     return result[0]?.rulesContent ?? null;
 }
 
-export async function setRules(rulesContent: string): Promise<string> {
+export async function setRules(rulesContent: string): Promise<{ rules: string; previous: string | null }> {
+    const previous = await getRules();
     const result = await db
         .insert(settingsTable)
         .values({ rulesContent, updatedAt: new Date() })
@@ -170,7 +175,7 @@ export async function setRules(rulesContent: string): Promise<string> {
         })
         .returning({ rulesContent: settingsTable.rulesContent });
 
-    return result[0]!.rulesContent!;
+    return { rules: result[0]!.rulesContent!, previous };
 }
 
 export async function getPrivacy(): Promise<string | null> {
@@ -179,7 +184,8 @@ export async function getPrivacy(): Promise<string | null> {
     return result[0]?.privacyContent ?? null;
 }
 
-export async function setPrivacy(privacyContent: string): Promise<string> {
+export async function setPrivacy(privacyContent: string): Promise<{ privacy: string; previous: string | null }> {
+    const previous = await getPrivacy();
     const result = await db
         .insert(settingsTable)
         .values({ privacyContent, updatedAt: new Date() })
@@ -189,7 +195,7 @@ export async function setPrivacy(privacyContent: string): Promise<string> {
         })
         .returning({ privacyContent: settingsTable.privacyContent });
 
-    return result[0]!.privacyContent!;
+    return { privacy: result[0]!.privacyContent!, previous };
 }
 
 export async function addCwlApplication(data: {
@@ -303,17 +309,27 @@ export async function deleteClanApplication(id: number) {
 }
 
 export async function deleteAcceptedClanApplications() {
-    const deleted = await db
-        .delete(clanApplicationTable)
-        .where(eq(clanApplicationTable.status, "accepted"))
-        .returning({ id: clanApplicationTable.id });
-    return deleted.length;
+    const deleted = await db.delete(clanApplicationTable).where(eq(clanApplicationTable.status, "accepted")).returning({
+        id: clanApplicationTable.id,
+        cocAccountTag: clanApplicationTable.cocAccountTag,
+        discordUserId: clanApplicationTable.discordUserId,
+    });
+    return deleted;
 }
 
+// Returns the previous status and what else the transition did (linked or
+// unlinked the account, moved the applicant's role) so the audit entry can say so.
 export async function updateClanApplicationStatus(id: number, status: ClanApplicationStatus) {
     return db.transaction(async (tx) => {
-        const [existing] = await tx.select().from(clanApplicationTable).where(eq(clanApplicationTable.id, id));
+        const [existing] = await tx.select().from(clanApplicationTable).where(eq(clanApplicationTable.id, id)).for("update");
         if (!existing) return null;
+        const effects: { userId: string | null; accountLinked: boolean; accountUnlinked: boolean; roleChange: { from: string; to: string } | null } =
+            {
+                userId: null,
+                accountLinked: false,
+                accountUnlinked: false,
+                roleChange: null,
+            };
 
         if (status === "accepted" && existing.status !== "accepted") {
             const [acct] = await tx
@@ -326,17 +342,26 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
                 throw new MissingDiscordAccountError(existing.discordUserId);
             }
 
-            await tx
+            effects.userId = acct.userId;
+            const linked = await tx
                 .insert(cocAccountTable)
                 .values({ discordUserId: existing.discordUserId, cocAccountTag: existing.cocAccountTag })
-                .onConflictDoNothing({ target: cocAccountTable.cocAccountTag });
+                .onConflictDoNothing({ target: cocAccountTable.cocAccountTag })
+                .returning({ id: cocAccountTable.id });
+            effects.accountLinked = linked.length > 0;
 
-            await tx
+            const promoted = await tx
                 .update(user)
                 .set({ role: "verified" })
-                .where(and(eq(user.id, acct.userId), eq(user.role, "unverified")));
+                .where(and(eq(user.id, acct.userId), eq(user.role, "unverified")))
+                .returning({ id: user.id });
+            if (promoted.length) effects.roleChange = { from: "unverified", to: "verified" };
         } else if (existing.status === "accepted" && status !== "accepted") {
-            await tx.delete(cocAccountTable).where(eq(cocAccountTable.cocAccountTag, existing.cocAccountTag));
+            const unlinked = await tx
+                .delete(cocAccountTable)
+                .where(eq(cocAccountTable.cocAccountTag, existing.cocAccountTag))
+                .returning({ id: cocAccountTable.id });
+            effects.accountUnlinked = unlinked.length > 0;
 
             const [{ count } = { count: 0 }] = await tx
                 .select({ count: sql<number>`count(*)::int` })
@@ -350,16 +375,19 @@ export async function updateClanApplicationStatus(id: number, status: ClanApplic
                     .where(and(eq(account.accountId, existing.discordUserId), eq(account.providerId, "discord")))
                     .limit(1);
                 if (acct) {
-                    await tx
+                    effects.userId = acct.userId;
+                    const demoted = await tx
                         .update(user)
                         .set({ role: "unverified" })
-                        .where(and(eq(user.id, acct.userId), eq(user.role, "verified")));
+                        .where(and(eq(user.id, acct.userId), eq(user.role, "verified")))
+                        .returning({ id: user.id });
+                    if (demoted.length) effects.roleChange = { from: "verified", to: "unverified" };
                 }
             }
         }
 
         const [updated] = await tx.update(clanApplicationTable).set({ status }).where(eq(clanApplicationTable.id, id)).returning();
-        return updated ?? null;
+        return updated ? { application: updated, previousStatus: existing.status, effects } : null;
     });
 }
 
@@ -502,6 +530,10 @@ export async function getBonusLedger() {
 
 export async function setUserSeasonBonus(data: { discordUserId: string; seasonId: number; cocAccountTag: string | null; selected: boolean }) {
     const { discordUserId, seasonId, cocAccountTag, selected } = data;
+    const [previous] = await db
+        .select({ cocAccountTag: cwlBonusTable.cocAccountTag })
+        .from(cwlBonusTable)
+        .where(and(eq(cwlBonusTable.discordUserId, discordUserId), eq(cwlBonusTable.seasonId, seasonId)));
     if (selected) {
         const result = await db
             .insert(cwlBonusTable)
@@ -511,13 +543,13 @@ export async function setUserSeasonBonus(data: { discordUserId: string; seasonId
                 set: { cocAccountTag },
             })
             .returning();
-        return result[0] ?? null;
+        return { bonus: result[0] ?? null, previous: previous ?? null };
     }
     const result = await db
         .delete(cwlBonusTable)
         .where(and(eq(cwlBonusTable.discordUserId, discordUserId), eq(cwlBonusTable.seasonId, seasonId)))
         .returning();
-    return result[0] ?? null;
+    return { bonus: result[0] ?? null, previous: previous ?? null };
 }
 
 export type CwlAttackDetail = {
@@ -655,9 +687,18 @@ export async function getCwlStats(seasonId?: number) {
 }
 
 export async function assignCwlApplication(id: number, clanTag: string | null) {
-    const result = await db.update(cwlApplicationTable).set({ assignedTo: clanTag }).where(eq(cwlApplicationTable.id, id)).returning();
-    const row = result[0];
-    if (!row) return null;
+    const changed = await db.transaction(async (tx) => {
+        const [before] = await tx
+            .select({ assignedTo: cwlApplicationTable.assignedTo })
+            .from(cwlApplicationTable)
+            .where(eq(cwlApplicationTable.id, id))
+            .for("update");
+        if (!before) return null;
+        const [row] = await tx.update(cwlApplicationTable).set({ assignedTo: clanTag }).where(eq(cwlApplicationTable.id, id)).returning();
+        return { row: row!, previousAssignedTo: before.assignedTo };
+    });
+    if (!changed) return null;
+    const { row, previousAssignedTo } = changed;
     const [acc] = await db
         .select({ warWeight: cocAccountTable.warWeight, isExternal: cocAccountTable.isExternal, image: user.image })
         .from(cocAccountTable)
@@ -665,27 +706,40 @@ export async function assignCwlApplication(id: number, clanTag: string | null) {
         .leftJoin(user, eq(user.id, account.userId))
         .where(eq(cocAccountTable.cocAccountTag, row.cocAccountTag))
         .limit(1);
-    return { ...row, cocAccountWeight: acc?.warWeight ?? 0, isExternal: acc?.isExternal ?? false, image: acc?.image ?? null };
+    return {
+        application: { ...row, cocAccountWeight: acc?.warWeight ?? 0, isExternal: acc?.isExternal ?? false, image: acc?.image ?? null },
+        previousAssignedTo,
+    };
 }
 
 // Assigns (or unassigns when clanTag is null) many CWL applications in a single
-// statement. Returns the ids that were actually updated.
+// statement. Returns each updated row with its previous assignment.
 export async function assignCwlApplicationsBulk(ids: number[], clanTag: string | null) {
-    if (ids.length === 0) return { count: 0, ids: [] as number[] };
-    const updated = await db
-        .update(cwlApplicationTable)
-        .set({ assignedTo: clanTag })
-        .where(inArray(cwlApplicationTable.id, ids))
-        .returning({ id: cwlApplicationTable.id });
-    return { count: updated.length, ids: updated.map((r) => r.id) };
+    if (ids.length === 0) return { count: 0, rows: [] };
+    return db.transaction(async (tx) => {
+        const before = await tx
+            .select({
+                id: cwlApplicationTable.id,
+                assignedTo: cwlApplicationTable.assignedTo,
+                cocAccountTag: cwlApplicationTable.cocAccountTag,
+                cocAccountName: cwlApplicationTable.cocAccountName,
+                discordUserId: cwlApplicationTable.discordUserId,
+            })
+            .from(cwlApplicationTable)
+            .where(inArray(cwlApplicationTable.id, ids))
+            .for("update");
+        if (before.length === 0) return { count: 0, rows: [] };
+        await tx.update(cwlApplicationTable).set({ assignedTo: clanTag }).where(inArray(cwlApplicationTable.id, ids));
+        return { count: before.length, rows: before };
+    });
 }
 
 // Admin-only: permanently delete many CWL applications in a single statement.
-// Returns the ids that were actually deleted.
+// Returns the deleted rows.
 export async function deleteCwlApplicationsBulk(ids: number[]) {
-    if (ids.length === 0) return { count: 0, ids: [] as number[] };
-    const deleted = await db.delete(cwlApplicationTable).where(inArray(cwlApplicationTable.id, ids)).returning({ id: cwlApplicationTable.id });
-    return { count: deleted.length, ids: deleted.map((r) => r.id) };
+    if (ids.length === 0) return { count: 0, rows: [] };
+    const rows = await db.delete(cwlApplicationTable).where(inArray(cwlApplicationTable.id, ids)).returning();
+    return { count: rows.length, rows };
 }
 
 export async function getSettings() {
@@ -700,6 +754,7 @@ export async function updateSettings(values: {
     guildId?: string | null;
     currentCwlSeasonId?: number | null;
 }) {
+    const previous = await getSettings();
     const result = await db
         .insert(settingsTable)
         .values({ ...values, updatedAt: new Date() })
@@ -708,7 +763,7 @@ export async function updateSettings(values: {
             set: { ...values, updatedAt: new Date() },
         })
         .returning();
-    return result[0]!;
+    return { settings: result[0]!, previous };
 }
 
 // Scoped to just the CWL ping columns so it never collides with `updateSettings`
@@ -729,6 +784,7 @@ export async function getCwlPingSettings() {
 }
 
 export async function updateCwlPingSettings(values: { enabled?: boolean; channelId?: string | null; intervalMinutes?: number }) {
+    const previous = await getCwlPingSettings();
     const columns = {
         ...(values.enabled !== undefined ? { cwlPingEnabled: values.enabled } : {}),
         ...(values.channelId !== undefined ? { cwlPingChannelId: values.channelId } : {}),
@@ -749,7 +805,7 @@ export async function updateCwlPingSettings(values: { enabled?: boolean; channel
             lastRunAt: settingsTable.cwlPingLastRunAt,
             lastRunSummary: settingsTable.cwlPingLastRunSummary,
         });
-    return result[0]!;
+    return { settings: result[0]!, previous };
 }
 
 // Deliberately bypasses `updateSettings`'s `updatedAt` bump — a scheduled ping
@@ -769,8 +825,12 @@ export async function createClan(values: typeof clanInfoTable.$inferInsert) {
 }
 
 export async function updateClan(id: number, values: Partial<typeof clanInfoTable.$inferInsert>) {
-    const result = await db.update(clanInfoTable).set(values).where(eq(clanInfoTable.id, id)).returning();
-    return result[0] ?? null;
+    return db.transaction(async (tx) => {
+        const [before] = await tx.select().from(clanInfoTable).where(eq(clanInfoTable.id, id)).for("update");
+        if (!before) return null;
+        const [clan] = await tx.update(clanInfoTable).set(values).where(eq(clanInfoTable.id, id)).returning();
+        return { clan: clan!, before };
+    });
 }
 
 export async function deleteClan(id: number) {
@@ -897,29 +957,43 @@ const normalizeCocTag = (tag: string) => {
     return t.startsWith("#") ? t : `#${t}`;
 };
 
+export const SHEET_STAT_FIELDS = [
+    "currentClan",
+    "townHall",
+    "totalDonated",
+    "totalReceived",
+    "clanGames",
+    "capitalGoldLooted",
+    "capitalGoldContributed",
+    "activityScore",
+] as const;
+
+// `updated` counts every matched account (what the sheet covered); `changed`
+// holds only the rows whose values differ, and only those are written.
 export async function syncCocAccountStats(rows: CocAccountSheetStats[]) {
     const existing = await db
-        .select({ id: cocAccountTable.id, cocAccountTag: cocAccountTable.cocAccountTag, ownerName: user.name })
+        .select({ ...getTableColumns(cocAccountTable), ownerName: user.name })
         .from(cocAccountTable)
         .leftJoin(account, eq(account.accountId, cocAccountTable.discordUserId))
         .leftJoin(user, eq(user.id, account.userId));
     const accByTag = new Map(existing.map((a) => [normalizeCocTag(a.cocAccountTag), a]));
 
-    const matched: { id: number; row: CocAccountSheetStats }[] = [];
+    const changed: { before: (typeof existing)[number]; row: CocAccountSheetStats }[] = [];
     const matchedIds = new Set<number>();
     const notFound: string[] = [];
     for (const row of rows) {
         const acc = accByTag.get(normalizeCocTag(row.cocAccountTag));
         if (!acc) notFound.push(row.cocAccountTag);
         else {
-            matched.push({ id: acc.id, row });
             matchedIds.add(acc.id);
+            if (SHEET_STAT_FIELDS.some((f) => acc[f] !== row[f])) changed.push({ before: acc, row });
         }
     }
 
-    if (matched.length > 0) {
+    if (changed.length > 0) {
         await db.transaction(async (tx) => {
-            for (const { id, row } of matched) {
+            for (const { before, row } of changed) {
+                const id = before.id;
                 await tx
                     .update(cocAccountTable)
                     .set({
@@ -940,7 +1014,7 @@ export async function syncCocAccountStats(rows: CocAccountSheetStats[]) {
     // Linked accounts that had no matching row in the sheet.
     const notInSheet = existing.filter((a) => !matchedIds.has(a.id)).map((a) => ({ cocAccountTag: a.cocAccountTag, ownerName: a.ownerName }));
 
-    return { updated: matched.length, notFound, notInSheet };
+    return { updated: matchedIds.size, changed, notFound, notInSheet };
 }
 
 export type CocAccountWarWeightRow = { cocAccountTag: string; warWeight: number };
@@ -951,7 +1025,9 @@ export async function syncCocAccountWarWeights(rows: CocAccountWarWeightRow[]) {
         .select({
             id: cocAccountTable.id,
             cocAccountTag: cocAccountTable.cocAccountTag,
+            discordUserId: cocAccountTable.discordUserId,
             isExternal: cocAccountTable.isExternal,
+            warWeight: cocAccountTable.warWeight,
             ownerName: user.name,
         })
         .from(cocAccountTable)
@@ -960,15 +1036,19 @@ export async function syncCocAccountWarWeights(rows: CocAccountWarWeightRow[]) {
     const accByTag = new Map(existing.map((a) => [normalizeCocTag(a.cocAccountTag), a]));
 
     const weightById = new Map<number, number>();
+    const changed: { before: (typeof existing)[number]; warWeight: number }[] = [];
     for (const row of rows) {
         const acc = accByTag.get(normalizeCocTag(row.cocAccountTag));
-        if (acc) weightById.set(acc.id, row.warWeight);
+        if (!acc) continue;
+        weightById.set(acc.id, row.warWeight);
+        if (acc.warWeight !== row.warWeight) changed.push({ before: acc, warWeight: row.warWeight });
     }
 
-    if (weightById.size > 0) {
+    // Only rows whose weight moved are written; FWA re-syncs are mostly no-ops.
+    if (changed.length > 0) {
         await db.transaction(async (tx) => {
-            for (const [id, warWeight] of weightById) {
-                await tx.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, id));
+            for (const { before, warWeight } of changed) {
+                await tx.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, before.id));
             }
         });
     }
@@ -977,7 +1057,7 @@ export async function syncCocAccountWarWeights(rows: CocAccountWarWeightRow[]) {
         .filter((a) => !a.isExternal && !weightById.has(a.id))
         .map((a) => ({ cocAccountTag: a.cocAccountTag, ownerName: a.ownerName }));
 
-    return { updated: weightById.size, notInFwa };
+    return { updated: weightById.size, changed, notInFwa };
 }
 
 export async function getAdminUsers(
@@ -1067,16 +1147,25 @@ export async function getAdminUsers(
     };
 }
 
+// Reads the row under lock in the same transaction as the write, so the audit
+// entry's "before" is exactly what this update replaced.
+async function updateCocAccountWithBefore(id: number, values: Partial<typeof cocAccountTable.$inferInsert>) {
+    return db.transaction(async (tx) => {
+        const [before] = await tx.select().from(cocAccountTable).where(eq(cocAccountTable.id, id)).for("update");
+        if (!before) return null;
+        const [account] = await tx.update(cocAccountTable).set(values).where(eq(cocAccountTable.id, id)).returning();
+        return { account: account!, before };
+    });
+}
+
 export async function updateCocAccountWarWeight(id: number, warWeight: number) {
-    const result = await db.update(cocAccountTable).set({ warWeight }).where(eq(cocAccountTable.id, id)).returning();
-    return result[0] ?? null;
+    return updateCocAccountWithBefore(id, { warWeight });
 }
 
 // Admin-only toggle of the external flag. Used to revert a member-marked
 // external account back to a main account (members can only set it one-way).
 export async function updateCocAccountExternal(id: number, isExternal: boolean) {
-    const result = await db.update(cocAccountTable).set({ isExternal }).where(eq(cocAccountTable.id, id)).returning();
-    return result[0] ?? null;
+    return updateCocAccountWithBefore(id, { isExternal });
 }
 
 // Admin-only: manually edit the sheet-synced stat columns from the grid.
@@ -1092,8 +1181,7 @@ export type CocAccountStatsUpdate = Partial<{
     activityScore: number;
 }>;
 export async function updateCocAccountStats(id: number, values: CocAccountStatsUpdate) {
-    const result = await db.update(cocAccountTable).set(values).where(eq(cocAccountTable.id, id)).returning();
-    return result[0] ?? null;
+    return updateCocAccountWithBefore(id, values);
 }
 
 // Admin-only: permanently delete a CoC account. Cascades to that tag's CWL
@@ -1106,11 +1194,8 @@ export async function deleteCocAccount(id: number) {
 // Admin-only: permanently delete many CoC accounts in a single statement.
 // Cascades to each tag's CWL applications. Returns the deleted ids and tags.
 export async function deleteCocAccountsBulk(ids: number[]) {
-    if (ids.length === 0) return { count: 0, accounts: [] as { id: number; cocAccountTag: string }[] };
-    const deleted = await db
-        .delete(cocAccountTable)
-        .where(inArray(cocAccountTable.id, ids))
-        .returning({ id: cocAccountTable.id, cocAccountTag: cocAccountTable.cocAccountTag });
+    if (ids.length === 0) return { count: 0, accounts: [] as (typeof cocAccountTable.$inferSelect)[] };
+    const deleted = await db.delete(cocAccountTable).where(inArray(cocAccountTable.id, ids)).returning();
     return { count: deleted.length, accounts: deleted };
 }
 
@@ -1119,73 +1204,243 @@ export async function deleteCocAccountsBulk(ids: number[]) {
 // ever sets isExternal to true — reverting to a main account is staff-only (see
 // updateCocAccountExternal). War weight is left untouched; members never edit it.
 export async function setUserCocAccountExternal(id: number, discordUserId: string) {
-    const result = await db
-        .update(cocAccountTable)
-        .set({ isExternal: true })
-        .where(and(eq(cocAccountTable.id, id), eq(cocAccountTable.discordUserId, discordUserId)))
-        .returning();
-    return result[0] ?? null;
+    return db.transaction(async (tx) => {
+        const owned = and(eq(cocAccountTable.id, id), eq(cocAccountTable.discordUserId, discordUserId));
+        const [before] = await tx.select().from(cocAccountTable).where(owned).for("update");
+        if (!before) return null;
+        const [account] = await tx.update(cocAccountTable).set({ isExternal: true }).where(owned).returning();
+        return { account: account!, before };
+    });
 }
 
-export async function getAuditLog(
-    opts: {
-        actorId?: string;
-        action?: string;
-        targetType?: string;
-        targetId?: string;
-        source?: string;
-        before?: Date;
-        after?: Date;
-        limit?: number;
-        offset?: number;
-    } = {},
-) {
-    const { actorId, action, targetType, targetId, source, before, after, limit = 50, offset = 0 } = opts;
+type AuditLogFilters = {
+    actorId?: string;
+    // Events this user did or was the subject of.
+    involvingUserId?: string;
+    action?: string;
+    targetType?: string;
+    targetId?: string;
+    source?: string;
+    q?: string;
+    before?: Date;
+    after?: Date;
+};
 
+// Users referenced by id, as `subjects @> [...]` containment so the GIN index serves it.
+function involvesUsers(userIds: string[]) {
+    return or(
+        inArray(auditLogTable.actorId, userIds),
+        and(eq(auditLogTable.targetType, "user"), inArray(auditLogTable.targetId, userIds)),
+        ...userIds.map((id) => sql`${auditLogTable.subjects} @> ${JSON.stringify([{ type: "user", id }])}::jsonb`),
+    );
+}
+
+const SEARCH_MATCH_LIMIT = 25;
+
+async function auditLogWhere(f: AuditLogFilters) {
     const conditions = [];
-    if (actorId) conditions.push(eq(auditLogTable.actorId, actorId));
-    if (action) conditions.push(eq(auditLogTable.action, action));
-    if (targetType) conditions.push(eq(auditLogTable.targetType, targetType));
-    if (targetId) conditions.push(eq(auditLogTable.targetId, targetId));
-    if (source) conditions.push(eq(auditLogTable.source, source));
-    if (after) conditions.push(gte(auditLogTable.createdAt, after));
-    if (before) conditions.push(lte(auditLogTable.createdAt, before));
-    const whereClause = conditions.length ? and(...conditions) : undefined;
+    if (f.actorId) conditions.push(eq(auditLogTable.actorId, f.actorId));
+    if (f.involvingUserId) conditions.push(involvesUsers([f.involvingUserId]));
+    if (f.action) conditions.push(eq(auditLogTable.action, f.action));
+    if (f.targetType) conditions.push(eq(auditLogTable.targetType, f.targetType));
+    if (f.targetId) conditions.push(eq(auditLogTable.targetId, f.targetId));
+    if (f.source) conditions.push(eq(auditLogTable.source, f.source));
+    if (f.after) conditions.push(gte(auditLogTable.createdAt, f.after));
+    if (f.before) conditions.push(lte(auditLogTable.createdAt, f.before));
+    if (f.q) {
+        const pattern = `%${f.q.replace(/[\\%_]/g, (ch) => `\\${ch}`)}%`;
+        // Entries hold ids and tags, not names, so a name search resolves them first.
+        const [users, clans, cwlClans, accounts] = await Promise.all([
+            db
+                .selectDistinct({ id: user.id })
+                .from(user)
+                .leftJoin(account, and(eq(account.userId, user.id), eq(account.providerId, "discord")))
+                .where(or(ilike(user.name, pattern), ilike(account.accountId, pattern), eq(user.id, f.q)))
+                .limit(SEARCH_MATCH_LIMIT),
+            db
+                .select({ id: clanInfoTable.cocClanTag })
+                .from(clanInfoTable)
+                .where(or(ilike(clanInfoTable.cocClanName, pattern), ilike(clanInfoTable.cocClanCode, pattern)))
+                .limit(SEARCH_MATCH_LIMIT),
+            db
+                .select({ id: cwlClanInfoTable.cocClanTag })
+                .from(cwlClanInfoTable)
+                .where(ilike(cwlClanInfoTable.cocClanName, pattern))
+                .limit(SEARCH_MATCH_LIMIT),
+            db
+                .selectDistinct({ id: cwlApplicationTable.cocAccountTag })
+                .from(cwlApplicationTable)
+                .where(ilike(cwlApplicationTable.cocAccountName, pattern))
+                .limit(SEARCH_MATCH_LIMIT),
+        ]);
+        const contains = (type: string, rows: { id: string }[]) =>
+            rows.map((r) => sql`${auditLogTable.subjects} @> ${JSON.stringify([{ type, id: r.id }])}::jsonb`);
+        conditions.push(
+            or(
+                ilike(auditLogTable.targetId, pattern),
+                // Tags and ids typed directly.
+                sql`${auditLogTable.subjects}::text ilike ${pattern}`,
+                ...(users.length ? [involvesUsers(users.map((u) => u.id))] : []),
+                ...contains("clan", clans),
+                ...contains("cwl_clan", cwlClans),
+                ...contains("coc_account", accounts),
+            ),
+        );
+    }
+    return conditions.length ? and(...conditions) : undefined;
+}
 
-    const discordJoin = and(eq(account.userId, auditLogTable.actorId), eq(account.providerId, "discord"));
-    const [rows, countResult] = await Promise.all([
-        db
-            .select({
-                id: auditLogTable.id,
-                actorId: auditLogTable.actorId,
-                actorName: auditLogTable.actorName,
-                actorCurrentName: user.name,
-                actorCurrentImage: user.image,
-                actorCurrentRole: user.role,
-                actorDiscordId: account.accountId,
-                action: auditLogTable.action,
-                targetType: auditLogTable.targetType,
-                targetId: auditLogTable.targetId,
-                metadata: auditLogTable.metadata,
-                source: auditLogTable.source,
-                apiKeyId: auditLogTable.apiKeyId,
-                apiKeyName: auditLogTable.apiKeyName,
-                createdAt: auditLogTable.createdAt,
-            })
-            .from(auditLogTable)
-            .leftJoin(user, eq(auditLogTable.actorId, user.id))
-            .leftJoin(account, discordJoin)
-            .where(whereClause)
-            .orderBy(desc(auditLogTable.createdAt))
-            .limit(limit)
-            .offset(offset),
+export type AuditLogRow = typeof auditLogTable.$inferSelect;
+
+type AuditRefLike = { type?: string; ref?: string; id?: string | null; discordId?: string | null };
+
+// Entries store references only (see AuditEntity in lib/audit.ts). This walks a
+// page of them, collects every referenced id by kind, and fetches each kind in
+// one query, Discord's `users` alongside `audit_log_entries` pattern. Anything
+// missing from the result no longer exists: a user renders as a ghost, the
+// rest fall back to their id or tag.
+async function resolveAuditRefs(rows: AuditLogRow[]) {
+    const want: Record<string, Set<string>> = {};
+    const discordIds = new Set<string>();
+    const add = (type: string | undefined, id: string | null | undefined) => {
+        if (!type || !id) return;
+        (want[type] ??= new Set()).add(id);
+    };
+    const addEntity = (e: AuditRefLike | null | undefined) => {
+        if (!e) return;
+        if (e.type === "user" && !e.id && e.discordId) discordIds.add(e.discordId);
+        else add(e.type, e.id);
+    };
+    const addChanges = (changes: unknown) => {
+        for (const ch of (changes ?? []) as { before?: unknown; after?: unknown }[]) {
+            for (const v of [ch.before, ch.after]) {
+                if (v && typeof v === "object" && !Array.isArray(v)) {
+                    const r = v as AuditRefLike;
+                    add(r.ref, r.id);
+                }
+            }
+        }
+    };
+    for (const r of rows) {
+        add("user", r.actorId);
+        if (r.targetType === "user") add("user", r.targetId);
+        const impersonatorId = r.context?.impersonatorId;
+        if (typeof impersonatorId === "string") add("user", impersonatorId);
+        for (const e of (r.subjects ?? []) as AuditRefLike[]) addEntity(e);
+        addChanges(r.changes);
+        for (const i of (r.items ?? []) as { entity?: AuditRefLike; owner?: AuditRefLike; changes?: unknown }[]) {
+            addEntity(i.entity);
+            addEntity(i.owner);
+            addChanges(i.changes);
+        }
+    }
+
+    const ids = (type: string) => [...(want[type] ?? [])];
+    const userIds = ids("user");
+    const tags = ids("coc_account");
+    const clanTags = ids("clan");
+    const cwlClanTags = ids("cwl_clan");
+    const seasonIds = ids("cwl_season").map(Number).filter(Number.isInteger);
+    const keyIds = ids("api_key");
+
+    const userMatch = [
+        ...(userIds.length ? [inArray(user.id, userIds)] : []),
+        ...(discordIds.size ? [inArray(account.accountId, [...discordIds])] : []),
+    ];
+    const [users, accounts, cwlNames, appNames, clans, cwlClans, seasons, apiKeys] = await Promise.all([
+        userMatch.length
+            ? db
+                  .select({ id: user.id, name: user.name, image: user.image, role: user.role, discordId: account.accountId })
+                  .from(user)
+                  .leftJoin(account, and(eq(account.userId, user.id), eq(account.providerId, "discord")))
+                  .where(or(...userMatch))
+            : [],
+        tags.length
+            ? db
+                  .select({ tag: cocAccountTable.cocAccountTag, townHall: cocAccountTable.townHall, ownerDiscordId: cocAccountTable.discordUserId })
+                  .from(cocAccountTable)
+                  .where(inArray(cocAccountTable.cocAccountTag, tags))
+            : [],
+        // coc_account_table stores no player name; the newest application carrying the tag does.
+        tags.length
+            ? db
+                  .selectDistinctOn([cwlApplicationTable.cocAccountTag], {
+                      tag: cwlApplicationTable.cocAccountTag,
+                      name: cwlApplicationTable.cocAccountName,
+                  })
+                  .from(cwlApplicationTable)
+                  .where(inArray(cwlApplicationTable.cocAccountTag, tags))
+                  .orderBy(cwlApplicationTable.cocAccountTag, desc(cwlApplicationTable.appliedAt))
+            : [],
+        tags.length
+            ? db
+                  .select({
+                      tag: clanApplicationTable.cocAccountTag,
+                      name: sql<string | null>`${clanApplicationTable.cocAccountData}->>'name'`,
+                      townHall: sql<number | null>`(${clanApplicationTable.cocAccountData}->>'townHallLevel')::int`,
+                  })
+                  .from(clanApplicationTable)
+                  .where(inArray(clanApplicationTable.cocAccountTag, tags))
+            : [],
+        clanTags.length
+            ? db
+                  .select({ tag: clanInfoTable.cocClanTag, name: clanInfoTable.cocClanName, code: clanInfoTable.cocClanCode })
+                  .from(clanInfoTable)
+                  .where(inArray(clanInfoTable.cocClanTag, clanTags))
+            : [],
+        cwlClanTags.length
+            ? db
+                  .select({ tag: cwlClanInfoTable.cocClanTag, name: cwlClanInfoTable.cocClanName, league: cwlClanInfoTable.cocClanLeague })
+                  .from(cwlClanInfoTable)
+                  .where(inArray(cwlClanInfoTable.cocClanTag, cwlClanTags))
+            : [],
+        seasonIds.length
+            ? db.select({ id: cwlSeasonTable.id, name: cwlSeasonTable.name }).from(cwlSeasonTable).where(inArray(cwlSeasonTable.id, seasonIds))
+            : [],
+        keyIds.length ? db.select({ id: apikey.id, name: apikey.name }).from(apikey).where(inArray(apikey.id, keyIds)) : [],
+    ]);
+
+    const live = new Map(accounts.map((a) => [a.tag, a]));
+    const cwlName = new Map(cwlNames.map((r) => [r.tag, r.name]));
+    const app = new Map(appNames.map((r) => [r.tag, r]));
+    return {
+        users,
+        // Every referenced tag comes back, deleted ones included, so the name derived from applications still shows.
+        accounts: tags.map((tag) => ({
+            tag,
+            name: cwlName.get(tag) ?? app.get(tag)?.name ?? null,
+            townHall: live.get(tag)?.townHall || app.get(tag)?.townHall || null,
+            ownerDiscordId: live.get(tag)?.ownerDiscordId ?? null,
+            linked: live.has(tag),
+        })),
+        clans,
+        cwlClans,
+        seasons,
+        apiKeys,
+        // Names come from Discord, which this module can't reach without an import cycle; the route resolves them.
+        channelIds: ids("discord_channel"),
+    };
+}
+
+export type AuditLookup = Awaited<ReturnType<typeof resolveAuditRefs>>;
+
+export async function getAuditLog(opts: AuditLogFilters & { limit?: number; offset?: number } = {}) {
+    const { limit = 50, offset = 0, ...filters } = opts;
+    const where = await auditLogWhere(filters);
+    const [entries, countResult] = await Promise.all([
+        db.select().from(auditLogTable).where(where).orderBy(desc(auditLogTable.createdAt), desc(auditLogTable.id)).limit(limit).offset(offset),
         db
             .select({ count: sql<number>`count(*)::int` })
             .from(auditLogTable)
-            .where(whereClause),
+            .where(where),
     ]);
+    return { entries, lookup: await resolveAuditRefs(entries), total: countResult[0]?.count ?? 0 };
+}
 
-    return { entries: rows, total: countResult[0]?.count ?? 0 };
+export async function getAuditLogEntry(id: number) {
+    const [entry] = await db.select().from(auditLogTable).where(eq(auditLogTable.id, id)).limit(1);
+    if (!entry) return null;
+    return { entry, lookup: await resolveAuditRefs([entry]) };
 }
 
 export async function importCocAccountsForUser(userId: string, discordUserId: string, accounts: { tag: string; weight: number }[]) {
@@ -1280,7 +1535,7 @@ export async function getTopAdminActivity(limit: number, days?: number) {
     const actors = await db
         .select({
             actorId: auditLogTable.actorId,
-            name: sql<string>`coalesce(${user.name}, ${auditLogTable.actorName})`,
+            name: user.name,
             image: user.image,
             role: user.role,
             discordId: account.accountId,
@@ -1290,7 +1545,7 @@ export async function getTopAdminActivity(limit: number, days?: number) {
         .innerJoin(user, eq(auditLogTable.actorId, user.id))
         .leftJoin(account, discordJoin)
         .where(and(inArray(user.role, ["reviewer", "manager", "admin", "superadmin"]), inWindow))
-        .groupBy(auditLogTable.actorId, user.name, auditLogTable.actorName, user.image, user.role, account.accountId)
+        .groupBy(auditLogTable.actorId, user.name, user.image, user.role, account.accountId)
         .orderBy(desc(sql`count(*)`))
         .limit(limit);
 

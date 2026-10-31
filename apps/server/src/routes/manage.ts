@@ -1,4 +1,4 @@
-import { logAction } from "@/lib/audit";
+import { logAction, textDiff } from "@/lib/audit";
 import { isManager } from "@/lib/auth/functions";
 import { setRules } from "@/lib/db/functions";
 import { hasAccessAuthMiddleware } from "@/lib/middlewares";
@@ -50,9 +50,9 @@ app.put(
     async (c) => {
         try {
             const { rules } = c.req.valid("json");
-            const updatedRules = await setRules(rules);
+            const { rules: updatedRules, previous } = await setRules(rules);
             await invalidateSettingsCache();
-            logAction(c, { action: "rules.update", targetType: "rules" });
+            if (previous !== updatedRules) logAction(c, { action: "rules.update", targetType: "rules", ...textDiff(previous, updatedRules) });
             return c.json({
                 success: true,
                 data: { rules: updatedRules },

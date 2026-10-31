@@ -35,6 +35,7 @@ export { getApiKeyUsageEndpoints } from "./getApiKeyUsageEndpoints.ts";
 export { getApiKeyUsageStatus } from "./getApiKeyUsageStatus.ts";
 export { getApiKeyUsageSummary } from "./getApiKeyUsageSummary.ts";
 export { getAuditLog } from "./getAuditLog.ts";
+export { getAuditLogEntry } from "./getAuditLogEntry.ts";
 export { getBonusData } from "./getBonusData.ts";
 export { getBonusLedger } from "./getBonusLedger.ts";
 export { getCOCCWLWar } from "./getCOCCWLWar.ts";

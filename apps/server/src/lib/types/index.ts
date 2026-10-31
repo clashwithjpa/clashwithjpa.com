@@ -14,6 +14,9 @@ export type AppEnv = {
         user: typeof auth.$Infer.Session.user | null;
         session: typeof auth.$Infer.Session.session | null;
         apiKey: RequestApiKey | null;
+        // Set by the better-auth `before` hook: the target as it was before the
+        // handler ran, so the `after` hook can log a real before/after diff.
+        auditBefore: Record<string, unknown> | undefined;
     } & RequestIdVariables;
 };
 

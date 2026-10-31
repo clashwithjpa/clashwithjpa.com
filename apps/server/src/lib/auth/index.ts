@@ -1,6 +1,8 @@
-import { logActionForActor, type AuditActor, type LogActionInput } from "@/lib/audit";
+import { diffFields, entity, logActionForActor, userEntity, type LogActionInput } from "@/lib/audit";
 import { config } from "@/lib/config";
 import { countApiKeysForUser } from "@/lib/db/functions";
+import { apikey } from "@/lib/db/schema";
+import type { AppEnv } from "@/lib/types";
 import { apiKey as apiKeyPlugin } from "@better-auth/api-key";
 import { db } from "@lib/db";
 import { ac, admin, jpaPermsForRole, manager, reviewer, ROLE_LEVELS, roleLevel, superadmin, unverified, verified } from "@repo/auth-shared";
@@ -8,6 +10,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { admin as adminPlugin, captcha, openAPI } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
+import { tryGetContext } from "hono/context-storage";
 
 const ROLE_MUTATING_PATHS = new Set(["/admin/set-role", "/admin/update-user", "/admin/create-user"]);
 const TARGETED_USER_PATHS = new Set(["/admin/ban-user", "/admin/unban-user", "/admin/remove-user", "/admin/impersonate-user"]);
@@ -17,112 +21,208 @@ const TARGETED_USER_PATHS = new Set(["/admin/ban-user", "/admin/unban-user", "/a
 const API_KEY_MUTATING_PATHS = new Set(["/api-key/create", "/api-key/update"]);
 export const MAX_API_KEYS_PER_USER = 5;
 
-function normalizeRole(role: unknown): string | string[] | undefined {
-    if (typeof role === "string") return role;
-    if (Array.isArray(role)) return role.filter((r): r is string => typeof r === "string");
-    return undefined;
-}
-
-// Scopes as stored on a key: { jpa: ["apply", "cwl"] }. Flattened to a plain
-// string array for audit metadata so the log stays readable.
-function scopesFromBody(body: Record<string, unknown>): string[] | undefined {
-    const perms = body.permissions;
-    if (!perms || typeof perms !== "object") return undefined;
-    const jpa = (perms as Record<string, unknown>).jpa;
+// Scopes as stored on a key: { jpa: ["apply", "cwl"] }, flattened for the log.
+function scopesOf(permissions: unknown): string[] | undefined {
+    const parsed = typeof permissions === "string" ? safeJson(permissions) : permissions;
+    if (!parsed || typeof parsed !== "object") return undefined;
+    const jpa = (parsed as Record<string, unknown>).jpa;
     return Array.isArray(jpa) ? jpa.filter((p): p is string => typeof p === "string") : undefined;
 }
 
-function buildAuditFromAuthCall(path: string, body: unknown, returned: unknown): LogActionInput | null {
-    const b = (body && typeof body === "object" ? (body as Record<string, unknown>) : {}) as Record<string, unknown>;
-    const userId = typeof b.userId === "string" ? b.userId : undefined;
+function safeJson(s: string): unknown {
+    try {
+        return JSON.parse(s);
+    } catch {
+        return null;
+    }
+}
+
+const asRecord = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
+const asString = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+
+// Paths whose audit entry needs the target as it was before the handler ran.
+const AUDIT_BEFORE_PATHS = new Set([
+    "/admin/set-role",
+    "/admin/update-user",
+    "/admin/ban-user",
+    "/admin/unban-user",
+    "/admin/remove-user",
+    "/admin/revoke-user-session",
+    "/admin/revoke-user-sessions",
+    "/admin/stop-impersonating",
+    "/api-key/update",
+    "/api-key/delete",
+]);
+
+// Fields an admin can never read back, so their values stay out of the log:
+// the entry records that they changed, not what to.
+const HIDDEN_USER_FIELDS = new Set(["email", "password", "emailVerified"]);
+const HIDDEN = "[hidden]";
+
+type AuthCtx = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
+
+async function findApiKey(id: string) {
+    const [row] = await db.select().from(apikey).where(eq(apikey.id, id)).limit(1);
+    return row ?? null;
+}
+
+const apiKeySnapshot = (k: { name?: unknown; enabled?: unknown; permissions?: unknown; expiresAt?: unknown } | null) =>
+    k ? { name: k.name ?? null, enabled: k.enabled ?? null, scopes: scopesOf(k.permissions) ?? null, expiresAt: k.expiresAt ?? null } : null;
+
+// Runs in the `before` hook. Stashes the target on the request so the `after`
+// hook can diff against it; by then a removed user or a revoked key is gone.
+async function captureAuditBefore(ctx: AuthCtx) {
+    if (!AUDIT_BEFORE_PATHS.has(ctx.path)) return;
+    const c = tryGetContext<AppEnv>();
+    if (!c) return;
+    const b = asRecord(ctx.body);
+    const adapter = ctx.context.internalAdapter;
+
+    if (ctx.path === "/api-key/update" || ctx.path === "/api-key/delete") {
+        const keyId = asString(b.keyId);
+        if (keyId) c.set("auditBefore", { key: apiKeySnapshot(await findApiKey(keyId)) });
+        return;
+    }
+    if (ctx.path === "/admin/revoke-user-session") {
+        // Only the owner is kept: the token itself is a live credential.
+        const token = asString(b.sessionToken);
+        const found = token ? await adapter.findSession(token) : null;
+        if (found) c.set("auditBefore", { userId: found.session.userId });
+        return;
+    }
+    if (ctx.path === "/admin/stop-impersonating") {
+        const session = await getSessionFromCtx(ctx);
+        if (session) c.set("auditBefore", { userId: session.user.id, impersonatorId: session.session.impersonatedBy ?? null });
+        return;
+    }
+
+    const userId = asString(b.userId);
+    if (!userId) return;
+    const target = asRecord(await adapter.findUserById(userId));
+    const snapshot: Record<string, unknown> = { userId, user: target };
+    if (ctx.path === "/admin/revoke-user-sessions") snapshot.sessionCount = (await adapter.listSessions(userId)).length;
+    c.set("auditBefore", snapshot);
+}
+
+function buildAuditFromAuthCall(path: string, body: unknown, returned: unknown, before: Record<string, unknown> | undefined): LogActionInput | null {
+    const b = asRecord(body);
+    const prev = asRecord(before?.user);
+    const userId = asString(b.userId) ?? asString(before?.userId);
+    const targetUser = (id: string | undefined) => ({
+        targetType: "user" as const,
+        targetId: id ?? null,
+        subjects: id ? [userEntity({ id }, "target")] : [],
+    });
 
     switch (path) {
-        // API key lifecycle. The plaintext key (and its `start` fragment) is a
-        // live credential and must never reach the audit log — name, id and
-        // scopes only.
+        // The plaintext key (and its `start` fragment) is a live credential and
+        // must never reach the audit log: name, scopes and expiry only.
         case "/api-key/create": {
-            const created = (returned && typeof returned === "object" ? (returned as { id?: unknown; name?: unknown }) : {}) as Record<
-                string,
-                unknown
-            >;
+            const created = asRecord(returned);
+            const id = asString(created.id);
             return {
                 action: "api_key.create",
                 targetType: "api_key",
-                targetId: typeof created.id === "string" ? created.id : null,
-                metadata: { name: typeof b.name === "string" ? b.name : undefined, scopes: scopesFromBody(b) },
+                targetId: id ?? null,
+                subjects: id ? [entity("api_key", id, "target")] : [],
+                changes: diffFields(null, apiKeySnapshot(created), ["name", "scopes", "enabled", "expiresAt"]),
             };
         }
         case "/api-key/update": {
+            const keyId = asString(b.keyId);
+            const prevKey = asRecord(before?.key) as ReturnType<typeof apiKeySnapshot>;
             return {
                 action: "api_key.update",
                 targetType: "api_key",
-                targetId: typeof b.keyId === "string" ? b.keyId : null,
-                metadata: {
-                    name: typeof b.name === "string" ? b.name : undefined,
-                    scopes: scopesFromBody(b),
-                    enabled: typeof b.enabled === "boolean" ? b.enabled : undefined,
-                },
+                targetId: keyId ?? null,
+                subjects: keyId ? [entity("api_key", keyId, "target")] : [],
+                changes: diffFields(prevKey, apiKeySnapshot(asRecord(returned)), ["name", "scopes", "enabled", "expiresAt"]),
+                onlyIfChanged: true,
             };
         }
         case "/api-key/delete": {
-            return { action: "api_key.delete", targetType: "api_key", targetId: typeof b.keyId === "string" ? b.keyId : null };
+            const keyId = asString(b.keyId);
+            const prevKey = asRecord(before?.key) as ReturnType<typeof apiKeySnapshot>;
+            return {
+                action: "api_key.delete",
+                targetType: "api_key",
+                targetId: keyId ?? null,
+                subjects: keyId ? [entity("api_key", keyId, "target")] : [],
+                changes: diffFields(prevKey, null, ["name", "scopes", "enabled", "expiresAt"]),
+            };
         }
         case "/admin/set-role": {
             if (!userId) return null;
-            return { action: "user.role_set", targetType: "user", targetId: userId, metadata: { role: normalizeRole(b.role) } };
+            return {
+                action: "user.role_set",
+                ...targetUser(userId),
+                changes: diffFields(prev, { role: b.role }, ["role"]),
+                onlyIfChanged: true,
+            };
         }
         case "/admin/update-user": {
             if (!userId) return null;
-            const data = (b.data && typeof b.data === "object" ? (b.data as Record<string, unknown>) : {}) as Record<string, unknown>;
-            const changedFields = Object.keys(data);
-            if (Object.prototype.hasOwnProperty.call(data, "role")) {
-                return { action: "user.role_set", targetType: "user", targetId: userId, metadata: { role: normalizeRole(data.role), changedFields } };
-            }
-            return { action: "user.update", targetType: "user", targetId: userId, metadata: { changedFields } };
+            const data = asRecord(b.data);
+            const fields = Object.keys(data);
+            const changes = fields
+                .map((field) => (HIDDEN_USER_FIELDS.has(field) ? { field, before: HIDDEN, after: HIDDEN } : diffFields(prev, data, [field])[0]))
+                .filter((ch) => ch !== undefined);
+            return {
+                action: "role" in data ? "user.role_set" : "user.update",
+                ...targetUser(userId),
+                changes,
+                onlyIfChanged: true,
+            };
         }
         case "/admin/create-user": {
-            const created = (returned && typeof returned === "object" ? (returned as { user?: { id?: unknown } }).user : undefined) ?? undefined;
-            const newUserId = created && typeof created.id === "string" ? created.id : undefined;
-            return {
-                action: "user.create",
-                targetType: "user",
-                targetId: newUserId ?? null,
-                metadata: { role: normalizeRole(b.role) },
-            };
+            const created = asRecord(asRecord(returned).user);
+            const id = asString(created.id);
+            return { action: "user.create", ...targetUser(id), changes: diffFields(null, created, ["role"]) };
         }
         case "/admin/ban-user": {
             if (!userId) return null;
+            const after = asRecord(asRecord(returned).user);
             return {
                 action: "user.ban",
-                targetType: "user",
-                targetId: userId,
-                metadata: {
-                    banReason: typeof b.banReason === "string" ? b.banReason : undefined,
-                    banExpiresIn: typeof b.banExpiresIn === "number" ? b.banExpiresIn : undefined,
-                },
+                ...targetUser(userId),
+                changes: diffFields({ banned: false, ...prev }, after, ["banned", "banReason", "banExpires"]),
             };
         }
         case "/admin/unban-user": {
             if (!userId) return null;
-            return { action: "user.unban", targetType: "user", targetId: userId };
+            return {
+                action: "user.unban",
+                ...targetUser(userId),
+                changes: diffFields(prev, { banned: false, banReason: null, banExpires: null }, ["banned", "banReason", "banExpires"]),
+            };
         }
         case "/admin/remove-user": {
             if (!userId) return null;
-            return { action: "user.remove", targetType: "user", targetId: userId };
+            // Only the role is recorded: the user's profile goes with them, and the
+            // entry shows them as a ghost from here on.
+            return { action: "user.remove", ...targetUser(userId), changes: diffFields(prev, null, ["role"]) };
         }
         case "/admin/set-user-password": {
             if (!userId) return null;
-            return { action: "user.password_set", targetType: "user", targetId: userId };
+            return { action: "user.password_set", ...targetUser(userId), changes: [{ field: "password", before: HIDDEN, after: HIDDEN }] };
         }
         case "/admin/revoke-user-session": {
-            // Session token is a live credential — never store it. Without
-            // pre-resolution in a before hook, we have no userId either, so
-            // this entry only records the action + actor + timestamp.
-            return { action: "user.session_revoked", targetType: "user", targetId: null };
+            return { action: "user.session_revoked", ...targetUser(userId) };
         }
         case "/admin/revoke-user-sessions": {
             if (!userId) return null;
-            return { action: "user.sessions_revoked", targetType: "user", targetId: userId };
+            return {
+                action: "user.sessions_revoked",
+                ...targetUser(userId),
+                metadata: typeof before?.sessionCount === "number" ? { sessionsRevoked: before.sessionCount } : undefined,
+            };
+        }
+        case "/admin/impersonate-user": {
+            if (!userId) return null;
+            return { action: "user.impersonate", ...targetUser(userId) };
+        }
+        case "/admin/stop-impersonating": {
+            return { action: "user.impersonate_stop", ...targetUser(userId) };
         }
         default:
             return null;
@@ -149,51 +249,6 @@ function redactUserEmail(value: unknown): unknown {
         return rest;
     }
     return value;
-}
-
-type AuthCtxForLookup = {
-    context: {
-        internalAdapter: {
-            findUserById: (id: string) => Promise<unknown>;
-            findAccountByUserId: (id: string) => Promise<unknown[]>;
-        };
-    };
-};
-
-async function resolveTargetIdentity(
-    ctx: AuthCtxForLookup,
-    targetId: string | number | null | undefined,
-    returned: unknown,
-): Promise<{ targetName?: string; targetDiscordId?: string }> {
-    let userId: string | undefined;
-    let nameFromResponse: string | undefined;
-
-    if (returned && typeof returned === "object") {
-        const u = (returned as { user?: { id?: unknown; name?: unknown } }).user;
-        if (u && typeof u.id === "string") {
-            userId = u.id;
-            if (typeof u.name === "string") nameFromResponse = u.name;
-        }
-    }
-    if (!userId && typeof targetId === "string") userId = targetId;
-    if (!userId) return {};
-
-    try {
-        const [userRow, accounts] = await Promise.all([
-            nameFromResponse ? Promise.resolve(null) : ctx.context.internalAdapter.findUserById(userId),
-            ctx.context.internalAdapter.findAccountByUserId(userId),
-        ]);
-        const name = nameFromResponse ?? (userRow as { name?: string } | null)?.name;
-        const discord = accounts.find((a): a is { providerId: string; accountId: string } => {
-            return !!a && typeof a === "object" && (a as { providerId?: unknown }).providerId === "discord";
-        });
-        const out: { targetName?: string; targetDiscordId?: string } = {};
-        if (name) out.targetName = name;
-        if (discord?.accountId) out.targetDiscordId = discord.accountId;
-        return out;
-    } catch {
-        return {};
-    }
 }
 
 function extractRoleChange(path: string, body: unknown): { targetUserId?: string; newRole?: string | string[] } | null {
@@ -313,6 +368,8 @@ export const auth = betterAuth({
         // Without this, anyone with the `user:set-role` permission (currently
         // manager and above) could promote themselves or others to admin.
         before: createAuthMiddleware(async (ctx) => {
+            await captureAuditBefore(ctx);
+
             const isRoleMutation = ROLE_MUTATING_PATHS.has(ctx.path);
             const isTargetedAction = TARGETED_USER_PATHS.has(ctx.path);
             const isApiKeyMutation = API_KEY_MUTATING_PATHS.has(ctx.path);
@@ -439,25 +496,20 @@ export const auth = betterAuth({
                 }
             }
 
-            const input = buildAuditFromAuthCall(ctx.path, ctx.body, returned);
+            const before = tryGetContext<AppEnv>()?.get("auditBefore");
+            const input = buildAuditFromAuthCall(ctx.path, ctx.body, returned, before);
             if (!input) return;
 
             // POST /api-keys reaches the plugin with no session attached and logs
             // the action itself with the real actor; logging again here would
             // only add an actor-less duplicate.
-            if (ctx.path.startsWith("/api-key/") && !(await getSessionFromCtx(ctx))) return;
-
-            // Only user targets have a name/Discord id to resolve; skip the two
-            // lookups for api_key rows.
-            const identity = input.targetType === "user" ? await resolveTargetIdentity(ctx, input.targetId, returned) : {};
-            const enriched: LogActionInput = {
-                ...input,
-                metadata: { ...identity, ...(input.metadata ?? {}) },
-            };
-
             const session = await getSessionFromCtx(ctx);
-            const actor: AuditActor = session?.user ? { id: session.user.id, name: session.user.name } : null;
-            logActionForActor(actor, enriched);
+            if (ctx.path.startsWith("/api-key/") && !session) return;
+
+            // Stopping an impersonation is done from inside the impersonated
+            // session, so the real actor is the admin it points back to.
+            const actorId = ctx.path === "/admin/stop-impersonating" ? asString(before?.impersonatorId) : session?.user.id;
+            logActionForActor(actorId ? { id: actorId } : null, input);
         }),
     },
     advanced: {

@@ -384,14 +384,43 @@ export type {
     GetAuditLogSourceKey,
     GetAuditLogStatus200,
     GetAuditLogStatus200DataEntriesActionEnumKey,
-    GetAuditLogStatus200DataEntriesActorCurrentRoleKey,
+    GetAuditLogStatus200DataEntriesChangesAfterRefEnumKey,
+    GetAuditLogStatus200DataEntriesChangesBeforeRefEnumKey,
+    GetAuditLogStatus200DataEntriesItemsChangesAfterRefEnumKey,
+    GetAuditLogStatus200DataEntriesItemsChangesBeforeRefEnumKey,
+    GetAuditLogStatus200DataEntriesItemsEntityTypeEnumKey,
+    GetAuditLogStatus200DataEntriesItemsOwnerTypeEnumKey,
     GetAuditLogStatus200DataEntriesSourceEnumKey,
+    GetAuditLogStatus200DataEntriesSubjectsTypeEnumKey,
     GetAuditLogStatus200DataEntriesTargetTypeKey,
+    GetAuditLogStatus200DataLookupUsersRoleKey,
     GetAuditLogStatus400,
     GetAuditLogStatus401,
     GetAuditLogStatus500,
     GetAuditLogTargetTypeKey,
 } from "./models/GetAuditLog.ts";
+export type {
+    GetAuditLogEntryOptions,
+    GetAuditLogEntryPath,
+    GetAuditLogEntryResponse,
+    GetAuditLogEntryResponses,
+    GetAuditLogEntryStatus200,
+    GetAuditLogEntryStatus200DataEntryActionEnumKey,
+    GetAuditLogEntryStatus200DataEntryChangesAfterRefEnumKey,
+    GetAuditLogEntryStatus200DataEntryChangesBeforeRefEnumKey,
+    GetAuditLogEntryStatus200DataEntryItemsChangesAfterRefEnumKey,
+    GetAuditLogEntryStatus200DataEntryItemsChangesBeforeRefEnumKey,
+    GetAuditLogEntryStatus200DataEntryItemsEntityTypeEnumKey,
+    GetAuditLogEntryStatus200DataEntryItemsOwnerTypeEnumKey,
+    GetAuditLogEntryStatus200DataEntrySourceEnumKey,
+    GetAuditLogEntryStatus200DataEntrySubjectsTypeEnumKey,
+    GetAuditLogEntryStatus200DataEntryTargetTypeKey,
+    GetAuditLogEntryStatus200DataLookupUsersRoleKey,
+    GetAuditLogEntryStatus400,
+    GetAuditLogEntryStatus401,
+    GetAuditLogEntryStatus404,
+    GetAuditLogEntryStatus500,
+} from "./models/GetAuditLogEntry.ts";
 export type {
     GetBonusDataOptions,
     GetBonusDataQuery,
@@ -945,6 +974,7 @@ export { getApiKeyUsageEndpoints } from "./clients/getApiKeyUsageEndpoints.ts";
 export { getApiKeyUsageStatus } from "./clients/getApiKeyUsageStatus.ts";
 export { getApiKeyUsageSummary } from "./clients/getApiKeyUsageSummary.ts";
 export { getAuditLog } from "./clients/getAuditLog.ts";
+export { getAuditLogEntry } from "./clients/getAuditLogEntry.ts";
 export { getBonusData } from "./clients/getBonusData.ts";
 export { getBonusLedger } from "./clients/getBonusLedger.ts";
 export { getCOCCWLWar } from "./clients/getCOCCWLWar.ts";
@@ -1007,11 +1037,31 @@ export {
     getAuditLogAction,
     getAuditLogSource,
     getAuditLogStatus200DataEntriesActionEnum,
-    getAuditLogStatus200DataEntriesActorCurrentRole,
+    getAuditLogStatus200DataEntriesChangesAfterRefEnum,
+    getAuditLogStatus200DataEntriesChangesBeforeRefEnum,
+    getAuditLogStatus200DataEntriesItemsChangesAfterRefEnum,
+    getAuditLogStatus200DataEntriesItemsChangesBeforeRefEnum,
+    getAuditLogStatus200DataEntriesItemsEntityTypeEnum,
+    getAuditLogStatus200DataEntriesItemsOwnerTypeEnum,
     getAuditLogStatus200DataEntriesSourceEnum,
+    getAuditLogStatus200DataEntriesSubjectsTypeEnum,
     getAuditLogStatus200DataEntriesTargetType,
+    getAuditLogStatus200DataLookupUsersRole,
     getAuditLogTargetType,
 } from "./models/GetAuditLog.ts";
+export {
+    getAuditLogEntryStatus200DataEntryActionEnum,
+    getAuditLogEntryStatus200DataEntryChangesAfterRefEnum,
+    getAuditLogEntryStatus200DataEntryChangesBeforeRefEnum,
+    getAuditLogEntryStatus200DataEntryItemsChangesAfterRefEnum,
+    getAuditLogEntryStatus200DataEntryItemsChangesBeforeRefEnum,
+    getAuditLogEntryStatus200DataEntryItemsEntityTypeEnum,
+    getAuditLogEntryStatus200DataEntryItemsOwnerTypeEnum,
+    getAuditLogEntryStatus200DataEntrySourceEnum,
+    getAuditLogEntryStatus200DataEntrySubjectsTypeEnum,
+    getAuditLogEntryStatus200DataEntryTargetType,
+    getAuditLogEntryStatus200DataLookupUsersRole,
+} from "./models/GetAuditLogEntry.ts";
 export { getCOCCWLWarStatus200DataWarBattleModifierEnum, getCOCCWLWarStatus200DataWarStateEnum } from "./models/GetCOCCWLWar.ts";
 export {
     getCOCClanStatus200DataClanMemberListRoleEnum,
@@ -1414,13 +1464,26 @@ export {
     getApiKeyUsageSummaryStatus500Schema,
 } from "./zod/getApiKeyUsageSummarySchema.ts";
 export {
+    getAuditLogEntryErrorSchema,
+    getAuditLogEntryPathIdSchema,
+    getAuditLogEntryPathSchema,
+    getAuditLogEntryResponseSchema,
+    getAuditLogEntryStatus200Schema,
+    getAuditLogEntryStatus400Schema,
+    getAuditLogEntryStatus401Schema,
+    getAuditLogEntryStatus404Schema,
+    getAuditLogEntryStatus500Schema,
+} from "./zod/getAuditLogEntrySchema.ts";
+export {
     getAuditLogErrorSchema,
     getAuditLogQueryActionSchema,
     getAuditLogQueryActorIdSchema,
     getAuditLogQueryAfterSchema,
     getAuditLogQueryBeforeSchema,
+    getAuditLogQueryInvolvingUserIdSchema,
     getAuditLogQueryLimitSchema,
     getAuditLogQueryOffsetSchema,
+    getAuditLogQueryQSchema,
     getAuditLogQuerySchema,
     getAuditLogQuerySourceSchema,
     getAuditLogQueryTargetIdSchema,

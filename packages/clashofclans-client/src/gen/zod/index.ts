@@ -367,13 +367,26 @@ export {
     getApiKeyUsageSummaryStatus500Schema,
 } from "./getApiKeyUsageSummarySchema.ts";
 export {
+    getAuditLogEntryErrorSchema,
+    getAuditLogEntryPathIdSchema,
+    getAuditLogEntryPathSchema,
+    getAuditLogEntryResponseSchema,
+    getAuditLogEntryStatus200Schema,
+    getAuditLogEntryStatus400Schema,
+    getAuditLogEntryStatus401Schema,
+    getAuditLogEntryStatus404Schema,
+    getAuditLogEntryStatus500Schema,
+} from "./getAuditLogEntrySchema.ts";
+export {
     getAuditLogErrorSchema,
     getAuditLogQueryActionSchema,
     getAuditLogQueryActorIdSchema,
     getAuditLogQueryAfterSchema,
     getAuditLogQueryBeforeSchema,
+    getAuditLogQueryInvolvingUserIdSchema,
     getAuditLogQueryLimitSchema,
     getAuditLogQueryOffsetSchema,
+    getAuditLogQueryQSchema,
     getAuditLogQuerySchema,
     getAuditLogQuerySourceSchema,
     getAuditLogQueryTargetIdSchema,

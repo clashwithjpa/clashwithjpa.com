@@ -41,6 +41,7 @@
         "@sentry/sveltekit": "^11.9.0",
         "@tanstack/svelte-table": "^9.3.1",
         "@tanstack/svelte-virtual": "^3.13.48",
+        "animejs": "^4.5.0",
         "better-auth": "catalog:",
         "carta-md": "^4.11.5",
         "codemirror": "^6.0.2",
