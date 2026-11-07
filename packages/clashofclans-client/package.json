@@ -15,12 +15,12 @@
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@kubb/parser-ts": "^5.14.0",
-        "@kubb/plugin-fetch": "^5.9.2",
-        "@kubb/plugin-ts": "^5.2.0",
-        "@kubb/plugin-zod": "^5.7.2",
+        "@kubb/parser-ts": "^5.15.3",
+        "@kubb/plugin-fetch": "^5.11.0",
+        "@kubb/plugin-ts": "^5.4.0",
+        "@kubb/plugin-zod": "^5.8.0",
         "@types/node": "catalog:",
-        "kubb": "^5.14.0",
+        "kubb": "^5.15.3",
         "prettier": "catalog:",
         "typescript": "catalog:"
     },

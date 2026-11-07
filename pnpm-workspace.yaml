@@ -12,16 +12,16 @@ peerDependencyRules:
 # Versions shared by two or more workspace packages, referenced as `catalog:`.
 # Bump here once and every package follows; single-consumer deps stay in their own package.json.
 catalog:
-  "@better-auth/api-key": ^1.7.12
+  "@better-auth/api-key": ^1.7.16
   "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-  "@types/node": ^26.6.5
-  better-auth: ^1.7.12
-  eslint: ^10.13.0
+  "@types/node": ^26.6.6
+  better-auth: ^1.7.16
+  eslint: ^10.14.0
   ioredis: ^6.0.0
   prettier: ^3.9.10
   prettier-plugin-svelte: ^4.1.1
   prettier-plugin-tailwindcss: ^0.8.1
-  tsc-alias: ^1.9.9
+  tsc-alias: ^1.9.10
   typescript: ^6.0.3
   zod: ^4.6.7
 allowBuilds:

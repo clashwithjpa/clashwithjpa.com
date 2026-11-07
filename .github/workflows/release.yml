@@ -13,7 +13,7 @@ concurrency:
 
 env:
   GITEA_API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
-  GIT_CLIFF: git-cliff@2.13.1
+  GIT_CLIFF: git-cliff@2.14.2
 
 jobs:
   tag:
