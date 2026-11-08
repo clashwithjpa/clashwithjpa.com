@@ -2,6 +2,29 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.7.0] - 2026-11-08
+
+### Features
+
+- **audit:** Rebuild audit log with real before/after changes ([1c3dad3](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/1c3dad30e59a9bc56b42b606a3826b9b141095df))
+
+### Bug Fixes
+
+- **web:** Keep checkboxes from covering sticky table headers ([211b7ca](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/211b7cac7c685897b699da525212bb1593b03812))
+
+### Documentation
+
+- Update README ([7ffda1b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/7ffda1b25e04cbac78c9618074f411a325455d76))
+
+### Dependencies
+
+- **deps:** Lock file maintenance ([6f4d861](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/6f4d861258d15e6b59e48e03a2572e539b70e8c9))
+- **deps:** Lock file maintenance ([acecc09](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/acecc097ab22d41ee3ebe1becb2d6bce0d76a7ad))
+- **deps:** Lock file maintenance ([455f550](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/455f55050c7afdcdd963e4705776253beb91d1fe))
+- **deps:** Update digests ([2fa9786](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/2fa9786c4d1e0bb13ef1511b999a498033443ebf))
+- **deps:** Lock file maintenance ([2584535](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/2584535d32ef618552d5fe1ea3d9d0acfa9bc00d))
+- **deps:** Update digests ([aa5d89b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/aa5d89bbf9c6af143aa6af168682f4dc00a55b42))
+- **deps:** Update dependency better-auth to ^1.7.12 [security] ([c95809b](https://git.bymini.dev/clashwithjpa/clashwithjpa.com/commit/c95809bf967471e3a150e2dcd50bb3e8854ba916))
 ## [2.6.1] - 2026-10-26
 
 ### Refactor
