@@ -581,13 +581,13 @@ importers:
     devDependencies:
       '@kubb/parser-ts':
         specifier: ^5.14.0
-        version: 5.16.0
+        version: 5.16.1
       '@kubb/plugin-fetch':
         specifier: ^5.9.2
-        version: 5.13.0(@kubb/parser-ts@5.16.0)(typescript@6.0.3)(zod@4.6.7)
+        version: 5.13.0(@kubb/parser-ts@5.16.1)(typescript@6.0.3)(zod@4.6.7)
       '@kubb/plugin-ts':
         specifier: ^5.2.0
-        version: 5.4.1(@kubb/parser-ts@5.16.0)(typescript@6.0.3)
+        version: 5.4.1(@kubb/parser-ts@5.16.1)(typescript@6.0.3)
       '@kubb/plugin-zod':
         specifier: ^5.7.2
         version: 5.8.2(zod@4.6.7)
@@ -596,7 +596,7 @@ importers:
         version: 26.6.6
       kubb:
         specifier: ^5.14.0
-        version: 5.16.0(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+        version: 5.16.1(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
@@ -1900,22 +1900,22 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@kubb/adapter-oas@5.16.0':
-    resolution: {integrity: sha512-+SRqe+dposKOXcopYx/98dgVcGTjvkR0wVvzdzrRl6f/ahxNL8MgCUK6kDJV86UBnAdLExLtIov+7aU/z4KdUA==}
+  '@kubb/adapter-oas@5.16.1':
+    resolution: {integrity: sha512-OH0ItTQGj/8O7kciwR8UWYbFczZN14HT2M9cTkiEUH3gQnEkZo92P6IeDQvM4oWGc8BskJOJ1c4sqH9FYfZK0g==}
     engines: {node: '>=22.22'}
 
-  '@kubb/ast@5.16.0':
-    resolution: {integrity: sha512-TSECJjYs2+RaBM/SNUh0vqN/Yu/Yz92dzHYouQY6r5M+5MCVklwqcLX0+wfDbePHK5K4SPWEbH4+ps8psqQmdA==}
+  '@kubb/ast@5.16.1':
+    resolution: {integrity: sha512-zc1tJtf4Ka50FHRLY6llOzLI+OEI3hG5/waZNQKgXTqJtBnLmXu7NUvT1bd0FDS2YyjhLDq8FvGJbtuNIeQLvw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/cli@5.16.0':
-    resolution: {integrity: sha512-+qZ670oOpG4fjkM8ifUx1QUUIUqd199aTND260Z4xqgBfmsQ8amitg+0R47fMhuWGOqDD047nHVHRQzqnrqdgg==}
+  '@kubb/cli@5.16.1':
+    resolution: {integrity: sha512-9OBO1Cmh0G8wRXvk1Luri6nFUbsy+/Umk+10WfPYvs8Hm1m5R0nZO0ldVBID85qHuvHLCOiQk+gqQTneGonFOw==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/adapter-oas': 5.16.0
-      '@kubb/mcp': 5.16.0
-      '@kubb/studio': 5.16.0
+      '@kubb/adapter-oas': 5.16.1
+      '@kubb/mcp': 5.16.1
+      '@kubb/studio': 5.16.1
     peerDependenciesMeta:
       '@kubb/adapter-oas':
         optional: true
@@ -1924,31 +1924,31 @@ packages:
       '@kubb/studio':
         optional: true
 
-  '@kubb/core@5.16.0':
-    resolution: {integrity: sha512-UlprzWKUHmdcbiJucPv7f7JVpiKC3V9muVBNSr9BzP7KUAy2qneG6U9CvSHEjMh1ZGEmY4Ym71MTdTdtNwaNYQ==}
+  '@kubb/core@5.16.1':
+    resolution: {integrity: sha512-ZFjBZj0o7xS8bOMz403Inar8O9FW4bP3YM+4vbFTUXSO8OO5JSRuA2SNVg/c6yqIfnptk3ZRNT3AS/5bE0v8fQ==}
     engines: {node: '>=22.22'}
 
-  '@kubb/kit@5.16.0':
-    resolution: {integrity: sha512-kF7TXawcCSqyy9j+W/19OCQ5FyqZYveWNWnEW+PIMkQvrwad4Y8Ghyiq7/zq8Th5YznuubmnMyJiJLJ6p1YjUA==}
+  '@kubb/kit@5.16.1':
+    resolution: {integrity: sha512-EVF7Z6s7omz0W9qHdF+VZBrAEygBBuE1RfNewRXXcdxp5Katgr/6ynkEP1+Id9U3ibqEP5dWJrW4YbSuQLur3w==}
     engines: {node: '>=22.22'}
 
-  '@kubb/mcp@5.16.0':
-    resolution: {integrity: sha512-dqX4OjV2AbyWsJv/U0TQkvPgL+8wPZunFDGk8nrTxY7cKMNUcjCOKWce0O4Yj6J15cRdYJ3j9cp3Oq59cM9hoA==}
+  '@kubb/mcp@5.16.1':
+    resolution: {integrity: sha512-jw5G8fHkl6JuO06ZqwrCsvFFDh90zYRKwvJU9PbeeVkXoZIPyRAyaAqNRVc7HwzLTO1V26MuBdATChfeZxPk4g==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/renderer-jsx': 5.16.1
 
-  '@kubb/parser-md@5.16.0':
-    resolution: {integrity: sha512-pG++3UX1eKPLrmtI/aW93pCGerSoyxSUWq7Y7MZiwf9cSXB9BFMXr+/LE3+S9i4pn+frAyxSNWAc7/GAe2igdw==}
+  '@kubb/parser-md@5.16.1':
+    resolution: {integrity: sha512-MP1YgXF2O2MI3JLz8/7WfUc7SjYdVW5QVp3kNFMqkH0SI7psgPsWVyPtFxGkqCjNSUrRvhfwVJpkS1bK8pVxQg==}
     engines: {node: '>=22.22'}
 
-  '@kubb/parser-ts@5.16.0':
-    resolution: {integrity: sha512-mRMjtfuh5Ds74XOvjU9nrZCEduWHeMBpFim0pRPofMVY2T1TXd2ndBxcya5h3Xo0gNLViaE11xHo79zs6GY2yg==}
+  '@kubb/parser-ts@5.16.1':
+    resolution: {integrity: sha512-JdFUVpP90b6Za3orlO5HH61hrjeDZ4SOUneOAPHBvM7z30SmjEvejMIcpKX+Uwd4mtsATgpMzOB5Usx4jlYbZw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/plugin-barrel@5.16.0':
-    resolution: {integrity: sha512-xmLgcMt1TcquoOtIA3R9i35nutqJYL6yloSCufuWbsD7oDAg8dtbB5orq8GqU9/T4kS34DQ+IdNBJyFMOk4O1g==}
+  '@kubb/plugin-barrel@5.16.1':
+    resolution: {integrity: sha512-KigR9u8wVJtbvkapqEYKbBazYvSPcwZhaDO9TdN3bd6NWkhvDxSkcQp/O1Qiukpdgxi3i7BNfyHyo3warI6r5Q==}
     engines: {node: '>=22.22'}
 
   '@kubb/plugin-client@5.10.0':
@@ -1983,12 +1983,12 @@ packages:
       zod:
         optional: true
 
-  '@kubb/renderer-jsx@5.16.0':
-    resolution: {integrity: sha512-XYhD2jreGcEF2m28xvjTv0hMoLLV9RxWLOoKHn9+UptJ8tfroHOCOQE6czoA3+W/VmySM5FDcT0oW6I/RkwMbQ==}
+  '@kubb/renderer-jsx@5.16.1':
+    resolution: {integrity: sha512-71+QSb9zHidbcjgs2QgjEu2oC77NlKeS8gLTxA287wvVASptBdsOqCpVpTVxbYTIMVFNpJT7fz7BZUtGTgVF0w==}
     engines: {node: '>=22.22'}
 
-  '@kubb/studio@5.16.0':
-    resolution: {integrity: sha512-3UJ5vh1eVwoY2Wx4unRtKcTX8DplulU7xhebiflMdm3xWvVwqRkEGrHEhmSSY5PT7VZf1/e9XdRkKu1bHu1ZeA==}
+  '@kubb/studio@5.16.1':
+    resolution: {integrity: sha512-XBb56K7BO1Hs0zBXNSdp/oFVUJVRtbk3vH9dAWW+sUfrYzYeB4xUdxcsZZV1kEBYUUaTrIBKbYCDX6IY3EIYXg==}
     engines: {node: '>=22.22'}
     peerDependencies:
       tsdown: ^0.23.1
@@ -4754,8 +4754,8 @@ packages:
   known-css-properties@0.37.0:
     resolution: {integrity: sha512-JCDrsP4Z1Sb9JwG0aJ8Eo2r7k4Ou5MwmThS/6lcIe1ICyb7UBJKGRIUUdqc2ASdE/42lgz6zFUnzAIhtXnBVrQ==}
 
-  kubb@5.16.0:
-    resolution: {integrity: sha512-4AjSDSo+lgUg83HB97v55cCnbRWRt5FzcnluKOkOd4AO7Gqo4B6ZrvyPEy4Jb/HdkmFXdIjwbI3DnCJBFPeP2Q==}
+  kubb@5.16.1:
+    resolution: {integrity: sha512-r5q54Z/DCEq7SqzQCD1eNYzANNSQXITEWOL0gqfSZg37xOdYOK+QNF/Y335pp+7NpiPM0sAc5P3JJv7rjz1bYQ==}
     engines: {node: '>=22.22'}
     hasBin: true
 
@@ -6023,8 +6023,8 @@ packages:
       svelte:
         optional: true
 
-  unplugin-kubb@5.16.0:
-    resolution: {integrity: sha512-g+MQQ3LZ/4RXZj+HQVA0Zfzisf9dmyyDYqco5H3nr3tD5U5JYzyUd5zZzFCaQyZmgJuvsufEnCYRTbDK0nIwCg==}
+  unplugin-kubb@5.16.1:
+    resolution: {integrity: sha512-/NsxgmEoA8HWC7+VgxcC1Qu99QCB297tpj7973gzAIpyBPOEwahhLu4aE0GCZdvFR/NxMeC7HFn/kYiFyN+C6A==}
     engines: {node: '>=22.22'}
     peerDependencies:
       '@farmfe/core': ^1.7.0
@@ -7608,10 +7608,10 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@kubb/adapter-oas@5.16.0(openapi-types@12.1.3)':
+  '@kubb/adapter-oas@5.16.1(openapi-types@12.1.3)':
     dependencies:
-      '@kubb/core': 5.16.0
-      '@kubb/kit': 5.16.0
+      '@kubb/core': 5.16.1
+      '@kubb/kit': 5.16.1
       '@readme/openapi-parser': 10.0.0(openapi-types@12.1.3)
       '@scalar/openapi-upgrader': 0.4.7
       api-ref-bundler: 0.5.1
@@ -7620,13 +7620,13 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  '@kubb/ast@5.16.0': {}
+  '@kubb/ast@5.16.1': {}
 
-  '@kubb/cli@5.16.0(@kubb/adapter-oas@5.16.0(openapi-types@12.1.3))(@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@6.0.3))(@kubb/studio@5.16.0)':
+  '@kubb/cli@5.16.1(@kubb/adapter-oas@5.16.1(openapi-types@12.1.3))(@kubb/mcp@5.16.1(@kubb/renderer-jsx@5.16.1)(openapi-types@12.1.3)(typescript@6.0.3))(@kubb/studio@5.16.1)':
     dependencies:
       '@clack/prompts': 1.8.1
       '@gunshi/plugin-dryrun': 0.37.3
-      '@kubb/core': 5.16.0
+      '@kubb/core': 5.16.1
       chokidar: 6.0.0
       gunshi: 0.37.3
       jiti: 2.7.0
@@ -7635,26 +7635,26 @@ snapshots:
       verkit: 0.5.0
       yuku-parser: 0.19.0
     optionalDependencies:
-      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
-      '@kubb/mcp': 5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@6.0.3)
-      '@kubb/studio': 5.16.0
+      '@kubb/adapter-oas': 5.16.1(openapi-types@12.1.3)
+      '@kubb/mcp': 5.16.1(@kubb/renderer-jsx@5.16.1)(openapi-types@12.1.3)(typescript@6.0.3)
+      '@kubb/studio': 5.16.1
 
-  '@kubb/core@5.16.0':
+  '@kubb/core@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
+      '@kubb/ast': 5.16.1
       tinyexec: 1.3.1
       verkit: 0.5.0
 
-  '@kubb/kit@5.16.0':
+  '@kubb/kit@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
-      '@kubb/core': 5.16.0
+      '@kubb/ast': 5.16.1
+      '@kubb/core': 5.16.1
 
-  '@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@6.0.3)':
+  '@kubb/mcp@5.16.1(@kubb/renderer-jsx@5.16.1)(openapi-types@12.1.3)(typescript@6.0.3)':
     dependencies:
-      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
-      '@kubb/core': 5.16.0
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/adapter-oas': 5.16.1(openapi-types@12.1.3)
+      '@kubb/core': 5.16.1
+      '@kubb/renderer-jsx': 5.16.1
       '@tmcp/adapter-valibot': 0.1.7(tmcp@1.20.1(typescript@6.0.3))(valibot@1.5.0(typescript@6.0.3))
       '@tmcp/transport-stdio': 0.5.1(tmcp@1.20.1(typescript@6.0.3))
       jiti: 2.7.0
@@ -7664,72 +7664,72 @@ snapshots:
       - openapi-types
       - typescript
 
-  '@kubb/parser-md@5.16.0':
+  '@kubb/parser-md@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
-      '@kubb/core': 5.16.0
+      '@kubb/ast': 5.16.1
+      '@kubb/core': 5.16.1
       yaml: 2.9.1
 
-  '@kubb/parser-ts@5.16.0':
+  '@kubb/parser-ts@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
-      '@kubb/core': 5.16.0
+      '@kubb/ast': 5.16.1
+      '@kubb/core': 5.16.1
       yuku-parser: 0.19.0
 
-  '@kubb/plugin-barrel@5.16.0':
+  '@kubb/plugin-barrel@5.16.1':
     dependencies:
-      '@kubb/kit': 5.16.0
+      '@kubb/kit': 5.16.1
 
-  '@kubb/plugin-client@5.10.0(@kubb/parser-ts@5.16.0)(typescript@6.0.3)(zod@4.6.7)':
+  '@kubb/plugin-client@5.10.0(@kubb/parser-ts@5.16.1)(typescript@6.0.3)(zod@4.6.7)':
     dependencies:
-      '@kubb/kit': 5.16.0
-      '@kubb/plugin-ts': 5.4.1(@kubb/parser-ts@5.16.0)(typescript@6.0.3)
+      '@kubb/kit': 5.16.1
+      '@kubb/plugin-ts': 5.4.1(@kubb/parser-ts@5.16.1)(typescript@6.0.3)
       '@kubb/plugin-zod': 5.8.2(zod@4.6.7)
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/renderer-jsx': 5.16.1
     transitivePeerDependencies:
       - '@kubb/parser-ts'
       - '@typescript/typescript6'
       - typescript
       - zod
 
-  '@kubb/plugin-fetch@5.13.0(@kubb/parser-ts@5.16.0)(typescript@6.0.3)(zod@4.6.7)':
+  '@kubb/plugin-fetch@5.13.0(@kubb/parser-ts@5.16.1)(typescript@6.0.3)(zod@4.6.7)':
     dependencies:
-      '@kubb/kit': 5.16.0
-      '@kubb/plugin-client': 5.10.0(@kubb/parser-ts@5.16.0)(typescript@6.0.3)(zod@4.6.7)
-      '@kubb/plugin-ts': 5.4.1(@kubb/parser-ts@5.16.0)(typescript@6.0.3)
+      '@kubb/kit': 5.16.1
+      '@kubb/plugin-client': 5.10.0(@kubb/parser-ts@5.16.1)(typescript@6.0.3)(zod@4.6.7)
+      '@kubb/plugin-ts': 5.4.1(@kubb/parser-ts@5.16.1)(typescript@6.0.3)
       '@kubb/plugin-zod': 5.8.2(zod@4.6.7)
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/renderer-jsx': 5.16.1
     transitivePeerDependencies:
       - '@kubb/parser-ts'
       - '@typescript/typescript6'
       - typescript
       - zod
 
-  '@kubb/plugin-ts@5.4.1(@kubb/parser-ts@5.16.0)(typescript@6.0.3)':
+  '@kubb/plugin-ts@5.4.1(@kubb/parser-ts@5.16.1)(typescript@6.0.3)':
     dependencies:
-      '@kubb/kit': 5.16.0
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/kit': 5.16.1
+      '@kubb/renderer-jsx': 5.16.1
       yuku-codegen: 0.19.0
     optionalDependencies:
-      '@kubb/parser-ts': 5.16.0
+      '@kubb/parser-ts': 5.16.1
       typescript: 6.0.3
 
   '@kubb/plugin-zod@5.8.2(zod@4.6.7)':
     dependencies:
-      '@kubb/kit': 5.16.0
-      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/kit': 5.16.1
+      '@kubb/renderer-jsx': 5.16.1
     optionalDependencies:
       zod: 4.6.7
 
-  '@kubb/renderer-jsx@5.16.0':
+  '@kubb/renderer-jsx@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
+      '@kubb/ast': 5.16.1
       yaml: 2.9.1
 
-  '@kubb/studio@5.16.0':
+  '@kubb/studio@5.16.1':
     dependencies:
-      '@kubb/ast': 5.16.0
-      '@kubb/core': 5.16.0
+      '@kubb/ast': 5.16.1
+      '@kubb/core': 5.16.1
       capnweb: 0.12.0
       diff: 9.0.0
       ofetch: 1.5.1
@@ -10929,19 +10929,19 @@ snapshots:
 
   known-css-properties@0.37.0: {}
 
-  kubb@5.16.0(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)):
+  kubb@5.16.1(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
-      '@kubb/cli': 5.16.0(@kubb/adapter-oas@5.16.0(openapi-types@12.1.3))(@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@6.0.3))(@kubb/studio@5.16.0)
-      '@kubb/core': 5.16.0
-      '@kubb/kit': 5.16.0
-      '@kubb/mcp': 5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@6.0.3)
-      '@kubb/parser-md': 5.16.0
-      '@kubb/parser-ts': 5.16.0
-      '@kubb/plugin-barrel': 5.16.0
-      '@kubb/renderer-jsx': 5.16.0
-      '@kubb/studio': 5.16.0
-      unplugin-kubb: 5.16.0(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@kubb/adapter-oas': 5.16.1(openapi-types@12.1.3)
+      '@kubb/cli': 5.16.1(@kubb/adapter-oas@5.16.1(openapi-types@12.1.3))(@kubb/mcp@5.16.1(@kubb/renderer-jsx@5.16.1)(openapi-types@12.1.3)(typescript@6.0.3))(@kubb/studio@5.16.1)
+      '@kubb/core': 5.16.1
+      '@kubb/kit': 5.16.1
+      '@kubb/mcp': 5.16.1(@kubb/renderer-jsx@5.16.1)(openapi-types@12.1.3)(typescript@6.0.3)
+      '@kubb/parser-md': 5.16.1
+      '@kubb/parser-ts': 5.16.1
+      '@kubb/plugin-barrel': 5.16.1
+      '@kubb/renderer-jsx': 5.16.1
+      '@kubb/studio': 5.16.1
+      unplugin-kubb: 5.16.1(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@nuxt/kit'
@@ -12501,13 +12501,13 @@ snapshots:
       - vite
       - webpack
 
-  unplugin-kubb@5.16.0(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)):
+  unplugin-kubb@5.16.1(esbuild@0.28.2)(openapi-types@12.1.3)(rolldown@1.2.16)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
-      '@kubb/core': 5.16.0
-      '@kubb/parser-md': 5.16.0
-      '@kubb/parser-ts': 5.16.0
-      '@kubb/plugin-barrel': 5.16.0
+      '@kubb/adapter-oas': 5.16.1(openapi-types@12.1.3)
+      '@kubb/core': 5.16.1
+      '@kubb/parser-md': 5.16.1
+      '@kubb/parser-ts': 5.16.1
+      '@kubb/plugin-barrel': 5.16.1
       jiti: 2.7.0
       unplugin: 3.7.0(esbuild@0.28.2)(rolldown@1.2.16)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
       yuku-codegen: 0.19.0
