@@ -23,7 +23,7 @@
         "prettier": "catalog:"
     },
     "peerDependencies": {
-        "prettier": "^3.9.6"
+        "prettier": "^3.10.0"
     },
     "publishConfig": {
         "access": "public"
