@@ -76,7 +76,7 @@ services:
 
   redis-insight:
     container_name: redis-insight
-    image: redis/redisinsight:latest@sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84
+    image: redis/redisinsight:latest@sha256:7aea9c96ee8e34518d7d692c02a081f6e46ff9230e7779212aa10a65c423c18a
     restart: unless-stopped
     ports:
       - 7104:5540
